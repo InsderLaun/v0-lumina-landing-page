@@ -81,37 +81,39 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
     setIsSubmitting(true);
 
     try {
-      // TODO: Insert Webhook URL here (Formspree/Make)
-      // Replace the URL below with your Formspree or Make.com webhook endpoint
-      // Example: await fetch("https://formspree.io/f/YOUR_FORM_ID", { ... })
-      // Example: await fetch("https://hook.us1.make.com/YOUR_WEBHOOK_ID", { ... })
-
-      const webhookPayload = {
-        nombre_apellido: data.nombreApellido,
+      const formPayload = {
+        nombre: data.nombreApellido,
         email: data.email,
-        telefono: data.telefono,
+        whatsapp: data.telefono,
         matricula_ssn: data.matriculaSSN || "No proporcionada",
         experiencia: data.experiencia,
-        opera_organizacion: data.operaOrganizacion === "si" ? "Sí" : "No",
-        facturacion_mensual: data.facturacion,
-        plan_interes:
-          data.plan === "gratis" ? "Plan Digital ($0)" : "Membresía Full ($150 USD)",
-        fecha_registro: new Date().toISOString(),
+        organizacion: data.operaOrganizacion === "si" ? "Sí" : "No",
+        facturacion: data.facturacion,
+        plan:
+          data.plan === "gratis"
+            ? "Plan Digital ($0)"
+            : "Membresía Full ($150 USD)",
       };
 
-      // Simulated fetch — replace with real endpoint
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // await fetch("YOUR_WEBHOOK_URL", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(webhookPayload),
-      // });
+      const response = await fetch("https://formspree.io/f/mnjbpyry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(formPayload),
+      });
 
-      console.log("Form submitted:", webhookPayload);
+      if (!response.ok) {
+        throw new Error("Error al enviar el formulario");
+      }
+
       setIsSuccess(true);
     } catch {
-      // Handle error
-      console.error("Error submitting form");
+      form.setError("root", {
+        message:
+          "Hubo un error al enviar tu solicitud. Por favor intentá de nuevo.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -128,10 +130,10 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
           <CheckCircle2 className="h-10 w-10 text-accent" />
         </div>
         <h2 className="text-balance text-2xl font-bold text-foreground sm:text-3xl">
-          {"Solicitud Recibida"}
+          {"¡Postulación Recibida con Éxito!"}
         </h2>
         <p className="max-w-md text-pretty leading-relaxed text-muted-foreground">
-          {"Gracias por tu interés en Lumina. Un asesor se comunicará con vos en las próximas 24 horas para completar tu proceso de alta."}
+          {"Nuestros asesores se contactará con vos a la brevedad para enviarte tu Diagnóstico de Rentabilidad."}
         </p>
         <Link
           href="/"
@@ -419,6 +421,13 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
             </FormItem>
           )}
         />
+
+        {/* Root error */}
+        {form.formState.errors.root && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {form.formState.errors.root.message}
+          </div>
+        )}
 
         {/* Submit */}
         <div className="pt-2">
