@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap } from "lucide-react";
 
@@ -53,20 +54,20 @@ export function HeroSection() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
-          <a
-            href="#planes"
+          <Link
+            href="/registro?plan=gratis"
             className="group flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-secondary px-8 py-4 text-base font-semibold text-secondary-foreground transition-all hover:border-primary/50 hover:bg-secondary/80 sm:w-auto"
           >
-            Opción A: Alta Gratis
+            {"Opción A: Alta Gratis"}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </a>
-          <a
-            href="#planes"
+          </Link>
+          <Link
+            href="/registro?plan=full"
             className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:opacity-90 sm:w-auto"
           >
-            Opción B: Membresía Full
+            {"Opción B: Membresía Full"}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </a>
+          </Link>
         </motion.div>
 
         <motion.div

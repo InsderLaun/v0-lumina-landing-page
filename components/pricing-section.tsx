@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Check,
@@ -122,12 +123,12 @@ export function PricingSection() {
               ))}
             </div>
 
-            <a
-              href="#"
+            <Link
+              href="/registro?plan=gratis"
               className="flex items-center justify-center rounded-xl border border-border bg-secondary py-3.5 text-sm font-semibold text-secondary-foreground transition-all hover:border-primary/50 hover:bg-secondary/80"
             >
               Empezar Gratis
-            </a>
+            </Link>
           </motion.div>
 
           {/* Membresía Full */}
@@ -188,12 +189,12 @@ export function PricingSection() {
               ))}
             </div>
 
-            <a
-              href="#"
+            <Link
+              href="/registro?plan=full"
               className="flex items-center justify-center rounded-xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Quiero mi Oficina
-            </a>
+            </Link>
           </motion.div>
         </div>
       </div>

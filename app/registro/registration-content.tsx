@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { RegistrationForm } from "@/components/registro/registration-form";
@@ -9,7 +10,7 @@ export function RegistrationContent() {
   const searchParams = useSearchParams();
   const planParam = searchParams.get("plan");
   const initialPlan =
-    planParam === "A" || planParam === "B" ? planParam : undefined;
+    planParam === "gratis" || planParam === "full" ? planParam : undefined;
 
   return (
     <main className="relative min-h-screen px-6 py-8">
@@ -21,15 +22,18 @@ export function RegistrationContent() {
 
       <div className="relative z-10 mx-auto max-w-2xl">
         {/* Back link */}
-        <motion.a
-          href="/"
+        <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Volver al Inicio
-        </motion.a>
+          <Link
+            href="/"
+            className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver al Inicio
+          </Link>
+        </motion.div>
 
         {/* Header */}
         <motion.div
@@ -49,11 +53,10 @@ export function RegistrationContent() {
             </span>
           </div>
           <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Unite a Lumina
+            {"Unite a Lumina"}
           </h1>
           <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">
-            Completá el formulario para comenzar a operar con las mejores
-            comisiones del mercado.
+            {"Completá el formulario para comenzar a operar con las mejores comisiones del mercado."}
           </p>
         </motion.div>
 
