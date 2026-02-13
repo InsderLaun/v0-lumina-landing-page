@@ -105,11 +105,16 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
       });
 
       if (!response.ok) {
-        throw new Error("Error al enviar el formulario");
+        const errorBody = await response.text();
+        console.error("[v0] Formspree response error:", response.status, errorBody);
+        throw new Error(`Formspree error ${response.status}: ${errorBody}`);
       }
 
+      const result = await response.json();
+      console.log("[v0] Formspree success:", result);
       setIsSuccess(true);
-    } catch {
+    } catch (error) {
+      console.error("[v0] Form submission error:", error);
       form.setError("root", {
         message:
           "Hubo un error al enviar tu solicitud. Por favor intentá de nuevo.",
