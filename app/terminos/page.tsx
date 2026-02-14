@@ -159,19 +159,13 @@ export default function TerminosPage() {
         <hr className="my-10 border-border" />
 
         {/* Back to home */}
-        <div className="flex items-center justify-between">
+        <div>
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver al Inicio
-          </Link>
-          <Link
-            href="/registro"
-            className="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Registrarme
           </Link>
         </div>
       </div>
