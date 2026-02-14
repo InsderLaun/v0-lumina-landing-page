@@ -33,7 +33,7 @@ export function Footer() {
             <span>Lumina</span>
           </a>
           <a
-            href="#"
+            href="/terminos"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             {"Términos y Condiciones"}
