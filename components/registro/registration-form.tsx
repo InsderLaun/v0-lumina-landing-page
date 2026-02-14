@@ -63,7 +63,7 @@ interface RegistrationFormProps {
 
 export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(true); // TEMP: revert to false after visual check
 
   const form = useForm<RegistrationData>({
     resolver: zodResolver(registrationSchema),
