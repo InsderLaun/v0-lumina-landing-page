@@ -23,14 +23,14 @@ export function Footer() {
             <span>WhatsApp</span>
           </a>
           <a
-            href="https://linkedin.com/in/agustintiberio"
+            href="https://www.linkedin.com/company/lumina-org10/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            aria-label="LinkedIn de Agustín Tiberio"
+            aria-label="LinkedIn de Lumina"
           >
             <Linkedin className="h-4 w-4" />
-            <span>{"Agustín Tiberio"}</span>
+            <span>Lumina</span>
           </a>
           <a
             href="#"
