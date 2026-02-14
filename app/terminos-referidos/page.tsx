@@ -262,7 +262,7 @@ export default function TerminosReferidosPage() {
             {"9.3 Vigencia:"}
           </h3>
           <p className="leading-relaxed text-muted-foreground">
-            {"Condiciones vigentes a partir del 31 de octubre de 2026."}
+            {"Condiciones vigentes a partir del 14 de febrero de 2026."}
           </p>
         </article>
 

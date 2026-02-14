@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Gift, UserPlus, ArrowRight, Check } from "lucide-react";
+import { Gift, UserPlus, ArrowRight, Check, FileText } from "lucide-react";
 
 const steps = [
   {
@@ -82,14 +83,23 @@ export function ReferralSection() {
               </p>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <a
-                href="#"
-                className="group inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                href="https://api.whatsapp.com/send?text=%C2%A1Hola%21%20Me%20acabo%20de%20sumar%20a%20Lumina%2C%20la%20nueva%20red%20para%20Productores%20de%20Seguros.%20Te%20dan%20comisiones%20del%20100%25%20directo%20de%20compa%C3%B1%C3%ADa.%20Anotate%20ac%C3%A1%3A%20https%3A%2F%2Flumina-org.com%20y%20pon%C3%A9%20mi%20N%C2%B0%20de%20Matr%C3%ADcula%20como%20referido%20as%C3%AD%20sumamos%20beneficios."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
               >
                 <UserPlus className="h-4 w-4" />
                 {"Obtener mi Link de Referido"}
               </a>
+              <Link
+                href="/terminos-referidos"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                <FileText className="h-4 w-4" />
+                {"Términos y Condiciones"}
+              </Link>
             </div>
           </div>
         </motion.div>
