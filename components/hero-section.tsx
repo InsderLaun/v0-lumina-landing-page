@@ -1,10 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap } from "lucide-react";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onOpenModal: (plan: string) => void;
+}
+
+export function HeroSection({ onOpenModal }: HeroSectionProps) {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-20">
       {/* Background glow effects */}
@@ -54,20 +57,22 @@ export function HeroSection() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
         >
-          <Link
-            href="/registro?plan=gratis"
+          <button
+            type="button"
+            onClick={() => onOpenModal("gratis")}
             className="group flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-secondary px-8 py-4 text-base font-semibold text-secondary-foreground transition-all hover:border-primary/50 hover:bg-secondary/80 sm:w-auto"
           >
             {"Opción A: Alta Gratis"}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link
-            href="/registro?plan=full"
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenModal("full")}
             className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:opacity-90 sm:w-auto"
           >
             {"Opción B: Membresía Full"}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+          </button>
         </motion.div>
 
         <motion.div

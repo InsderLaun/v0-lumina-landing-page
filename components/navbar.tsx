@@ -6,13 +6,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { label: "Planes", href: "/precios" },
+  { label: "Planes", href: "/#planes" },
   { label: "Add-Ons", href: "/#addons" },
   { label: "Calculadora", href: "/#calculadora" },
   { label: "Referidos", href: "/#referidos" },
 ];
 
-export function Navbar() {
+interface NavbarProps {
+  onOpenModal?: (plan: string) => void;
+}
+
+export function Navbar({ onOpenModal }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -40,12 +44,13 @@ export function Navbar() {
         </nav>
 
         <div className="hidden md:block">
-          <Link
-            href="/precios"
+          <button
+            type="button"
+            onClick={() => onOpenModal?.("full")}
             className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Comenzar
-          </Link>
+          </button>
         </div>
 
         <button
@@ -78,13 +83,16 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                href="/precios"
-                onClick={() => setMobileOpen(false)}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  onOpenModal?.("full");
+                }}
                 className="mt-2 rounded-lg bg-primary px-5 py-2.5 text-center text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
               >
                 Comenzar
-              </Link>
+              </button>
             </div>
           </motion.div>
         )}

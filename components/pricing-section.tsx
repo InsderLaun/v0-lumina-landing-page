@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Check,
@@ -61,7 +60,11 @@ const fullBenefits = [
   },
 ];
 
-export function PricingSection() {
+interface PricingSectionProps {
+  onOpenModal: (plan: string) => void;
+}
+
+export function PricingSection({ onOpenModal }: PricingSectionProps) {
   return (
     <section id="planes" className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
@@ -123,12 +126,13 @@ export function PricingSection() {
               ))}
             </div>
 
-            <Link
-              href="/registro?plan=gratis"
+            <button
+              type="button"
+              onClick={() => onOpenModal("gratis")}
               className="flex items-center justify-center rounded-xl border border-border bg-secondary py-3.5 text-sm font-semibold text-secondary-foreground transition-all hover:border-primary/50 hover:bg-secondary/80"
             >
               Empezar Gratis
-            </Link>
+            </button>
           </motion.div>
 
           {/* Membresía Full */}
@@ -189,12 +193,13 @@ export function PricingSection() {
               ))}
             </div>
 
-            <Link
-              href="/registro?plan=full"
+            <button
+              type="button"
+              onClick={() => onOpenModal("full")}
               className="flex items-center justify-center rounded-xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Quiero mi Oficina
-            </Link>
+            </button>
           </motion.div>
         </div>
       </div>
