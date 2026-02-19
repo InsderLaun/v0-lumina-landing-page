@@ -96,7 +96,7 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
         plan:
           data.plan === "gratis"
             ? "Plan Digital ($0)"
-            : "Membresía Full ($150 USD)",
+            : "Membresía Full ($100 USD)",
       };
 
       const response = await fetch("https://formspree.io/f/mnjbpyry", {
@@ -483,7 +483,7 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
                       <RadioGroupItem value="full" />
                     </div>
                     <p className="text-2xl font-bold text-foreground">
-                      $150
+                      $100
                       <span className="text-sm font-normal text-muted-foreground">
                         {" USD / mes"}
                       </span>

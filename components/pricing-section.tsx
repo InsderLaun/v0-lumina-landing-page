@@ -162,7 +162,7 @@ export function PricingSection({ onOpenModal }: PricingSectionProps) {
                 </span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-5xl font-bold text-foreground">$150</span>
+                <span className="text-5xl font-bold text-foreground">$100</span>
                 <span className="text-lg text-muted-foreground">USD / mes</span>
               </div>
               <p className="mt-2 text-sm font-medium uppercase tracking-wider text-primary">

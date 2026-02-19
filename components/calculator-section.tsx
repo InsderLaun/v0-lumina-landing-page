@@ -13,7 +13,7 @@ export function CalculatorSection() {
     const traditionalIncome = production * traditionalRate;
     const luminaIncome = production * luminaRate;
     const difference = luminaIncome - traditionalIncome;
-    const differenceWithMembership = difference - 150 * 1200;
+    const differenceWithMembership = difference - 100 * 1200;
     const maxValue = Math.max(traditionalIncome, luminaIncome);
 
     return {
@@ -147,7 +147,7 @@ export function CalculatorSection() {
               </span>{" "}
               {"más por mes."}{" "}
               <span className="text-muted-foreground">
-                {"Incluso pagando la Membresía Full de $150 USD, ganás más que en el modelo tradicional."}
+                {"Incluso pagando la Membresía Full de $100 USD, ganás más que en el modelo tradicional."}
               </span>
             </p>
           </div>

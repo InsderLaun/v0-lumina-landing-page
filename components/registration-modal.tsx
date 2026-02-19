@@ -121,7 +121,7 @@ export function RegistrationModal({
     const planLabel =
         selectedPlan === "gratis"
             ? "Plan Digital – Alta Gratis"
-            : "Membresía Full – $150 USD/mes";
+            : "Membresía Full – $100 USD/mes";
 
     async function onSubmit(data: FormData) {
         // Validate captcha
@@ -354,15 +354,15 @@ export function RegistrationModal({
                                         aria-checked={addonContabilidad}
                                         tabIndex={0}
                                         className={`flex items-start gap-3 rounded-lg border p-3 transition-colors cursor-pointer select-none ${addonContabilidad
-                                                ? "border-[#F5C347]/40 bg-[#F5C347]/10"
-                                                : "border-border/50 bg-secondary/30 hover:border-[#F5C347]/20"
+                                            ? "border-[#F5C347]/40 bg-[#F5C347]/10"
+                                            : "border-border/50 bg-secondary/30 hover:border-[#F5C347]/20"
                                             }`}
                                         onClick={() => setAddonContabilidad((prev) => !prev)}
                                         onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); setAddonContabilidad((prev) => !prev); } }}
                                     >
                                         <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors ${addonContabilidad
-                                                ? "border-[#F5C347] bg-[#F5C347] text-black"
-                                                : "border-muted-foreground"
+                                            ? "border-[#F5C347] bg-[#F5C347] text-black"
+                                            : "border-muted-foreground"
                                             }`}>
                                             {addonContabilidad && (
                                                 <svg width="10" height="10" viewBox="0 0 15 15" fill="none"><path d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" /></svg>
@@ -388,15 +388,15 @@ export function RegistrationModal({
                                         aria-checked={addonMarketing}
                                         tabIndex={0}
                                         className={`flex items-start gap-3 rounded-lg border p-3 transition-colors cursor-pointer select-none ${addonMarketing
-                                                ? "border-[#F5C347]/40 bg-[#F5C347]/10"
-                                                : "border-border/50 bg-secondary/30 hover:border-[#F5C347]/20"
+                                            ? "border-[#F5C347]/40 bg-[#F5C347]/10"
+                                            : "border-border/50 bg-secondary/30 hover:border-[#F5C347]/20"
                                             }`}
                                         onClick={() => setAddonMarketing((prev) => !prev)}
                                         onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); setAddonMarketing((prev) => !prev); } }}
                                     >
                                         <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors ${addonMarketing
-                                                ? "border-[#F5C347] bg-[#F5C347] text-black"
-                                                : "border-muted-foreground"
+                                            ? "border-[#F5C347] bg-[#F5C347] text-black"
+                                            : "border-muted-foreground"
                                             }`}>
                                             {addonMarketing && (
                                                 <svg width="10" height="10" viewBox="0 0 15 15" fill="none"><path d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3354 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.5553 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" /></svg>

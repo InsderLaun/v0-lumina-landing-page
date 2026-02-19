@@ -28,7 +28,7 @@ const steps = [
   {
     step: "03",
     title: "Fee bonificado",
-    description: "Tu Membresía Full de $150 USD queda 100% bonificada.",
+    description: "Tu Membresía Full de $100 USD queda 100% bonificada.",
   },
 ];
 
@@ -55,7 +55,7 @@ export function ReferralSection() {
               {"¿Querés la Membresía Full GRATIS?"}
             </h2>
             <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-              {"Referí a 5 colegas productores. Cuando se activen, tu Fee de $150 USD queda 100% bonificado."}
+              {"Referí a 5 colegas productores. Cuando se activen, tu Fee de $100 USD queda 100% bonificado."}
             </p>
 
             <div className="mt-10 grid gap-6 sm:grid-cols-3">
