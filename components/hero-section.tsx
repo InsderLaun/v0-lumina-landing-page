@@ -1,15 +1,36 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Zap, Car, TrendingUp, Globe } from "lucide-react";
 
 interface HeroSectionProps {
   onOpenModal: (plan: string) => void;
 }
 
+const benefits = [
+  {
+    number: "100%",
+    label: "Comisión Automotores",
+    icon: Car,
+    description: "Cobrá el total de tus comisiones sin retenciones.",
+  },
+  {
+    number: "+15%",
+    label: "Comisiones y Bonos",
+    icon: TrendingUp,
+    description: "De la mejor comisión del mercado, directo a tu cuenta.",
+  },
+  {
+    number: "Web & App",
+    label: "Multicotizador",
+    icon: Globe,
+    description: "Cotizá en segundos desde cualquier dispositivo.",
+  },
+];
+
 export function HeroSection({ onOpenModal }: HeroSectionProps) {
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-20">
+    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-20 pb-10">
       {/* Background glow effects */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
@@ -75,23 +96,45 @@ export function HeroSection({ onOpenModal }: HeroSectionProps) {
           </button>
         </motion.div>
 
+        {/* ── Beneficios del PAS ── */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="mt-20"
         >
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-accent" />
-            <span>100% Comisión Automotores</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-accent" />
-            <span>97% Bonos al PAS</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-accent" />
-            <span>Multicotizador Web & App</span>
+          <h2 className="mb-8 text-xs font-semibold uppercase tracking-[0.25em] text-primary/80">
+            Beneficios del PAS
+          </h2>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            {benefits.map((b, i) => {
+              const Icon = b.icon;
+              return (
+                <motion.div
+                  key={b.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 + i * 0.1 }}
+                  className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-white/[0.06]"
+                >
+                  <div className="mb-3 flex items-center justify-center">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                  </div>
+                  <p className="text-3xl font-bold text-primary md:text-4xl">
+                    {b.number}
+                  </p>
+                  <p className="mt-1 text-base font-semibold text-foreground">
+                    {b.label}
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {b.description}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, UserPlus, ShieldCheck, ChevronDown, Calculator, Video, Crown } from "lucide-react";
+import { Loader2, UserPlus, ShieldCheck, ChevronDown, Calculator, Video, Crown, FileSignature, CalendarCheck } from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -81,6 +81,7 @@ export function RegistrationModal({
     const [submitError, setSubmitError] = React.useState("");
     const [addonContabilidad, setAddonContabilidad] = React.useState(false);
     const [addonMarketing, setAddonMarketing] = React.useState(false);
+    const [continuacion, setContinuacion] = React.useState<"firmar" | "agendar" | "">("");
     const isFull = selectedPlan === "full";
 
     const {
@@ -115,6 +116,7 @@ export function RegistrationModal({
             setSubmitError("");
             setAddonContabilidad(false);
             setAddonMarketing(false);
+            setContinuacion("");
         }
     }, [open, reset]);
 
@@ -141,13 +143,7 @@ export function RegistrationModal({
             if (addonContabilidad) addonsSelected.push("Contabilidad Expert");
             if (addonMarketing) addonsSelected.push("Marketing Pack");
 
-            let subject = isFull ? "Interés en Membresía Full" : "Interés en Plan Digital";
-            if (addonsSelected.length > 0) {
-                subject += " + " + addonsSelected.join(" + ");
-            }
-
             const payload: Record<string, string> = {
-                _subject: subject,
                 plan: isFull ? "Membresía Full" : "Plan Digital (Gratis)",
                 nombre: data.nombre,
                 email: data.email,
@@ -165,13 +161,28 @@ export function RegistrationModal({
                 payload.matricula_referente = data.matriculaReferente;
             }
 
-            const res = await fetch("https://formspree.io/f/mnjbpyry", {
+            payload.continuacion = continuacion;
+
+            if (!continuacion) {
+                setSubmitError("Seleccioná cómo querés continuar.");
+                setSubmitting(false);
+                return;
+            }
+
+            const res = await fetch("/api/registro", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
 
             if (!res.ok) throw new Error("Error al enviar");
+
+            const result = await res.json();
+
+            // Option B: redirect to calendar
+            if (continuacion === "agendar" && result.calendarUrl) {
+                window.open(result.calendarUrl, "_blank");
+            }
 
             onOpenChange(false);
             onSuccess();
@@ -418,6 +429,60 @@ export function RegistrationModal({
                                 </div>
                             </div>
                         )}
+
+                        {/* ─── Continuación (bifurcador) ─── */}
+                        <div className="space-y-3">
+                            <Label className="text-foreground text-sm font-semibold">
+                                {"¿Cómo te gustaría continuar?"} <span className="text-destructive">*</span>
+                            </Label>
+                            <div className="grid gap-2.5">
+                                {/* Option A: Firmar */}
+                                <label
+                                    className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-3.5 transition-all ${continuacion === "firmar"
+                                            ? "border-primary bg-primary/5"
+                                            : "border-border bg-card hover:border-primary/30"
+                                        }`}
+                                    onClick={() => setContinuacion("firmar")}
+                                >
+                                    <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${continuacion === "firmar" ? "border-primary bg-primary" : "border-muted-foreground"
+                                        }`}>
+                                        {continuacion === "firmar" && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <FileSignature className="h-3.5 w-3.5 text-primary" />
+                                            <span className="font-semibold text-foreground text-sm">Estoy listo, quiero firmar</span>
+                                        </div>
+                                        <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
+                                            Recibí los contratos por email para firmarlos digitalmente y comenzar.
+                                        </p>
+                                    </div>
+                                </label>
+
+                                {/* Option B: Agendar */}
+                                <label
+                                    className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-3.5 transition-all ${continuacion === "agendar"
+                                            ? "border-accent bg-accent/5"
+                                            : "border-border bg-card hover:border-accent/30"
+                                        }`}
+                                    onClick={() => setContinuacion("agendar")}
+                                >
+                                    <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${continuacion === "agendar" ? "border-accent bg-accent" : "border-muted-foreground"
+                                        }`}>
+                                        {continuacion === "agendar" && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <CalendarCheck className="h-3.5 w-3.5 text-accent" />
+                                            <span className="font-semibold text-foreground text-sm">Prefiero una videollamada</span>
+                                        </div>
+                                        <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
+                                            Agendá una breve reunión para conocer más antes de firmar.
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
 
                         {/* Captcha */}
                         <div className="space-y-1.5">

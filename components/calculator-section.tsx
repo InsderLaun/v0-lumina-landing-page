@@ -27,7 +27,7 @@ export function CalculatorSection() {
   }, [production]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("es-AR", {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "ARS",
       maximumFractionDigits: 0,

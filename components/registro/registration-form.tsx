@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Loader2,
   Send,
+  FileSignature,
+  CalendarCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -53,6 +55,9 @@ const registrationSchema = z.object({
   plan: z.enum(["gratis", "full"], {
     required_error: "Selecciona un plan",
   }),
+  continuacion: z.enum(["firmar", "agendar"], {
+    required_error: "Seleccioná cómo querés continuar",
+  }),
 });
 
 type RegistrationData = z.infer<typeof registrationSchema>;
@@ -77,6 +82,7 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
       facturacion: "",
       referidoPor: "",
       plan: initialPlan || undefined,
+      continuacion: undefined,
     },
   });
 
@@ -97,19 +103,26 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
           data.plan === "gratis"
             ? "Plan Digital ($0)"
             : "Membresía Full ($100 USD)",
+        continuacion: data.continuacion,
       };
 
-      const response = await fetch("https://formspree.io/f/mnjbpyry", {
+      const response = await fetch("/api/registro", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
         },
         body: JSON.stringify(formPayload),
       });
 
       if (!response.ok) {
         throw new Error("Error al enviar el formulario");
+      }
+
+      const result = await response.json();
+
+      // Option B: redirect to calendar
+      if (data.continuacion === "agendar" && result.calendarUrl) {
+        window.open(result.calendarUrl, "_blank");
       }
 
       setIsSuccess(true);
@@ -488,6 +501,73 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
                         {" USD / mes"}
                       </span>
                     </p>
+                  </label>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* ─── Continuación (bifurcador) ─── */}
+        <FormField
+          control={form.control}
+          name="continuacion"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
+              <FormLabel className="text-foreground text-base font-semibold">
+                {"¿Cómo te gustaría continuar?"}
+              </FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="grid gap-3"
+                >
+                  {/* Option A: Firmar */}
+                  <label
+                    className={cn(
+                      "group relative flex cursor-pointer items-start gap-4 rounded-xl border-2 p-4 transition-all",
+                      field.value === "firmar"
+                        ? "border-primary bg-primary/5"
+                        : "border-border bg-card hover:border-primary/30"
+                    )}
+                  >
+                    <RadioGroupItem value="firmar" className="mt-1" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <FileSignature className="h-4 w-4 text-primary" />
+                        <span className="font-semibold text-foreground text-sm">
+                          Estoy listo, quiero firmar
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        Recibí los contratos por email para firmarlos digitalmente y comenzar.
+                      </p>
+                    </div>
+                  </label>
+
+                  {/* Option B: Agendar */}
+                  <label
+                    className={cn(
+                      "group relative flex cursor-pointer items-start gap-4 rounded-xl border-2 p-4 transition-all",
+                      field.value === "agendar"
+                        ? "border-accent bg-accent/5"
+                        : "border-border bg-card hover:border-accent/30"
+                    )}
+                  >
+                    <RadioGroupItem value="agendar" className="mt-1" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <CalendarCheck className="h-4 w-4 text-accent" />
+                        <span className="font-semibold text-foreground text-sm">
+                          Prefiero una videollamada
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        Agendá una breve reunión para conocer más sobre el plan antes de firmar.
+                      </p>
+                    </div>
                   </label>
                 </RadioGroup>
               </FormControl>

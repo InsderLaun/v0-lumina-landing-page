@@ -1,59 +1,166 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Navbar } from "@/components/navbar";
-import { HeroSection } from "@/components/hero-section";
-import { PricingSection } from "@/components/pricing-section";
-import { AddonsSection } from "@/components/addons-section";
-import { CalculatorSection } from "@/components/calculator-section";
-import { ReferralSection } from "@/components/referral-section";
-import { LegalSection } from "@/components/legal-section";
-import { Footer } from "@/components/footer";
-import { RegistrationModal } from "@/components/registration-modal";
-import { TermsReferidosModal } from "@/components/terms-referidos-modal";
-import { SuccessScreen } from "@/components/success-screen";
-import { CuposLumina } from "@/components/CuposLumina";
+import { useState, useCallback, type ReactNode } from "react"
+import { Web3Provider } from "@/components/lumina/web3-provider"
+import { PerspectiveProvider, usePerspective } from "@/components/lumina/perspective-context"
+import { Navbar } from "@/components/lumina/navbar"
+import { ScrollProgressBar } from "@/components/lumina/scroll-progress"
+import { HeroSection } from "@/components/lumina/hero-section"
+import { PerspectiveTabs } from "@/components/lumina/perspective-tabs"
+import { DualEngineSection } from "@/components/lumina/dual-engine-section"
+import { AgentSkillsSection } from "@/components/lumina/agent-skills-section"
+import { ProductGrid } from "@/components/lumina/product-grid"
+import { ComparisonTable } from "@/components/lumina/comparison-table"
+import { CalculatorSection } from "@/components/lumina/calculator-section"
+import { HowItWorksSection } from "@/components/lumina/how-it-works-section"
+import { DeveloperZone } from "@/components/lumina/developer-zone"
+import { ExampleScenario } from "@/components/lumina/example-scenario"
+import { ProtocolStatus } from "@/components/lumina/protocol-status"
+import { SecuritySection } from "@/components/lumina/security-section"
+import { ThreePathsSection } from "@/components/lumina/three-paths-section"
+import { FAQSection } from "@/components/lumina/faq-section"
+import { OnboardingSection } from "@/components/lumina/onboarding-section"
+import { Footer } from "@/components/lumina/footer"
+import { BackToTop } from "@/components/lumina/back-to-top"
+import { RegisterAgentModal } from "@/components/lumina/register-agent-modal"
+import { DepositLPModal } from "@/components/lumina/deposit-lp-modal"
+import { AgentRedirectModal } from "@/components/lumina/agent-redirect-modal"
+import { LPHeroSection, LPPoolGrid, LPComparisonSection, LPCtaSection } from "@/components/lumina/lp-sections"
+
+/** CSS-only show/hide wrapper — no unmount, no layout shift */
+function AgentOnly({ children, section }: { children: ReactNode; section?: string }) {
+  const { perspective } = usePerspective()
+  const hidden = perspective !== "agent"
+  return (
+    <div
+      className={hidden ? "h-0 overflow-hidden opacity-0 pointer-events-none" : ""}
+      aria-hidden={hidden}
+      {...(section ? { "data-section": section } : {})}
+    >
+      {children}
+    </div>
+  )
+}
+
+function LPOnly({ children, section }: { children: ReactNode; section?: string }) {
+  const { perspective } = usePerspective()
+  const hidden = perspective !== "lp"
+  return (
+    <div
+      className={hidden ? "h-0 overflow-hidden opacity-0 pointer-events-none" : ""}
+      aria-hidden={hidden}
+      {...(section ? { "data-section": section } : {})}
+    >
+      {children}
+    </div>
+  )
+}
 
 export default function Page() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState("gratis");
-  const [termsOpen, setTermsOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false)
+  const [depositOpen, setDepositOpen] = useState(false)
+  const [agentRedirectOpen, setAgentRedirectOpen] = useState(false)
 
-  function handleOpenModal(plan: string) {
-    setSelectedPlan(plan);
-    setModalOpen(true);
-  }
+  const handleRegisterAgent = useCallback(() => setRegisterOpen(true), [])
+  const handleDepositLP = useCallback(() => setDepositOpen(true), [])
 
-  if (submitted) {
-    return (
-      <>
-        <SuccessScreen onOpenTerms={() => setTermsOpen(true)} onGoBack={() => setSubmitted(false)} />
-        <TermsReferidosModal open={termsOpen} onOpenChange={setTermsOpen} />
-      </>
-    );
-  }
+  const handleScrollToCalculator = useCallback(() => {
+    const el = document.querySelector("#calculator")
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" })
+  }, [])
 
   return (
-    <main className="min-h-screen">
-      <Navbar onOpenModal={handleOpenModal} />
-      <HeroSection onOpenModal={handleOpenModal} />
-      <PricingSection onOpenModal={handleOpenModal} />
-      <CuposLumina />
-      <AddonsSection />
-      <CalculatorSection />
-      <ReferralSection />
-      <LegalSection />
-      <Footer />
+    <Web3Provider>
+      <PerspectiveProvider>
+        <main className="min-h-screen bg-lumina-bg">
+          <Navbar
+            onRegisterAgent={handleRegisterAgent}
+            onDepositLP={handleDepositLP}
+          />
+          <ScrollProgressBar />
+          <div data-section="hero">
+            <HeroSection />
+          </div>
+          <PerspectiveTabs />
 
-      <RegistrationModal
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-        selectedPlan={selectedPlan}
-        onSuccess={() => setSubmitted(true)}
-        onOpenTerms={() => setTermsOpen(true)}
-      />
-      <TermsReferidosModal open={termsOpen} onOpenChange={setTermsOpen} />
-    </main>
-  );
+          {/* ── Agent-only sections ── */}
+          <AgentOnly section="how-it-works">
+            <DualEngineSection onRegisterAgent={handleRegisterAgent} />
+          </AgentOnly>
+          <div data-section="skills">
+            <AgentSkillsSection onRegisterAgent={handleRegisterAgent} />
+          </div>
+          <AgentOnly section="products">
+            <ProductGrid onScrollToCalculator={handleScrollToCalculator} />
+          </AgentOnly>
+          <AgentOnly section="comparison">
+            <ComparisonTable />
+          </AgentOnly>
+
+          {/* ── LP-only sections ── */}
+          <LPOnly>
+            <LPHeroSection />
+          </LPOnly>
+          <LPOnly section="products">
+            <LPPoolGrid onScrollToCalculator={handleScrollToCalculator} />
+          </LPOnly>
+
+          {/* ── Shared: Calculator (switches content internally) ── */}
+          <div id="calculator" data-section="calculator">
+            <CalculatorSection />
+          </div>
+
+          {/* ── LP-only: Comparison + CTA ── */}
+          <LPOnly section="comparison">
+            <LPComparisonSection />
+          </LPOnly>
+          <LPOnly section="cta">
+            <LPCtaSection onDepositLP={handleDepositLP} />
+          </LPOnly>
+
+          {/* ── Agent-only sections ── */}
+          <AgentOnly section="how-it-works">
+            <HowItWorksSection />
+          </AgentOnly>
+          <AgentOnly>
+            <DeveloperZone />
+          </AgentOnly>
+          <AgentOnly>
+            <ExampleScenario />
+          </AgentOnly>
+
+          {/* ── Shared sections ── */}
+          <div id="status">
+            <ProtocolStatus />
+          </div>
+          <SecuritySection />
+          <AgentOnly>
+            <ThreePathsSection />
+          </AgentOnly>
+          <FAQSection />
+          <OnboardingSection
+            onRegisterAgent={handleRegisterAgent}
+            onDepositLP={handleDepositLP}
+          />
+          <Footer />
+          <BackToTop />
+
+          {/* ── Modals ── */}
+          <RegisterAgentModal
+            open={registerOpen}
+            onClose={() => setRegisterOpen(false)}
+          />
+          <DepositLPModal
+            open={depositOpen}
+            onClose={() => setDepositOpen(false)}
+          />
+          <AgentRedirectModal
+            open={agentRedirectOpen}
+            onClose={() => setAgentRedirectOpen(false)}
+            onRegisterAgent={handleRegisterAgent}
+          />
+        </main>
+      </PerspectiveProvider>
+    </Web3Provider>
+  )
 }
