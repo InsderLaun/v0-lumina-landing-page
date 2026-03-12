@@ -134,12 +134,12 @@ export default function Home() {
       <section id="how-it-works" className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            How It Works
+            {perspective === "protect" ? "Deploy Protection in 3 Simple Steps" : "Put Your Capital to Work in 3 Simple Steps"}
           </h2>
           <p className="text-white/50 text-center mb-16 max-w-xl mx-auto">
             {perspective === "protect"
-              ? "Three steps. Your agent handles all of them."
-              : "Deposit once. Earn indefinitely. Withdraw when you want."}
+              ? "Give your agent the instructions. It handles everything else."
+              : "Your agent manages yield 24/7. You just watch your balance grow."}
           </p>
 
           <AnimatePresence mode="wait">
@@ -153,52 +153,31 @@ export default function Home() {
             >
               {perspective === "protect" ? (
                 <>
-                  <HowCard
-                    step="01"
-                    title="Agent Requests a Quote"
-                    description="Via REST API or Virtuals Protocol, your agent requests coverage. The Kink Model calculates the premium based on real-time vault utilization."
-                    accent="cyan"
-                  />
-                  <HowCard
-                    step="02"
-                    title="Oracle Verifies the Event"
-                    description="Chainlink price feeds + Phala TEE verify the trigger. No human judges. No voting. Pure math."
-                    accent="cyan"
-                  />
-                  <HowCard
-                    step="03"
-                    title="Instant Payout"
-                    description="97% of the calculated payout arrives in your agent's wallet in the same transaction. Automatic. Deterministic."
-                    accent="cyan"
-                  />
+                  <HowCard step="01" icon="📋" title="Connect & Instruct" description="Copy our Skill link and paste it into your agent platform. It's like giving a manual to your new financial employee — your agent instantly knows how to protect your portfolio." note="It's a manual, not code." accent="cyan" />
+                  <HowCard step="02" icon="🛡️" title="Autonomous Protection" description="Your agent scans markets 24/7. It activates insurance shields only when risk warrants it — crashes, depegs, exploits. Everything happens autonomously on-chain. You don't lift a finger." note="24/7 vigilance without moving a finger." accent="cyan" />
+                  <HowCard step="03" icon="⚡" title="Instant Claims" description="If a trigger is met, your agent collects the payout instantly — same block, same transaction. If markets are calm, your capital stays protected and ready. You just monitor from the dashboard." note="Your balance is always protected." accent="cyan" />
                 </>
               ) : (
                 <>
-                  <HowCard
-                    step="01"
-                    title="Agent Deposits USDY"
-                    description="Your agent deposits USDY into one of four vaults. Each has different risk and cooldown. Your USDY earns 3.55% base yield automatically from Ondo Finance."
-                    accent="purple"
-                  />
-                  <HowCard
-                    step="02"
-                    title="Premiums Flow In"
-                    description="Every time an agent buys insurance, 97% of the premium goes to your vault. More policies = more yield. APY adjusts in real-time with the Kink Model."
-                    accent="purple"
-                  />
-                  <HowCard
-                    step="03"
-                    title="Withdraw When You Want"
-                    description="Your deposit is indefinite. When you want to leave, give a cooldown notice (30-365 days). After cooldown, withdraw principal + all accumulated yield."
-                    accent="purple"
-                  />
+                  <HowCard step="01" icon="📋" title="Connect & Instruct" description="Copy our Skill link and paste it into your agent platform. It's like giving a manual to your new financial employee — your agent instantly knows where to find the best yields." note="It's a manual, not code." accent="purple" />
+                  <HowCard step="02" icon="📈" title="Autonomous Yield" description="Your agent deposits USDY into the optimal vault and monitors yields 24/7. It earns from US Treasury rates (3.55%) PLUS insurance premiums. Everything happens autonomously on-chain." note="24/7 yield management without moving a finger." accent="purple" />
+                  <HowCard step="03" icon="💰" title="Watch It Grow" description="Premiums flow into your vault every time an agent buys insurance. Your balance grows daily. When you want to exit, your agent handles the cooldown and withdrawal. You just watch." note="Your capital grows and you're always in control." accent="purple" />
                 </>
               )}
             </motion.div>
           </AnimatePresence>
 
+          {/* Closing phrase */}
+          <div className="mt-12 max-w-3xl mx-auto bg-white/[0.02] border border-white/10 rounded-xl p-6">
+            <p className="text-lg text-white/70 italic text-center">
+              {perspective === "protect"
+                ? "Lumina turns your AI agent into a professional risk manager. You provide the capital, your agent provides the execution."
+                : "Lumina turns your AI agent into a professional yield manager. You provide the capital, your agent provides the execution."}
+            </p>
+          </div>
+
           {/* CTA */}
-          <div className="text-center mt-12">
+          <div className="text-center mt-8">
             <a
               href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
               target="_blank"
@@ -2343,15 +2322,19 @@ function Navbar({ perspective }: { perspective: Perspective }) {
   )
 }
 
-function HowCard({ step, title, description, accent }: { step: string; title: string; description: string; accent: "cyan" | "purple" }) {
+function HowCard({ step, icon, title, description, note, accent }: { step: string; icon: string; title: string; description: string; note: string; accent: "cyan" | "purple" }) {
   const borderColor = accent === "cyan" ? "border-cyan-500/20 hover:border-cyan-500/40" : "border-purple-500/20 hover:border-purple-500/40"
   const stepColor = accent === "cyan" ? "text-cyan-500" : "text-purple-500"
 
   return (
     <div className={`p-6 rounded-2xl bg-white/[0.02] border ${borderColor} transition-all duration-300`}>
-      <span className={`text-sm font-mono ${stepColor} mb-3 block`}>{step}</span>
+      <div className="flex items-center gap-3 mb-3">
+        <span className="text-3xl">{icon}</span>
+        <span className={`text-sm font-mono ${stepColor}`}>{step}</span>
+      </div>
       <h3 className="text-xl font-semibold mb-3">{title}</h3>
       <p className="text-white/50 text-[15px] leading-relaxed">{description}</p>
+      <p className="text-xs text-white/30 italic mt-3">{note}</p>
     </div>
   )
 }
