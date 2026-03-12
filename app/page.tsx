@@ -149,8 +149,47 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="grid md:grid-cols-3 gap-8"
             >
+              {/* Timeline connector - horizontal on desktop */}
+              <div className="hidden md:flex items-center justify-center mb-8 max-w-4xl mx-auto px-16">
+                {/* Dot 1 - active with ping */}
+                <div className="relative flex items-center justify-center">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${perspective === "protect" ? "bg-cyan-400/30" : "bg-purple-400/30"}`}></span>
+                  <div className={`w-4 h-4 rounded-full relative ${perspective === "protect" ? "bg-cyan-500" : "bg-purple-500"}`} />
+                </div>
+                {/* Line 1→2 */}
+                <div className={`flex-1 h-0.5 ${perspective === "protect" ? "bg-gradient-to-r from-cyan-500 to-cyan-500/30" : "bg-gradient-to-r from-purple-500 to-purple-500/30"}`} />
+                {/* Dot 2 */}
+                <div className={`w-4 h-4 rounded-full ${perspective === "protect" ? "bg-cyan-500" : "bg-purple-500"}`} />
+                {/* Line 2→3 */}
+                <div className={`flex-1 h-0.5 ${perspective === "protect" ? "bg-gradient-to-r from-cyan-500/30 to-cyan-500" : "bg-gradient-to-r from-purple-500/30 to-purple-500"}`} />
+                {/* Dot 3 */}
+                <div className={`w-4 h-4 rounded-full ${perspective === "protect" ? "bg-cyan-500" : "bg-purple-500"}`} />
+              </div>
+
+              {/* Timeline connector - vertical on mobile */}
+              <div className="md:hidden flex mb-8">
+                <div className="flex flex-col items-center mr-6 ml-2">
+                  {/* Dot 1 - active with ping */}
+                  <div className="relative flex items-center justify-center">
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${perspective === "protect" ? "bg-cyan-400/30" : "bg-purple-400/30"}`}></span>
+                    <div className={`w-3 h-3 rounded-full relative ${perspective === "protect" ? "bg-cyan-500" : "bg-purple-500"}`} />
+                  </div>
+                  <div className={`w-0.5 flex-1 ${perspective === "protect" ? "bg-gradient-to-b from-cyan-500 to-cyan-500/30" : "bg-gradient-to-b from-purple-500 to-purple-500/30"}`} />
+                  {/* Dot 2 */}
+                  <div className={`w-3 h-3 rounded-full ${perspective === "protect" ? "bg-cyan-500" : "bg-purple-500"}`} />
+                  <div className={`w-0.5 flex-1 ${perspective === "protect" ? "bg-gradient-to-b from-cyan-500/30 to-cyan-500" : "bg-gradient-to-b from-purple-500/30 to-purple-500"}`} />
+                  {/* Dot 3 */}
+                  <div className={`w-3 h-3 rounded-full ${perspective === "protect" ? "bg-cyan-500" : "bg-purple-500"}`} />
+                </div>
+                <div className="flex-1 text-white/30 text-sm flex flex-col justify-between py-1">
+                  <span>01</span>
+                  <span>02</span>
+                  <span>03</span>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
               {perspective === "protect" ? (
                 <>
                   <HowCard step="01" icon="📋" title="Connect & Instruct" description="Copy our Skill link and paste it into your agent platform. It's like giving a manual to your new financial employee — your agent instantly knows how to protect your portfolio." note="It's a manual, not code." accent="cyan" />
@@ -164,6 +203,7 @@ export default function Home() {
                   <HowCard step="03" icon="💰" title="Watch It Grow" description="Premiums flow into your vault every time an agent buys insurance. Your balance grows daily. When you want to exit, your agent handles the cooldown and withdrawal. You just watch." note="Your capital grows and you're always in control." accent="purple" />
                 </>
               )}
+              </div>
             </motion.div>
           </AnimatePresence>
 
