@@ -220,6 +220,11 @@ export default function Home() {
       {perspective === "earn" && (
         <VaultsSection />
       )}
+
+      {/* YIELD CALCULATOR */}
+      {perspective === "earn" && (
+        <YieldCalculatorSection />
+      )}
     </main>
   )
 }
@@ -1022,6 +1027,162 @@ function VaultsSection() {
           >
             Give Your Agent the Skill →
           </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  YIELD CALCULATOR SECTION                                 */
+/* ═══════════════════════════════════════════════════════════ */
+
+type YieldVaultKey = "volatile-short" | "volatile-long" | "stable-short" | "stable-long"
+
+const YIELD_VAULTS: Record<YieldVaultKey, {
+  label: string
+  cooldown: number
+  premiumAPYmin: number
+  premiumAPYmax: number
+  usdyBase: number
+  products: string
+  risk: string
+  worstCase: number
+}> = {
+  "volatile-short": { label: "Volatile Short", cooldown: 30, premiumAPYmin: 0.09, premiumAPYmax: 0.21, usdyBase: 0.0355, products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
+  "volatile-long": { label: "Volatile Long", cooldown: 90, premiumAPYmin: 0.12, premiumAPYmax: 0.26, usdyBase: 0.0355, products: "IL Index + BSS overflow", risk: "Higher", worstCase: 0.28 },
+  "stable-short": { label: "Stable Short", cooldown: 90, premiumAPYmin: 0.08, premiumAPYmax: 0.18, usdyBase: 0.0355, products: "Depeg Shield", risk: "Low", worstCase: 0.20 },
+  "stable-long": { label: "Stable Long", cooldown: 365, premiumAPYmin: 0.15, premiumAPYmax: 0.36, usdyBase: 0.0355, products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
+}
+
+function YieldCalculatorSection() {
+  const [vault, setVault] = useState<YieldVaultKey>("volatile-short")
+  const [deposit, setDeposit] = useState(100000)
+  const [months, setMonths] = useState(12)
+
+  const v = YIELD_VAULTS[vault]
+  const avgPremiumAPY = (v.premiumAPYmin + v.premiumAPYmax) / 2
+  const totalAPY = v.usdyBase + avgPremiumAPY
+  const usdyYield = deposit * v.usdyBase * (months / 12)
+  const premiumYield = deposit * avgPremiumAPY * (months / 12)
+  const totalYield = usdyYield + premiumYield
+
+  const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
+  const fmt2 = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Yield Calculator
+        </h2>
+        <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
+          See what your agent can earn by providing liquidity.
+        </p>
+
+        <div className="rounded-2xl bg-white/[0.02] border border-purple-500/20 p-6 md:p-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Inputs */}
+            <div className="space-y-6">
+              {/* Vault */}
+              <CustomDropdown
+                label="Vault"
+                value={vault}
+                onChange={(v) => setVault(v as YieldVaultKey)}
+                options={[
+                  { value: "volatile-short", label: "Volatile Short" },
+                  { value: "volatile-long", label: "Volatile Long" },
+                  { value: "stable-short", label: "Stable Short" },
+                  { value: "stable-long", label: "Stable Long" },
+                ]}
+              />
+
+              {/* Deposit */}
+              <div>
+                <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">
+                  Deposit: ${fmt(deposit)}
+                </label>
+                <input
+                  type="range" min={1000} max={1000000} step={1000} value={deposit}
+                  onChange={(e) => setDeposit(Number(e.target.value))}
+                  className="w-full accent-purple-400 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-white/30 mt-1">
+                  <span>$1,000</span><span>$1,000,000</span>
+                </div>
+              </div>
+
+              {/* Period */}
+              <div>
+                <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">
+                  Period: {months} month{months !== 1 ? "s" : ""}
+                </label>
+                <input
+                  type="range" min={1} max={36} step={1} value={months}
+                  onChange={(e) => setMonths(Number(e.target.value))}
+                  className="w-full accent-purple-400 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-white/30 mt-1">
+                  <span>1 mo</span><span>36 mo</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Results */}
+            <div className="space-y-4">
+              {/* Row 1: Yield breakdown */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">USDY Base Yield</div>
+                  <div className="text-lg font-bold text-white">${fmt2(usdyYield)}</div>
+                  <div className="text-xs text-white/30 mt-1">(3.55% from Ondo Finance)</div>
+                </div>
+                <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Premium Yield</div>
+                  <div className="text-lg font-bold text-white">${fmt2(premiumYield)}</div>
+                  <div className="text-xs text-white/30 mt-1">(estimated at avg utilization)</div>
+                </div>
+              </div>
+
+              {/* Row 2: Totals */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4">
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Total Yield</div>
+                  <div className="text-2xl font-bold text-purple-400">${fmt(totalYield)}</div>
+                </div>
+                <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4">
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Effective APY</div>
+                  <div className="text-2xl font-bold text-purple-400">{(totalAPY * 100).toFixed(1)}%</div>
+                </div>
+              </div>
+
+              {/* Row 3: Vault info */}
+              <div className="rounded-xl bg-white/[0.02] border border-white/10 p-4 space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-white/40">Vault</span><span className="text-white/70">{v.label}</span></div>
+                <div className="flex justify-between"><span className="text-white/40">Cooldown</span><span className="text-white/70">{v.cooldown} days</span></div>
+                <div className="flex justify-between"><span className="text-white/40">Products Backed</span><span className="text-white/70">{v.products}</span></div>
+                <div className="flex justify-between"><span className="text-white/40">Claim Risk</span><span className="text-white/70">{v.risk}</span></div>
+                <div className="flex justify-between"><span className="text-white/40">Worst Case Loss (once per 5-10yr)</span><span className="text-white/70">~{(v.worstCase * 100).toFixed(0)}% of deposit</span></div>
+              </div>
+
+              {/* Warning */}
+              <p className="text-xs text-white/30 leading-relaxed">
+                &#9888;&#65039; APYs are real-time estimates based on current utilization. They fluctuate with market demand. The USDY base yield (3.55%) is independent of Lumina — it comes from Ondo Finance US Treasuries. Premium yield depends on insurance policy volume.
+              </p>
+
+              {/* CTA */}
+              <div className="text-center pt-2">
+                <a
+                  href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 transition-all"
+                >
+                  Give Your Agent the Skill →
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
