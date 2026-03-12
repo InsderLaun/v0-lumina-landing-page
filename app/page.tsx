@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 type Perspective = "protect" | "earn"
@@ -583,7 +583,7 @@ function CustomDropdown({ value, onChange, options, label }: {
 
 function PremiumCalculatorSection() {
   const [product, setProduct] = useState<CalcProduct>("bss")
-  const [coverage, setCoverage] = useState(50000)
+  const [coverage, setCoverage] = useState(10000)
   const [duration, setDuration] = useState(14)
   const [asset, setAsset] = useState("ETH")
   const [stablecoin, setStablecoin] = useState("USDC")
@@ -600,16 +600,20 @@ function PremiumCalculatorSection() {
   // Clamp duration
   const clampedDuration = Math.min(Math.max(duration, min), max)
 
-  const MU = 1.25
-  const params = getCalcParams(product, stablecoin, protocol)
-  const durationDiscount = getDurationDiscount(product, clampedDuration)
+  const calculations = useMemo(() => {
+    const MU = 1.25
+    const params = getCalcParams(product, stablecoin, protocol)
+    const dd = getDurationDiscount(product, clampedDuration)
+    const premium = coverage * params.pBase * params.riskMult * dd * MU * (clampedDuration / 365)
+    const premiumFee = premium * 0.03
+    const maxPayout = coverage * (1 - params.deductible)
+    const payoutFee = maxPayout * 0.03
+    const netPayout = maxPayout - payoutFee
+    const returnOnPremium = premium > 0 ? netPayout / premium : 0
+    return { premium, premiumFee, maxPayout, payoutFee, netPayout, returnOnPremium }
+  }, [product, coverage, clampedDuration, stablecoin, protocol])
 
-  const premium = coverage * params.pBase * params.riskMult * durationDiscount * MU * (clampedDuration / 365)
-  const premiumFee = premium * 0.03
-  const maxPayout = coverage * (1 - params.deductible)
-  const payoutFee = maxPayout * 0.03
-  const netPayout = maxPayout - payoutFee
-  const returnOnPremium = premium > 0 ? netPayout / premium : 0
+  const { premium, premiumFee, maxPayout, payoutFee, netPayout, returnOnPremium } = calculations
 
   const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
   const fmt2 = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -647,12 +651,12 @@ function PremiumCalculatorSection() {
                   Coverage: ${fmt(coverage)}
                 </label>
                 <input
-                  type="range" min={1000} max={500000} step={1000} value={coverage}
+                  type="range" min={100} max={100000} step={100} value={coverage}
                   onChange={(e) => setCoverage(Number(e.target.value))}
                   className="w-full accent-cyan-400 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-white/30 mt-1">
-                  <span>$1,000</span><span>$500,000</span>
+                  <span>$100</span><span>$100,000</span>
                 </div>
               </div>
 
@@ -717,7 +721,7 @@ function PremiumCalculatorSection() {
             </div>
 
             {/* Results */}
-            <div className="space-y-4">
+            <div key={product} className="space-y-4">
               {/* Row 1: Premium */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
@@ -1057,18 +1061,24 @@ const YIELD_VAULTS: Record<YieldVaultKey, {
 
 function YieldCalculatorSection() {
   const [vault, setVault] = useState<YieldVaultKey>("volatile-short")
-  const [deposit, setDeposit] = useState(100000)
+  const [deposit, setDeposit] = useState(10000)
 
   const v = YIELD_VAULTS[vault]
-  const avgPremiumAPY = (v.premiumAPYmin + v.premiumAPYmax) / 2
-  const effectiveAPY = v.usdyBase + avgPremiumAPY
 
-  const monthlyUSDY = deposit * v.usdyBase / 12
-  const monthlyPremium = deposit * avgPremiumAPY / 12
-  const monthlyTotal = monthlyUSDY + monthlyPremium
-  const annualUSDY = deposit * v.usdyBase
-  const annualPremium = deposit * avgPremiumAPY
-  const annualTotal = annualUSDY + annualPremium
+  const calculations = useMemo(() => {
+    const vaultData = YIELD_VAULTS[vault]
+    const avgPremiumAPY = (vaultData.premiumAPYmin + vaultData.premiumAPYmax) / 2
+    const totalAPY = vaultData.usdyBase + avgPremiumAPY
+    const monthlyUSDY = deposit * vaultData.usdyBase / 12
+    const monthlyPremium = deposit * avgPremiumAPY / 12
+    const monthlyTotal = monthlyUSDY + monthlyPremium
+    const annualUSDY = deposit * vaultData.usdyBase
+    const annualPremium = deposit * avgPremiumAPY
+    const annualTotal = annualUSDY + annualPremium
+    return { totalAPY, avgPremiumAPY, monthlyUSDY, monthlyPremium, monthlyTotal, annualUSDY, annualPremium, annualTotal }
+  }, [vault, deposit])
+
+  const { totalAPY, avgPremiumAPY, monthlyUSDY, monthlyPremium, monthlyTotal, annualUSDY, annualPremium, annualTotal } = calculations
 
   const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
   const fmt2 = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -1106,12 +1116,12 @@ function YieldCalculatorSection() {
                   Deposit: ${fmt(deposit)}
                 </label>
                 <input
-                  type="range" min={1000} max={1000000} step={1000} value={deposit}
+                  type="range" min={100} max={100000} step={100} value={deposit}
                   onChange={(e) => setDeposit(Number(e.target.value))}
                   className="w-full accent-purple-400 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-white/30 mt-1">
-                  <span>$1,000</span><span>$1,000,000</span>
+                  <span>$100</span><span>$100,000</span>
                 </div>
               </div>
 
@@ -1161,7 +1171,7 @@ function YieldCalculatorSection() {
             </div>
 
             {/* Results */}
-            <div className="space-y-4">
+            <div key={vault} className="space-y-4">
               {/* Row 1: Monthly & Annual */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
@@ -1180,7 +1190,7 @@ function YieldCalculatorSection() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4">
                   <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Effective APY</div>
-                  <div className="text-2xl font-bold text-purple-400">{(effectiveAPY * 100).toFixed(1)}%</div>
+                  <div className="text-2xl font-bold text-purple-400">{(totalAPY * 100).toFixed(1)}%</div>
                   <div className="text-xs text-white/30 mt-1">USDY 3.55% + Premiums ~{(avgPremiumAPY * 100).toFixed(0)}%</div>
                 </div>
                 <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4">
