@@ -1246,14 +1246,14 @@ const RISK_SCENARIOS: Record<YieldVaultKey, {
   color: "green" | "amber" | "red"
 }[]> = {
   "volatile-short": [
-    { name: "Normal Year", probability: "95%", description: "No major crashes. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
-    { name: "Market Crash", probability: "4%", description: "ETH drops 35%. BSS claims trigger. Vault loses ~15% of TVL in one month.", lossPct: 0.15, color: "amber" },
-    { name: "Black Swan", probability: "1%", description: "ETH drops 50%+ AND IL spikes simultaneously. Multiple claims trigger.", lossPct: 0.30, color: "red" },
+    { name: "Normal Year", probability: "85%", description: "No major crashes. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
+    { name: "Market Crash", probability: "12%", description: "ETH drops 35%. BSS claims trigger. Vault loses ~15% of TVL in one month.", lossPct: 0.15, color: "amber" },
+    { name: "Black Swan", probability: "3%", description: "ETH drops 50%+ AND IL spikes simultaneously. Multiple claims trigger.", lossPct: 0.30, color: "red" },
   ],
   "volatile-long": [
-    { name: "Normal Year", probability: "95%", description: "No major crashes. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
-    { name: "Market Crash", probability: "4%", description: "ETH drops 35%. IL + BSS overflow claims trigger against the vault.", lossPct: 0.15, color: "amber" },
-    { name: "Black Swan", probability: "1%", description: "Severe market downturn with cascading IL and BSS claims.", lossPct: 0.28, color: "red" },
+    { name: "Normal Year", probability: "85%", description: "No major crashes. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
+    { name: "Market Crash", probability: "12%", description: "ETH drops 35%. IL + BSS overflow claims trigger against the vault.", lossPct: 0.15, color: "amber" },
+    { name: "Black Swan", probability: "3%", description: "Severe market downturn with cascading IL and BSS claims.", lossPct: 0.28, color: "red" },
   ],
   "stable-short": [
     { name: "Normal Year", probability: "97%", description: "No depeg events. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
