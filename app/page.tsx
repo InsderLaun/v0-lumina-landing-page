@@ -115,17 +115,17 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/40"
+            className="flex flex-wrap items-center justify-center gap-6 text-base font-medium"
           >
-            <span>4 Products</span>
-            <span className="w-1 h-1 rounded-full bg-white/20" />
-            <span>4 Vaults</span>
-            <span className="w-1 h-1 rounded-full bg-white/20" />
-            <span>24 Audited Contracts</span>
-            <span className="w-1 h-1 rounded-full bg-white/20" />
-            <span>3% Protocol Fee</span>
-            <span className="w-1 h-1 rounded-full bg-white/20" />
-            <span>USDY Base Yield 3.55%</span>
+            <span className="text-cyan-400"><span className="font-bold">4</span> Products</span>
+            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="text-purple-400"><span className="font-bold">4</span> Vaults</span>
+            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="text-cyan-400"><span className="font-bold">24</span> Audited Contracts</span>
+            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="text-purple-400"><span className="font-bold">3%</span> Protocol Fee</span>
+            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="text-cyan-400">USDY Base Yield <span className="font-bold">3.55%</span></span>
           </motion.div>
         </div>
       </section>
