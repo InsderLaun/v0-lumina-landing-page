@@ -1584,7 +1584,7 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
         </div>
 
         {/* BLOQUE 3 — Compatibility */}
-        <CompatibilityCards accent={accent} borderAccent={borderAccent} skillUrl={skillUrl} />
+        <CompatibilityCards accent={accent} borderAccent={borderAccent} skillUrl={skillUrl} perspective={perspective} />
 
         {/* BLOQUE 4 — What the Skill Contains */}
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-6">
@@ -1650,7 +1650,7 @@ const INTEGRATIONS: { key: IntegrationKey; icon: string; name: string; desc: str
   { key: "virtuals", icon: "🌐", name: "Virtuals Protocol", desc: "Discover Lumina on the Virtuals ACP marketplace.", status: "Coming Soon", statusColor: "text-amber-400" },
 ]
 
-const INTEGRATION_MODALS: Record<IntegrationKey, {
+type IntegrationModal = {
   title: string
   subtitle: string
   whatIs: { q: string; a: string }
@@ -1660,70 +1660,94 @@ const INTEGRATION_MODALS: Record<IntegrationKey, {
   needs?: string[]
   available?: string
   ctaLabel: string
-}> = {
-  http: {
-    title: "Connect via REST API",
-    subtitle: "The simplest way. Any AI agent that can make HTTP calls works with Lumina.",
-    whatIs: { q: "What is this?", a: "A REST API is like a phone number for software. Your AI agent 'calls' Lumina's server, asks for a quote, and buys insurance — all in code, no browser needed. If your agent can send a message to the internet, it can use Lumina." },
-    howLabel: "How it works:",
-    steps: [
-      "Your agent reads the Skill file (a document that teaches it everything about Lumina)",
-      "Your agent calls our API: GET /api/v2/quote → receives premium price",
-      "Your agent approves USDY and calls the smart contract to purchase",
-      "Done. Policy is active. Your agent monitors and claims automatically.",
-    ],
-    needs: [
-      "An AI agent (Claude, GPT, any LLM with tool use)",
-      "A wallet with USDY on Base L2",
-      "The Skill file (link below)",
-    ],
-    available: "This is available TODAY. No SDK needed, no plugin, just HTTP calls.",
-    ctaLabel: "Contact Us for Help",
-  },
-  elizaos: {
-    title: "Connect via ElizaOS",
-    subtitle: "Coming Soon — Native plugin for the ElizaOS agent framework.",
-    whatIs: { q: "What is ElizaOS?", a: "ElizaOS is a popular open-source framework for building AI agents that can interact with the real world. Think of it as an operating system for your AI — it handles memory, conversations, and actions." },
-    howLabel: "How it will work:",
-    steps: [
-      "Install the Lumina plugin: npm install @lumina/elizaos-plugin",
-      "Add it to your agent's configuration",
-      "Your agent automatically gets insurance and yield capabilities",
-    ],
-    fallback: "In the meantime, you can use the REST API — it works with any ElizaOS agent today via the HTTP action.",
-    ctaLabel: "Contact Us for Updates",
-  },
-  langchain: {
-    title: "Connect via LangChain",
-    subtitle: "Coming Soon — Lumina tools for LangChain agents.",
-    whatIs: { q: "What is LangChain?", a: "LangChain is the most popular framework for building AI applications. It lets you chain together LLMs, tools, and data sources. Think of it as LEGO blocks for AI." },
-    howLabel: "How it will work:",
-    steps: [
-      "Import the Lumina toolkit: from lumina import LuminaToolkit",
-      "Add tools to your agent: agent.add_tools(LuminaToolkit())",
-      "Your agent can now quote, buy, deposit, and claim automatically",
-    ],
-    fallback: "In the meantime, you can use the REST API — LangChain agents can make HTTP calls natively with the RequestsTool.",
-    ctaLabel: "Contact Us for Updates",
-  },
-  virtuals: {
-    title: "Connect via Virtuals Protocol",
-    subtitle: "Coming Soon — Lumina on the Virtuals ACP marketplace.",
-    whatIs: { q: "What is Virtuals Protocol?", a: "Virtuals is a decentralized marketplace where AI agents offer services to each other. Think of it as an app store, but for AI agents instead of humans. Your agent browses, finds Lumina, and starts using it." },
-    howLabel: "How it will work:",
-    steps: [
-      "Find Lumina on the Virtuals ACP marketplace",
-      "Your agent registers via the ACP Handler",
-      "Insurance and yield operations are available as ACP actions",
-    ],
-    fallback: "In the meantime, you can use the REST API — any Virtuals agent can make HTTP calls.",
-    ctaLabel: "Contact Us for Updates",
-  },
 }
 
-function CompatibilityCards({ accent, borderAccent, skillUrl }: { accent: "cyan" | "purple"; borderAccent: string; skillUrl: string }) {
+function getIntegrationModals(perspective: Perspective): Record<IntegrationKey, IntegrationModal> {
+  const isEarn = perspective === "earn"
+  return {
+    http: {
+      title: "Connect via REST API",
+      subtitle: "The simplest way. Any AI agent that can make HTTP calls works with Lumina.",
+      whatIs: {
+        q: "What is this?",
+        a: isEarn
+          ? "A REST API is like a phone number for software. Your AI agent 'calls' Lumina's server, checks vault yields, and deposits USDY — all in code, no browser needed."
+          : "A REST API is like a phone number for software. Your AI agent 'calls' Lumina's server, asks for a quote, and buys insurance — all in code, no browser needed. If your agent can send a message to the internet, it can use Lumina.",
+      },
+      howLabel: "How it works:",
+      steps: isEarn
+        ? [
+            "Your agent reads the Skill file (a document that teaches it everything about Lumina)",
+            "Your agent calls our API: GET /api/v2/vaults → sees all 4 vaults with APY and utilization",
+            "Your agent approves USDY and calls the vault contract to deposit",
+            "Done. Your USDY earns yield indefinitely. Your agent monitors and manages withdrawals.",
+          ]
+        : [
+            "Your agent reads the Skill file (a document that teaches it everything about Lumina)",
+            "Your agent calls our API: GET /api/v2/quote → receives premium price",
+            "Your agent approves USDY and calls the smart contract to purchase",
+            "Done. Policy is active. Your agent monitors and claims automatically.",
+          ],
+      needs: [
+        "An AI agent (Claude, GPT, any LLM with tool use)",
+        "A wallet with USDY on Base L2",
+        "The Skill file (link below)",
+      ],
+      available: "This is available TODAY. No SDK needed, no plugin, just HTTP calls.",
+      ctaLabel: "Contact Us for Help",
+    },
+    elizaos: {
+      title: "Connect via ElizaOS",
+      subtitle: "Coming Soon — Native plugin for the ElizaOS agent framework.",
+      whatIs: { q: "What is ElizaOS?", a: "ElizaOS is a popular open-source framework for building AI agents that can interact with the real world. Think of it as an operating system for your AI — it handles memory, conversations, and actions." },
+      howLabel: "How it will work:",
+      steps: [
+        "Install the Lumina plugin: npm install @lumina/elizaos-plugin",
+        "Add it to your agent's configuration",
+        isEarn
+          ? "Your agent automatically gets yield management capabilities — deposit, monitor APY, request withdrawal"
+          : "Your agent automatically gets insurance and yield capabilities",
+      ],
+      fallback: "In the meantime, you can use the REST API — it works with any ElizaOS agent today via the HTTP action.",
+      ctaLabel: "Contact Us for Updates",
+    },
+    langchain: {
+      title: "Connect via LangChain",
+      subtitle: "Coming Soon — Lumina tools for LangChain agents.",
+      whatIs: { q: "What is LangChain?", a: "LangChain is the most popular framework for building AI applications. It lets you chain together LLMs, tools, and data sources. Think of it as LEGO blocks for AI." },
+      howLabel: "How it will work:",
+      steps: [
+        "Import the Lumina toolkit: from lumina import LuminaToolkit",
+        "Add tools to your agent: agent.add_tools(LuminaToolkit())",
+        isEarn
+          ? "Your agent can now check vaults, deposit, monitor yield, and manage withdrawals automatically"
+          : "Your agent can now quote, buy, deposit, and claim automatically",
+      ],
+      fallback: "In the meantime, you can use the REST API — LangChain agents can make HTTP calls natively with the RequestsTool.",
+      ctaLabel: "Contact Us for Updates",
+    },
+    virtuals: {
+      title: "Connect via Virtuals Protocol",
+      subtitle: "Coming Soon — Lumina on the Virtuals ACP marketplace.",
+      whatIs: { q: "What is Virtuals Protocol?", a: "Virtuals is a decentralized marketplace where AI agents offer services to each other. Think of it as an app store, but for AI agents instead of humans. Your agent browses, finds Lumina, and starts using it." },
+      howLabel: "How it will work:",
+      steps: [
+        "Find Lumina on the Virtuals ACP marketplace",
+        "Your agent registers via the ACP Handler",
+        isEarn
+          ? "Yield management operations are available as ACP actions — deposit, withdraw, monitor"
+          : "Insurance and yield operations are available as ACP actions",
+      ],
+      fallback: "In the meantime, you can use the REST API — any Virtuals agent can make HTTP calls.",
+      ctaLabel: "Contact Us for Updates",
+    },
+  }
+}
+
+function CompatibilityCards({ accent, borderAccent, skillUrl, perspective }: { accent: "cyan" | "purple"; borderAccent: string; skillUrl: string; perspective: Perspective }) {
   const [modalKey, setModalKey] = useState<IntegrationKey | null>(null)
-  const modalData = modalKey ? INTEGRATION_MODALS[modalKey] : null
+  const modals = getIntegrationModals(perspective)
+  const modalData = modalKey ? modals[modalKey] : null
   const borderModal = accent === "cyan" ? "border-cyan-500/40" : "border-purple-500/40"
   const textAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
   const checkColor = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
