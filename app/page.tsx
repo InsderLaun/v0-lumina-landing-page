@@ -2309,13 +2309,13 @@ function Navbar({ perspective }: { perspective: Perspective }) {
 
         {/* Connect Wallet */}
         <div className="hidden md:block">
-          <button className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+          <a href="/dashboard" className={`px-6 py-2.5 rounded-full text-base font-medium transition-all inline-block ${
             accent === "cyan"
               ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
               : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
           }`}>
             Connect Wallet
-          </button>
+          </a>
         </div>
 
         {/* Mobile hamburger */}
@@ -2350,13 +2350,13 @@ function Navbar({ perspective }: { perspective: Perspective }) {
                 )
               ))}
               <div className="pt-2">
-                <button className={`w-full px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+                <a href="/dashboard" className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
                   accent === "cyan"
                     ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
                     : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
                 }`}>
                   Connect Wallet
-                </button>
+                </a>
               </div>
             </div>
           </motion.div>
