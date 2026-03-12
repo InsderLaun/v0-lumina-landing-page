@@ -2263,17 +2263,21 @@ function Navbar({ perspective }: { perspective: Perspective }) {
     <nav className="sticky top-0 z-50 bg-[#0A0A0F]/80 backdrop-blur-md border-b border-white/5">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="text-xl font-bold text-white">LUMINA</a>
+        <a href="#" className="text-xl font-bold">
+          <span className="text-cyan-400">LUMINA</span>
+          <span className="text-white/20"> · </span>
+          <span className="text-purple-400">M2M</span>
+        </a>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             link.external ? (
-              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={`text-sm text-white/50 ${hoverColor} transition-colors`}>
+              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={`text-base text-white/50 ${hoverColor} transition-colors`}>
                 {link.label}
               </a>
             ) : (
-              <button key={link.label} onClick={() => handleClick(link.href)} className={`text-sm text-white/50 ${hoverColor} transition-colors`}>
+              <button key={link.label} onClick={() => handleClick(link.href)} className={`text-base text-white/50 ${hoverColor} transition-colors`}>
                 {link.label}
               </button>
             )
@@ -2282,7 +2286,11 @@ function Navbar({ perspective }: { perspective: Perspective }) {
 
         {/* Connect Wallet */}
         <div className="hidden md:block">
-          <button className="px-4 py-2 rounded-full text-sm font-medium text-white/70 border border-white/20 hover:border-white/40 hover:text-white transition-all">
+          <button className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+            accent === "cyan"
+              ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
+              : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
+          }`}>
             Connect Wallet
           </button>
         </div>
@@ -2309,17 +2317,21 @@ function Navbar({ perspective }: { perspective: Perspective }) {
             <div className="px-4 py-4 space-y-1">
               {navLinks.map((link) => (
                 link.external ? (
-                  <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className={`block py-3 text-sm text-white/50 ${hoverColor} transition-colors`}>
+                  <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className={`block py-3 text-base text-white/50 ${hoverColor} transition-colors`}>
                     {link.label}
                   </a>
                 ) : (
-                  <button key={link.label} onClick={() => handleClick(link.href)} className={`block w-full text-left py-3 text-sm text-white/50 ${hoverColor} transition-colors`}>
+                  <button key={link.label} onClick={() => handleClick(link.href)} className={`block w-full text-left py-3 text-base text-white/50 ${hoverColor} transition-colors`}>
                     {link.label}
                   </button>
                 )
               ))}
               <div className="pt-2">
-                <button className="w-full px-4 py-2.5 rounded-full text-sm font-medium text-white/70 border border-white/20 hover:border-white/40 hover:text-white transition-all">
+                <button className={`w-full px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+                  accent === "cyan"
+                    ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
+                    : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
+                }`}>
                   Connect Wallet
                 </button>
               </div>
