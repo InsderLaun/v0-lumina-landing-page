@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 type Perspective = "protect" | "earn"
@@ -520,6 +520,62 @@ function getDurationDiscount(product: CalcProduct, days: number) {
   return 1.0
 }
 
+/* ─── Custom Dropdown (dark mode) ─── */
+function CustomDropdown({ value, onChange, options, label }: {
+  value: string
+  onChange: (v: string) => void
+  options: { value: string; label: string }[]
+  label?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  const selectedLabel = options.find(o => o.value === value)?.label ?? value
+
+  return (
+    <div ref={ref} className="relative">
+      {label && <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">{label}</label>}
+      <div
+        onClick={() => setOpen(!open)}
+        className="w-full bg-[#1A1A2E] border border-white/10 rounded-lg px-4 py-3 text-sm text-white cursor-pointer flex justify-between items-center hover:border-white/20 transition-colors"
+      >
+        <span>{selectedLabel}</span>
+        <svg
+          className={`w-4 h-4 text-white/50 transition-transform ${open ? "rotate-180" : ""}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      {open && (
+        <div className="absolute left-0 right-0 mt-1 bg-[#1A1A2E] border border-white/10 rounded-lg z-50 shadow-xl overflow-hidden">
+          {options.map(opt => (
+            <div
+              key={opt.value}
+              onClick={() => { onChange(opt.value); setOpen(false) }}
+              className={`px-4 py-2.5 cursor-pointer text-sm transition-colors ${
+                opt.value === value
+                  ? "bg-cyan-500/20 text-cyan-400"
+                  : "text-white hover:bg-cyan-500/10"
+              }`}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function PremiumCalculatorSection() {
   const [product, setProduct] = useState<CalcProduct>("bss")
   const [coverage, setCoverage] = useState(50000)
@@ -568,19 +624,17 @@ function PremiumCalculatorSection() {
             {/* Inputs */}
             <div className="space-y-6">
               {/* Product */}
-              <div>
-                <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Product</label>
-                <select
-                  value={product}
-                  onChange={(e) => handleProductChange(e.target.value as CalcProduct)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"
-                >
-                  <option value="bss">Black Swan Shield</option>
-                  <option value="depeg">Depeg Shield</option>
-                  <option value="il">IL Index Cover</option>
-                  <option value="exploit">Exploit Shield</option>
-                </select>
-              </div>
+              <CustomDropdown
+                label="Product"
+                value={product}
+                onChange={(v) => handleProductChange(v as CalcProduct)}
+                options={[
+                  { value: "bss", label: "Black Swan Shield" },
+                  { value: "depeg", label: "Depeg Shield" },
+                  { value: "il", label: "IL Index Cover" },
+                  { value: "exploit", label: "Exploit Shield" },
+                ]}
+              />
 
               {/* Coverage */}
               <div>
@@ -614,52 +668,46 @@ function PremiumCalculatorSection() {
 
               {/* Asset (BSS, IL) */}
               {(product === "bss" || product === "il") && (
-                <div>
-                  <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Asset</label>
-                  <select
-                    value={asset}
-                    onChange={(e) => setAsset(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"
-                  >
-                    <option value="ETH">ETH</option>
-                    <option value="BTC">BTC</option>
-                  </select>
-                </div>
+                <CustomDropdown
+                  label="Asset"
+                  value={asset}
+                  onChange={setAsset}
+                  options={[
+                    { value: "ETH", label: "ETH" },
+                    { value: "BTC", label: "BTC" },
+                  ]}
+                />
               )}
 
               {/* Stablecoin (Depeg) */}
               {product === "depeg" && (
-                <div>
-                  <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Stablecoin</label>
-                  <select
-                    value={stablecoin}
-                    onChange={(e) => setStablecoin(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"
-                  >
-                    <option value="USDC">USDC</option>
-                    <option value="DAI">DAI</option>
-                    <option value="USDT">USDT</option>
-                  </select>
-                </div>
+                <CustomDropdown
+                  label="Stablecoin"
+                  value={stablecoin}
+                  onChange={setStablecoin}
+                  options={[
+                    { value: "USDC", label: "USDC" },
+                    { value: "DAI", label: "DAI" },
+                    { value: "USDT", label: "USDT" },
+                  ]}
+                />
               )}
 
               {/* Protocol (Exploit) */}
               {product === "exploit" && (
-                <div>
-                  <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Protocol</label>
-                  <select
-                    value={protocol}
-                    onChange={(e) => setProtocol(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"
-                  >
-                    <option value="Aave">Aave v3 (Tier 1)</option>
-                    <option value="Compound">Compound III (Tier 1)</option>
-                    <option value="Uniswap">Uniswap v3 (Tier 1)</option>
-                    <option value="MakerDAO">MakerDAO (1.1x)</option>
-                    <option value="Curve">Curve (1.5x)</option>
-                    <option value="Morpho">Morpho (1.8x)</option>
-                  </select>
-                </div>
+                <CustomDropdown
+                  label="Protocol"
+                  value={protocol}
+                  onChange={setProtocol}
+                  options={[
+                    { value: "Aave", label: "Aave v3 (Tier 1)" },
+                    { value: "Compound", label: "Compound III (Tier 1)" },
+                    { value: "Uniswap", label: "Uniswap v3 (Tier 1)" },
+                    { value: "MakerDAO", label: "MakerDAO (1.1x)" },
+                    { value: "Curve", label: "Curve (1.5x)" },
+                    { value: "Morpho", label: "Morpho (1.8x)" },
+                  ]}
+                />
               )}
             </div>
 
