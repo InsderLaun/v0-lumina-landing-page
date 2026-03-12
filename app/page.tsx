@@ -10,6 +10,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0A0A0F] text-white">
+      {/* NAVBAR */}
+      <Navbar perspective={perspective} />
+
       {/* HERO */}
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 text-center">
         {/* Gradient background */}
@@ -242,12 +245,53 @@ export default function Home() {
       <FAQSection perspective={perspective} />
 
       {/* FOOTER */}
-      <footer className="border-t border-white/5 py-8 px-4">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/30">
-          <span>© 2025 Lumina Protocol</span>
-          <div className="flex items-center gap-6">
-            <span>Sales: <a href="mailto:labs@lumina-org.com" className="text-white/50 hover:text-white transition-colors">labs@lumina-org.com</a></span>
-            <span>Support: <a href="mailto:support@lumina-org.com" className="text-white/50 hover:text-white transition-colors">support@lumina-org.com</a></span>
+      <footer className="bg-[#0A0A0F] border-t border-white/5 py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {/* Brand */}
+            <div className="col-span-2 lg:col-span-1">
+              <h4 className="text-lg font-bold text-white mb-2">LUMINA PROTOCOL</h4>
+              <p className="text-sm text-white/40 mb-1">Parametric Insurance for AI Agents</p>
+              <p className="text-xs text-white/30">Built on Base L2 · Settlement in USDY</p>
+            </div>
+
+            {/* Products */}
+            <div>
+              <h5 className="text-sm font-semibold text-white/60 uppercase mb-3">Products</h5>
+              <div className="space-y-2">
+                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Black Swan Shield</a>
+                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Depeg Shield</a>
+                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">IL Index Cover</a>
+                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Exploit Shield</a>
+              </div>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h5 className="text-sm font-semibold text-white/60 uppercase mb-3">Resources</h5>
+              <div className="space-y-2">
+                <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Skill File</a>
+                <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Smart Contracts</a>
+                <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Documentation</a>
+                <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Base L2</a>
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h5 className="text-sm font-semibold text-white/60 uppercase mb-3">Contact</h5>
+              <div className="space-y-2">
+                <a href="mailto:labs@lumina-org.com" className="block text-sm text-white/40 hover:text-white transition-colors">Sales: labs@lumina-org.com</a>
+                <a href="mailto:support@lumina-org.com" className="block text-sm text-white/40 hover:text-white transition-colors">Support: support@lumina-org.com</a>
+                <a href="#" className="block text-sm text-white/40 hover:text-white transition-colors">Twitter/X</a>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-white/5 pt-8">
+            <p className="text-xs text-white/20 text-center">
+              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 24 Audited Contracts · 0C/0H/0M
+            </p>
           </div>
         </div>
       </footer>
@@ -383,7 +427,7 @@ function ProductsSection() {
   const modalData = PRODUCTS.find((p) => p.key === modalProduct)
 
   return (
-    <section className="py-24 px-4">
+    <section id="products" className="py-24 px-4">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Insurance Products
@@ -913,7 +957,7 @@ function VaultsSection() {
   const modalData = VAULTS.find((v) => v.symbol === modalVault)
 
   return (
-    <section className="py-24 px-4">
+    <section id="vaults" className="py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Yield Vaults
@@ -1399,7 +1443,7 @@ function KinkModelSection({ perspective }: { perspective: Perspective }) {
   const xTicks = [0, 20, 40, 60, 80, 95]
 
   return (
-    <section className="py-24 px-4">
+    <section id="pricing" className="py-24 px-4">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           How Pricing Works
@@ -1543,7 +1587,7 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
   }
 
   return (
-    <section className="py-24 px-4">
+    <section id="skill" className="py-24 px-4">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Connect Your Agent
@@ -1996,7 +2040,7 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
   ]
 
   return (
-    <section className="py-24 px-4">
+    <section id="security" className="py-24 px-4">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Security
@@ -2089,7 +2133,7 @@ function FAQSection({ perspective }: { perspective: Perspective }) {
   const allFAQs = [...FAQ_GENERAL, ...perspectiveFAQs]
 
   return (
-    <section className="py-24 px-4">
+    <section id="faq" className="py-24 px-4">
       <div className="max-w-3xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
           Frequently Asked Questions
@@ -2173,6 +2217,105 @@ function FAQSection({ perspective }: { perspective: Perspective }) {
         </div>
       </div>
     </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  NAVBAR                                                   */
+/* ═══════════════════════════════════════════════════════════ */
+
+function Navbar({ perspective }: { perspective: Perspective }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const accent = perspective === "protect" ? "cyan" : "purple"
+  const hoverColor = accent === "cyan" ? "hover:text-cyan-400" : "hover:text-purple-400"
+
+  const navLinks = [
+    ...(perspective === "protect" ? [{ label: "Products", href: "#products" }] : []),
+    ...(perspective === "earn" ? [{ label: "Vaults", href: "#vaults" }] : []),
+    { label: "Pricing", href: "#pricing" },
+    { label: "Skill", href: "https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md", external: true },
+    { label: "Security", href: "#security" },
+    { label: "FAQ", href: "#faq" },
+    { label: "Docs", href: "https://github.com/agustintiberio10/LUMINA-PROTOCOL", external: true },
+  ]
+
+  const handleClick = (href: string, external?: boolean) => {
+    setMenuOpen(false)
+    if (!external && href.startsWith("#")) {
+      const el = document.querySelector(href)
+      el?.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  return (
+    <nav className="sticky top-0 z-50 bg-[#0A0A0F]/80 backdrop-blur-md border-b border-white/5">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <a href="#" className="text-xl font-bold text-white">LUMINA</a>
+
+        {/* Desktop links */}
+        <div className="hidden md:flex items-center gap-6">
+          {navLinks.map((link) => (
+            link.external ? (
+              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={`text-sm text-white/50 ${hoverColor} transition-colors`}>
+                {link.label}
+              </a>
+            ) : (
+              <button key={link.label} onClick={() => handleClick(link.href)} className={`text-sm text-white/50 ${hoverColor} transition-colors`}>
+                {link.label}
+              </button>
+            )
+          ))}
+        </div>
+
+        {/* Connect Wallet */}
+        <div className="hidden md:block">
+          <button className="px-4 py-2 rounded-full text-sm font-medium text-white/70 border border-white/20 hover:border-white/40 hover:text-white transition-all">
+            Connect Wallet
+          </button>
+        </div>
+
+        {/* Mobile hamburger */}
+        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-white/70 hover:text-white p-2">
+          {menuOpen ? (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+          )}
+        </button>
+      </div>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-[#0A0A0F] border-b border-white/5 overflow-hidden"
+          >
+            <div className="px-4 py-4 space-y-1">
+              {navLinks.map((link) => (
+                link.external ? (
+                  <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className={`block py-3 text-sm text-white/50 ${hoverColor} transition-colors`}>
+                    {link.label}
+                  </a>
+                ) : (
+                  <button key={link.label} onClick={() => handleClick(link.href)} className={`block w-full text-left py-3 text-sm text-white/50 ${hoverColor} transition-colors`}>
+                    {link.label}
+                  </button>
+                )
+              ))}
+              <div className="pt-2">
+                <button className="w-full px-4 py-2.5 rounded-full text-sm font-medium text-white/70 border border-white/20 hover:border-white/40 hover:text-white transition-all">
+                  Connect Wallet
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
   )
 }
 
