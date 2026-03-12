@@ -1209,6 +1209,9 @@ function YieldCalculatorSection() {
                 <div className="flex justify-between"><span className="text-white/40">Worst Case Loss (once per 5-10yr)</span><span className="text-white/70">~{(v.worstCase * 100).toFixed(0)}% of deposit</span></div>
               </div>
 
+              {/* Risk Scenarios */}
+              <RiskScenariosSection vaultKey={vault} deposit={deposit} monthlyTotal={monthlyTotal} />
+
               {/* Warning */}
               <p className="text-xs text-white/30 leading-relaxed">
                 &#9888;&#65039; APYs are real-time estimates based on current utilization. They fluctuate with market demand. The USDY base yield (3.55%) is independent of Lumina — it comes from Ondo Finance US Treasuries. Premium yield depends on insurance policy volume.
@@ -1230,6 +1233,85 @@ function YieldCalculatorSection() {
         </div>
       </div>
     </section>
+  )
+}
+
+/* ─── Risk Scenarios ─── */
+
+const RISK_SCENARIOS: Record<YieldVaultKey, {
+  name: string
+  probability: string
+  description: string
+  lossPct: number
+  color: "green" | "amber" | "red"
+}[]> = {
+  "volatile-short": [
+    { name: "Normal Year", probability: "95%", description: "No major crashes. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
+    { name: "Market Crash", probability: "4%", description: "ETH drops 35%. BSS claims trigger. Vault loses ~15% of TVL in one month.", lossPct: 0.15, color: "amber" },
+    { name: "Black Swan", probability: "1%", description: "ETH drops 50%+ AND IL spikes simultaneously. Multiple claims trigger.", lossPct: 0.30, color: "red" },
+  ],
+  "volatile-long": [
+    { name: "Normal Year", probability: "95%", description: "No major crashes. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
+    { name: "Market Crash", probability: "4%", description: "ETH drops 35%. IL + BSS overflow claims trigger against the vault.", lossPct: 0.15, color: "amber" },
+    { name: "Black Swan", probability: "1%", description: "Severe market downturn with cascading IL and BSS claims.", lossPct: 0.28, color: "red" },
+  ],
+  "stable-short": [
+    { name: "Normal Year", probability: "97%", description: "No depeg events. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
+    { name: "Stablecoin Wobble", probability: "2.5%", description: "A stablecoin briefly depegs 2-5%. Some claims trigger but recover quickly.", lossPct: 0.10, color: "amber" },
+    { name: "Full Depeg (SVB/USDC Mar 2023)", probability: "0.5%", description: "A major depeg event like USDC during SVB collapse. Significant claims trigger.", lossPct: 0.20, color: "red" },
+  ],
+  "stable-long": [
+    { name: "Normal Year", probability: "98%", description: "No depeg or exploit events. Premiums exceed claims. Full estimated yield.", lossPct: 0, color: "green" },
+    { name: "Depeg Event", probability: "1.5%", description: "A stablecoin depegs. Claims trigger but high premium income offsets losses.", lossPct: 0.12, color: "amber" },
+    { name: "Depeg + Exploit Simultaneous", probability: "0.5%", description: "A depeg event coincides with a protocol exploit. Multiple claim types trigger.", lossPct: 0.25, color: "red" },
+  ],
+}
+
+function RiskScenariosSection({ vaultKey, deposit, monthlyTotal }: { vaultKey: YieldVaultKey; deposit: number; monthlyTotal: number }) {
+  const scenarios = RISK_SCENARIOS[vaultKey]
+  const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
+
+  const colorMap = {
+    green: { border: "border-green-500/30", text: "text-green-400", bg: "bg-green-500/5" },
+    amber: { border: "border-amber-500/30", text: "text-amber-400", bg: "bg-amber-500/5" },
+    red: { border: "border-red-500/30", text: "text-red-400", bg: "bg-red-500/5" },
+  }
+
+  return (
+    <div className="rounded-xl bg-white/[0.02] border border-amber-500/20 p-6">
+      <h4 className="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-4">&#9888;&#65039; Risk Scenarios — What Could Go Wrong</h4>
+      <div className="space-y-3">
+        {scenarios.map((s) => {
+          const loss = deposit * s.lossPct
+          const recoveryMonths = monthlyTotal > 0 && loss > 0 ? Math.ceil(loss / monthlyTotal) : 0
+          const c = colorMap[s.color]
+          return (
+            <div key={s.name} className={`rounded-lg border ${c.border} ${c.bg} p-4`}>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-1">
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm font-semibold ${c.text}`}>{s.name}</span>
+                  <span className="text-xs text-white/30">({s.probability} probability)</span>
+                </div>
+                <div className="text-right">
+                  {s.lossPct === 0 ? (
+                    <span className="text-sm font-semibold text-green-400">Loss: $0</span>
+                  ) : (
+                    <span className={`text-sm font-semibold ${c.text}`}>Potential Loss: -${fmt(loss)}</span>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-white/50 leading-relaxed">{s.description}</p>
+              {recoveryMonths > 0 && (
+                <p className="text-xs text-white/40 mt-1">Recovery Time: ~{recoveryMonths} month{recoveryMonths !== 1 ? "s" : ""} of yield</p>
+              )}
+            </div>
+          )
+        })}
+      </div>
+      <p className="text-xs text-white/25 leading-relaxed mt-4">
+        These scenarios are estimates based on historical DeFi events and actuarial modeling. Past events do not guarantee future outcomes. The Kink Model and protocol safeguards (TWAP, circuit breakers, dual triggers) significantly reduce claim probability.
+      </p>
+    </div>
   )
 }
 
