@@ -1902,6 +1902,7 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
   const checkAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
   const colBg = accent === "cyan" ? "bg-cyan-500/[0.03]" : "bg-purple-500/[0.03]"
   const colBorder = accent === "cyan" ? "border-l border-r border-cyan-500/20" : "border-l border-r border-purple-500/20"
+  const tableBorder = accent === "cyan" ? "border border-cyan-500/30 rounded-xl" : "border border-purple-500/30 rounded-xl"
 
   return (
     <section className="py-24 px-4">
@@ -1914,13 +1915,13 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
         </p>
 
         {/* Desktop table */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className={`hidden md:block overflow-x-auto ${tableBorder} overflow-hidden`}>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/10">
                 <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4 w-[180px]">Feature</th>
                 <th className={`text-left text-xs uppercase tracking-wider font-medium py-3 px-4 ${colBg} ${borderTop} border-t-2 ${colBorder} ${checkAccent}`}>M2M Insurance — Lumina</th>
-                <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4">Traditional Web3 Insurance</th>
+                <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4 bg-white/[0.01]">Traditional Web3 Insurance</th>
               </tr>
             </thead>
             <tbody>
@@ -1930,7 +1931,7 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
                   <td className={`py-3 px-4 ${colBg} ${colBorder} text-white/80 font-medium`}>
                     {row.lumina.startsWith("✅") ? <><span className={checkAccent}>✅</span>{row.lumina.slice(1)}</> : row.lumina}
                   </td>
-                  <td className="py-3 px-4 text-white/40">
+                  <td className="py-3 px-4 text-white/40 bg-white/[0.01]">
                     {row.traditional.startsWith("❌") ? <><span className="text-white/30">❌</span>{row.traditional.slice(1)}</> : row.traditional}
                   </td>
                 </tr>
