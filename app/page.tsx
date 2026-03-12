@@ -231,6 +231,15 @@ export default function Home() {
 
       {/* AGENT SKILLS (shared) */}
       <AgentSkillsSection perspective={perspective} />
+
+      {/* COMPARISON TABLE (shared) */}
+      <ComparisonSection perspective={perspective} />
+
+      {/* SECURITY & AUDITS (shared) */}
+      <SecuritySection perspective={perspective} />
+
+      {/* FAQ + CONTACT (shared) */}
+      <FAQSection perspective={perspective} />
     </main>
   )
 }
@@ -1856,6 +1865,281 @@ function CompatibilityCards({ accent, borderAccent, skillUrl, perspective }: { a
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  COMPARISON TABLE                                         */
+/* ═══════════════════════════════════════════════════════════ */
+
+const COMPARISON_ROWS: { feature: string; lumina: string; nexus: string; insurace: string }[] = [
+  { feature: "Operator", lumina: "AI Agent (M2M)", nexus: "Human", insurace: "Human" },
+  { feature: "Resolution", lumina: "Automatic (1 transaction)", nexus: "Jury vote (up to 35 days)", insurace: "Committee (up to 30d)" },
+  { feature: "Trigger", lumina: "Parametric (trustless math)", nexus: "Subjective (human judgment)", insurace: "Subjective" },
+  { feature: "Settlement", lumina: "Same-block", nexus: "Days/weeks", insurace: "Days/weeks" },
+  { feature: "Chain", lumina: "Base L2 (low fees)", nexus: "Ethereum L1", insurace: "Multi-chain" },
+  { feature: "Settlement Token", lumina: "USDY (earns 3.55% while idle)", nexus: "ETH/DAI", insurace: "Various" },
+  { feature: "Agent-native", lumina: "✅ Built for M2M", nexus: "❌ Human UI only", insurace: "❌ Human UI only" },
+  { feature: "Skill file", lumina: "✅ 736 lines", nexus: "❌", insurace: "❌" },
+  { feature: "Oracle", lumina: "Chainlink + Phala TEE", nexus: "Proprietary", insurace: "Chainlink" },
+  { feature: "LP Yield", lumina: "11-40% + USDY base", nexus: "~5-8%", insurace: "~4-7%" },
+]
+
+function ComparisonSection({ perspective }: { perspective: Perspective }) {
+  const accent = perspective === "protect" ? "cyan" : "purple"
+  const borderTop = accent === "cyan" ? "border-t-cyan-500" : "border-t-purple-500"
+
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          How Lumina Compares
+        </h2>
+        <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
+          The first insurance protocol built exclusively for AI agents.
+        </p>
+
+        {/* Desktop table */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4 w-[180px]">Feature</th>
+                <th className={`text-left text-xs uppercase tracking-wider font-medium py-3 px-4 bg-white/[0.03] ${borderTop} border-t-2 ${accent === "cyan" ? "text-cyan-400" : "text-purple-400"}`}>Lumina</th>
+                <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4">Nexus Mutual</th>
+                <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4">InsurAce</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARISON_ROWS.map((row) => (
+                <tr key={row.feature} className="border-b border-white/5">
+                  <td className="py-3 px-4 text-white/50 font-medium">{row.feature}</td>
+                  <td className="py-3 px-4 bg-white/[0.03] text-white/80 font-medium">
+                    {row.lumina.startsWith("✅") ? <><span className="text-green-400">✅</span>{row.lumina.slice(1)}</> : row.lumina}
+                  </td>
+                  <td className="py-3 px-4 text-white/40">
+                    {row.nexus.startsWith("❌") ? <><span className="text-white/30">❌</span>{row.nexus.slice(1)}</> : row.nexus}
+                  </td>
+                  <td className="py-3 px-4 text-white/40">
+                    {row.insurace.startsWith("❌") ? <><span className="text-white/30">❌</span>{row.insurace.slice(1)}</> : row.insurace}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile cards */}
+        <div className="md:hidden space-y-4">
+          {[
+            { name: "Lumina", isHighlight: true, getData: (r: typeof COMPARISON_ROWS[0]) => r.lumina },
+            { name: "Nexus Mutual", isHighlight: false, getData: (r: typeof COMPARISON_ROWS[0]) => r.nexus },
+            { name: "InsurAce", isHighlight: false, getData: (r: typeof COMPARISON_ROWS[0]) => r.insurace },
+          ].map((proto) => (
+            <div key={proto.name} className={`rounded-xl border p-5 ${proto.isHighlight ? `${borderTop} border-t-2 bg-white/[0.03] border-white/10` : "border-white/5 bg-white/[0.01]"}`}>
+              <h4 className={`text-sm font-bold mb-3 ${proto.isHighlight ? (accent === "cyan" ? "text-cyan-400" : "text-purple-400") : "text-white/50"}`}>{proto.name}</h4>
+              <div className="space-y-2">
+                {COMPARISON_ROWS.map((row) => {
+                  const val = proto.getData(row)
+                  return (
+                    <div key={row.feature} className="flex justify-between text-xs">
+                      <span className="text-white/40">{row.feature}</span>
+                      <span className={`text-right ${proto.isHighlight ? "text-white/80 font-medium" : "text-white/40"}`}>
+                        {val.startsWith("✅") ? <><span className="text-green-400">✅</span>{val.slice(1)}</> : val.startsWith("❌") ? <><span className="text-white/30">❌</span>{val.slice(1)}</> : val}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  SECURITY & AUDITS                                        */
+/* ═══════════════════════════════════════════════════════════ */
+
+function SecuritySection({ perspective }: { perspective: Perspective }) {
+  const accent = perspective === "protect" ? "cyan" : "purple"
+  const checkColor = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
+  const borderAccent = accent === "cyan" ? "border-cyan-500/20" : "border-purple-500/20"
+
+  const phases = [
+    { title: "Phase 1: Core", desc: "CoverRouter + PolicyManager + Vaults", rounds: "12+ audit rounds", badge: "0C / 0H / 0M" },
+    { title: "Phase 2: Shields", desc: "4 insurance products + BaseShield", rounds: "3 dual audit rounds", badge: "0C / 0H / 0M / 0L" },
+    { title: "Phase 3: Oracles", desc: "LuminaOracle + PhalaVerifier", rounds: "2 dual audit rounds", badge: "0C / 0H / 0M / 0L" },
+  ]
+
+  const protections = [
+    "TWAP price verification (anti flash-crash)",
+    "L2 Sequencer uptime check with 1h grace period",
+    "Circuit breakers on extreme volatility",
+    "Waiting periods (24h Depeg, 14d Exploit)",
+    "European-style IL resolution (48h window)",
+    "$50K per-wallet cap on Exploit Shield",
+    "Dual trigger (Chainlink + Phala TEE) for exploits",
+    "Soulbound vault shares (anti-cooldown bypass)",
+  ]
+
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Security
+        </h2>
+        <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
+          24 contracts. 4,825 lines. 3 phases audited.
+        </p>
+
+        {/* Phase cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {phases.map((p) => (
+            <div key={p.title} className={`bg-white/[0.03] border ${borderAccent} rounded-xl p-6`}>
+              <h4 className="text-sm font-bold text-white mb-2">{p.title}</h4>
+              <p className="text-xs text-white/50 mb-2">{p.desc}</p>
+              <p className="text-xs text-white/40 mb-3">{p.rounds}</p>
+              <span className="text-sm font-bold text-green-400">{p.badge}</span>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-white/40 text-center mb-8 leading-relaxed">
+          Dual audit methodology: Claude Code Security + Gemini Pro — independent findings cross-verified across both AI auditors.
+        </p>
+
+        {/* Protections */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-8">
+          <div className="grid sm:grid-cols-2 gap-2">
+            {protections.map((item) => (
+              <div key={item} className="flex items-start gap-2 py-1">
+                <span className={`${checkColor} text-sm mt-0.5`}>✓</span>
+                <span className="text-sm text-white/60">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center">
+          <a
+            href="https://github.com/agustintiberio10/LUMINA-PROTOCOL"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
+              accent === "cyan"
+                ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20"
+                : "bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20"
+            }`}
+          >
+            View Contracts on GitHub →
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  FAQ + CONTACT                                            */
+/* ═══════════════════════════════════════════════════════════ */
+
+const FAQ_GENERAL = [
+  { q: "What is Lumina Protocol?", a: "Lumina is parametric insurance built exclusively for AI agents on Base L2. Agents buy coverage, oracles verify triggers, and payouts are instant. No claims process, no human judges, no disputes. Settlement is in USDY, a yield-bearing stablecoin by Ondo Finance." },
+  { q: "Can a human buy a policy or deposit from this website?", a: "No. This website is informational only. All operations — buying insurance, depositing in vaults, claiming payouts, withdrawing — are performed by your AI agent. The website explains, convinces, and provides the Skill file. Your agent does the rest." },
+  { q: "What is USDY?", a: "USDY is Ondo Finance's yield-bearing stablecoin, backed by US Treasuries. It currently earns ~3.55% APY automatically. When you deposit USDY in a Lumina vault, you earn the USDY base yield PLUS insurance premiums on top." },
+  { q: "What is the protocol fee?", a: "Lumina charges 3% on premiums (when your agent buys insurance) and 3% on payouts (when your agent collects a claim). This is the protocol's revenue model. For LPs, the fee reduces yield by ~0.3% — barely noticeable." },
+  { q: "Is my money safe?", a: "Your funds are held in audited smart contracts on Base L2 — not in anyone's wallet. 24 contracts were audited across 3 phases by Claude Code Security + Gemini Pro with 0 Critical, 0 High, 0 Medium findings. The protocol uses TWAP verification, circuit breakers, L2 sequencer checks, and waiting periods to prevent manipulation." },
+]
+
+const FAQ_PROTECT = [
+  { q: "What happens if the L2 sequencer goes down during a crash?", a: "The oracle blocks stale prices until 1 hour after sequencer recovery. You have a 24-hour grace period after policy expiry to submit your claim. Even with sequencer downtime, you're protected." },
+  { q: "Can I cancel a policy?", a: "No. Policies are non-cancellable. The premium is paid upfront and non-refundable. This is by design — it ensures the vault always has premium income to offset potential claims." },
+  { q: "How does auto-repurchase work?", a: "Your agent monitors policy expiry and buys a new policy before the current one expires. For Depeg (24h waiting), your agent repurchases at least 24h before expiry. For Exploit (14d waiting), at least 14 days before. The Skill file has the complete logic." },
+  { q: "What if the trigger is met but my agent doesn't claim?", a: "You have 24 hours after policy expiry (the grace period) to submit the claim. If your agent misses it, the policy expires and funds return to the vault. Set up monitoring alerts in your agent to avoid this." },
+]
+
+const FAQ_EARN = [
+  { q: "Is the APY guaranteed?", a: "No. The USDY base yield (~3.55%) comes from Ondo Finance and depends on US Treasury rates. The premium yield depends on insurance policy volume and vault utilization. Both fluctuate. The numbers shown are estimates based on current conditions." },
+  { q: "What's the worst that can happen as an LP?", a: "In a severe event (market crash + stablecoin depeg simultaneously), a vault could lose 20-30% of TVL. This is extremely rare. In normal years, premiums far exceed claims. The Risk Scenarios section in the Yield Calculator shows detailed probabilities." },
+  { q: "What is a cooldown? Is my money locked?", a: "No lock. Cooldown is an EXIT NOTICE. You deposit indefinitely and earn yield. When you want to leave, you give notice (30-365 days depending on vault). During cooldown, you KEEP earning. After cooldown, you withdraw everything." },
+  { q: "Can I switch between vaults?", a: "Not directly. You request withdrawal from one vault, wait for cooldown, then deposit into another. Your agent handles all of this automatically." },
+  { q: "Why are shares soulbound?", a: "To prevent cooldown bypass. If you could sell shares on a DEX, someone could buy 'mature' shares about to finish cooldown, defeating the purpose of locking capital to back policies." },
+]
+
+function FAQSection({ perspective }: { perspective: Perspective }) {
+  const [openIdx, setOpenIdx] = useState<number | null>(null)
+  const accent = perspective === "protect" ? "cyan" : "purple"
+  const textAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
+  const borderAccent = accent === "cyan" ? "border-cyan-500/20" : "border-purple-500/20"
+
+  const perspectiveFAQs = perspective === "protect" ? FAQ_PROTECT : FAQ_EARN
+  const allFAQs = [...FAQ_GENERAL, ...perspectiveFAQs]
+
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+          Frequently Asked Questions
+        </h2>
+
+        <div className="space-y-2 mb-16">
+          {allFAQs.map((faq, i) => {
+            const isOpen = openIdx === i
+            return (
+              <div key={i} className={`border ${isOpen ? borderAccent : "border-white/5"} rounded-xl overflow-hidden transition-colors`}>
+                <button
+                  onClick={() => setOpenIdx(isOpen ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-4 text-left"
+                >
+                  <span className="text-sm font-medium text-white/80 pr-4">{faq.q}</span>
+                  <svg
+                    className={`w-4 h-4 text-white/40 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-6 pb-4 text-sm text-white/50 leading-relaxed">{faq.a}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* CONTACT */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 text-center">
+          <h3 className="text-xl font-bold text-white mb-2">Need Help?</h3>
+          <p className="text-sm text-white/50 mb-6">A human will respond. We&apos;ll explain the products, give you the Skill file, and help you get started.</p>
+          <a href="mailto:hello@lumina-org.com" className={`text-2xl font-bold ${textAccent} hover:underline block mb-6`}>
+            hello@lumina-org.com
+          </a>
+          <a
+            href="mailto:hello@lumina-org.com"
+            className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
+              accent === "cyan"
+                ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20"
+                : "bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20"
+            }`}
+          >
+            Email Us →
+          </a>
+        </div>
+      </div>
+    </section>
   )
 }
 
