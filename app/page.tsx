@@ -1584,24 +1584,7 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
         </div>
 
         {/* BLOQUE 3 — Compatibility */}
-        <div className="mb-6">
-          <p className="text-sm text-white/60 mb-4 text-center">Compatible with:</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { icon: "🤖", name: "ElizaOS", desc: "Install the Lumina plugin for ElizaOS agents.", status: "Coming Soon", statusColor: "text-amber-400" },
-              { icon: "🔗", name: "LangChain", desc: "Use Lumina tools in your LangChain agent.", status: "Coming Soon", statusColor: "text-amber-400" },
-              { icon: "🌐", name: "Virtuals Protocol", desc: "Discover Lumina on the Virtuals ACP marketplace.", status: "Coming Soon", statusColor: "text-amber-400" },
-              { icon: "⚡", name: "HTTP / REST API", desc: "Any agent that can make HTTP calls can use Lumina.", status: "Available", statusColor: "text-green-400" },
-            ].map((c) => (
-              <div key={c.name} className={`bg-white/[0.03] border border-white/10 rounded-xl p-5 hover:scale-[1.02] hover:border-white/20 transition-all duration-200 cursor-default`}>
-                <div className="text-2xl mb-3">{c.icon}</div>
-                <h4 className="text-sm font-semibold text-white mb-1">{c.name}</h4>
-                <p className="text-xs text-white/50 mb-3 leading-relaxed">{c.desc}</p>
-                <span className={`text-xs font-medium ${c.statusColor}`}>{c.status}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <CompatibilityCards accent={accent} borderAccent={borderAccent} skillUrl={skillUrl} />
 
         {/* BLOQUE 4 — What the Skill Contains */}
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-6">
@@ -1653,6 +1636,202 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
         </div>
       </div>
     </section>
+  )
+}
+
+/* ─── Compatibility Cards + Modals ─── */
+
+type IntegrationKey = "http" | "elizaos" | "langchain" | "virtuals"
+
+const INTEGRATIONS: { key: IntegrationKey; icon: string; name: string; desc: string; status: string; statusColor: string }[] = [
+  { key: "http", icon: "⚡", name: "HTTP / REST API", desc: "Any agent that can make HTTP calls can use Lumina.", status: "Available", statusColor: "text-green-400" },
+  { key: "elizaos", icon: "🤖", name: "ElizaOS", desc: "Install the Lumina plugin for ElizaOS agents.", status: "Coming Soon", statusColor: "text-amber-400" },
+  { key: "langchain", icon: "🔗", name: "LangChain", desc: "Use Lumina tools in your LangChain agent.", status: "Coming Soon", statusColor: "text-amber-400" },
+  { key: "virtuals", icon: "🌐", name: "Virtuals Protocol", desc: "Discover Lumina on the Virtuals ACP marketplace.", status: "Coming Soon", statusColor: "text-amber-400" },
+]
+
+const INTEGRATION_MODALS: Record<IntegrationKey, {
+  title: string
+  subtitle: string
+  whatIs: { q: string; a: string }
+  howLabel: string
+  steps: string[]
+  fallback?: string
+  needs?: string[]
+  available?: string
+  ctaLabel: string
+}> = {
+  http: {
+    title: "Connect via REST API",
+    subtitle: "The simplest way. Any AI agent that can make HTTP calls works with Lumina.",
+    whatIs: { q: "What is this?", a: "A REST API is like a phone number for software. Your AI agent 'calls' Lumina's server, asks for a quote, and buys insurance — all in code, no browser needed. If your agent can send a message to the internet, it can use Lumina." },
+    howLabel: "How it works:",
+    steps: [
+      "Your agent reads the Skill file (a document that teaches it everything about Lumina)",
+      "Your agent calls our API: GET /api/v2/quote → receives premium price",
+      "Your agent approves USDY and calls the smart contract to purchase",
+      "Done. Policy is active. Your agent monitors and claims automatically.",
+    ],
+    needs: [
+      "An AI agent (Claude, GPT, any LLM with tool use)",
+      "A wallet with USDY on Base L2",
+      "The Skill file (link below)",
+    ],
+    available: "This is available TODAY. No SDK needed, no plugin, just HTTP calls.",
+    ctaLabel: "Contact Us for Help",
+  },
+  elizaos: {
+    title: "Connect via ElizaOS",
+    subtitle: "Coming Soon — Native plugin for the ElizaOS agent framework.",
+    whatIs: { q: "What is ElizaOS?", a: "ElizaOS is a popular open-source framework for building AI agents that can interact with the real world. Think of it as an operating system for your AI — it handles memory, conversations, and actions." },
+    howLabel: "How it will work:",
+    steps: [
+      "Install the Lumina plugin: npm install @lumina/elizaos-plugin",
+      "Add it to your agent's configuration",
+      "Your agent automatically gets insurance and yield capabilities",
+    ],
+    fallback: "In the meantime, you can use the REST API — it works with any ElizaOS agent today via the HTTP action.",
+    ctaLabel: "Contact Us for Updates",
+  },
+  langchain: {
+    title: "Connect via LangChain",
+    subtitle: "Coming Soon — Lumina tools for LangChain agents.",
+    whatIs: { q: "What is LangChain?", a: "LangChain is the most popular framework for building AI applications. It lets you chain together LLMs, tools, and data sources. Think of it as LEGO blocks for AI." },
+    howLabel: "How it will work:",
+    steps: [
+      "Import the Lumina toolkit: from lumina import LuminaToolkit",
+      "Add tools to your agent: agent.add_tools(LuminaToolkit())",
+      "Your agent can now quote, buy, deposit, and claim automatically",
+    ],
+    fallback: "In the meantime, you can use the REST API — LangChain agents can make HTTP calls natively with the RequestsTool.",
+    ctaLabel: "Contact Us for Updates",
+  },
+  virtuals: {
+    title: "Connect via Virtuals Protocol",
+    subtitle: "Coming Soon — Lumina on the Virtuals ACP marketplace.",
+    whatIs: { q: "What is Virtuals Protocol?", a: "Virtuals is a decentralized marketplace where AI agents offer services to each other. Think of it as an app store, but for AI agents instead of humans. Your agent browses, finds Lumina, and starts using it." },
+    howLabel: "How it will work:",
+    steps: [
+      "Find Lumina on the Virtuals ACP marketplace",
+      "Your agent registers via the ACP Handler",
+      "Insurance and yield operations are available as ACP actions",
+    ],
+    fallback: "In the meantime, you can use the REST API — any Virtuals agent can make HTTP calls.",
+    ctaLabel: "Contact Us for Updates",
+  },
+}
+
+function CompatibilityCards({ accent, borderAccent, skillUrl }: { accent: "cyan" | "purple"; borderAccent: string; skillUrl: string }) {
+  const [modalKey, setModalKey] = useState<IntegrationKey | null>(null)
+  const modalData = modalKey ? INTEGRATION_MODALS[modalKey] : null
+  const borderModal = accent === "cyan" ? "border-cyan-500/40" : "border-purple-500/40"
+  const textAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
+  const checkColor = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
+  const btnClass = accent === "cyan"
+    ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20"
+    : "bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20"
+
+  return (
+    <div className="mb-6">
+      <p className="text-sm text-white/60 mb-4 text-center">Compatible with:</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {INTEGRATIONS.map((c) => (
+          <div
+            key={c.key}
+            onClick={() => setModalKey(c.key)}
+            className="bg-white/[0.03] border border-white/10 rounded-xl p-5 hover:scale-[1.02] hover:border-white/20 transition-all duration-200 cursor-pointer"
+          >
+            <div className="text-2xl mb-3">{c.icon}</div>
+            <h4 className="text-sm font-semibold text-white mb-1">{c.name}</h4>
+            <p className="text-xs text-white/50 mb-3 leading-relaxed">{c.desc}</p>
+            <span className={`text-xs font-medium ${c.statusColor}`}>{c.status}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {modalData && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setModalKey(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className={`bg-[#12121A] border ${borderModal} rounded-2xl p-8 max-w-2xl w-full max-h-[85vh] overflow-y-auto`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h3 className={`text-xl font-bold ${textAccent} mb-1`}>{modalData.title}</h3>
+                  <p className="text-sm text-white/50">{modalData.subtitle}</p>
+                </div>
+                <button onClick={() => setModalKey(null)} className="text-white/40 hover:text-white transition-colors p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+              </div>
+
+              {/* What is this? */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-white mb-2">{modalData.whatIs.q}</h4>
+                <p className="text-sm text-white/50 leading-relaxed">{modalData.whatIs.a}</p>
+              </div>
+
+              {/* Steps */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-white mb-3">{modalData.howLabel}</h4>
+                <div className="space-y-3">
+                  {modalData.steps.map((step, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className={`w-6 h-6 rounded-full border ${borderAccent} flex items-center justify-center shrink-0 mt-0.5`}>
+                        <span className={`text-xs font-bold ${textAccent}`}>{i + 1}</span>
+                      </div>
+                      <p className="text-sm text-white/60 leading-relaxed">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Needs (HTTP only) */}
+              {modalData.needs && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-white mb-2">What you need:</h4>
+                  <div className="space-y-1.5">
+                    {modalData.needs.map((n) => (
+                      <div key={n} className="flex items-start gap-2">
+                        <span className={`${checkColor} text-sm mt-0.5`}>✓</span>
+                        <span className="text-sm text-white/60">{n}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Available note */}
+              {modalData.available && (
+                <p className="text-sm text-green-400 font-medium mb-6">{modalData.available}</p>
+              )}
+
+              {/* Fallback */}
+              {modalData.fallback && (
+                <p className="text-sm text-white/40 mb-6 leading-relaxed">{modalData.fallback}</p>
+              )}
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <CopyButton text={skillUrl} accent={accent} />
+                <a href="mailto:hello@lumina-org.com" className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${btnClass}`}>
+                  {modalData.ctaLabel}
+                </a>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
