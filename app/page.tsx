@@ -1055,31 +1055,20 @@ const YIELD_VAULTS: Record<YieldVaultKey, {
   "stable-long": { label: "Stable Long", cooldown: 365, premiumAPYmin: 0.15, premiumAPYmax: 0.36, usdyBase: 0.0355, products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
 }
 
-const YIELD_PERIOD_RANGES: Record<YieldVaultKey, [number, number, number]> = {
-  "volatile-short": [1, 36, 3],
-  "volatile-long": [3, 36, 6],
-  "stable-short": [3, 36, 6],
-  "stable-long": [12, 36, 12],
-}
-
 function YieldCalculatorSection() {
   const [vault, setVault] = useState<YieldVaultKey>("volatile-short")
   const [deposit, setDeposit] = useState(100000)
-  const [months, setMonths] = useState(3)
-
-  const handleVaultChange = (v: YieldVaultKey) => {
-    setVault(v)
-    const [minM] = YIELD_PERIOD_RANGES[v]
-    if (months < minM) setMonths(minM)
-  }
 
   const v = YIELD_VAULTS[vault]
-  const [minMonths, maxMonths] = YIELD_PERIOD_RANGES[vault]
   const avgPremiumAPY = (v.premiumAPYmin + v.premiumAPYmax) / 2
-  const totalAPY = v.usdyBase + avgPremiumAPY
-  const usdyYield = deposit * v.usdyBase * (months / 12)
-  const premiumYield = deposit * avgPremiumAPY * (months / 12)
-  const totalYield = usdyYield + premiumYield
+  const effectiveAPY = v.usdyBase + avgPremiumAPY
+
+  const monthlyUSDY = deposit * v.usdyBase / 12
+  const monthlyPremium = deposit * avgPremiumAPY / 12
+  const monthlyTotal = monthlyUSDY + monthlyPremium
+  const annualUSDY = deposit * v.usdyBase
+  const annualPremium = deposit * avgPremiumAPY
+  const annualTotal = annualUSDY + annualPremium
 
   const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
   const fmt2 = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -1102,7 +1091,7 @@ function YieldCalculatorSection() {
               <CustomDropdown
                 label="Vault"
                 value={vault}
-                onChange={(v) => handleVaultChange(v as YieldVaultKey)}
+                onChange={(val) => setVault(val as YieldVaultKey)}
                 options={[
                   { value: "volatile-short", label: "Volatile Short" },
                   { value: "volatile-long", label: "Volatile Long" },
@@ -1126,50 +1115,78 @@ function YieldCalculatorSection() {
                 </div>
               </div>
 
-              {/* Period */}
-              <div>
-                <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">
-                  Period: {months} month{months !== 1 ? "s" : ""}
-                </label>
-                <input
-                  type="range" min={minMonths} max={maxMonths} step={1} value={Math.max(months, minMonths)}
-                  onChange={(e) => setMonths(Number(e.target.value))}
-                  className="w-full accent-purple-400 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
-                />
-                <div className="flex justify-between text-xs text-white/30 mt-1">
-                  <span>{minMonths} mo</span><span>{maxMonths} mo</span>
-                </div>
-                <p className="text-xs text-white/25 mt-2">
-                  Minimum period = vault cooldown ({v.cooldown} days). You can hold longer — deposits are indefinite.
+              {/* Indefinite deposit explanation */}
+              <div className="rounded-xl bg-white/[0.02] border border-purple-500/10 p-5">
+                <p className="text-sm text-white/60 leading-relaxed mb-5">
+                  Your deposit earns yield <span className="text-white font-medium">INDEFINITELY</span>. There is no fixed term.<br />
+                  When you decide to leave:
                 </p>
+
+                {/* Mini-timeline */}
+                <div className="relative flex items-start justify-between px-2">
+                  {/* Connecting line */}
+                  <div className="absolute top-[7px] left-[18px] right-[18px] h-[2px] bg-purple-500/30" />
+
+                  {/* Point 1 */}
+                  <div className="relative flex flex-col items-center text-center w-1/3">
+                    <div className="w-3.5 h-3.5 rounded-full bg-purple-500 border-2 border-purple-400 z-10" />
+                    <span className="text-xs font-semibold text-purple-400 mt-2">Deposit</span>
+                    <span className="text-[10px] text-white/30 mt-0.5">Today</span>
+                    <span className="text-[10px] text-white/40 mt-0.5">Start earning</span>
+                  </div>
+
+                  {/* Point 2 */}
+                  <div className="relative flex flex-col items-center text-center w-1/3">
+                    <div className="w-3.5 h-3.5 rounded-full bg-purple-500 border-2 border-purple-400 z-10" />
+                    <span className="text-xs font-semibold text-purple-400 mt-2">Request Exit</span>
+                    <span className="text-[10px] text-white/30 mt-0.5">When you decide</span>
+                    <span className="text-[10px] text-white/40 mt-0.5">Cooldown starts</span>
+                    <span className="text-[10px] text-white/30 mt-0.5">(still earning)</span>
+                  </div>
+
+                  {/* Point 3 */}
+                  <div className="relative flex flex-col items-center text-center w-1/3">
+                    <div className="w-3.5 h-3.5 rounded-full bg-purple-500 border-2 border-purple-400 z-10" />
+                    <span className="text-xs font-semibold text-purple-400 mt-2">Withdraw</span>
+                    <span className="text-[10px] text-white/30 mt-0.5">+ {v.cooldown} days later</span>
+                    <span className="text-[10px] text-white/40 mt-0.5">Get principal + yield</span>
+                  </div>
+                </div>
+
+                <div className="mt-5 space-y-1">
+                  <p className="text-xs text-white/40">Cooldown for {v.label}: <span className="text-white/60 font-medium">{v.cooldown} days</span></p>
+                  <p className="text-xs text-white/40">During cooldown you <span className="text-white/60 font-medium">KEEP earning</span> from existing policies.</p>
+                </div>
               </div>
             </div>
 
             {/* Results */}
             <div className="space-y-4">
-              {/* Row 1: Yield breakdown */}
+              {/* Row 1: Monthly & Annual */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
-                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">USDY Base Yield</div>
-                  <div className="text-lg font-bold text-white">${fmt2(usdyYield)}</div>
-                  <div className="text-xs text-white/30 mt-1">(3.55% from Ondo Finance)</div>
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Monthly Yield</div>
+                  <div className="text-xl font-bold text-purple-400">${fmt2(monthlyTotal)}</div>
+                  <div className="text-xs text-white/30 mt-1">USDY ${fmt2(monthlyUSDY)} + Premiums ${fmt2(monthlyPremium)}</div>
                 </div>
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
-                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Premium Yield</div>
-                  <div className="text-lg font-bold text-white">${fmt2(premiumYield)}</div>
-                  <div className="text-xs text-white/30 mt-1">(estimated at avg utilization)</div>
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Annual Yield</div>
+                  <div className="text-2xl font-bold text-purple-400">${fmt(annualTotal)}</div>
+                  <div className="text-xs text-white/30 mt-1">USDY ${fmt(annualUSDY)} + Premiums ${fmt(annualPremium)}</div>
                 </div>
               </div>
 
-              {/* Row 2: Totals */}
+              {/* Row 2: APY & Exit */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4">
-                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Total Yield</div>
-                  <div className="text-2xl font-bold text-purple-400">${fmt(totalYield)}</div>
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Effective APY</div>
+                  <div className="text-2xl font-bold text-purple-400">{(effectiveAPY * 100).toFixed(1)}%</div>
+                  <div className="text-xs text-white/30 mt-1">USDY 3.55% + Premiums ~{(avgPremiumAPY * 100).toFixed(0)}%</div>
                 </div>
                 <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4">
-                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Effective APY</div>
-                  <div className="text-2xl font-bold text-purple-400">{(totalAPY * 100).toFixed(1)}%</div>
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Exit Timeline</div>
+                  <div className="text-2xl font-bold text-purple-400">{v.cooldown}d notice</div>
+                  <div className="text-xs text-white/30 mt-1">Deposit is indefinite. This is the exit notice required.</div>
                 </div>
               </div>
 
