@@ -205,7 +205,169 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* PRODUCTS */}
+      {perspective === "protect" && (
+        <ProductsSection />
+      )}
     </main>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  PRODUCTS SECTION                                         */
+/* ═══════════════════════════════════════════════════════════ */
+
+const PRODUCTS = [
+  {
+    key: "bss",
+    emoji: "🌊",
+    label: "Black Swan Shield",
+    tagline: "Insurance against catastrophic crashes",
+    analogy: "Like hurricane insurance — covers the worst-case scenario",
+    rows: [
+      ["Trigger", "ETH or BTC drops >30% from your purchase price"],
+      ["Payout", "80% of coverage (net 77.6% after 3% fee)"],
+      ["Duration", "7–30 days"],
+      ["Waiting Period", "None — instant coverage"],
+      ["Price", "From 0.53% for 7 days"],
+    ],
+    example: "$50K coverage, 14 days → Premium $527 → If triggered: receive $38,800 → Return: 73x",
+  },
+  {
+    key: "depeg",
+    emoji: "🔥",
+    label: "Depeg Shield",
+    tagline: "Protection when stablecoins lose their peg",
+    analogy: "Like fire insurance — 24h waiting because you can smell the smoke before it burns",
+    rows: [
+      ["Trigger", "Stablecoin TWAP 30 min < $0.95"],
+      ["Covers", "USDC (net 87.3%), DAI (net 85.4%), USDT (net 82.5%)"],
+      ["Duration", "14–365 days"],
+      ["Waiting Period", "24 hours"],
+      ["Price", "Discounts for longer durations: 10% off at 91d, 20% off at 181d"],
+    ],
+    example: "$100K USDC, 90 days → Premium $3,699 → If triggered: receive $87,300",
+  },
+  {
+    key: "il",
+    emoji: "🚗",
+    label: "IL Index Cover",
+    tagline: "Proportional coverage for impermanent loss",
+    analogy: "Like car dent insurance — small dent = small payout, big crash = bigger payout",
+    rows: [
+      ["Trigger", "IL > 2% at policy expiry (European-style, 48h claim window)"],
+      ["Payout", "Proportional: Coverage × (IL% − 2%) × 90% × 97%. Cap at 11.7%"],
+      ["Duration", "14–90 days"],
+      ["Waiting Period", "None"],
+      ["Key Difference", "ONLY product with proportional payout. Can ONLY claim during 48h window after expiry."],
+    ],
+    example: "ETH moves ±50% → IL 5.7% → Net payout $1,665 on $50K coverage",
+  },
+  {
+    key: "exploit",
+    emoji: "🏦",
+    label: "Exploit Shield",
+    tagline: "Coverage against protocol hacks",
+    analogy: "Like bank robbery insurance — dual trigger prevents false alarms",
+    rows: [
+      ["Trigger", "DUAL: Governance token −25% in 24h AND receipt token −30% for 4h (or contract paused)"],
+      ["Payout", "90% of coverage (net 87.3% after fee)"],
+      ["Duration", "90–365 days"],
+      ["Waiting Period", "14 days (anti-insider)"],
+      ["Cap", "$50,000 per wallet"],
+      ["Protocols", "Aave, Compound, Uniswap, MakerDAO, Curve, Morpho"],
+      ["Why Dual Trigger", "Bear market drops gov tokens but aUSDC stays at $1 = NOT an exploit. Only real hacks trigger BOTH."],
+    ],
+    example: "",
+  },
+]
+
+function ProductsSection() {
+  const [active, setActive] = useState(0)
+  const product = PRODUCTS[active]
+
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Insurance Products
+        </h2>
+        <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
+          Four parametric products. Each with its own trigger, payout, and oracle verification.
+        </p>
+
+        {/* Tabs */}
+        <div className="flex overflow-x-auto gap-1 mb-8 border-b border-white/5 pb-px scrollbar-hide">
+          {PRODUCTS.map((p, i) => (
+            <button
+              key={p.key}
+              onClick={() => setActive(i)}
+              className={`flex items-center gap-2 px-5 py-3 text-sm font-medium whitespace-nowrap transition-all ${
+                active === i
+                  ? "text-cyan-400 border-b-2 border-cyan-400"
+                  : "text-white/40 hover:text-white/60"
+              }`}
+            >
+              <span>{p.emoji}</span>
+              <span>{p.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Card */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={product.key}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.25 }}
+            className="rounded-2xl bg-white/[0.02] border border-cyan-500/20 p-6 md:p-8"
+          >
+            {/* Header */}
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-2">
+                <span className="mr-2">{product.emoji}</span>
+                {product.label}
+              </h3>
+              <p className="text-cyan-400 text-[15px] mb-1">{product.tagline}</p>
+              <p className="text-white/40 text-sm italic">{product.analogy}</p>
+            </div>
+
+            {/* Info rows */}
+            <div className="space-y-3 mb-6">
+              {product.rows.map(([label, value]) => (
+                <div key={label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 py-2 border-b border-white/5 last:border-0">
+                  <span className="text-xs uppercase tracking-wider text-white/30 sm:w-40 shrink-0 font-medium">{label}</span>
+                  <span className="text-[15px] text-white/70 leading-relaxed">{value}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Example */}
+            {product.example && (
+              <div className="rounded-xl bg-cyan-500/5 border border-cyan-500/10 p-4 mb-6">
+                <span className="text-xs uppercase tracking-wider text-cyan-400/60 font-medium block mb-1">Example</span>
+                <p className="text-[15px] text-white/70">{product.example}</p>
+              </div>
+            )}
+
+            {/* CTA */}
+            <div className="text-center pt-2">
+              <a
+                href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition-all"
+              >
+                Give This Skill To Your Agent →
+              </a>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </section>
   )
 }
 
