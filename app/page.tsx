@@ -25,9 +25,15 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-sm text-white/60 mb-8"
+            className="inline-flex items-center px-4 py-2 rounded-full border border-white/10 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 text-sm mb-8"
           >
-            Built on Base L2 · Powered by USDY
+            <span className="relative flex h-2.5 w-2.5 mr-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+            </span>
+            <span className="text-cyan-400">Built on Base L2</span>
+            <span className="text-white/30 mx-1"> · </span>
+            <span className="text-purple-400">Powered by USDY</span>
           </motion.div>
 
           {/* Headline */}
