@@ -440,51 +440,191 @@ const VAULTS = [
     name: "Volatile Short",
     symbol: "lvsUSDY",
     cooldown: "30 days",
-    apy: "12-15%",
+    apy: "12-25%",
     base: "3.55%",
-    premiums: "9-11%",
+    premiums: "9-21%",
     backs: ["BSS 7-30d", "IL Index 14-30d"],
     risk: "Higher",
     riskColor: "text-red-400",
     bestFor: "Quick access traders who want short commitment",
+    technicalDetails: [
+      ["Contract", "VolatileShortVault.sol"],
+      ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
+      ["Cooldown", "30 days exit notice (NOT a lock)"],
+      ["Max Allocation", "20% of vault TVL per product"],
+      ["Waterfall", "First choice for BSS 7-30d and IL 14-30d"],
+      ["During Cooldown", "Capital still earns from existing policies, no new policies assigned"],
+      ["Withdrawal", "requestWithdrawal() → wait 30d → completeWithdrawal()"],
+      ["Cancel", "cancelWithdrawal() returns to full availability"],
+      ["USDY Yield", "3.55% from Ondo Finance (US Treasuries), independent of Lumina"],
+      ["Premium Yield", "Dynamic, depends on # of policies and Kink multiplier"],
+      ["Worst Case", "BSS crash + IL spike = ~30% TVL loss in a month (5-10yr event)"],
+    ],
   },
   {
     name: "Volatile Long",
     symbol: "lvlUSDY",
     cooldown: "90 days",
-    apy: "15-18%",
+    apy: "15-30%",
     base: "3.55%",
-    premiums: "12-14%",
+    premiums: "12-26%",
     backs: ["IL Index 60-90d", "BSS overflow"],
     risk: "Higher",
     riskColor: "text-red-400",
     bestFor: "Balanced investors who want higher yield",
+    technicalDetails: [
+      ["Contract", "VolatileLongVault.sol"],
+      ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
+      ["Cooldown", "90 days exit notice"],
+      ["Waterfall", "Receives overflow when VolatileShort is full (>95% utilized)"],
+      ["Backs", "IL 60-90d policies and BSS when Short vault is >95% utilized"],
+      ["Higher Yield", "Longer commitment = longer policies = more premium per dollar"],
+      ["Withdrawal", "requestWithdrawal() → wait 90d → completeWithdrawal()"],
+      ["Worst Case", "Same risk type as VolatileShort but longer lock = higher yield compensation"],
+    ],
   },
   {
     name: "Stable Short",
     symbol: "lssUSDY",
     cooldown: "90 days",
-    apy: "11-14%",
+    apy: "11-22%",
     base: "3.55%",
-    premiums: "8-10%",
+    premiums: "8-18%",
     backs: ["Depeg Shield 14-90d"],
     risk: "Low",
     riskColor: "text-green-400",
     bestFor: "Conservative investors",
+    technicalDetails: [
+      ["Contract", "StableShortVault.sol"],
+      ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
+      ["Cooldown", "90 days exit notice"],
+      ["Restriction", "Cannot back Exploit Shield (90d policy + 14d waiting = 104d > 90d cooldown)"],
+      ["Only Backs", "Depeg Shield 14-90d"],
+      ["Claim Risk", "Lower — stablecoin depegs are rare (2-3 per decade)"],
+      ["Withdrawal", "requestWithdrawal() → wait 90d → completeWithdrawal()"],
+      ["Worst Case", "Major depeg like USDC March 2023 (went to $0.87) = ~20% TVL loss"],
+    ],
   },
   {
     name: "Stable Long",
     symbol: "lslUSDY",
     cooldown: "365 days",
-    apy: "18-26%",
+    apy: "18-40%",
     base: "3.55%",
-    premiums: "15-22%",
+    premiums: "15-36%",
     backs: ["Depeg 365d", "Exploit Shield 90-365d"],
     risk: "Very low",
     riskColor: "text-green-400",
     bestFor: "Institutions, DAOs, family offices — set and forget",
+    technicalDetails: [
+      ["Contract", "StableLongVault.sol"],
+      ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
+      ["Cooldown", "365 days exit notice — longest commitment, highest yield"],
+      ["Monopoly", "ONLY vault that can back annual Depeg policies and Exploit Shield"],
+      ["Advantage", "Monopoly on long-term premiums → highest APY"],
+      ["Target", "Institutional LPs, DAO treasuries, family offices"],
+      ["Exploit Risk", "Extremely rare: dual trigger + 14d waiting + $50K cap"],
+      ["Withdrawal", "requestWithdrawal() → wait 365d → completeWithdrawal()"],
+      ["Worst Case", "Simultaneous depeg + exploit = ~25% TVL loss (once per decade)"],
+    ],
   },
 ]
+
+function VaultCard({ v }: { v: typeof VAULTS[number] }) {
+  const [detailsOpen, setDetailsOpen] = useState(false)
+
+  return (
+    <div className="rounded-2xl bg-white/[0.02] border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 p-6 flex flex-col h-full">
+      {/* APY */}
+      <div className="min-h-[72px]">
+        <div>
+          <span className="text-3xl font-bold text-purple-400">{v.apy}</span>
+          <span className="text-sm text-white/40 ml-2">APY</span>
+        </div>
+        <p className="text-sm text-white/50">
+          USDY {v.base} + Premiums {v.premiums}
+        </p>
+        <p className="text-xs text-white/30">Range reflects 20-90% utilization via Kink Model</p>
+      </div>
+
+      {/* Name + Symbol */}
+      <div className="min-h-[52px] mt-4">
+        <h3 className="text-lg font-semibold mb-1">{v.name}</h3>
+        <span className="text-xs font-mono text-purple-400/60">{v.symbol}</span>
+      </div>
+
+      {/* Cooldown */}
+      <div className="flex items-center gap-2 text-sm text-white/60 min-h-[32px] mt-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Cooldown: {v.cooldown}
+      </div>
+
+      {/* Backs */}
+      <div className="min-h-[60px] mt-3">
+        <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Backs</span>
+        <div className="flex flex-wrap gap-1">
+          {v.backs.map((b) => (
+            <span key={b} className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full">{b}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Risk */}
+      <div className="min-h-[40px] mt-3">
+        <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Risk</span>
+        <span className={`text-sm font-medium ${v.riskColor}`}>{v.risk}</span>
+      </div>
+
+      {/* Best for */}
+      <p className="text-sm text-white/40 italic min-h-[40px] mt-3">{v.bestFor}</p>
+
+      {/* Technical Details */}
+      <div className="mt-auto pt-4">
+        <button
+          onClick={() => setDetailsOpen(!detailsOpen)}
+          className="flex items-center gap-2 text-xs text-white/40 hover:text-white/60 transition-colors"
+        >
+          <motion.svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            animate={{ rotate: detailsOpen ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <path d="m6 9 6 6 6-6" />
+          </motion.svg>
+          Technical Details
+        </button>
+        <AnimatePresence>
+          {detailsOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-2 bg-white/[0.03] border-t border-white/10 rounded-lg p-3 space-y-2">
+                {v.technicalDetails.map(([label, value]) => (
+                  <div key={label} className="flex flex-col gap-0.5">
+                    <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium">{label}</span>
+                    <span className="text-xs text-white/70">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
 
 function VaultsSection() {
   return (
@@ -506,45 +646,8 @@ function VaultsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="rounded-2xl bg-white/[0.02] border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 p-6 flex flex-col"
             >
-              {/* APY */}
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-purple-400">{v.apy}</span>
-                <span className="text-sm text-white/40 ml-2">APY</span>
-              </div>
-              <p className="text-sm text-white/50 mb-4">
-                USDY {v.base} + Premiums {v.premiums}
-              </p>
-
-              {/* Name + Symbol */}
-              <h3 className="text-lg font-semibold mb-1">{v.name}</h3>
-              <span className="text-xs font-mono text-purple-400/60 mb-4">{v.symbol}</span>
-
-              {/* Cooldown */}
-              <div className="flex items-center gap-2 text-sm text-white/60 mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Cooldown: {v.cooldown}
-              </div>
-
-              {/* Backs */}
-              <div className="mb-3">
-                <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Backs</span>
-                <div className="flex flex-wrap gap-1">
-                  {v.backs.map((b) => (
-                    <span key={b} className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full">{b}</span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Risk */}
-              <div className="mb-3">
-                <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Risk</span>
-                <span className={`text-sm font-medium ${v.riskColor}`}>{v.risk}</span>
-              </div>
-
-              {/* Best for */}
-              <p className="text-sm text-white/40 italic mt-auto">{v.bestFor}</p>
+              <VaultCard v={v} />
             </motion.div>
           ))}
         </div>
