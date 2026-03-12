@@ -1210,7 +1210,7 @@ function YieldCalculatorSection() {
               </div>
 
               {/* Risk Scenarios */}
-              <RiskScenariosSection vaultKey={vault} deposit={deposit} monthlyTotal={monthlyTotal} />
+              <RiskScenariosSection vaultKey={vault} deposit={deposit} monthlyTotal={monthlyTotal} annualTotal={annualTotal} />
 
               {/* Warning */}
               <p className="text-xs text-white/30 leading-relaxed">
@@ -1267,7 +1267,7 @@ const RISK_SCENARIOS: Record<YieldVaultKey, {
   ],
 }
 
-function RiskScenariosSection({ vaultKey, deposit, monthlyTotal }: { vaultKey: YieldVaultKey; deposit: number; monthlyTotal: number }) {
+function RiskScenariosSection({ vaultKey, deposit, monthlyTotal, annualTotal }: { vaultKey: YieldVaultKey; deposit: number; monthlyTotal: number; annualTotal: number }) {
   const scenarios = RISK_SCENARIOS[vaultKey]
   const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
 
@@ -1294,13 +1294,16 @@ function RiskScenariosSection({ vaultKey, deposit, monthlyTotal }: { vaultKey: Y
                 </div>
                 <div className="text-right">
                   {s.lossPct === 0 ? (
-                    <span className="text-sm font-semibold text-green-400">Loss: $0</span>
+                    <span className="text-sm font-bold text-green-400">Gain: +${fmt(annualTotal)}</span>
                   ) : (
                     <span className={`text-sm font-semibold ${c.text}`}>Potential Loss: -${fmt(loss)}</span>
                   )}
                 </div>
               </div>
               <p className="text-xs text-white/50 leading-relaxed">{s.description}</p>
+              {s.lossPct === 0 && (
+                <p className="text-xs text-green-400/70 mt-1">Your deposit grows to ${fmt(deposit + annualTotal)} after 12 months.</p>
+              )}
               {recoveryMonths > 0 && (
                 <p className="text-xs text-white/40 mt-1">Recovery Time: ~{recoveryMonths} month{recoveryMonths !== 1 ? "s" : ""} of yield</p>
               )}
