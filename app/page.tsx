@@ -1888,6 +1888,7 @@ const COMPARISON_ROWS: { feature: string; lumina: string; traditional: string }[
 function ComparisonSection({ perspective }: { perspective: Perspective }) {
   const accent = perspective === "protect" ? "cyan" : "purple"
   const borderTop = accent === "cyan" ? "border-t-cyan-500" : "border-t-purple-500"
+  const checkAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
 
   return (
     <section className="py-24 px-4">
@@ -1914,7 +1915,7 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
                 <tr key={row.feature} className="border-b border-white/5">
                   <td className="py-3 px-4 text-white/50 font-medium">{row.feature}</td>
                   <td className="py-3 px-4 bg-white/[0.03] text-white/80 font-medium">
-                    {row.lumina.startsWith("✅") ? <><span className="text-green-400">✅</span>{row.lumina.slice(1)}</> : row.lumina}
+                    {row.lumina.startsWith("✅") ? <><span className={checkAccent}>✅</span>{row.lumina.slice(1)}</> : row.lumina}
                   </td>
                   <td className="py-3 px-4 text-white/40">
                     {row.traditional.startsWith("❌") ? <><span className="text-white/30">❌</span>{row.traditional.slice(1)}</> : row.traditional}
@@ -1940,7 +1941,7 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
                     <div key={row.feature} className="flex justify-between text-xs">
                       <span className="text-white/40">{row.feature}</span>
                       <span className={`text-right ${proto.isHighlight ? "text-white/80 font-medium" : "text-white/40"}`}>
-                        {val.startsWith("✅") ? <><span className="text-green-400">✅</span>{val.slice(1)}</> : val.startsWith("❌") ? <><span className="text-white/30">❌</span>{val.slice(1)}</> : val}
+                        {val.startsWith("✅") ? <><span className={checkAccent}>✅</span>{val.slice(1)}</> : val.startsWith("❌") ? <><span className="text-white/30">❌</span>{val.slice(1)}</> : val}
                       </span>
                     </div>
                   )
