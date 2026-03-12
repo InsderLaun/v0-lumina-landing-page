@@ -210,6 +210,11 @@ export default function Home() {
       {perspective === "protect" && (
         <ProductsSection />
       )}
+
+      {/* VAULTS */}
+      {perspective === "earn" && (
+        <VaultsSection />
+      )}
     </main>
   )
 }
@@ -421,6 +426,159 @@ function ProductsSection() {
             </div>
           </motion.div>
         </AnimatePresence>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  VAULTS SECTION                                           */
+/* ═══════════════════════════════════════════════════════════ */
+
+const VAULTS = [
+  {
+    name: "Volatile Short",
+    symbol: "lvsUSDY",
+    cooldown: "30 days",
+    apy: "12-15%",
+    base: "3.55%",
+    premiums: "9-11%",
+    backs: ["BSS 7-30d", "IL Index 14-30d"],
+    risk: "Higher",
+    riskColor: "text-red-400",
+    bestFor: "Quick access traders who want short commitment",
+  },
+  {
+    name: "Volatile Long",
+    symbol: "lvlUSDY",
+    cooldown: "90 days",
+    apy: "15-18%",
+    base: "3.55%",
+    premiums: "12-14%",
+    backs: ["IL Index 60-90d", "BSS overflow"],
+    risk: "Higher",
+    riskColor: "text-red-400",
+    bestFor: "Balanced investors who want higher yield",
+  },
+  {
+    name: "Stable Short",
+    symbol: "lssUSDY",
+    cooldown: "90 days",
+    apy: "11-14%",
+    base: "3.55%",
+    premiums: "8-10%",
+    backs: ["Depeg Shield 14-90d"],
+    risk: "Low",
+    riskColor: "text-green-400",
+    bestFor: "Conservative investors",
+  },
+  {
+    name: "Stable Long",
+    symbol: "lslUSDY",
+    cooldown: "365 days",
+    apy: "18-26%",
+    base: "3.55%",
+    premiums: "15-22%",
+    backs: ["Depeg 365d", "Exploit Shield 90-365d"],
+    risk: "Very low",
+    riskColor: "text-green-400",
+    bestFor: "Institutions, DAOs, family offices — set and forget",
+  },
+]
+
+function VaultsSection() {
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Yield Vaults
+        </h2>
+        <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
+          Four vaults. Each backs different products with different risk and cooldown.
+        </p>
+
+        {/* Vault cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
+          {VAULTS.map((v) => (
+            <motion.div
+              key={v.symbol}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="rounded-2xl bg-white/[0.02] border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 p-6 flex flex-col"
+            >
+              {/* APY */}
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-purple-400">{v.apy}</span>
+                <span className="text-sm text-white/40 ml-2">APY</span>
+              </div>
+              <p className="text-sm text-white/50 mb-4">
+                USDY {v.base} + Premiums {v.premiums}
+              </p>
+
+              {/* Name + Symbol */}
+              <h3 className="text-lg font-semibold mb-1">{v.name}</h3>
+              <span className="text-xs font-mono text-purple-400/60 mb-4">{v.symbol}</span>
+
+              {/* Cooldown */}
+              <div className="flex items-center gap-2 text-sm text-white/60 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Cooldown: {v.cooldown}
+              </div>
+
+              {/* Backs */}
+              <div className="mb-3">
+                <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Backs</span>
+                <div className="flex flex-wrap gap-1">
+                  {v.backs.map((b) => (
+                    <span key={b} className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full">{b}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Risk */}
+              <div className="mb-3">
+                <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Risk</span>
+                <span className={`text-sm font-medium ${v.riskColor}`}>{v.risk}</span>
+              </div>
+
+              {/* Best for */}
+              <p className="text-sm text-white/40 italic mt-auto">{v.bestFor}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Cooldown explainer */}
+        <div className="bg-white/[0.03] border border-purple-500/10 rounded-xl p-6 mb-10">
+          <h3 className="text-xl font-semibold mb-4">What is a Cooldown?</h3>
+          <div className="space-y-3 text-[15px] text-white/60 leading-relaxed">
+            <p>
+              Cooldown is <span className="text-white font-medium">NOT a lock period</span>. It&apos;s an <span className="text-white font-medium">EXIT NOTICE</span>.
+            </p>
+            <p>
+              Think of it like renting an apartment: you move in (deposit) and live there as long as you want (earn yield). One day you decide to move out (request withdrawal). You give 30 days notice (cooldown). After 30 days, you leave with your deposit + everything you earned.
+            </p>
+            <p>
+              Why? Because your money backs insurance policies. If everyone could withdraw instantly during a crash, the policies would have no collateral.
+            </p>
+            <p>
+              Your money keeps earning during the cooldown. The only change is that no NEW policies are assigned to your capital.
+            </p>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="text-center">
+          <a
+            href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 transition-all"
+          >
+            Give Your Agent the Skill →
+          </a>
+        </div>
       </div>
     </section>
   )
