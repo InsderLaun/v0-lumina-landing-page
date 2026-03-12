@@ -1055,12 +1055,26 @@ const YIELD_VAULTS: Record<YieldVaultKey, {
   "stable-long": { label: "Stable Long", cooldown: 365, premiumAPYmin: 0.15, premiumAPYmax: 0.36, usdyBase: 0.0355, products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
 }
 
+const YIELD_PERIOD_RANGES: Record<YieldVaultKey, [number, number, number]> = {
+  "volatile-short": [1, 36, 3],
+  "volatile-long": [3, 36, 6],
+  "stable-short": [3, 36, 6],
+  "stable-long": [12, 36, 12],
+}
+
 function YieldCalculatorSection() {
   const [vault, setVault] = useState<YieldVaultKey>("volatile-short")
   const [deposit, setDeposit] = useState(100000)
-  const [months, setMonths] = useState(12)
+  const [months, setMonths] = useState(3)
+
+  const handleVaultChange = (v: YieldVaultKey) => {
+    setVault(v)
+    const [minM] = YIELD_PERIOD_RANGES[v]
+    if (months < minM) setMonths(minM)
+  }
 
   const v = YIELD_VAULTS[vault]
+  const [minMonths, maxMonths] = YIELD_PERIOD_RANGES[vault]
   const avgPremiumAPY = (v.premiumAPYmin + v.premiumAPYmax) / 2
   const totalAPY = v.usdyBase + avgPremiumAPY
   const usdyYield = deposit * v.usdyBase * (months / 12)
@@ -1088,7 +1102,7 @@ function YieldCalculatorSection() {
               <CustomDropdown
                 label="Vault"
                 value={vault}
-                onChange={(v) => setVault(v as YieldVaultKey)}
+                onChange={(v) => handleVaultChange(v as YieldVaultKey)}
                 options={[
                   { value: "volatile-short", label: "Volatile Short" },
                   { value: "volatile-long", label: "Volatile Long" },
@@ -1118,13 +1132,16 @@ function YieldCalculatorSection() {
                   Period: {months} month{months !== 1 ? "s" : ""}
                 </label>
                 <input
-                  type="range" min={1} max={36} step={1} value={months}
+                  type="range" min={minMonths} max={maxMonths} step={1} value={Math.max(months, minMonths)}
                   onChange={(e) => setMonths(Number(e.target.value))}
                   className="w-full accent-purple-400 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-white/30 mt-1">
-                  <span>1 mo</span><span>36 mo</span>
+                  <span>{minMonths} mo</span><span>{maxMonths} mo</span>
                 </div>
+                <p className="text-xs text-white/25 mt-2">
+                  Minimum period = vault cooldown ({v.cooldown} days). You can hold longer — deposits are indefinite.
+                </p>
               </div>
             </div>
 
