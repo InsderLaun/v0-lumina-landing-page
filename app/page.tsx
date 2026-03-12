@@ -228,6 +228,9 @@ export default function Home() {
 
       {/* KINK MODEL EXPLAINER (shared) */}
       <KinkModelSection perspective={perspective} />
+
+      {/* AGENT SKILLS (shared) */}
+      <AgentSkillsSection perspective={perspective} />
     </main>
   )
 }
@@ -1477,6 +1480,175 @@ function KinkModelSection({ perspective }: { perspective: Perspective }) {
             <p className="text-xs text-white/30 leading-relaxed">
               &#9888;&#65039; The 95% cap is NOT a system failure — it&apos;s a SAFETY MECHANISM. It ensures there is ALWAYS enough capital in the vault to pay existing claims. As policies expire and capacity frees up, new policies are accepted again.
             </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  AGENT SKILLS SECTION                                     */
+/* ═══════════════════════════════════════════════════════════ */
+
+function CopyButton({ text, accent }: { text: string; accent: "cyan" | "purple" }) {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  const bg = accent === "cyan" ? "bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400" : "bg-purple-500/10 hover:bg-purple-500/20 text-purple-400"
+  return (
+    <button onClick={handleCopy} className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${bg}`}>
+      {copied ? "Copied!" : "📋 COPY"}
+    </button>
+  )
+}
+
+function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
+  const accent = perspective === "protect" ? "cyan" : "purple"
+  const borderAccent = accent === "cyan" ? "border-cyan-500/20" : "border-purple-500/20"
+  const textAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
+  const checkColor = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
+
+  const skillUrl = "lumina-org.com/skill-v2.md"
+  const githubUrl = "github.com/agustintiberio10/LUMINA-PROTOCOL/docs/SKILL-lumina-v2.md"
+
+  const hl = (text: string) => {
+    const cls = accent === "cyan"
+      ? "text-cyan-300 bg-cyan-500/10 px-1 rounded"
+      : "text-purple-300 bg-purple-500/10 px-1 rounded"
+    return <span className={cls}>{text}</span>
+  }
+
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Connect Your Agent
+        </h2>
+        <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
+          Lumina publishes a machine-readable Skill file. Give it to your agent and it knows what to do.
+        </p>
+
+        {/* BLOQUE 1 — Skill Link */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-6">
+          <p className="text-sm text-white/60 mb-4">Ask your agent to read:</p>
+          <div className="flex items-center gap-2 min-w-0 bg-white/[0.03] border border-white/10 rounded-lg px-4 py-3 mb-3">
+            <span className="text-sm text-white/70 font-mono truncate">{skillUrl}</span>
+            <CopyButton text={skillUrl} accent={accent} />
+          </div>
+          <p className="text-sm text-white/60 mb-3">Or from GitHub:</p>
+          <div className="flex items-center gap-2 min-w-0 bg-white/[0.03] border border-white/10 rounded-lg px-4 py-3">
+            <span className="text-sm text-white/70 font-mono truncate">{githubUrl}</span>
+            <CopyButton text={`https://${githubUrl}`} accent={accent} />
+          </div>
+        </div>
+
+        {/* BLOQUE 2 — Ready-made Prompts */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-6">
+          <p className="text-sm text-white/60 mb-4">Or copy a ready-made prompt for your agent:</p>
+
+          {perspective === "protect" ? (
+            <div className="space-y-3">
+              <div className={`flex items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
+                <p className="text-sm text-white/70 leading-relaxed flex-1">
+                  Read {skillUrl} and buy {hl("$50K")} of Black Swan coverage for my {hl("ETH")} position for {hl("14 days")}.
+                </p>
+                <CopyButton text={`Read ${skillUrl} and buy $50K of Black Swan coverage for my ETH position for 14 days.`} accent={accent} />
+              </div>
+              <div className={`flex items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
+                <p className="text-sm text-white/70 leading-relaxed flex-1">
+                  Read {skillUrl} and buy {hl("$100K")} of Depeg coverage for my {hl("USDC")} position for {hl("90 days")}.
+                </p>
+                <CopyButton text={`Read ${skillUrl} and buy $100K of Depeg coverage for my USDC position for 90 days.`} accent={accent} />
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className={`flex items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
+                <p className="text-sm text-white/70 leading-relaxed flex-1">
+                  Read {skillUrl} and deposit {hl("$10K")} USDY into the {hl("Stable Long")} vault for maximum yield.
+                </p>
+                <CopyButton text={`Read ${skillUrl} and deposit $10K USDY into the Stable Long vault for maximum yield.`} accent={accent} />
+              </div>
+              <div className={`flex items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
+                <p className="text-sm text-white/70 leading-relaxed flex-1">
+                  Read {skillUrl} and deposit {hl("$5K")} USDY into the {hl("Volatile Short")} vault for quick access yield.
+                </p>
+                <CopyButton text={`Read ${skillUrl} and deposit $5K USDY into the Volatile Short vault for quick access yield.`} accent={accent} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BLOQUE 3 — Compatibility */}
+        <div className="mb-6">
+          <p className="text-sm text-white/60 mb-4 text-center">Compatible with:</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { icon: "🤖", name: "ElizaOS", desc: "Install the Lumina plugin for ElizaOS agents.", status: "Coming Soon", statusColor: "text-amber-400" },
+              { icon: "🔗", name: "LangChain", desc: "Use Lumina tools in your LangChain agent.", status: "Coming Soon", statusColor: "text-amber-400" },
+              { icon: "🌐", name: "Virtuals Protocol", desc: "Discover Lumina on the Virtuals ACP marketplace.", status: "Coming Soon", statusColor: "text-amber-400" },
+              { icon: "⚡", name: "HTTP / REST API", desc: "Any agent that can make HTTP calls can use Lumina.", status: "Available", statusColor: "text-green-400" },
+            ].map((c) => (
+              <div key={c.name} className={`bg-white/[0.03] border border-white/10 rounded-xl p-5 hover:scale-[1.02] hover:border-white/20 transition-all duration-200 cursor-default`}>
+                <div className="text-2xl mb-3">{c.icon}</div>
+                <h4 className="text-sm font-semibold text-white mb-1">{c.name}</h4>
+                <p className="text-xs text-white/50 mb-3 leading-relaxed">{c.desc}</p>
+                <span className={`text-xs font-medium ${c.statusColor}`}>{c.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* BLOQUE 4 — What the Skill Contains */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-6">
+          <p className="text-sm text-white/60 mb-4">The Skill file contains everything your agent needs:</p>
+          <div className="grid sm:grid-cols-2 gap-2">
+            {[
+              "All 4 insurance products with pricing formulas",
+              "All 4 yield vaults with APY calculations",
+              "API endpoints and payloads for every operation",
+              "Smart contract ABIs and addresses",
+              "Decision framework — when to buy, when to deposit",
+              "Error handling and retry strategies",
+              "Auto-repurchase logic for continuous coverage",
+              "Risk scenarios and claim probability data",
+            ].map((item) => (
+              <div key={item} className="flex items-start gap-2 py-1">
+                <span className={`${checkColor} text-sm mt-0.5`}>✓</span>
+                <span className="text-sm text-white/60">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* BLOQUE 5 — Final CTA */}
+        <div className="text-center">
+          <p className="text-white/50 text-sm mb-6">
+            Your agent reads the Skill once and can autonomously manage insurance and yield for your entire portfolio.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
+                accent === "cyan"
+                  ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20"
+                  : "bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20"
+              }`}
+            >
+              Read the Full Skill →
+            </a>
+            <a
+              href="mailto:hello@lumina-org.com"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white/70 border border-white/20 hover:bg-white/5 transition-all"
+            >
+              Contact Us →
+            </a>
           </div>
         </div>
       </div>
