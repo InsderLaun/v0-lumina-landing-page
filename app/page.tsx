@@ -211,6 +211,11 @@ export default function Home() {
         <ProductsSection />
       )}
 
+      {/* PREMIUM CALCULATOR */}
+      {perspective === "protect" && (
+        <PremiumCalculatorSection />
+      )}
+
       {/* VAULTS */}
       {perspective === "earn" && (
         <VaultsSection />
@@ -474,6 +479,249 @@ function ProductsSection() {
           </motion.div>
         )}
       </AnimatePresence>
+    </section>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  PREMIUM CALCULATOR                                       */
+/* ═══════════════════════════════════════════════════════════ */
+
+type CalcProduct = "bss" | "depeg" | "il" | "exploit"
+
+const CALC_DURATION_RANGES: Record<CalcProduct, [number, number, number]> = {
+  bss: [7, 30, 14],
+  depeg: [14, 365, 90],
+  il: [14, 90, 30],
+  exploit: [90, 365, 180],
+}
+
+function getCalcParams(product: CalcProduct, stablecoin: string, protocol: string) {
+  switch (product) {
+    case "bss":
+      return { pBase: 0.22, riskMult: 1.0, deductible: 0.20 }
+    case "depeg":
+      if (stablecoin === "DAI") return { pBase: 0.24, riskMult: 1.2, deductible: 0.12 }
+      if (stablecoin === "USDT") return { pBase: 0.24, riskMult: 1.4, deductible: 0.15 }
+      return { pBase: 0.24, riskMult: 1.0, deductible: 0.10 }
+    case "il":
+      return { pBase: 0.20, riskMult: 1.0, deductible: 0.02 }
+    case "exploit": {
+      const mults: Record<string, number> = { Aave: 1.0, Compound: 1.0, Uniswap: 1.0, MakerDAO: 1.1, Curve: 1.5, Morpho: 1.8 }
+      return { pBase: 0.03, riskMult: mults[protocol] || 1.0, deductible: 0.10 }
+    }
+  }
+}
+
+function getDurationDiscount(product: CalcProduct, days: number) {
+  if (product !== "depeg") return 1.0
+  if (days >= 181) return 0.80
+  if (days >= 91) return 0.90
+  return 1.0
+}
+
+function PremiumCalculatorSection() {
+  const [product, setProduct] = useState<CalcProduct>("bss")
+  const [coverage, setCoverage] = useState(50000)
+  const [duration, setDuration] = useState(14)
+  const [asset, setAsset] = useState("ETH")
+  const [stablecoin, setStablecoin] = useState("USDC")
+  const [protocol, setProtocol] = useState("Aave")
+
+  const [min, max, def] = CALC_DURATION_RANGES[product]
+
+  const handleProductChange = (p: CalcProduct) => {
+    setProduct(p)
+    const [, , d] = CALC_DURATION_RANGES[p]
+    setDuration(d)
+  }
+
+  // Clamp duration
+  const clampedDuration = Math.min(Math.max(duration, min), max)
+
+  const MU = 1.25
+  const params = getCalcParams(product, stablecoin, protocol)
+  const durationDiscount = getDurationDiscount(product, clampedDuration)
+
+  const premium = coverage * params.pBase * params.riskMult * durationDiscount * MU * (clampedDuration / 365)
+  const premiumFee = premium * 0.03
+  const maxPayout = coverage * (1 - params.deductible)
+  const payoutFee = maxPayout * 0.03
+  const netPayout = maxPayout - payoutFee
+  const returnOnPremium = premium > 0 ? netPayout / premium : 0
+
+  const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
+  const fmt2 = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Premium Calculator
+        </h2>
+        <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
+          See exactly what your agent will pay and what you&apos;ll receive.
+        </p>
+
+        <div className="rounded-2xl bg-white/[0.02] border border-cyan-500/20 p-6 md:p-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Inputs */}
+            <div className="space-y-6">
+              {/* Product */}
+              <div>
+                <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Product</label>
+                <select
+                  value={product}
+                  onChange={(e) => handleProductChange(e.target.value as CalcProduct)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"
+                >
+                  <option value="bss">Black Swan Shield</option>
+                  <option value="depeg">Depeg Shield</option>
+                  <option value="il">IL Index Cover</option>
+                  <option value="exploit">Exploit Shield</option>
+                </select>
+              </div>
+
+              {/* Coverage */}
+              <div>
+                <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">
+                  Coverage: ${fmt(coverage)}
+                </label>
+                <input
+                  type="range" min={1000} max={500000} step={1000} value={coverage}
+                  onChange={(e) => setCoverage(Number(e.target.value))}
+                  className="w-full accent-cyan-400 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-white/30 mt-1">
+                  <span>$1,000</span><span>$500,000</span>
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div>
+                <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">
+                  Duration: {clampedDuration} days
+                </label>
+                <input
+                  type="range" min={min} max={max} step={1} value={clampedDuration}
+                  onChange={(e) => setDuration(Number(e.target.value))}
+                  className="w-full accent-cyan-400 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-white/30 mt-1">
+                  <span>{min}d</span><span>{max}d</span>
+                </div>
+              </div>
+
+              {/* Asset (BSS, IL) */}
+              {(product === "bss" || product === "il") && (
+                <div>
+                  <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Asset</label>
+                  <select
+                    value={asset}
+                    onChange={(e) => setAsset(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"
+                  >
+                    <option value="ETH">ETH</option>
+                    <option value="BTC">BTC</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Stablecoin (Depeg) */}
+              {product === "depeg" && (
+                <div>
+                  <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Stablecoin</label>
+                  <select
+                    value={stablecoin}
+                    onChange={(e) => setStablecoin(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"
+                  >
+                    <option value="USDC">USDC</option>
+                    <option value="DAI">DAI</option>
+                    <option value="USDT">USDT</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Protocol (Exploit) */}
+              {product === "exploit" && (
+                <div>
+                  <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Protocol</label>
+                  <select
+                    value={protocol}
+                    onChange={(e) => setProtocol(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"
+                  >
+                    <option value="Aave">Aave v3 (Tier 1)</option>
+                    <option value="Compound">Compound III (Tier 1)</option>
+                    <option value="Uniswap">Uniswap v3 (Tier 1)</option>
+                    <option value="MakerDAO">MakerDAO (1.1x)</option>
+                    <option value="Curve">Curve (1.5x)</option>
+                    <option value="Morpho">Morpho (1.8x)</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Results */}
+            <div className="space-y-4">
+              {/* Row 1: Premium */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Premium</div>
+                  <div className="text-lg font-bold text-white">${fmt2(premium)}</div>
+                </div>
+                <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
+                  <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Protocol Fee (3%)</div>
+                  <div className="text-lg font-bold text-white/60">${fmt2(premiumFee)}</div>
+                </div>
+              </div>
+
+              {/* Row 2: Payout */}
+              <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.03] p-4">
+                <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-3">If Triggered</div>
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <div className="text-xs text-white/30 mb-1">Gross Payout</div>
+                    <div className="text-sm font-semibold text-white/70">${fmt(maxPayout)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-white/30 mb-1">Fee (3%)</div>
+                    <div className="text-sm font-semibold text-white/70">-${fmt2(payoutFee)}</div>
+                  </div>
+                </div>
+                <div className="border-t border-white/5 pt-3 flex items-end justify-between">
+                  <div>
+                    <div className="text-xs text-white/30 mb-1">Net Payout (you receive)</div>
+                    <div className="text-2xl font-bold text-cyan-400">${fmt(netPayout)}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-white/30 mb-1">Return on Premium</div>
+                    <div className="text-xl font-bold text-cyan-400">{fmt(returnOnPremium)}x</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Note */}
+              <p className="text-xs text-white/30 leading-relaxed">
+                Calculated at 40% vault utilization (M(U) = 1.25x). At higher utilization, premiums increase via the Kink Model.
+              </p>
+
+              {/* CTA */}
+              <div className="text-center pt-2">
+                <a
+                  href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition-all"
+                >
+                  Give This Skill To Your Agent →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }
