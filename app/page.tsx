@@ -1872,17 +1872,17 @@ function CompatibilityCards({ accent, borderAccent, skillUrl, perspective }: { a
 /*  COMPARISON TABLE                                         */
 /* ═══════════════════════════════════════════════════════════ */
 
-const COMPARISON_ROWS: { feature: string; lumina: string; nexus: string; insurace: string }[] = [
-  { feature: "Operator", lumina: "AI Agent (M2M)", nexus: "Human", insurace: "Human" },
-  { feature: "Resolution", lumina: "Automatic (1 transaction)", nexus: "Jury vote (up to 35 days)", insurace: "Committee (up to 30d)" },
-  { feature: "Trigger", lumina: "Parametric (trustless math)", nexus: "Subjective (human judgment)", insurace: "Subjective" },
-  { feature: "Settlement", lumina: "Same-block", nexus: "Days/weeks", insurace: "Days/weeks" },
-  { feature: "Chain", lumina: "Base L2 (low fees)", nexus: "Ethereum L1", insurace: "Multi-chain" },
-  { feature: "Settlement Token", lumina: "USDY (earns 3.55% while idle)", nexus: "ETH/DAI", insurace: "Various" },
-  { feature: "Agent-native", lumina: "✅ Built for M2M", nexus: "❌ Human UI only", insurace: "❌ Human UI only" },
-  { feature: "Skill file", lumina: "✅ 736 lines", nexus: "❌", insurace: "❌" },
-  { feature: "Oracle", lumina: "Chainlink + Phala TEE", nexus: "Proprietary", insurace: "Chainlink" },
-  { feature: "LP Yield", lumina: "11-40% + USDY base", nexus: "~5-8%", insurace: "~4-7%" },
+const COMPARISON_ROWS: { feature: string; lumina: string; traditional: string }[] = [
+  { feature: "Operator", lumina: "AI Agent (M2M)", traditional: "Human" },
+  { feature: "Resolution", lumina: "Automatic (1 transaction)", traditional: "Jury vote or committee (up to 35 days)" },
+  { feature: "Trigger", lumina: "Parametric (trustless math)", traditional: "Subjective (human judgment)" },
+  { feature: "Settlement", lumina: "Same-block", traditional: "Days/weeks" },
+  { feature: "Chain", lumina: "Base L2 (low fees)", traditional: "Ethereum L1 / Multi-chain" },
+  { feature: "Settlement Token", lumina: "USDY (earns 3.55% while idle)", traditional: "ETH/DAI/Various" },
+  { feature: "Agent-native", lumina: "✅ Built for M2M", traditional: "❌ Human UI only" },
+  { feature: "Skill file", lumina: "✅ 736 lines", traditional: "❌" },
+  { feature: "Oracle", lumina: "Chainlink + Phala TEE", traditional: "Proprietary or Chainlink" },
+  { feature: "LP Yield", lumina: "11-40% + USDY base", traditional: "~4-8%" },
 ]
 
 function ComparisonSection({ perspective }: { perspective: Perspective }) {
@@ -1905,9 +1905,8 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
             <thead>
               <tr className="border-b border-white/10">
                 <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4 w-[180px]">Feature</th>
-                <th className={`text-left text-xs uppercase tracking-wider font-medium py-3 px-4 bg-white/[0.03] ${borderTop} border-t-2 ${accent === "cyan" ? "text-cyan-400" : "text-purple-400"}`}>Lumina</th>
-                <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4">Nexus Mutual</th>
-                <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4">InsurAce</th>
+                <th className={`text-left text-xs uppercase tracking-wider font-medium py-3 px-4 bg-white/[0.03] ${borderTop} border-t-2 ${accent === "cyan" ? "text-cyan-400" : "text-purple-400"}`}>M2M Insurance — Lumina</th>
+                <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4">Traditional Web3 Insurance</th>
               </tr>
             </thead>
             <tbody>
@@ -1918,10 +1917,7 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
                     {row.lumina.startsWith("✅") ? <><span className="text-green-400">✅</span>{row.lumina.slice(1)}</> : row.lumina}
                   </td>
                   <td className="py-3 px-4 text-white/40">
-                    {row.nexus.startsWith("❌") ? <><span className="text-white/30">❌</span>{row.nexus.slice(1)}</> : row.nexus}
-                  </td>
-                  <td className="py-3 px-4 text-white/40">
-                    {row.insurace.startsWith("❌") ? <><span className="text-white/30">❌</span>{row.insurace.slice(1)}</> : row.insurace}
+                    {row.traditional.startsWith("❌") ? <><span className="text-white/30">❌</span>{row.traditional.slice(1)}</> : row.traditional}
                   </td>
                 </tr>
               ))}
@@ -1932,9 +1928,8 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
         {/* Mobile cards */}
         <div className="md:hidden space-y-4">
           {[
-            { name: "Lumina", isHighlight: true, getData: (r: typeof COMPARISON_ROWS[0]) => r.lumina },
-            { name: "Nexus Mutual", isHighlight: false, getData: (r: typeof COMPARISON_ROWS[0]) => r.nexus },
-            { name: "InsurAce", isHighlight: false, getData: (r: typeof COMPARISON_ROWS[0]) => r.insurace },
+            { name: "M2M Insurance — Lumina", isHighlight: true, getData: (r: typeof COMPARISON_ROWS[0]) => r.lumina },
+            { name: "Traditional Web3 Insurance", isHighlight: false, getData: (r: typeof COMPARISON_ROWS[0]) => r.traditional },
           ].map((proto) => (
             <div key={proto.name} className={`rounded-xl border p-5 ${proto.isHighlight ? `${borderTop} border-t-2 bg-white/[0.03] border-white/10` : "border-white/5 bg-white/[0.01]"}`}>
               <h4 className={`text-sm font-bold mb-3 ${proto.isHighlight ? (accent === "cyan" ? "text-cyan-400" : "text-purple-400") : "text-white/50"}`}>{proto.name}</h4>
