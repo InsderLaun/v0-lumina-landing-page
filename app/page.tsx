@@ -41,7 +41,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold tracking-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6"
           >
             Parametric Insurance{" "}
             <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
@@ -115,16 +115,16 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-6 text-base font-medium"
+            className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base font-medium"
           >
             <span className="text-cyan-400"><span className="font-bold">4</span> Products</span>
-            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
             <span className="text-purple-400"><span className="font-bold">4</span> Vaults</span>
-            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
             <span className="text-cyan-400"><span className="font-bold">24</span> Audited Contracts</span>
-            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
             <span className="text-purple-400"><span className="font-bold">3%</span> Protocol Fee</span>
-            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
             <span className="text-cyan-400">USDY Base Yield <span className="font-bold">3.55%</span></span>
           </motion.div>
         </div>
@@ -479,7 +479,7 @@ function ProductsSection() {
               }`}
             >
               <span>{p.emoji}</span>
-              <span>{p.label}</span>
+              <span className="hidden sm:inline">{p.label}</span>
             </button>
           ))}
         </div>
@@ -823,7 +823,7 @@ function PremiumCalculatorSection() {
             {/* Results */}
             <div key={product} className="space-y-4">
               {/* Row 1: Premium */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
                   <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Premium</div>
                   <div className="text-lg font-bold text-white">${fmt2(premium)}</div>
@@ -837,7 +837,7 @@ function PremiumCalculatorSection() {
               {/* Row 2: Payout */}
               <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.03] p-4">
                 <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-3">If Triggered</div>
-                <div className="grid grid-cols-2 gap-4 mb-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
                   <div>
                     <div className="text-xs text-white/30 mb-1">Gross Payout</div>
                     <div className="text-sm font-semibold text-white/70">${fmt(maxPayout)}</div>
@@ -1528,13 +1528,13 @@ function KinkModelSection({ perspective }: { perspective: Perspective }) {
           {/* Slider */}
           <div className="max-w-md mx-auto mb-8">
             <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Simulate Utilization</label>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
               <input
                 type="range" min={0} max={95} step={1} value={utilization}
                 onChange={(e) => setUtilization(Number(e.target.value))}
                 className={`flex-1 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer ${accent === "cyan" ? "accent-cyan-400" : "accent-purple-400"}`}
               />
-              <div className="text-sm text-white/70 whitespace-nowrap min-w-[180px] text-right">
+              <div className="text-sm text-white/70 whitespace-nowrap text-center sm:text-right">
                 Utilization: <span className={`${textAccent} font-semibold`}>{utilization}%</span> → Multiplier: <span className={`${textAccent} font-semibold`}>{multiplier.toFixed(2)}x</span>
               </div>
             </div>
@@ -1630,32 +1630,32 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
         </p>
 
         {/* BLOQUE 1 — Skill Link */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-6">
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 sm:p-8 mb-6">
           <p className="text-sm text-white/60 mb-4">Ask your agent to read:</p>
-          <div className="flex items-center gap-2 min-w-0 bg-white/[0.03] border border-white/10 rounded-lg px-4 py-3 mb-3">
-            <span className="text-sm text-white/70 font-mono truncate">{skillUrl}</span>
+          <div className="flex items-center gap-2 min-w-0 bg-white/[0.03] border border-white/10 rounded-lg px-3 sm:px-4 py-3 mb-3">
+            <span className="text-xs sm:text-sm text-white/70 font-mono truncate">{skillUrl}</span>
             <CopyButton text={skillUrl} accent={accent} />
           </div>
           <p className="text-sm text-white/60 mb-3">Or from GitHub:</p>
-          <div className="flex items-center gap-2 min-w-0 bg-white/[0.03] border border-white/10 rounded-lg px-4 py-3">
-            <span className="text-sm text-white/70 font-mono truncate">{githubUrl}</span>
+          <div className="flex items-center gap-2 min-w-0 bg-white/[0.03] border border-white/10 rounded-lg px-3 sm:px-4 py-3">
+            <span className="text-xs sm:text-sm text-white/70 font-mono truncate">{githubUrl}</span>
             <CopyButton text={`https://${githubUrl}`} accent={accent} />
           </div>
         </div>
 
         {/* BLOQUE 2 — Ready-made Prompts */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-6">
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 sm:p-8 mb-6">
           <p className="text-sm text-white/60 mb-4">Or copy a ready-made prompt for your agent:</p>
 
           {perspective === "protect" ? (
             <div className="space-y-3">
-              <div className={`flex items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
+              <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
                 <p className="text-sm text-white/70 leading-relaxed flex-1">
                   Read {skillUrl} and buy {hl("$50K")} of Black Swan coverage for my {hl("ETH")} position for {hl("14 days")}.
                 </p>
                 <CopyButton text={`Read ${skillUrl} and buy $50K of Black Swan coverage for my ETH position for 14 days.`} accent={accent} />
               </div>
-              <div className={`flex items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
+              <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
                 <p className="text-sm text-white/70 leading-relaxed flex-1">
                   Read {skillUrl} and buy {hl("$100K")} of Depeg coverage for my {hl("USDC")} position for {hl("90 days")}.
                 </p>
@@ -1664,13 +1664,13 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
             </div>
           ) : (
             <div className="space-y-3">
-              <div className={`flex items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
+              <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
                 <p className="text-sm text-white/70 leading-relaxed flex-1">
                   Read {skillUrl} and deposit {hl("$10K")} USDY into the {hl("Stable Long")} vault for maximum yield.
                 </p>
                 <CopyButton text={`Read ${skillUrl} and deposit $10K USDY into the Stable Long vault for maximum yield.`} accent={accent} />
               </div>
-              <div className={`flex items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
+              <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
                 <p className="text-sm text-white/70 leading-relaxed flex-1">
                   Read {skillUrl} and deposit {hl("$5K")} USDY into the {hl("Volatile Short")} vault for quick access yield.
                 </p>
@@ -1684,7 +1684,7 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
         <CompatibilityCards accent={accent} borderAccent={borderAccent} skillUrl={skillUrl} perspective={perspective} />
 
         {/* BLOQUE 4 — What the Skill Contains */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 mb-6">
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 sm:p-8 mb-6">
           <p className="text-sm text-white/60 mb-4">The Skill file contains everything your agent needs:</p>
           <div className="grid sm:grid-cols-2 gap-2">
             {[
@@ -2337,7 +2337,7 @@ function Navbar({ perspective }: { perspective: Perspective }) {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-[#0A0A0F] border-b border-white/5 overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-1">
+            <div className="px-4 py-4 space-y-2">
               {navLinks.map((link) => (
                 link.external ? (
                   <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className={`block py-3 text-base text-white ${hoverColor} transition-colors`}>
