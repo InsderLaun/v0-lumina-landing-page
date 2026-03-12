@@ -1900,6 +1900,8 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
   const accent = perspective === "protect" ? "cyan" : "purple"
   const borderTop = accent === "cyan" ? "border-t-cyan-500" : "border-t-purple-500"
   const checkAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
+  const colBg = accent === "cyan" ? "bg-cyan-500/[0.03]" : "bg-purple-500/[0.03]"
+  const colBorder = accent === "cyan" ? "border-l border-r border-cyan-500/20" : "border-l border-r border-purple-500/20"
 
   return (
     <section className="py-24 px-4">
@@ -1917,7 +1919,7 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
             <thead>
               <tr className="border-b border-white/10">
                 <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4 w-[180px]">Feature</th>
-                <th className={`text-left text-xs uppercase tracking-wider font-medium py-3 px-4 bg-white/[0.03] ${borderTop} border-t-2 ${accent === "cyan" ? "text-cyan-400" : "text-purple-400"}`}>M2M Insurance — Lumina</th>
+                <th className={`text-left text-xs uppercase tracking-wider font-medium py-3 px-4 ${colBg} ${borderTop} border-t-2 ${colBorder} ${checkAccent}`}>M2M Insurance — Lumina</th>
                 <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-3 px-4">Traditional Web3 Insurance</th>
               </tr>
             </thead>
@@ -1925,7 +1927,7 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
               {COMPARISON_ROWS.map((row) => (
                 <tr key={row.feature} className="border-b border-white/5">
                   <td className="py-3 px-4 text-white/50 font-medium">{row.feature}</td>
-                  <td className="py-3 px-4 bg-white/[0.03] text-white/80 font-medium">
+                  <td className={`py-3 px-4 ${colBg} ${colBorder} text-white/80 font-medium`}>
                     {row.lumina.startsWith("✅") ? <><span className={checkAccent}>✅</span>{row.lumina.slice(1)}</> : row.lumina}
                   </td>
                   <td className="py-3 px-4 text-white/40">
@@ -1943,7 +1945,7 @@ function ComparisonSection({ perspective }: { perspective: Perspective }) {
             { name: "M2M Insurance — Lumina", isHighlight: true, getData: (r: typeof COMPARISON_ROWS[0]) => r.lumina },
             { name: "Traditional Web3 Insurance", isHighlight: false, getData: (r: typeof COMPARISON_ROWS[0]) => r.traditional },
           ].map((proto) => (
-            <div key={proto.name} className={`rounded-xl border p-5 ${proto.isHighlight ? `${borderTop} border-t-2 bg-white/[0.03] border-white/10` : "border-white/5 bg-white/[0.01]"}`}>
+            <div key={proto.name} className={`rounded-xl border p-5 ${proto.isHighlight ? `${borderTop} border-t-2 ${colBg} ${colBorder}` : "border-white/5 bg-white/[0.01]"}`}>
               <h4 className={`text-sm font-bold mb-3 ${proto.isHighlight ? (accent === "cyan" ? "text-cyan-400" : "text-purple-400") : "text-white/50"}`}>{proto.name}</h4>
               <div className="space-y-2">
                 {COMPARISON_ROWS.map((row) => {
