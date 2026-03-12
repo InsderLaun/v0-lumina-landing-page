@@ -1382,7 +1382,7 @@ function KinkModelSection({ perspective }: { perspective: Perspective }) {
           How Pricing Works
         </h2>
         <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
-          Dynamic premiums. Like Uber&apos;s surge pricing — when demand rises, prices rise automatically.
+          Dynamic premiums — when demand rises, prices rise automatically. When it drops, they drop too.
         </p>
 
         <div className={`rounded-2xl bg-white/[0.02] border ${borderClass} p-6 md:p-8`}>
