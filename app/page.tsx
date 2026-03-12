@@ -342,7 +342,9 @@ const PRODUCTS = [
 
 function ProductsSection() {
   const [active, setActive] = useState(0)
+  const [modalProduct, setModalProduct] = useState<string | null>(null)
   const product = PRODUCTS[active]
+  const modalData = PRODUCTS.find((p) => p.key === modalProduct)
 
   return (
     <section className="py-24 px-4">
@@ -402,8 +404,14 @@ function ProductsSection() {
               ))}
             </div>
 
-            {/* Technical Details */}
-            <TechnicalDetails details={product.technicalDetails} />
+            {/* Technical Details button */}
+            <button
+              onClick={() => setModalProduct(product.key)}
+              className="flex items-center gap-2 text-sm text-white/50 hover:text-white/70 transition-colors mb-6"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+              Technical Details
+            </button>
 
             {/* Example */}
             {product.example && (
@@ -427,6 +435,45 @@ function ProductsSection() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Technical Details Modal */}
+      <AnimatePresence>
+        {modalData && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setModalProduct(null)}
+          >
+            <motion.div
+              className="bg-[#12121A] border border-cyan-500/40 rounded-2xl p-8 max-w-lg mx-4 max-h-[80vh] overflow-y-auto"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold">
+                  <span className="mr-2">{modalData.emoji}</span>
+                  {modalData.label}
+                </h3>
+                <button onClick={() => setModalProduct(null)} className="text-white/40 hover:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+              </div>
+              <div className="space-y-3">
+                {modalData.technicalDetails.map(([label, value]) => (
+                  <div key={label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                    <span className="text-xs uppercase tracking-wider text-white/40 sm:w-44 shrink-0 font-medium">{label}</span>
+                    <span className="text-sm text-white/70">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }
@@ -530,103 +577,10 @@ const VAULTS = [
   },
 ]
 
-function VaultCard({ v }: { v: typeof VAULTS[number] }) {
-  const [detailsOpen, setDetailsOpen] = useState(false)
-
-  return (
-    <div className="rounded-2xl bg-white/[0.02] border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 p-6 flex flex-col h-full">
-      {/* APY */}
-      <div className="min-h-[72px]">
-        <div>
-          <span className="text-3xl font-bold text-purple-400">{v.apy}</span>
-          <span className="text-sm text-white/40 ml-2">APY</span>
-        </div>
-        <p className="text-sm text-white/50">
-          USDY {v.base} + Premiums {v.premiums}
-        </p>
-        <p className="text-xs text-white/30">Range reflects 20-90% utilization via Kink Model</p>
-      </div>
-
-      {/* Name + Symbol */}
-      <div className="min-h-[52px] mt-4">
-        <h3 className="text-lg font-semibold mb-1">{v.name}</h3>
-        <span className="text-xs font-mono text-purple-400/60">{v.symbol}</span>
-      </div>
-
-      {/* Cooldown */}
-      <div className="flex items-center gap-2 text-sm text-white/60 min-h-[32px] mt-3">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Cooldown: {v.cooldown}
-      </div>
-
-      {/* Backs */}
-      <div className="min-h-[60px] mt-3">
-        <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Backs</span>
-        <div className="flex flex-wrap gap-1">
-          {v.backs.map((b) => (
-            <span key={b} className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full">{b}</span>
-          ))}
-        </div>
-      </div>
-
-      {/* Risk */}
-      <div className="min-h-[40px] mt-3">
-        <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Risk</span>
-        <span className={`text-sm font-medium ${v.riskColor}`}>{v.risk}</span>
-      </div>
-
-      {/* Best for */}
-      <p className="text-sm text-white/40 italic min-h-[40px] mt-3">{v.bestFor}</p>
-
-      {/* Technical Details */}
-      <div className="mt-auto pt-4">
-        <button
-          onClick={() => setDetailsOpen(!detailsOpen)}
-          className="flex items-center gap-2 text-xs text-white/40 hover:text-white/60 transition-colors"
-        >
-          <motion.svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            animate={{ rotate: detailsOpen ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <path d="m6 9 6 6 6-6" />
-          </motion.svg>
-          Technical Details
-        </button>
-        <AnimatePresence>
-          {detailsOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-2 bg-white/[0.03] border-t border-white/10 rounded-lg p-3 space-y-2">
-                {v.technicalDetails.map(([label, value]) => (
-                  <div key={label} className="flex flex-col gap-0.5">
-                    <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium">{label}</span>
-                    <span className="text-xs text-white/70">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
-  )
-}
-
 function VaultsSection() {
+  const [modalVault, setModalVault] = useState<string | null>(null)
+  const modalData = VAULTS.find((v) => v.symbol === modalVault)
+
   return (
     <section className="py-24 px-4">
       <div className="max-w-6xl mx-auto">
@@ -646,11 +600,102 @@ function VaultsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
+              className="h-full"
             >
-              <VaultCard v={v} />
+              <div className="rounded-2xl bg-white/[0.02] border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 p-6 flex flex-col h-full">
+                {/* APY */}
+                <div className="min-h-[120px]">
+                  <div>
+                    <span className="text-3xl font-bold text-purple-400">{v.apy}</span>
+                    <span className="text-sm text-white/40 ml-2">APY</span>
+                  </div>
+                  <p className="text-sm text-white/50">
+                    USDY {v.base} + Premiums {v.premiums}
+                  </p>
+                  <p className="text-xs text-white/30">Range reflects 20-90% utilization via Kink Model</p>
+                </div>
+
+                {/* Name + Symbol */}
+                <div className="min-h-[70px]">
+                  <h3 className="text-lg font-semibold mb-1">{v.name}</h3>
+                  <span className="text-xs font-mono text-purple-400/60">{v.symbol}</span>
+                </div>
+
+                {/* Cooldown */}
+                <div className="flex items-center gap-2 text-sm text-white/60 min-h-[40px]">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  Cooldown: {v.cooldown}
+                </div>
+
+                {/* Backs */}
+                <div className="min-h-[80px]">
+                  <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Backs</span>
+                  <div className="flex flex-wrap gap-1">
+                    {v.backs.map((b) => (
+                      <span key={b} className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full">{b}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Risk */}
+                <div className="min-h-[30px]">
+                  <span className="text-xs uppercase tracking-wider text-white/30 font-medium block mb-1">Risk</span>
+                  <span className={`text-sm font-medium ${v.riskColor}`}>{v.risk}</span>
+                </div>
+
+                {/* Best for */}
+                <p className="text-sm text-white/40 italic min-h-[50px] mt-3">{v.bestFor}</p>
+
+                {/* Technical Details button */}
+                <div className="mt-auto pt-4">
+                  <button
+                    onClick={() => setModalVault(v.symbol)}
+                    className="flex items-center gap-2 text-xs text-white/40 hover:text-white/60 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                    Technical Details
+                  </button>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
+
+        {/* Technical Details Modal */}
+        <AnimatePresence>
+          {modalData && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setModalVault(null)}
+            >
+              <motion.div
+                className="bg-[#12121A] border border-purple-500/40 rounded-2xl p-8 max-w-lg mx-4 max-h-[80vh] overflow-y-auto"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold">{modalData.name} <span className="text-sm font-mono text-purple-400/60 ml-2">{modalData.symbol}</span></h3>
+                  <button onClick={() => setModalVault(null)} className="text-white/40 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {modalData.technicalDetails.map(([label, value]) => (
+                    <div key={label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                      <span className="text-xs uppercase tracking-wider text-white/40 sm:w-44 shrink-0 font-medium">{label}</span>
+                      <span className="text-sm text-white/70">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Cooldown explainer */}
         <div className="bg-white/[0.03] border border-purple-500/10 rounded-xl p-6 mb-10">
@@ -684,56 +729,6 @@ function VaultsSection() {
         </div>
       </div>
     </section>
-  )
-}
-
-function TechnicalDetails({ details }: { details: string[][] }) {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <div className="mb-6">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 text-sm text-white/50 hover:text-white/70 transition-colors"
-      >
-        <motion.svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <path d="m6 9 6 6 6-6" />
-        </motion.svg>
-        Technical Details
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden"
-          >
-            <div className="mt-3 bg-white/[0.03] border-t border-white/10 rounded-lg p-4 space-y-2">
-              {details.map(([label, value]) => (
-                <div key={label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
-                  <span className="text-xs uppercase tracking-wider text-white/40 sm:w-44 shrink-0 font-medium">{label}</span>
-                  <span className="text-sm text-white/70">{value}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   )
 }
 
