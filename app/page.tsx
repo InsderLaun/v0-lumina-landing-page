@@ -96,7 +96,7 @@ export default function Home() {
             }`}>
               Learn How It Works
             </a>
-            <a href="mailto:hello@lumina-org.com" className="px-8 py-3 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all">
+            <a href="mailto:labs@lumina-org.com" className="px-8 py-3 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all">
               Contact Us
             </a>
           </motion.div>
@@ -240,6 +240,17 @@ export default function Home() {
 
       {/* FAQ + CONTACT (shared) */}
       <FAQSection perspective={perspective} />
+
+      {/* FOOTER */}
+      <footer className="border-t border-white/5 py-8 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/30">
+          <span>© 2025 Lumina Protocol</span>
+          <div className="flex items-center gap-6">
+            <span>Sales: <a href="mailto:labs@lumina-org.com" className="text-white/50 hover:text-white transition-colors">labs@lumina-org.com</a></span>
+            <span>Support: <a href="mailto:support@lumina-org.com" className="text-white/50 hover:text-white transition-colors">support@lumina-org.com</a></span>
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
@@ -1636,7 +1647,7 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
               Read the Full Skill →
             </a>
             <a
-              href="mailto:hello@lumina-org.com"
+              href="mailto:labs@lumina-org.com"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white/70 border border-white/20 hover:bg-white/5 transition-all"
             >
               Contact Us →
@@ -1856,7 +1867,7 @@ function CompatibilityCards({ accent, borderAccent, skillUrl, perspective }: { a
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <CopyButton text={skillUrl} accent={accent} />
-                <a href="mailto:hello@lumina-org.com" className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${btnClass}`}>
+                <a href="mailto:support@lumina-org.com" className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${btnClass}`}>
                   {modalData.ctaLabel}
                 </a>
               </div>
@@ -2119,20 +2130,43 @@ function FAQSection({ perspective }: { perspective: Perspective }) {
         {/* CONTACT */}
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 text-center">
           <h3 className="text-xl font-bold text-white mb-2">Need Help?</h3>
-          <p className="text-sm text-white/50 mb-6">A human will respond. We&apos;ll explain the products, give you the Skill file, and help you get started.</p>
-          <a href="mailto:hello@lumina-org.com" className={`text-2xl font-bold ${textAccent} hover:underline block mb-6`}>
-            hello@lumina-org.com
-          </a>
-          <a
-            href="mailto:hello@lumina-org.com"
-            className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
-              accent === "cyan"
-                ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20"
-                : "bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20"
-            }`}
-          >
-            Email Us →
-          </a>
+          <p className="text-sm text-white/50 mb-8">A human will respond. We&apos;ll explain the products, give you the Skill file, and help you get started.</p>
+
+          <div className="grid sm:grid-cols-2 gap-6 mb-8">
+            <div>
+              <h4 className="text-sm font-semibold text-white/70 mb-2">Sales &amp; Onboarding</h4>
+              <a href="mailto:labs@lumina-org.com" className={`text-lg font-bold ${textAccent} hover:underline block mb-2`}>
+                labs@lumina-org.com
+              </a>
+              <p className="text-xs text-white/40">Want to integrate Lumina? Need the Skill file? Talk to our team.</p>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-white/70 mb-2">Support &amp; Questions</h4>
+              <a href="mailto:support@lumina-org.com" className={`text-lg font-bold ${textAccent} hover:underline block mb-2`}>
+                support@lumina-org.com
+              </a>
+              <p className="text-xs text-white/40">General questions, technical help, or just curious.</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="mailto:labs@lumina-org.com"
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
+                accent === "cyan"
+                  ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20"
+                  : "bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20"
+              }`}
+            >
+              Contact Sales →
+            </a>
+            <a
+              href="mailto:support@lumina-org.com"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white/70 border border-white/20 hover:bg-white/5 transition-all"
+            >
+              Get Support →
+            </a>
+          </div>
         </div>
       </div>
     </section>
