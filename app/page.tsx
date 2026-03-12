@@ -233,6 +233,19 @@ const PRODUCTS = [
       ["Price", "From 0.53% for 7 days"],
     ],
     example: "$50K coverage, 14 days → Premium $527 → If triggered: receive $38,800 → Return: 73x",
+    technicalDetails: [
+      ["Product ID", "BLACKSWAN-001"],
+      ["Risk Type", "VOLATILE"],
+      ["Oracle", "Chainlink TWAP 15 min or 3 consecutive roundIds"],
+      ["Strike Price", "Captured at moment of purchase"],
+      ["Trigger Price", "strikePrice × 0.70"],
+      ["Deductible", "20%"],
+      ["Max Allocation", "20% of vault"],
+      ["Grace Period", "24h post-expiry to submit claim"],
+      ["Vault", "VolatileShort (30d) → overflow to VolatileLong (90d)"],
+      ["Kink Model", "P_base 22% annualized × M(U) × duration"],
+      ["Protocol Fee", "3% on premium + 3% on payout"],
+    ],
   },
   {
     key: "depeg",
@@ -248,6 +261,19 @@ const PRODUCTS = [
       ["Price", "Discounts for longer durations: 10% off at 91d, 20% off at 181d"],
     ],
     example: "$100K USDC, 90 days → Premium $3,699 → If triggered: receive $87,300",
+    technicalDetails: [
+      ["Product ID", "DEPEG-STABLE-001"],
+      ["Risk Type", "STABLE"],
+      ["Oracle", "Chainlink TWAP 30 min or 5 consecutive roundIds"],
+      ["Threshold", "Absolute $0.95 (not relative)"],
+      ["Risk Multipliers", "USDC 1.0x, DAI 1.2x, USDT 1.4x"],
+      ["Deductibles", "USDC 10%, DAI 12%, USDT 15%"],
+      ["Duration Discount", "0.90x (91-180d), 0.80x (181-365d)"],
+      ["Max Allocation", "20% of vault"],
+      ["Vault", "StableShort (90d) → overflow to StableLong (365d)"],
+      ["Kink Model", "P_base 24% annualized × riskMult × durationDiscount × M(U) × duration"],
+      ["Anti-Adverse Selection", "24h waiting prevents buying after seeing smoke"],
+    ],
   },
   {
     key: "il",
@@ -263,6 +289,18 @@ const PRODUCTS = [
       ["Key Difference", "ONLY product with proportional payout. Can ONLY claim during 48h window after expiry."],
     ],
     example: "ETH moves ±50% → IL 5.7% → Net payout $1,665 on $50K coverage",
+    technicalDetails: [
+      ["Product ID", "ILPROT-001"],
+      ["Risk Type", "VOLATILE"],
+      ["Oracle", "Chainlink TWAP 15 min at expiry"],
+      ["Formula", "IL% = 1 - 2√r / (1+r), where r = currentPrice / strikePrice"],
+      ["Deductible", "2% restable (subtracted, not multiplicative)"],
+      ["Payout Cap", "11.7% of coverage"],
+      ["Resolution", "European-style — 48h settlement window after expiresAt"],
+      ["Max Allocation", "20% of vault"],
+      ["Vault", "VolatileShort (30d) → overflow to VolatileLong (90d)"],
+      ["Kink Model", "P_base 20% annualized × M(U) × duration"],
+    ],
   },
   {
     key: "exploit",
@@ -280,6 +318,20 @@ const PRODUCTS = [
       ["Why Dual Trigger", "Bear market drops gov tokens but aUSDC stays at $1 = NOT an exploit. Only real hacks trigger BOTH."],
     ],
     example: "",
+    technicalDetails: [
+      ["Product ID", "EXPLOIT-001"],
+      ["Risk Type", "STABLE"],
+      ["Oracle", "Chainlink TWAP 15 min (governance) + Phala TEE attestation (receipt token)"],
+      ["Condition 1", "Governance token drops >25% in 24h"],
+      ["Condition 2", "Receipt token drops >30% sustained 4h OR contract paused"],
+      ["Both Required", "Both conditions must be met simultaneously"],
+      ["Protocol Tiers", "Tier 1 (Aave, Compound, Uniswap) 1.0x, MakerDAO 1.1x, Curve 1.5x, Morpho 1.8x"],
+      ["Max Coverage", "$50,000 per wallet"],
+      ["Max Allocation", "10% of vault (combined for all Exploit policies)"],
+      ["Vault", "StableLong (365d) only"],
+      ["Kink Model", "P_base 3% (Tier 1) × riskMult × durationDiscount × M(U) × duration"],
+      ["Anti-Insider", "14-day waiting makes timing attacks impractical"],
+    ],
   },
 ]
 
@@ -345,6 +397,9 @@ function ProductsSection() {
               ))}
             </div>
 
+            {/* Technical Details */}
+            <TechnicalDetails details={product.technicalDetails} />
+
             {/* Example */}
             {product.example && (
               <div className="rounded-xl bg-cyan-500/5 border border-cyan-500/10 p-4 mb-6">
@@ -368,6 +423,56 @@ function ProductsSection() {
         </AnimatePresence>
       </div>
     </section>
+  )
+}
+
+function TechnicalDetails({ details }: { details: string[][] }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="mb-6">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 text-sm text-white/50 hover:text-white/70 transition-colors"
+      >
+        <motion.svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </motion.svg>
+        Technical Details
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-3 bg-white/[0.03] border-t border-white/10 rounded-lg p-4 space-y-2">
+              {details.map(([label, value]) => (
+                <div key={label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                  <span className="text-xs uppercase tracking-wider text-white/40 sm:w-44 shrink-0 font-medium">{label}</span>
+                  <span className="text-sm text-white/70">{value}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
