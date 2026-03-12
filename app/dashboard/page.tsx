@@ -1,216 +1,86 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
-import { useAccount } from "wagmi"
-import { ConnectButton } from "@rainbow-me/rainbowkit"
-import { motion, AnimatePresence } from "framer-motion"
 
 export default function DashboardPage() {
-  const { address, isConnected } = useAccount()
-  const [advancedOpen, setAdvancedOpen] = useState(false)
-
-  if (!isConnected) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0F] flex flex-col items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <h1 className="text-3xl font-bold text-white mb-4">
-            <span className="text-cyan-400">LUMINA</span>
-            <span className="text-white/20"> · </span>
-            <span className="text-purple-400">M2M</span>
-          </h1>
-          <p className="text-white/70 text-lg mb-2">Connect your wallet to view your positions</p>
-          <p className="text-white/40 text-sm mb-8">Read-only dashboard — no transactions except emergency withdrawal</p>
-          <ConnectButton />
-        </div>
-      </div>
-    )
-  }
-
-  const truncatedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ""
-
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white">
-      {/* Testnet Banner */}
-      <div className="bg-amber-500/10 border-b border-amber-500/20 text-amber-400 text-sm text-center py-2">
-        ⚠️ Testnet Mode — Contract addresses pending deployment. Data shown is placeholder.
-      </div>
+    <div className="min-h-screen bg-[#0A0A0F] text-white flex flex-col items-center justify-center px-4">
+      <div className="max-w-2xl w-full text-center">
 
-      {/* Dashboard Navbar */}
-      <nav className="sticky top-0 z-50 bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
-          <Link href="/" className="text-lg font-bold">
-            <span className="text-cyan-400">LUMINA</span>
-            <span className="text-white/20"> · </span>
-            <span className="text-purple-400">M2M</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-white/50">Dashboard</span>
-            <ConnectButton accountStatus="address" chainStatus="icon" showBalance={false} />
-          </div>
-        </div>
-      </nav>
+        {/* Logo */}
+        <h1 className="text-lg font-bold mb-8">
+          <span className="text-cyan-400">LUMINA</span>
+          <span className="text-white/20"> · </span>
+          <span className="text-purple-400">M2M</span>
+        </h1>
 
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+        {/* Title */}
+        <h2 className="text-3xl font-bold text-white mb-3">Dashboard</h2>
+        <p className="text-white/50 mb-12">Monitor what your AI agent is doing with your capital.</p>
 
-        {/* SECTION 1 — Wallet Overview */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6">
-          <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-4">Your Wallet</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-              <p className="text-xs text-white/40 mb-1">Address</p>
-              <p className="text-white/70 font-mono text-sm">{truncatedAddress}</p>
+        {/* Timeline */}
+        <div className="flex items-start justify-center gap-0 mb-12 max-w-xl mx-auto">
+          {/* Step 1 */}
+          <div className="flex-1 flex flex-col items-center text-center">
+            <div className="relative flex items-center justify-center mb-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400/30"></span>
+              <div className="w-4 h-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 relative" />
             </div>
-            <div>
-              <p className="text-xs text-white/40 mb-1">USDY Balance</p>
-              <p className="text-white/70 text-lg font-semibold">$0.00</p>
-            </div>
-            <div>
-              <p className="text-xs text-white/40 mb-1">USDY in Vaults</p>
-              <p className="text-white/70 text-lg font-semibold">$0.00</p>
-            </div>
-            <div>
-              <p className="text-xs text-white/40 mb-1">Active Policies</p>
-              <p className="text-white/70 text-lg font-semibold">0</p>
-            </div>
-          </div>
-        </div>
-
-        {/* SECTION 2 — Vault Positions */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6">
-          <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-4">Your Vault Positions</h2>
-
-          {/* Desktop table */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/5">
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Vault</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Deposited</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Current Value</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Yield</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">APY</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-white/30 text-sm">
-                    No vault positions found. Give your agent the Skill to start earning.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <p className="text-xs font-mono text-cyan-400 mb-1">01</p>
+            <p className="text-sm font-semibold text-white mb-1">Connect Wallet</p>
+            <p className="text-xs text-white/40 leading-relaxed px-2">Connect your Base L2 wallet to link your address</p>
           </div>
 
-          {/* Mobile placeholder */}
-          <div className="md:hidden py-8 text-center text-white/30 text-sm">
-            No vault positions found. Give your agent the Skill to start earning.
+          {/* Line 1→2 */}
+          <div className="w-16 h-0.5 bg-gradient-to-r from-cyan-500/50 to-purple-500/30 mt-[10px] flex-shrink-0" />
+
+          {/* Step 2 */}
+          <div className="flex-1 flex flex-col items-center text-center">
+            <div className="w-4 h-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 mb-3" />
+            <p className="text-xs font-mono text-white/50 mb-1">02</p>
+            <p className="text-sm font-semibold text-white mb-1">Your Agent Operates</p>
+            <p className="text-xs text-white/40 leading-relaxed px-2">Your agent buys insurance and deposits in vaults using this wallet</p>
           </div>
 
-          <div className="mt-4">
-            <a
-              href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
-            >
-              Give Your Agent the Skill →
-            </a>
+          {/* Line 2→3 */}
+          <div className="w-16 h-0.5 bg-gradient-to-r from-purple-500/30 to-purple-500/50 mt-[10px] flex-shrink-0" />
+
+          {/* Step 3 */}
+          <div className="flex-1 flex flex-col items-center text-center">
+            <div className="w-4 h-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 mb-3" />
+            <p className="text-xs font-mono text-white/50 mb-1">03</p>
+            <p className="text-sm font-semibold text-white mb-1">Monitor Here</p>
+            <p className="text-xs text-white/40 leading-relaxed px-2">See your vault positions, active policies, yields, and claim history — all read-only</p>
           </div>
         </div>
 
-        {/* SECTION 3 — Active Policies */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6">
-          <h2 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-4">Your Active Policies</h2>
-
-          {/* Desktop table */}
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/5">
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Product</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Coverage</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Premium Paid</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Expires</th>
-                  <th className="text-left text-xs text-white/40 font-medium pb-3">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-white/30 text-sm">
-                    No active policies. Give your agent the Skill to get coverage.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile placeholder */}
-          <div className="md:hidden py-8 text-center text-white/30 text-sm">
-            No active policies. Give your agent the Skill to get coverage.
-          </div>
-
-          <div className="mt-4">
-            <a
-              href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors"
-            >
-              Give Your Agent the Skill →
-            </a>
+        {/* Info box */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6 max-w-lg mx-auto mb-6 text-left">
+          <p className="text-sm text-white/60 mb-4">After connecting, you&#39;ll see:</p>
+          <div className="space-y-2">
+            <p className="text-sm text-white/70"><span className="text-cyan-400 mr-2">✓</span>Your USDY balance</p>
+            <p className="text-sm text-white/70"><span className="text-cyan-400 mr-2">✓</span>Vault positions with current yield</p>
+            <p className="text-sm text-white/70"><span className="text-cyan-400 mr-2">✓</span>Active insurance policies and their status</p>
+            <p className="text-sm text-white/70"><span className="text-cyan-400 mr-2">✓</span>Claim history</p>
+            <p className="text-sm text-white/70"><span className="text-purple-400 mr-2">✓</span>Emergency withdrawal (if your agent fails)</p>
           </div>
         </div>
 
-        {/* SECTION 4 — Emergency Human Override */}
+        {/* Testnet banner */}
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 max-w-lg mx-auto mb-8">
+          <p className="text-amber-400 text-sm">⚠️ Contracts not yet deployed. Dashboard will be fully functional after mainnet launch.</p>
+        </div>
+
+        {/* Connect Wallet button */}
+        <button className="px-8 py-3.5 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-base mb-4 cursor-not-allowed opacity-70">
+          Connect Wallet
+        </button>
+
+        {/* Back to Home */}
         <div>
-          <button
-            onClick={() => setAdvancedOpen(!advancedOpen)}
-            className="text-white/30 text-sm hover:text-white/50 transition-colors"
-          >
-            ⚙️ Advanced
-          </button>
-
-          <AnimatePresence>
-            {advancedOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="mt-4 bg-red-500/5 border border-red-500/20 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-red-400 mb-2">🚨 EMERGENCY HUMAN OVERRIDE</h3>
-                  <p className="text-white/50 text-sm mb-6">
-                    Use these ONLY if your agent fails, runs out of gas, or you need to act immediately.
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                    <button
-                      disabled
-                      title="Available after contract deployment"
-                      className="px-6 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400/50 font-medium text-sm cursor-not-allowed"
-                    >
-                      Request Withdrawal
-                    </button>
-                    <button
-                      disabled
-                      title="Available after contract deployment"
-                      className="px-6 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400/50 font-medium text-sm cursor-not-allowed"
-                    >
-                      Complete Withdrawal
-                    </button>
-                  </div>
-
-                  <p className="text-xs text-white/30 italic">
-                    These are the ONLY transactions available from the web. All other operations require your AI agent.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <Link href="/" className="text-sm text-white/40 hover:text-white/60 transition-colors">
+            ← Back to Home
+          </Link>
         </div>
 
       </div>
