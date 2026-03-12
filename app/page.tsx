@@ -2273,11 +2273,11 @@ function Navbar({ perspective }: { perspective: Perspective }) {
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             link.external ? (
-              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={`text-base text-white/50 ${hoverColor} transition-colors`}>
+              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={`text-base text-white ${hoverColor} transition-colors`}>
                 {link.label}
               </a>
             ) : (
-              <button key={link.label} onClick={() => handleClick(link.href)} className={`text-base text-white/50 ${hoverColor} transition-colors`}>
+              <button key={link.label} onClick={() => handleClick(link.href)} className={`text-base text-white ${hoverColor} transition-colors`}>
                 {link.label}
               </button>
             )
@@ -2317,11 +2317,11 @@ function Navbar({ perspective }: { perspective: Perspective }) {
             <div className="px-4 py-4 space-y-1">
               {navLinks.map((link) => (
                 link.external ? (
-                  <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className={`block py-3 text-base text-white/50 ${hoverColor} transition-colors`}>
+                  <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className={`block py-3 text-base text-white ${hoverColor} transition-colors`}>
                     {link.label}
                   </a>
                 ) : (
-                  <button key={link.label} onClick={() => handleClick(link.href)} className={`block w-full text-left py-3 text-base text-white/50 ${hoverColor} transition-colors`}>
+                  <button key={link.label} onClick={() => handleClick(link.href)} className={`block w-full text-left py-3 text-base text-white ${hoverColor} transition-colors`}>
                     {link.label}
                   </button>
                 )
