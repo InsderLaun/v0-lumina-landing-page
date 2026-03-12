@@ -427,7 +427,8 @@ function ProductsSection() {
   const modalData = PRODUCTS.find((p) => p.key === modalProduct)
 
   return (
-    <section id="products" className="scroll-mt-24 py-24 px-4">
+    <section className="py-24 px-4">
+      <div id="products" className="scroll-mt-20" />
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Insurance Products
@@ -957,7 +958,8 @@ function VaultsSection() {
   const modalData = VAULTS.find((v) => v.symbol === modalVault)
 
   return (
-    <section id="vaults" className="scroll-mt-24 py-24 px-4">
+    <section className="py-24 px-4">
+      <div id="vaults" className="scroll-mt-20" />
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Yield Vaults
@@ -1443,7 +1445,8 @@ function KinkModelSection({ perspective }: { perspective: Perspective }) {
   const xTicks = [0, 20, 40, 60, 80, 95]
 
   return (
-    <section id="kink-model" className="scroll-mt-24 py-24 px-4">
+    <section className="py-24 px-4">
+      <div id="kink-model" className="scroll-mt-20" />
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           How Pricing Works
@@ -1587,7 +1590,8 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
   }
 
   return (
-    <section id="agent-skills" className="scroll-mt-24 py-24 px-4">
+    <section className="py-24 px-4">
+      <div id="agent-skills" className="scroll-mt-20" />
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Connect Your Agent
@@ -2040,7 +2044,8 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
   ]
 
   return (
-    <section id="security" className="scroll-mt-24 py-24 px-4">
+    <section className="py-24 px-4">
+      <div id="security" className="scroll-mt-20" />
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Security
@@ -2133,7 +2138,8 @@ function FAQSection({ perspective }: { perspective: Perspective }) {
   const allFAQs = [...FAQ_GENERAL, ...perspectiveFAQs]
 
   return (
-    <section id="faq" className="scroll-mt-24 py-24 px-4">
+    <section className="py-24 px-4">
+      <div id="faq" className="scroll-mt-20" />
       <div className="max-w-3xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
           Frequently Asked Questions
