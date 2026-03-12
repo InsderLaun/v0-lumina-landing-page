@@ -272,12 +272,16 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="bg-[#0A0A0F] border-t border-white/5 py-16 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 items-start mb-12">
             {/* Brand */}
-            <div className="col-span-2 lg:col-span-1">
-              <h4 className="text-lg font-bold text-white mb-2">LUMINA PROTOCOL</h4>
-              <p className="text-sm text-white/40 mb-1">Parametric Insurance for AI Agents</p>
-              <p className="text-xs text-white/30">Built on Base L2 · Settlement in USDY</p>
+            <div className="max-w-xs">
+              <h4 className="text-lg font-bold">
+                <span className="text-cyan-400">LUMINA</span>
+                <span className="text-white/20"> · </span>
+                <span className="text-purple-400">M2M</span>
+              </h4>
+              <p className="text-sm text-white/50 mt-2">Parametric Insurance for AI Agents</p>
+              <p className="text-xs text-white/30 mt-1">Built on Base L2 · Settlement in USDY</p>
             </div>
 
             {/* Products */}
