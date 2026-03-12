@@ -225,6 +225,9 @@ export default function Home() {
       {perspective === "earn" && (
         <YieldCalculatorSection />
       )}
+
+      {/* KINK MODEL EXPLAINER (shared) */}
+      <KinkModelSection perspective={perspective} />
     </main>
   )
 }
@@ -1315,6 +1318,169 @@ function RiskScenariosSection({ vaultKey, deposit, monthlyTotal, annualTotal }: 
         These scenarios are estimates based on historical DeFi events and actuarial modeling. Past events do not guarantee future outcomes. The Kink Model and protocol safeguards (TWAP, circuit breakers, dual triggers) significantly reduce claim probability.
       </p>
     </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  KINK MODEL EXPLAINER                                     */
+/* ═══════════════════════════════════════════════════════════ */
+
+function getMultiplier(u: number): number {
+  // Base rate = 0.05, slope1 = 0.0063 (0-80%), slope2 = 0.075 (80-95%)
+  if (u <= 80) return 1.0 + (u / 80) * 0.5
+  if (u <= 95) return 1.5 + ((u - 80) / 15) * 1.125
+  return 2.625
+}
+
+const KINK_TABLE = [
+  { range: "0–20%", mult: "1.0–1.13x", meaning: "Cheapest premiums. Few policies sold." },
+  { range: "20–40%", mult: "1.13–1.25x", meaning: "Normal operation." },
+  { range: "40–60%", mult: "1.25–1.38x", meaning: "Healthy demand. Good LP yields." },
+  { range: "60–80%", mult: "1.38–1.50x", meaning: "High demand. LPs earning well." },
+  { range: "80–90%", mult: "1.50–2.25x", meaning: "Stress zone. Premiums spike. Attracts new LPs." },
+  { range: "90–95%", mult: "2.25–2.63x", meaning: "Near capacity. Very expensive premiums." },
+  { range: ">95%", mult: "REJECTED", meaning: "No new policies. Safety mechanism to protect LP capital." },
+]
+
+function KinkModelSection({ perspective }: { perspective: Perspective }) {
+  const [utilization, setUtilization] = useState(40)
+  const accent = perspective === "protect" ? "cyan" : "purple"
+  const accentColor = accent === "cyan" ? "#22d3ee" : "#a855f7"
+  const borderClass = accent === "cyan" ? "border-cyan-500/20" : "border-purple-500/20"
+  const textAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
+
+  const multiplier = getMultiplier(utilization)
+
+  // SVG dimensions
+  const W = 600, H = 280, PAD_L = 55, PAD_R = 20, PAD_T = 20, PAD_B = 40
+  const gW = W - PAD_L - PAD_R, gH = H - PAD_T - PAD_B
+
+  const toX = (u: number) => PAD_L + (u / 100) * gW
+  const toY = (m: number) => PAD_T + gH - ((m - 1.0) / 2.0) * gH
+
+  // Build curve path
+  const points: string[] = []
+  for (let u = 0; u <= 95; u++) {
+    const m = getMultiplier(u)
+    points.push(`${u === 0 ? "M" : "L"}${toX(u).toFixed(1)},${toY(m).toFixed(1)}`)
+  }
+  const curvePath = points.join(" ")
+
+  // Dot position
+  const dotX = toX(utilization)
+  const dotY = toY(multiplier)
+
+  // Grid lines (Y axis: 1.0, 1.5, 2.0, 2.5, 3.0)
+  const yTicks = [1.0, 1.5, 2.0, 2.5, 3.0]
+  // X axis ticks
+  const xTicks = [0, 20, 40, 60, 80, 95]
+
+  return (
+    <section className="py-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          How Pricing Works
+        </h2>
+        <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
+          Dynamic premiums. Like Uber&apos;s surge pricing — when demand rises, prices rise automatically.
+        </p>
+
+        <div className={`rounded-2xl bg-white/[0.02] border ${borderClass} p-6 md:p-8`}>
+          {/* SVG Chart */}
+          <div className="w-full overflow-x-auto mb-6">
+            <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-[600px] mx-auto" preserveAspectRatio="xMidYMid meet">
+              {/* Grid lines */}
+              {yTicks.map(t => (
+                <g key={t}>
+                  <line x1={PAD_L} y1={toY(t)} x2={W - PAD_R} y2={toY(t)} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                  <text x={PAD_L - 8} y={toY(t) + 4} textAnchor="end" fill="rgba(255,255,255,0.3)" fontSize="11">{t.toFixed(1)}x</text>
+                </g>
+              ))}
+              {xTicks.map(t => (
+                <g key={t}>
+                  <line x1={toX(t)} y1={PAD_T} x2={toX(t)} y2={H - PAD_B} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                  <text x={toX(t)} y={H - PAD_B + 16} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="11">{t}%</text>
+                </g>
+              ))}
+
+              {/* Rejected zone (>95%) */}
+              <rect x={toX(95)} y={PAD_T} width={W - PAD_R - toX(95)} height={gH} fill="rgba(239,68,68,0.08)" />
+              <text x={toX(97.5)} y={PAD_T + gH / 2} textAnchor="middle" fill="rgba(239,68,68,0.5)" fontSize="10" fontWeight="bold" transform={`rotate(-90, ${toX(97.5)}, ${PAD_T + gH / 2})`}>REJECTED</text>
+
+              {/* Kink point marker at 80% */}
+              <line x1={toX(80)} y1={PAD_T} x2={toX(80)} y2={H - PAD_B} stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="4 4" />
+
+              {/* Curve */}
+              <path d={curvePath} fill="none" stroke={accentColor} strokeWidth="2.5" strokeLinecap="round" />
+
+              {/* Kink point dot + label */}
+              <circle cx={toX(80)} cy={toY(1.5)} r="4" fill={accentColor} />
+              <text x={toX(80) + 8} y={toY(1.5) - 8} fill="rgba(255,255,255,0.5)" fontSize="10">Kink Point</text>
+
+              {/* Interactive dot */}
+              <circle cx={dotX} cy={dotY} r="6" fill={accentColor} stroke="white" strokeWidth="2" />
+
+              {/* Axis labels */}
+              <text x={W / 2} y={H - 2} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="11">Vault Utilization</text>
+              <text x={12} y={H / 2} textAnchor="middle" fill="rgba(255,255,255,0.4)" fontSize="11" transform={`rotate(-90, 12, ${H / 2})`}>Premium Multiplier</text>
+            </svg>
+          </div>
+
+          {/* Slider */}
+          <div className="max-w-md mx-auto mb-8">
+            <label className="block text-xs text-white/70 uppercase tracking-wider font-medium mb-2">Simulate Utilization</label>
+            <div className="flex items-center gap-4">
+              <input
+                type="range" min={0} max={95} step={1} value={utilization}
+                onChange={(e) => setUtilization(Number(e.target.value))}
+                className={`flex-1 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer ${accent === "cyan" ? "accent-cyan-400" : "accent-purple-400"}`}
+              />
+              <div className="text-sm text-white/70 whitespace-nowrap min-w-[180px] text-right">
+                Utilization: <span className={`${textAccent} font-semibold`}>{utilization}%</span> → Multiplier: <span className={`${textAccent} font-semibold`}>{multiplier.toFixed(2)}x</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Reference Table */}
+          <div className="overflow-x-auto mb-8">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-2 px-3">Utilization</th>
+                  <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-2 px-3">Multiplier</th>
+                  <th className="text-left text-xs text-white/40 uppercase tracking-wider font-medium py-2 px-3">What it means</th>
+                </tr>
+              </thead>
+              <tbody>
+                {KINK_TABLE.map((row) => (
+                  <tr key={row.range} className="border-b border-white/5">
+                    <td className="py-2.5 px-3 text-white/70 font-medium">{row.range}</td>
+                    <td className={`py-2.5 px-3 font-semibold ${row.mult === "REJECTED" ? "text-red-400" : textAccent}`}>{row.mult}</td>
+                    <td className="py-2.5 px-3 text-white/50">{row.meaning}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Perspective-specific explainer */}
+          <div className="space-y-3">
+            {perspective === "protect" ? (
+              <p className="text-sm text-white/50 leading-relaxed">
+                When vault utilization is low, your agent gets cheap premiums. When it&apos;s high, premiums increase — but so does the probability that your coverage is backed by real capital. The Kink Model ensures the protocol is always solvent.
+              </p>
+            ) : (
+              <p className="text-sm text-white/50 leading-relaxed">
+                When utilization rises, premiums rise — which means YOUR yield rises. If a vault hits 85%+ utilization, the APY can spike to 30-40%. This naturally attracts new LPs who deposit and bring utilization back down. The market self-balances.
+              </p>
+            )}
+            <p className="text-xs text-white/30 leading-relaxed">
+              &#9888;&#65039; The 95% cap is NOT a system failure — it&apos;s a SAFETY MECHANISM. It ensures there is ALWAYS enough capital in the vault to pay existing claims. As policies expire and capacity frees up, new policies are accepted again.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 
