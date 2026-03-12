@@ -4,7 +4,13 @@ import Link from "next/link"
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0A0A0F] text-white flex flex-col items-center justify-center px-4 relative">
+      {/* Back arrow */}
+      <a href="/" className="absolute top-6 left-6 flex items-center gap-2 text-white/50 hover:text-white transition-colors">
+        <span className="text-xl">←</span>
+        <span className="text-sm">Back to Home</span>
+      </a>
+
       <div className="max-w-2xl w-full text-center">
 
         {/* Logo */}
