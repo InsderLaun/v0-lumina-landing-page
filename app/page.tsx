@@ -98,15 +98,15 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
           >
-            <a href="#how-it-works" className={`px-8 py-3 rounded-full font-semibold transition-all ${
+            <a href="#agent-skills" className={`px-8 py-3 rounded-full font-semibold transition-all ${
               perspective === "protect"
                 ? "bg-cyan-500 hover:bg-cyan-400 text-black"
                 : "bg-purple-500 hover:bg-purple-400 text-black"
             }`}>
-              Learn How It Works
+              Connect Your Agent
             </a>
-            <a href="mailto:labs@lumina-org.com" className="px-8 py-3 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all">
-              Contact Us
+            <a href="#how-it-works" className="px-8 py-3 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all">
+              Learn How It Works
             </a>
           </motion.div>
 
