@@ -1,94 +1,230 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 
+const TABS = ["Overview", "Vault Positions", "Active Policies", "Agent Activity", "Emergency"] as const
+type Tab = (typeof TABS)[number]
+
 export default function DashboardPage() {
-  return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white flex flex-col items-center justify-center px-4 relative">
-      {/* Back arrow */}
-      <a href="/" className="absolute top-6 left-6 flex items-center gap-2 text-white/50 hover:text-white transition-colors">
-        <span className="text-xl">←</span>
-        <span className="text-sm">Back to Home</span>
-      </a>
+  const [connected, setConnected] = useState(false)
+  const [activeTab, setActiveTab] = useState<Tab>("Overview")
 
-      <div className="max-w-2xl w-full text-center">
+  const mockAddress = "0x2b4D...0337"
 
-        {/* Logo */}
-        <h1 className="text-lg font-bold mb-8">
-          <span className="text-cyan-400">LUMINA</span>
-          <span className="text-white/20"> · </span>
-          <span className="text-purple-400">M2M</span>
-        </h1>
+  // ════════════════════════════════════════════
+  // HEADER
+  // ════════════════════════════════════════════
+  const header = (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0F]/90 backdrop-blur-md border-b border-white/10">
+      <div className="flex items-center justify-between px-6 h-16">
+        {/* Left: back + logo */}
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-white/40 hover:text-white transition-colors text-lg">←</Link>
+          <span className="text-sm font-bold">
+            <span className="text-cyan-400">LUMINA</span>
+            <span className="text-white/20"> · </span>
+            <span className="text-purple-400">M2M</span>
+          </span>
+        </div>
 
-        {/* Title */}
-        <h2 className="text-3xl font-bold text-white mb-3">Dashboard</h2>
-        <p className="text-white/50 mb-12">Monitor what your AI agent is doing with your capital.</p>
+        {/* Center */}
+        <span className="text-white font-semibold text-sm hidden md:block">Dashboard</span>
 
-        {/* Timeline */}
-        <div className="flex items-start justify-center gap-0 mb-12 max-w-xl mx-auto">
-          {/* Step 1 */}
-          <div className="flex-1 flex flex-col items-center text-center">
-            <div className="relative flex items-center justify-center mb-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400/30"></span>
-              <div className="w-4 h-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 relative" />
+        {/* Right: wallet */}
+        {connected ? (
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-full px-4 py-1.5">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-xs font-mono text-white/70">{mockAddress}</span>
             </div>
-            <p className="text-xs font-mono text-cyan-400 mb-1">01</p>
-            <p className="text-sm font-semibold text-white mb-1">Connect Wallet</p>
-            <p className="text-xs text-white/40 leading-relaxed px-2">Connect your Base L2 wallet to link your address</p>
+            <button
+              onClick={() => setConnected(false)}
+              className="text-xs text-white/40 hover:text-red-400 transition-colors"
+            >
+              Disconnect
+            </button>
           </div>
+        ) : (
+          <button
+            onClick={() => setConnected(true)}
+            className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-white"
+          >
+            Connect Wallet
+          </button>
+        )}
+      </div>
+    </header>
+  )
 
-          {/* Line 1→2 */}
-          <div className="w-16 h-0.5 bg-gradient-to-r from-cyan-500/50 to-purple-500/30 mt-[10px] flex-shrink-0" />
+  // ════════════════════════════════════════════
+  // NOT CONNECTED STATE
+  // ════════════════════════════════════════════
+  if (!connected) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0F] text-white">
+        {header}
+        <div className="flex flex-col items-center justify-center min-h-screen px-4 pt-16">
+          <h1 className="text-2xl font-bold mb-2">
+            <span className="text-cyan-400">LUMINA</span>
+            <span className="text-white/20"> · </span>
+            <span className="text-purple-400">M2M</span>
+          </h1>
+          <p className="text-white/50 text-sm mb-8 text-center max-w-md">
+            Connect your wallet to monitor your agent&apos;s activity
+          </p>
+          <button
+            onClick={() => setConnected(true)}
+            className="px-8 py-3.5 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-base mb-4"
+          >
+            Connect Wallet
+          </button>
+          <p className="text-white/30 text-xs">Read-only dashboard. Your agent operates, you supervise.</p>
+        </div>
+      </div>
+    )
+  }
 
-          {/* Step 2 */}
-          <div className="flex-1 flex flex-col items-center text-center">
-            <div className="w-4 h-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 mb-3" />
-            <p className="text-xs font-mono text-white/50 mb-1">02</p>
-            <p className="text-sm font-semibold text-white mb-1">Your Agent Operates</p>
-            <p className="text-xs text-white/40 leading-relaxed px-2">Your agent buys insurance and deposits in vaults using this wallet</p>
+  // ════════════════════════════════════════════
+  // SIDEBAR
+  // ════════════════════════════════════════════
+  const sidebar = (
+    <aside className="w-full md:w-[280px] md:min-h-[calc(100vh-64px)] bg-white/[0.02] border-r border-white/10 p-5 flex-shrink-0">
+      {/* Wallet info */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          <span className="text-xs font-mono text-white/60">{mockAddress}</span>
+        </div>
+        <span className="text-[10px] text-green-400/70 uppercase tracking-wider">Connected</span>
+      </div>
+
+      {/* Net Worth */}
+      <div className="mb-6">
+        <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Net Worth</p>
+        <p className="text-2xl font-bold text-white">$0.00</p>
+        <div className="mt-2 space-y-1">
+          <p className="text-xs text-cyan-400">Protection: $0.00</p>
+          <p className="text-xs text-purple-400">Yield: $0.00</p>
+        </div>
+      </div>
+
+      <div className="border-t border-white/10 mb-4" />
+
+      {/* Nav links */}
+      <nav className="space-y-1 mb-6">
+        {TABS.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+              activeTab === tab
+                ? "bg-white/[0.08] text-white font-medium"
+                : "text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </nav>
+
+      <div className="border-t border-white/10 mb-4" />
+
+      {/* System Status */}
+      <div>
+        <p className="text-[10px] text-white/40 uppercase tracking-wider mb-3">System Status</p>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            <span className="text-xs text-white/50">Contracts: Online</span>
           </div>
-
-          {/* Line 2→3 */}
-          <div className="w-16 h-0.5 bg-gradient-to-r from-purple-500/30 to-purple-500/50 mt-[10px] flex-shrink-0" />
-
-          {/* Step 3 */}
-          <div className="flex-1 flex flex-col items-center text-center">
-            <div className="w-4 h-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 mb-3" />
-            <p className="text-xs font-mono text-white/50 mb-1">03</p>
-            <p className="text-sm font-semibold text-white mb-1">Monitor Here</p>
-            <p className="text-xs text-white/40 leading-relaxed px-2">See your vault positions, active policies, yields, and claim history — all read-only</p>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            <span className="text-xs text-white/50">Oracle: Live prices</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+            <span className="text-xs text-white/50">API: Connected</span>
           </div>
         </div>
+      </div>
+    </aside>
+  )
 
-        {/* Info box */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6 max-w-lg mx-auto mb-6 text-left">
-          <p className="text-sm text-white/60 mb-4">After connecting, you&#39;ll see:</p>
-          <div className="space-y-2">
-            <p className="text-sm text-white/70"><span className="text-cyan-400 mr-2">✓</span>Your USDY balance</p>
-            <p className="text-sm text-white/70"><span className="text-cyan-400 mr-2">✓</span>Vault positions with current yield</p>
-            <p className="text-sm text-white/70"><span className="text-cyan-400 mr-2">✓</span>Active insurance policies and their status</p>
-            <p className="text-sm text-white/70"><span className="text-cyan-400 mr-2">✓</span>Claim history</p>
-            <p className="text-sm text-white/70"><span className="text-purple-400 mr-2">✓</span>Emergency withdrawal (if your agent fails)</p>
-          </div>
+  // ════════════════════════════════════════════
+  // MAIN PANEL CONTENT
+  // ════════════════════════════════════════════
+  const overviewContent = (
+    <div>
+      {/* Stats cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Total Deposited</p>
+          <p className="text-2xl font-bold text-purple-400">$0.00</p>
         </div>
-
-        {/* Testnet banner */}
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 max-w-lg mx-auto mb-8">
-          <p className="text-amber-400 text-sm">⚠️ Contracts not yet deployed. Dashboard will be fully functional after mainnet launch.</p>
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Active Coverage</p>
+          <p className="text-2xl font-bold text-cyan-400">$0.00</p>
         </div>
-
-        {/* Connect Wallet button */}
-        <button className="px-8 py-3.5 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-base mb-4 cursor-not-allowed opacity-70">
-          Connect Wallet
-        </button>
-
-        {/* Back to Home */}
-        <div>
-          <Link href="/" className="text-sm text-white/40 hover:text-white/60 transition-colors">
-            ← Back to Home
-          </Link>
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Total Yield Earned</p>
+          <p className="text-2xl font-bold text-green-400">$0.00</p>
         </div>
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+          <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Policies Active</p>
+          <p className="text-2xl font-bold text-white">0</p>
+        </div>
+      </div>
 
+      {/* CTA */}
+      <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6 text-center">
+        <p className="text-white/50 text-sm mb-4">
+          Connect your agent with the Skill file to start seeing activity here.
+        </p>
+        <Link
+          href="/docs/skill"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-white"
+        >
+          Give Your Agent the Skill
+          <span>→</span>
+        </Link>
+      </div>
+    </div>
+  )
+
+  const placeholderContent = (tab: Tab) => (
+    <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 text-center">
+      <p className="text-white/30 text-sm">{tab} — coming in Step 2+</p>
+    </div>
+  )
+
+  const mainContent = () => {
+    switch (activeTab) {
+      case "Overview":
+        return overviewContent
+      case "Vault Positions":
+        return placeholderContent("Vault Positions")
+      case "Active Policies":
+        return placeholderContent("Active Policies")
+      case "Agent Activity":
+        return placeholderContent("Agent Activity")
+      case "Emergency":
+        return placeholderContent("Emergency")
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // CONNECTED LAYOUT
+  // ════════════════════════════════════════════
+  return (
+    <div className="min-h-screen bg-[#0A0A0F] text-white">
+      {header}
+      <div className="flex flex-col md:flex-row pt-16">
+        {sidebar}
+        <main className="flex-1 p-6 md:p-8">
+          <h2 className="text-xl font-bold text-white mb-6">{activeTab}</h2>
+          {mainContent()}
+        </main>
       </div>
     </div>
   )
