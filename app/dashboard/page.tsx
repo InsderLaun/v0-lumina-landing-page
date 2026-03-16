@@ -52,6 +52,40 @@ const VAULT_CONFIG = [
   },
 ]
 
+// ════════════════════════════════════════════
+// SHIELD CONFIG
+// ════════════════════════════════════════════
+const SHIELD_CONFIG = [
+  {
+    name: "Black Swan Shield",
+    address: "0xC01ED8eF52506B29545f08BBf9aAe5Fe59b15CF7",
+    icon: "\u{1F6E1}\uFE0F",
+    productId: "BLACKSWAN-001",
+    vaultName: "Volatile Short",
+  },
+  {
+    name: "Depeg Shield",
+    address: "0xCdA417909d43F252f63034346db9121441BfE70F",
+    icon: "\u{1F512}",
+    productId: "DEPEG-STABLE-001",
+    vaultName: "Stable Short",
+  },
+  {
+    name: "IL Index Cover",
+    address: "0x73fB5CB9Aa0BeBAf74a3a4b6Cfb09d3Fd66C9FB6",
+    icon: "\u{1F4CA}",
+    productId: "ILPROT-001",
+    vaultName: "Volatile Short",
+  },
+  {
+    name: "Exploit Shield",
+    address: "0x05170F9Ca56026001064F5242c6F9F7f181c6baA",
+    icon: "\u{1F510}",
+    productId: "EXPLOIT-001",
+    vaultName: "Stable Short",
+  },
+]
+
 const RPC_URL = "https://mainnet.base.org"
 const MOCK_WALLET = "0x2b4D825417f568231e809E31B9332ED146760337"
 
@@ -88,6 +122,8 @@ const SEL_TOTAL_SUPPLY = "0x18160ddd" // totalSupply()
 const SEL_BALANCE_OF = "0x70a08231"   // balanceOf(address)
 const SEL_ALLOCATED = "0xf8e0e1c8"   // allocatedAssets()
 const SEL_UTILIZATION = "0x6c2e7a0b"  // utilizationBps()
+const SEL_TOTAL_POLICIES = "0x56261638" // totalPolicies()
+const SEL_GET_POLICY_INFO = "0xb94047a9" // getPolicyInfo(uint256)
 
 // ════════════════════════════════════════════
 // TYPES
@@ -102,6 +138,30 @@ interface VaultData {
   utilizationBps: number
   estimatedAPY: number
   loading: boolean
+}
+
+interface PolicyData {
+  policyId: number
+  shieldName: string
+  shieldIcon: string
+  vaultName: string
+  insuredAgent: string
+  coverageAmount: number
+  premiumPaid: number
+  maxPayout: number
+  startTimestamp: number
+  expiresAt: number
+  status: number // 0=NONEXISTENT,1=WAITING,2=ACTIVE,3=EXPIRED,4=SETTLEMENT,5=PAID_OUT,6=CANCELLED
+}
+
+const STATUS_LABELS: Record<number, { label: string; color: string; pulse?: boolean }> = {
+  0: { label: "Unknown", color: "bg-gray-500/15 text-gray-400 border-gray-500/20" },
+  1: { label: "Waiting Period", color: "bg-amber-500/15 text-amber-400 border-amber-500/20" },
+  2: { label: "Active", color: "bg-green-500/15 text-green-400 border-green-500/20", pulse: true },
+  3: { label: "Expired", color: "bg-white/10 text-white/40 border-white/10" },
+  4: { label: "Settlement", color: "bg-amber-500/15 text-amber-400 border-amber-500/20" },
+  5: { label: "Claimed", color: "bg-cyan-500/15 text-cyan-400 border-cyan-500/20" },
+  6: { label: "Cancelled", color: "bg-red-500/15 text-red-400 border-red-500/20" },
 }
 
 // ════════════════════════════════════════════
@@ -132,6 +192,8 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>("Overview")
   const [vaultData, setVaultData] = useState<VaultData[]>([])
   const [vaultsLoading, setVaultsLoading] = useState(true)
+  const [policies, setPolicies] = useState<PolicyData[]>([])
+  const [policiesLoading, setPoliciesLoading] = useState(true)
 
   const mockAddress = "0x2b4D...0337"
 
@@ -191,11 +253,93 @@ export default function DashboardPage() {
   }, [fetchVaultData])
 
   // ════════════════════════════════════════════
+  // FETCH POLICIES
+  // ════════════════════════════════════════════
+  const fetchPolicies = useCallback(async () => {
+    setPoliciesLoading(true)
+    try {
+      const allPolicies: PolicyData[] = []
+
+      for (const shield of SHIELD_CONFIG) {
+        // Get total policies count
+        const totalHex = await ethCall(shield.address, SEL_TOTAL_POLICIES)
+        const total = Number(decodeUint256(totalHex))
+
+        // Iterate through all policies (1-indexed)
+        for (let id = 1; id <= total; id++) {
+          try {
+            const idHex = "0x" + id.toString(16).padStart(64, "0")
+            const result = await ethCall(shield.address, SEL_GET_POLICY_INFO + idHex.slice(2))
+
+            if (!result || result === "0x" || result.length < 66) continue
+
+            // Decode the PolicyInfo tuple:
+            // (uint256 policyId, address insuredAgent, uint256 coverageAmount, uint256 premiumPaid,
+            //  uint256 maxPayout, uint256 startTimestamp, uint256 waitingEndsAt, uint256 expiresAt,
+            //  uint256 cleanupAt, uint8 status)
+            const data = result.slice(2) // remove 0x
+            const chunks = []
+            for (let j = 0; j < data.length; j += 64) {
+              chunks.push(data.slice(j, j + 64))
+            }
+
+            if (chunks.length < 10) continue
+
+            const insuredAgent = "0x" + chunks[1].slice(24)
+            if (insuredAgent.toLowerCase() !== MOCK_WALLET.toLowerCase()) continue
+
+            allPolicies.push({
+              policyId: Number(BigInt("0x" + chunks[0])),
+              shieldName: shield.name,
+              shieldIcon: shield.icon,
+              vaultName: shield.vaultName,
+              insuredAgent,
+              coverageAmount: Number(BigInt("0x" + chunks[2])),
+              premiumPaid: Number(BigInt("0x" + chunks[3])),
+              maxPayout: Number(BigInt("0x" + chunks[4])),
+              startTimestamp: Number(BigInt("0x" + chunks[5])),
+              expiresAt: Number(BigInt("0x" + chunks[7])),
+              status: Number(BigInt("0x" + chunks[9])),
+            })
+          } catch {
+            continue
+          }
+        }
+      }
+
+      setPolicies(allPolicies)
+    } catch (e) {
+      console.error("Failed to fetch policies:", e)
+    }
+    setPoliciesLoading(false)
+  }, [])
+
+  useEffect(() => {
+    fetchPolicies()
+  }, [fetchPolicies])
+
+  // ════════════════════════════════════════════
   // FORMAT HELPERS
   // ════════════════════════════════════════════
   function formatUSDY(amount: number): string {
     const usd = amount / 1e6
     return usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  function formatDate(ts: number): string {
+    return new Date(ts * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  }
+
+  function daysUntil(ts: number): number {
+    const now = Date.now() / 1000
+    return Math.max(0, Math.round((ts - now) / 86400))
+  }
+
+  function timeProgress(start: number, end: number): number {
+    const now = Date.now() / 1000
+    if (now >= end) return 100
+    if (now <= start) return 0
+    return Math.round(((now - start) / (end - start)) * 100)
   }
 
   function utilColor(bps: number): string {
@@ -294,7 +438,9 @@ export default function DashboardPage() {
         <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Net Worth</p>
         <p className="text-2xl font-bold text-white">${formatUSDY(totalUserValue)}</p>
         <div className="mt-2 space-y-1">
-          <p className="text-xs text-cyan-400">Protection: $0.00</p>
+          <p className="text-xs text-cyan-400">
+            Protection: ${formatUSDY(policies.filter(p => p.status === 2).reduce((s, p) => s + p.coverageAmount, 0))}
+          </p>
           <p className="text-xs text-purple-400">Yield: ${formatUSDY(totalUserValue)}</p>
         </div>
       </div>
@@ -351,7 +497,9 @@ export default function DashboardPage() {
         </div>
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
           <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Active Coverage</p>
-          <p className="text-2xl font-bold text-cyan-400">$0.00</p>
+          <p className="text-2xl font-bold text-cyan-400">
+            ${formatUSDY(policies.filter(p => p.status === 2).reduce((s, p) => s + p.coverageAmount, 0))}
+          </p>
         </div>
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
           <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Total Yield Earned</p>
@@ -359,7 +507,7 @@ export default function DashboardPage() {
         </div>
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
           <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Policies Active</p>
-          <p className="text-2xl font-bold text-white">0</p>
+          <p className="text-2xl font-bold text-white">{policies.filter(p => p.status === 2).length}</p>
         </div>
       </div>
 
@@ -507,6 +655,130 @@ export default function DashboardPage() {
   )
 
   // ════════════════════════════════════════════
+  // ACTIVE POLICIES TAB
+  // ════════════════════════════════════════════
+  const policiesContent = (
+    <div>
+      {policiesLoading ? (
+        <div className="space-y-4">
+          {[0, 1].map((i) => (
+            <div key={i} className="bg-white/[0.03] border border-white/10 rounded-xl p-6 animate-pulse">
+              <div className="h-5 bg-white/10 rounded w-1/3 mb-4" />
+              <div className="h-4 bg-white/10 rounded w-1/2 mb-3" />
+              <div className="h-3 bg-white/10 rounded w-2/3 mb-2" />
+              <div className="h-3 bg-white/10 rounded w-1/2 mb-4" />
+              <div className="h-2 bg-white/10 rounded w-full" />
+            </div>
+          ))}
+        </div>
+      ) : policies.length === 0 ? (
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 text-center">
+          <p className="text-white/50 text-sm mb-1">No active policies found.</p>
+          <p className="text-white/30 text-xs mb-6">Your agent hasn&apos;t bought any insurance yet.</p>
+          <Link
+            href="/docs/skill"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-white"
+          >
+            Give Your Agent the Skill
+            <span>→</span>
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {policies.map((policy) => {
+            const statusInfo = STATUS_LABELS[policy.status] || STATUS_LABELS[0]
+            const progress = timeProgress(policy.startTimestamp, policy.expiresAt)
+            const remaining = daysUntil(policy.expiresAt)
+            const netPayout = Math.round(policy.maxPayout * 0.97) // 3% fee
+            const payoutPct = policy.coverageAmount > 0
+              ? Math.round((policy.maxPayout / policy.coverageAmount) * 100)
+              : 0
+
+            return (
+              <div
+                key={`${policy.shieldName}-${policy.policyId}`}
+                className="bg-white/[0.03] border border-cyan-500/20 rounded-xl p-6"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">{policy.shieldIcon}</span>
+                    <div>
+                      <h3 className="text-sm font-semibold text-white">{policy.shieldName}</h3>
+                      <span className="text-[10px] text-white/30">Policy #{policy.policyId}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {statusInfo.pulse && (
+                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    )}
+                    <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-medium border ${statusInfo.color}`}>
+                      {statusInfo.label}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Data grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Coverage</p>
+                    <p className="text-sm font-semibold text-white">${formatUSDY(policy.coverageAmount)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Premium Paid</p>
+                    <p className="text-sm font-semibold text-white">${formatUSDY(policy.premiumPaid)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Max Payout ({payoutPct}%)</p>
+                    <p className="text-sm font-semibold text-cyan-400">${formatUSDY(policy.maxPayout)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Net Payout (after 3% fee)</p>
+                    <p className="text-sm font-semibold text-cyan-400">${formatUSDY(netPayout)}</p>
+                  </div>
+                </div>
+
+                {/* Details row */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5 text-xs">
+                  <div>
+                    <span className="text-white/40">Started:</span>{" "}
+                    <span className="text-white/70">{formatDate(policy.startTimestamp)}</span>
+                  </div>
+                  <div>
+                    <span className="text-white/40">Expires:</span>{" "}
+                    <span className="text-white/70">{formatDate(policy.expiresAt)}</span>
+                    {remaining > 0 && (
+                      <span className="text-cyan-400 ml-1">({remaining}d left)</span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="text-white/40">Vault:</span>{" "}
+                    <span className="text-white/70">{policy.vaultName}</span>
+                  </div>
+                </div>
+
+                {/* Time progress bar */}
+                <div>
+                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 transition-all"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-[10px] text-white/30">{formatDate(policy.startTimestamp)}</span>
+                    <span className="text-[10px] text-white/30">{formatDate(policy.expiresAt)}</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+
+  // ════════════════════════════════════════════
   // PLACEHOLDER FOR OTHER TABS
   // ════════════════════════════════════════════
   const placeholderContent = (tab: Tab) => (
@@ -522,7 +794,7 @@ export default function DashboardPage() {
       case "Vault Positions":
         return vaultPositionsContent
       case "Active Policies":
-        return placeholderContent("Active Policies")
+        return policiesContent
       case "Agent Activity":
         return placeholderContent("Agent Activity")
       case "Emergency":
