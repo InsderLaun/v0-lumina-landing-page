@@ -116,14 +116,14 @@ function decodeUint256(hex: string): bigint {
   return BigInt(hex)
 }
 
-// Function selectors
+// Function selectors (verified with cast sig)
 const SEL_TOTAL_ASSETS = "0x01e1d114" // totalAssets()
 const SEL_TOTAL_SUPPLY = "0x18160ddd" // totalSupply()
 const SEL_BALANCE_OF = "0x70a08231"   // balanceOf(address)
-const SEL_ALLOCATED = "0xf8e0e1c8"   // allocatedAssets()
-const SEL_UTILIZATION = "0x6c2e7a0b"  // utilizationBps()
-const SEL_TOTAL_POLICIES = "0x56261638" // totalPolicies()
-const SEL_GET_POLICY_INFO = "0xb94047a9" // getPolicyInfo(uint256)
+const SEL_ALLOCATED = "0x36cd2b11"   // allocatedAssets()
+const SEL_UTILIZATION = "0x975e900e"  // utilizationBps()
+const SEL_TOTAL_POLICIES = "0xf059d78e" // totalPolicies()
+const SEL_GET_POLICY_INFO = "0x9588d85b" // getPolicyInfo(uint256)
 
 // ════════════════════════════════════════════
 // TYPES
