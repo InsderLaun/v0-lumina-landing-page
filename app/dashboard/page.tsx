@@ -17,6 +17,8 @@ const VAULT_CONFIG = [
     riskType: "VOLATILE" as const,
     products: "BSS + IL Index",
     color: "purple",
+    riskBadge: "Higher Risk",
+    riskBadgeColor: "amber",
   },
   {
     name: "Volatile Long",
@@ -25,6 +27,8 @@ const VAULT_CONFIG = [
     riskType: "VOLATILE" as const,
     products: "BSS + IL Index",
     color: "purple",
+    riskBadge: "Higher Risk",
+    riskBadgeColor: "amber",
   },
   {
     name: "Stable Short",
@@ -33,6 +37,8 @@ const VAULT_CONFIG = [
     riskType: "STABLE" as const,
     products: "Depeg + Exploit",
     color: "cyan",
+    riskBadge: "Low Risk",
+    riskBadgeColor: "green",
   },
   {
     name: "Stable Long",
@@ -41,6 +47,8 @@ const VAULT_CONFIG = [
     riskType: "STABLE" as const,
     products: "Depeg + Exploit",
     color: "cyan",
+    riskBadge: "Very Low Risk",
+    riskBadgeColor: "green",
   },
 ]
 
@@ -418,6 +426,15 @@ export default function DashboardPage() {
                       }`}
                     />
                     <span className="text-sm font-semibold text-white">{vault.name}</span>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        vault.riskBadgeColor === "amber"
+                          ? "bg-amber-500/15 text-amber-400 border border-amber-500/20"
+                          : "bg-green-500/15 text-green-400 border border-green-500/20"
+                      }`}
+                    >
+                      {vault.riskBadge}
+                    </span>
                   </div>
                   <span className="text-[10px] text-white/30">Cooldown: {vault.cooldown}</span>
                 </div>
