@@ -257,37 +257,45 @@ export default function DashboardPage() {
   // ════════════════════════════════════════════
   const fetchPolicies = useCallback(async () => {
     setPoliciesLoading(true)
-    try {
-      const allPolicies: PolicyData[] = []
+    const allPolicies: PolicyData[] = []
 
-      for (const shield of SHIELD_CONFIG) {
-        // Get total policies count
-        const totalHex = await ethCall(shield.address, SEL_TOTAL_POLICIES)
-        const total = Number(decodeUint256(totalHex))
+    for (const shield of SHIELD_CONFIG) {
+      // Scan policy IDs 1 through 20
+      for (let id = 1; id <= 20; id++) {
+        try {
+          const idParam = id.toString(16).padStart(64, "0")
+          const calldata = SEL_GET_POLICY_INFO + idParam
 
-        // Iterate through all policies (1-indexed)
-        for (let id = 1; id <= total; id++) {
-          try {
-            const idHex = "0x" + id.toString(16).padStart(64, "0")
-            const result = await ethCall(shield.address, SEL_GET_POLICY_INFO + idHex.slice(2))
+          const res = await fetch(RPC_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              id: 1,
+              method: "eth_call",
+              params: [{ to: shield.address, data: calldata }, "latest"],
+            }),
+          })
+          const json = await res.json()
 
-            if (!result || result === "0x" || result.length < 66) continue
+          // If error or no result, this shield has no more policies
+          if (json.error || !json.result || json.result === "0x") break
 
-            // Decode the PolicyInfo tuple:
-            // (uint256 policyId, address insuredAgent, uint256 coverageAmount, uint256 premiumPaid,
-            //  uint256 maxPayout, uint256 startTimestamp, uint256 waitingEndsAt, uint256 expiresAt,
-            //  uint256 cleanupAt, uint8 status)
-            const data = result.slice(2) // remove 0x
-            const chunks = []
-            for (let j = 0; j < data.length; j += 64) {
-              chunks.push(data.slice(j, j + 64))
-            }
+          const hex = json.result.slice(2) // remove 0x
+          // Need at least 10 x 64 hex chars = 640
+          if (hex.length < 640) break
 
-            if (chunks.length < 10) continue
+          const chunks: string[] = []
+          for (let j = 0; j < hex.length; j += 64) {
+            chunks.push(hex.slice(j, j + 64))
+          }
 
-            const insuredAgent = "0x" + chunks[1].slice(24)
-            if (insuredAgent.toLowerCase() !== MOCK_WALLET.toLowerCase()) continue
+          // Check if insuredAgent is zero (policy doesn't exist)
+          const insuredAgent = "0x" + chunks[1].slice(24)
+          if (insuredAgent === "0x0000000000000000000000000000000000000000") break
 
+          // Only include policies for our wallet
+          if (insuredAgent.toLowerCase() === MOCK_WALLET.toLowerCase()) {
             allPolicies.push({
               policyId: Number(BigInt("0x" + chunks[0])),
               shieldName: shield.name,
@@ -301,16 +309,15 @@ export default function DashboardPage() {
               expiresAt: Number(BigInt("0x" + chunks[7])),
               status: Number(BigInt("0x" + chunks[9])),
             })
-          } catch {
-            continue
           }
+        } catch {
+          // getPolicyInfo reverted = no more policies in this shield
+          break
         }
       }
-
-      setPolicies(allPolicies)
-    } catch (e) {
-      console.error("Failed to fetch policies:", e)
     }
+
+    setPolicies(allPolicies)
     setPoliciesLoading(false)
   }, [])
 
