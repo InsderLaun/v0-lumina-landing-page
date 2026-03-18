@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lumina Protocol — Agent Setup Tutorial</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0f; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.7; }
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    h1 { color: #22d3ee; font-size: 2rem; margin-bottom: 8px; }
+    h2 { color: #a78bfa; font-size: 1.3rem; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    h3 { color: #22d3ee; font-size: 1.1rem; margin: 24px 0 12px; }
+    p { margin-bottom: 16px; color: rgba(255,255,255,0.7); }
+    .subtitle { color: rgba(255,255,255,0.5); font-size: 0.95rem; margin-bottom: 32px; }
+    .step { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .step-number { display: inline-block; background: rgba(34,211,238,0.15); color: #22d3ee; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: bold; font-size: 0.9rem; margin-right: 12px; }
+    .step-title { font-size: 1.1rem; font-weight: 600; color: white; display: inline; }
+    code { background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; color: #22d3ee; }
+    pre { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 12px 0 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; line-height: 1.6; color: rgba(255,255,255,0.8); }
+    .warning { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3); border-radius: 8px; padding: 16px; margin: 16px 0; }
+    .warning-title { color: #eab308; font-weight: 600; margin-bottom: 4px; }
+    .success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; padding: 16px; margin: 16px 0; }
+    .success-title { color: #22c55e; font-weight: 600; margin-bottom: 4px; }
+    .info { background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.3); border-radius: 8px; padding: 16px; margin: 16px 0; }
+    a { color: #22d3ee; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back-link { display: inline-block; margin-bottom: 24px; color: rgba(255,255,255,0.4); font-size: 0.9rem; }
+    .back-link:hover { color: #22d3ee; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; }
+    th { color: rgba(255,255,255,0.5); font-weight: 500; }
+    .killswitch { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 16px; margin: 16px 0; }
+    .killswitch-title { color: #ef4444; font-weight: 600; margin-bottom: 4px; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-link">&larr; Back to Lumina</a>
+
+    <h1>Connect Your AI Agent to Lumina</h1>
+    <p class="subtitle">Complete guide — from zero to insured in 10 minutes. No blockchain knowledge needed.</p>
+
+    <h2>What You'll Do</h2>
+    <p>You'll set up your AI agent to buy insurance automatically. After this setup (which takes 10 minutes), your agent operates on its own — you just monitor.</p>
+
+    <div class="info">
+      <p><strong>Think of it like this:</strong> You're giving your AI agent a credit card (API Key) with a spending limit (Approve). The agent decides when to buy insurance based on rules you define.</p>
+    </div>
+
+    <h2>What You Need</h2>
+    <table>
+      <tr><th>Item</th><th>What It Is</th><th>Where to Get It</th></tr>
+      <tr><td>Wallet</td><td>MetaMask, Coinbase Wallet, or Rainbow</td><td><a href="https://metamask.io">metamask.io</a></td></tr>
+      <tr><td>USDY</td><td>Dollars on blockchain (from Ondo Finance)</td><td><a href="https://ondo.finance">ondo.finance</a></td></tr>
+      <tr><td>ETH on Base</td><td>For the one-time approval (~$0.01)</td><td>Bridge from Ethereum or buy on Base</td></tr>
+    </table>
+
+    <h2>Step-by-Step Setup</h2>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <span class="step-title">Create Your API Key</span>
+      <p style="margin-top: 12px;">The API Key is like a password that lets your agent access Lumina. Run this command (replace YOUR_WALLET with your actual wallet address):</p>
+      <pre>curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/keys/create \
+  -H "Content-Type: application/json" \
+  -d '{"wallet": "YOUR_WALLET_ADDRESS", "label": "my-agent"}'</pre>
+      <p>You'll get back something like:</p>
+      <pre>{"apiKey": "lum_abc123...", "warning": "Save this key securely."}</pre>
+      <div class="warning">
+        <p class="warning-title">&#9888;&#65039; Save this key NOW</p>
+        <p>The API Key is shown only once. If you lose it, you'll need to create a new one.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <span class="step-title">Approve USDY Spending (Your Spending Limit)</span>
+      <p style="margin-top: 12px;">This step tells your USDY tokens: "Lumina is allowed to charge me up to $X." It's like putting a credit card on file with a spending cap.</p>
+      <p><strong>You control the limit.</strong> If you approve $1,000, that's the maximum your agent can spend. You can change or revoke it anytime.</p>
+      <p>Go to BaseScan and call the <code>approve</code> function:</p>
+      <pre>Contract: 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9
+Function: approve(address, uint256)
+  spender: 0x8407aF8a100812bFb5f9f188b44379E4268efF94
+  amount:  10000000000  (= $10,000)</pre>
+      <p>Or via command line:</p>
+      <pre>cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 \
+  "approve(address,uint256)" \
+  0x8407aF8a100812bFb5f9f188b44379E4268efF94 \
+  10000000000 \
+  --rpc-url YOUR_RPC_URL \
+  --private-key YOUR_KEY</pre>
+      <div class="info">
+        <p><strong>This is your risk limit.</strong> If you approve $10,000, that's the absolute maximum. Your agent can't spend more than that. You can revoke this permission anytime from MetaMask or by setting the approve to 0.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <span class="step-title">Give Your Agent the API Key + SKILL File</span>
+      <p style="margin-top: 12px;">Your agent needs two things:</p>
+      <p><strong>1. The API Key</strong> — set it as an environment variable or config:</p>
+      <pre>LUMINA_API_KEY=lum_your_key_here</pre>
+      <p><strong>2. The SKILL File</strong> — download it and give it to your agent as context:</p>
+      <p><a href="/LUMINA-SKILL.txt" download>Download LUMINA-SKILL.txt &rarr;</a></p>
+      <p>The SKILL file tells your agent what products exist, how to call the API, when to buy each product, and pricing rules.</p>
+    </div>
+
+    <div class="step">
+      <span class="step-number">4</span>
+      <span class="step-title">Test It — Buy Your First Policy</span>
+      <p style="margin-top: 12px;">Run this to verify everything works:</p>
+      <pre>curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: lum_your_key_here" \
+  -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'</pre>
+      <p>This buys a $100 Black Swan Shield for 7 days. If you see <code>"success": true</code>, you're all set!</p>
+      <div class="success">
+        <p class="success-title">&#10004; That's it!</p>
+        <p>Your agent can now buy insurance on its own. Monitor activity on the <a href="/dashboard">Dashboard</a>.</p>
+      </div>
+    </div>
+
+    <h2>Kill Switch (Emergency Stop)</h2>
+    <div class="killswitch">
+      <p class="killswitch-title">If something goes wrong, revoke the approve:</p>
+      <p>Call <code>approve</code> with amount <code>0</code> on the USDY contract. This instantly prevents Lumina from charging any more USDY. Your agent won't be able to buy policies until you re-approve.</p>
+      <pre>cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 \
+  "approve(address,uint256)" \
+  0x8407aF8a100812bFb5f9f188b44379E4268efF94 \
+  0 \
+  --rpc-url YOUR_RPC_URL --private-key YOUR_KEY</pre>
+      <p>You can also revoke from MetaMask &rarr; Connected Sites &rarr; Revoke Permissions.</p>
+    </div>
+
+    <h2>Products Reference</h2>
+    <table>
+      <tr><th>Product</th><th>ID</th><th>Covers</th><th>Duration</th><th>Deductible</th></tr>
+      <tr><td>Black Swan Shield</td><td><code>BSS</code></td><td>ETH crashes 30%+</td><td>7-30 days</td><td>20%</td></tr>
+      <tr><td>Depeg Shield</td><td><code>DEPEG</code></td><td>Stablecoin loses peg</td><td>14-365 days</td><td>10%</td></tr>
+      <tr><td>IL Index Cover</td><td><code>IL</code></td><td>Impermanent loss</td><td>14-90 days</td><td>2%</td></tr>
+      <tr><td>Exploit Shield</td><td><code>EXPLOIT</code></td><td>Smart contract hacks</td><td>90-365 days</td><td>10%</td></tr>
+    </table>
+
+    <h2>Need Help?</h2>
+    <p>Email <a href="mailto:support@lumina-org.com">support@lumina-org.com</a> or visit the <a href="/dashboard">Dashboard</a> to monitor your agent.</p>
+
+    <p style="margin-top: 40px; color: rgba(255,255,255,0.3); font-size: 0.8rem;">Lumina Protocol — Insurance for the Machine Economy</p>
+  </div>
+</body>
+</html>

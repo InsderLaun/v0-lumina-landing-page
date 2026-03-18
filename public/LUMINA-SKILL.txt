@@ -1,0 +1,115 @@
+# LUMINA PROTOCOL — SKILL FILE FOR AI AGENTS
+# Version: 2.0 | Chain: Base Mainnet (8453)
+# Last Updated: March 2026
+
+## WHAT IS LUMINA?
+You are connected to Lumina Protocol, a parametric insurance platform for AI agents on Base L2.
+You can buy insurance policies to protect your portfolio against market crashes, stablecoin depegs, impermanent loss, and smart contract exploits.
+You buy policies via a simple HTTP API. No blockchain knowledge needed.
+
+## API BASE URL
+https://lumina-protocol-production.up.railway.app
+
+## AUTHENTICATION
+All purchase requests require an API Key in the header:
+X-API-Key: YOUR_API_KEY_HERE
+
+## AVAILABLE PRODUCTS
+
+| ID      | Name              | Covers                              | Duration    | Deductible |
+|---------|-------------------|-------------------------------------|-------------|------------|
+| BSS     | Black Swan Shield | ETH crashes 30%+ in short period    | 7-30 days   | 20%        |
+| DEPEG   | Depeg Shield      | Stablecoin loses peg (USDC/USDT/DAI)| 14-365 days | 10%        |
+| IL      | IL Index Cover    | Impermanent loss in liquidity pools  | 14-90 days  | 2%         |
+| EXPLOIT | Exploit Shield    | Smart contract hacks/exploits        | 90-365 days | 10%        |
+
+## HOW TO BUY A POLICY (1 HTTP CALL)
+
+POST /api/v2/purchase
+Content-Type: application/json
+X-API-Key: YOUR_API_KEY
+
+Request body:
+{
+  "productId": "BSS",
+  "coverageAmount": 1000000000,
+  "durationSeconds": 1209600
+}
+
+Parameters:
+- productId: "BSS", "DEPEG", "IL", or "EXPLOIT"
+- coverageAmount: in 6 decimals. $1,000 = 1000000000. Min $100, Max $100,000
+- durationSeconds: in seconds. 7 days = 604800. 14 days = 1209600. 30 days = 2592000. 90 days = 7776000. 365 days = 31536000
+
+Success response (201):
+{
+  "success": true,
+  "txHash": "0x...",
+  "product": "Black Swan Shield",
+  "premium": "690000",
+  "premiumUSD": "0.69",
+  "durationDays": 14,
+  "explorer": "https://basescan.org/tx/0x..."
+}
+
+## OTHER USEFUL ENDPOINTS
+
+GET /api/v2/health
+→ Check if API is running
+
+GET /api/v2/products
+→ List all products with details
+
+GET /api/v2/vaults
+→ See vault TVL, utilization, APY
+
+GET /api/v2/policies?buyer=0xYOUR_WALLET
+→ Check your active policies
+
+## DECISION GUIDELINES
+
+When to buy BSS (Black Swan Shield):
+- ETH volatility is high (24h change > 5%)
+- Your portfolio has significant ETH exposure
+- Market sentiment is fearful
+
+When to buy DEPEG:
+- You hold stablecoins (USDC, USDT, DAI)
+- There are concerns about stablecoin issuers
+- Regulatory uncertainty around stablecoins
+
+When to buy IL (Impermanent Loss):
+- You are providing liquidity in DeFi pools
+- The assets in your LP are volatile
+- You want to hedge IL risk
+
+When to buy EXPLOIT:
+- You have funds in DeFi protocols
+- Recent hacks in similar protocols
+- Protocol has not been audited recently
+
+## PRICING
+Premiums are dynamic based on vault utilization (Kink Model).
+Low demand = cheap premiums. High demand = expensive premiums.
+Check current pricing via GET /api/v2/vaults before buying.
+
+## COVERAGE AMOUNTS
+Always insure based on your actual exposure:
+- If you have $10,000 in ETH, buy $10,000 BSS coverage
+- If you have $50,000 in USDC, buy $50,000 DEPEG coverage
+- Never over-insure (wastes premium) or under-insure (insufficient protection)
+
+## IMPORTANT RULES
+- Maximum 5 purchases per minute (rate limited)
+- Your wallet must have USDY balance to pay premiums
+- Your wallet must have approved the CoverRouter to spend USDY
+- Policies are created on Base L2 (chain 8453)
+- Payouts are automatic if the trigger condition is met
+
+## CONTRACTS (Base Mainnet)
+CoverRouter: 0x8407aF8a100812bFb5f9f188b44379E4268efF94
+USDY Token: 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9
+
+## SUPPORT
+Email: support@lumina-org.com
+Website: https://www.lumina-org.com

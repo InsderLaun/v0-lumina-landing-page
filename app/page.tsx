@@ -358,7 +358,7 @@ export default function Home() {
                 <p className="text-white/50 text-sm">Choose your path — from zero to insured in 10 minutes</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
                 {/* Card A: For Humans */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -371,7 +371,7 @@ export default function Home() {
                   <p className="text-xs text-white/50 mb-4 flex-grow">Step-by-step guide to set up your wallet, approve spending, get your API Key, and configure your agent. No blockchain knowledge needed.</p>
                   <div className="space-y-2">
                     <a
-                      href="/docs/tutorial"
+                      href="/tutorial.html"
                       className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all"
                     >
                       Read the Guide →
