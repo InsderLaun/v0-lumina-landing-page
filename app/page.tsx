@@ -2548,6 +2548,12 @@ function Navbar({ perspective, onConnectAgent }: { perspective: Perspective; onC
 
         {/* Connect Agent + Connect Wallet */}
         <div className="hidden md:flex items-center gap-3">
+          <a
+            href="/tutorial.html"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all"
+          >
+            📖 Beginner Guide
+          </a>
           <button
             onClick={onConnectAgent}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all"
@@ -2595,6 +2601,13 @@ function Navbar({ perspective, onConnectAgent }: { perspective: Perspective; onC
                 )
               ))}
               <div className="pt-2 space-y-2">
+                <a
+                  href="/tutorial.html"
+                  onClick={() => setMenuOpen(false)}
+                  className="block w-full text-center px-6 py-2.5 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-all"
+                >
+                  📖 Beginner Guide
+                </a>
                 <button
                   onClick={() => { setMenuOpen(false); onConnectAgent(); }}
                   className="block w-full text-center px-6 py-2.5 rounded-xl text-sm font-medium border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 transition-all"
