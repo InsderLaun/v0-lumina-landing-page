@@ -359,60 +359,52 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Card A: For Humans */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="bg-white/[0.03] border border-cyan-500/20 rounded-xl p-6 flex flex-col"
+                  className="bg-white/[0.03] border border-cyan-500/20 rounded-xl p-6 flex flex-col justify-between"
                 >
-                  <div className="text-3xl mb-3">📖</div>
-                  <h3 className="text-lg font-bold text-cyan-300 mb-2">For Humans</h3>
-                  <p className="text-sm text-white/70 mb-4 flex-1">Step-by-step guide to set up your wallet, approve spending, get your API Key, and configure your agent. No blockchain knowledge needed.</p>
-                  <div className="space-y-2 mt-auto">
-                    <a
-                      href="/tutorial.html"
-                      className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all"
-                    >
-                      Read the Guide →
-                    </a>
+                  <div>
+                    <div className="text-3xl mb-3">📖</div>
+                    <h3 className="text-lg font-bold text-cyan-300 mb-2">For Humans</h3>
+                    <p className="text-sm text-white/70">Step-by-step guide to set up your wallet, approve spending, get your API Key, and configure your agent. No blockchain knowledge needed.</p>
+                  </div>
+                  <div className="space-y-2 pt-6">
+                    <a href="/tutorial.html" className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all">Read the Guide →</a>
                     <p className="text-[10px] text-white/30 text-center">Visual walkthrough with examples</p>
                   </div>
                 </motion.div>
 
-                {/* Card B: For Your AI Agent */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="bg-white/[0.03] border border-purple-500/20 rounded-xl p-6 flex flex-col"
+                  className="bg-white/[0.03] border border-purple-500/20 rounded-xl p-6 flex flex-col justify-between"
                 >
-                  <div className="text-3xl mb-3">🤖</div>
-                  <h3 className="text-lg font-bold text-purple-300 mb-2">For Your AI Agent</h3>
-                  <p className="text-sm text-white/70 mb-4 flex-1">Give this file to your ChatGPT, Claude, or custom agent. It contains all endpoints, products, and instructions to operate Lumina autonomously.</p>
-                  <div className="space-y-2 mt-auto">
-                    <a
-                      href="/LUMINA-SKILL.txt"
-                      download
-                      className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 transition-all"
-                    >
-                      Download SKILL File ↓
-                    </a>
+                  <div>
+                    <div className="text-3xl mb-3">🤖</div>
+                    <h3 className="text-lg font-bold text-purple-300 mb-2">For Your AI Agent</h3>
+                    <p className="text-sm text-white/70">Give this file to your ChatGPT, Claude, or custom agent. It contains all endpoints, products, and instructions to operate Lumina autonomously.</p>
+                  </div>
+                  <div className="space-y-2 pt-6">
+                    <a href="/LUMINA-SKILL.txt" download className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 transition-all">Download SKILL File ↓</a>
                     <p className="text-[10px] text-white/30 text-center">Plain text — paste into any LLM</p>
                   </div>
                 </motion.div>
 
-                {/* Card C: Auto-Setup */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-white/[0.03] border border-green-500/20 rounded-xl p-6 flex flex-col"
+                  className="bg-white/[0.03] border border-green-500/20 rounded-xl p-6 flex flex-col justify-between"
                 >
-                  <div className="text-3xl mb-3">⚡</div>
-                  <h3 className="text-lg font-bold text-green-300 mb-2">Auto-Setup (Claude Code)</h3>
-                  <p className="text-sm text-white/70 mb-4 flex-1">Copy-paste this prompt into Claude Code PowerShell. It configures your wallet, approves USDY, creates your API Key, and runs a test purchase — all automatically.</p>
-                  <div className="space-y-2 mt-auto">
+                  <div>
+                    <div className="text-3xl mb-3">⚡</div>
+                    <h3 className="text-lg font-bold text-green-300 mb-2">Auto-Setup (Claude Code)</h3>
+                    <p className="text-sm text-white/70">Copy-paste this prompt into Claude Code PowerShell. It configures your wallet, approves USDY, creates your API Key, and runs a test purchase — all automatically.</p>
+                  </div>
+                  <div className="space-y-2 pt-6">
                     <button
                       onClick={() => {
                         const prompt = `I need to connect my AI agent to Lumina Protocol for DeFi insurance on Base L2.
