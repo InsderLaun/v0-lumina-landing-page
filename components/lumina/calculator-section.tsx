@@ -247,6 +247,30 @@ function LPCalculator() {
     const [productId, setProductId] = useState("LIQSHIELD-001")
     const [deposit, setDeposit] = useState(10000)
     const [utilization, setUtilization] = useState(30)
+    const [realUtilization, setRealUtilization] = useState<number | null>(null)
+
+    useEffect(() => {
+        fetch("https://lumina-protocol-production.up.railway.app/api/v2/dashboard")
+            .then(res => res.json())
+            .then(data => {
+                if (data.vaults && data.vaults.length > 0) {
+                    let totalAssets = 0
+                    let totalAllocated = 0
+                    for (const v of data.vaults) {
+                        if (!v.error) {
+                            totalAssets += Number(v.totalAssets)
+                            totalAllocated += Number(v.allocatedAssets)
+                        }
+                    }
+                    if (totalAssets > 0) {
+                        const real = Math.round((totalAllocated / totalAssets) * 100)
+                        setRealUtilization(real)
+                        setUtilization(real)
+                    }
+                }
+            })
+            .catch(() => {})
+    }, [])
 
     const result = calculateYield({
         productId,
@@ -300,6 +324,9 @@ function LPCalculator() {
                     <div>
                         <label className="block text-xs text-lumina-muted uppercase tracking-wider mb-2">
                             Utilization: {utilization}%
+                            {realUtilization !== null && (
+                                <span className="text-cyan-400 text-[10px] ml-2">Current: {realUtilization}%</span>
+                            )}
                         </label>
                         <input
                             type="range"
@@ -315,7 +342,9 @@ function LPCalculator() {
                             <span>100% (fully utilized)</span>
                         </div>
                         <p className="text-xs text-lumina-muted/70 mt-2">
-                            Typical utilization for new protocols: 10-30%. Mature protocols: 40-70%.
+                            {realUtilization !== null
+                                ? `Calculated at ${utilization}% vault utilization (live). At higher utilization, premiums increase via the Kink Model.`
+                                : "Typical utilization for new protocols: 10-30%. Mature protocols: 40-70%."}
                         </p>
                     </div>
 

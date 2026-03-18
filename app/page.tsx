@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { calculateYield } from "@/lib/pricing"
 
 type Perspective = "protect" | "earn"
 
@@ -601,28 +602,34 @@ const CALC_DURATION_RANGES: Record<CalcProduct, [number, number, number]> = {
   exploit: [90, 365, 180],
 }
 
-function getCalcParams(product: CalcProduct, stablecoin: string, protocol: string) {
-  switch (product) {
-    case "bss":
-      return { pBase: 0.22, riskMult: 1.0, deductible: 0.20 }
-    case "depeg":
-      if (stablecoin === "DAI") return { pBase: 0.24, riskMult: 1.2, deductible: 0.12 }
-      if (stablecoin === "USDT") return { pBase: 0.24, riskMult: 1.4, deductible: 0.15 }
-      return { pBase: 0.24, riskMult: 1.0, deductible: 0.10 }
-    case "il":
-      return { pBase: 0.20, riskMult: 1.0, deductible: 0.02 }
-    case "exploit": {
-      const mults: Record<string, number> = { Aave: 1.0, Compound: 1.0, Uniswap: 1.0, MakerDAO: 1.1, Curve: 1.5, Morpho: 1.8 }
-      return { pBase: 0.03, riskMult: mults[protocol] || 1.0, deductible: 0.10 }
-    }
+// Kink Model premium rate (same as API V2 / on-chain)
+function calcKinkPremiumRate(utilization: number, riskType: "VOLATILE" | "STABLE") {
+  const params = riskType === "VOLATILE"
+    ? { kink: 0.70, slopeBelow: 0.02, slopeAbove: 0.15, base: 0.01 }
+    : { kink: 0.80, slopeBelow: 0.005, slopeAbove: 0.10, base: 0.003 }
+  if (utilization <= params.kink) {
+    return params.base + params.slopeBelow * utilization
   }
+  const rateAtKink = params.base + params.slopeBelow * params.kink
+  return rateAtKink + params.slopeAbove * (utilization - params.kink)
 }
 
-function getDurationDiscount(product: CalcProduct, days: number) {
-  if (product !== "depeg") return 1.0
-  if (days >= 181) return 0.80
-  if (days >= 91) return 0.90
-  return 1.0
+// Product → risk type mapping
+const CALC_RISK_TYPE: Record<CalcProduct, "VOLATILE" | "STABLE"> = {
+  bss: "VOLATILE", il: "VOLATILE", depeg: "STABLE", exploit: "STABLE",
+}
+
+// Deductibles per product (unchanged)
+function getCalcDeductible(product: CalcProduct, stablecoin: string, protocol: string) {
+  switch (product) {
+    case "bss": return 0.20
+    case "depeg":
+      if (stablecoin === "DAI") return 0.12
+      if (stablecoin === "USDT") return 0.15
+      return 0.10
+    case "il": return 0.02
+    case "exploit": return 0.10
+  }
 }
 
 /* ─── Custom Dropdown (dark mode) ─── */
@@ -688,6 +695,39 @@ function PremiumCalculatorSection() {
   const [asset, setAsset] = useState("ETH")
   const [stablecoin, setStablecoin] = useState("USDC")
   const [protocol, setProtocol] = useState("Aave")
+  const [vaultUtilizations, setVaultUtilizations] = useState<Record<string, number>>({
+    bss: 20, il: 20, depeg: 20, exploit: 20,
+  })
+  const [refreshing, setRefreshing] = useState(false)
+
+  const refreshUtilization = () => {
+    setRefreshing(true)
+    fetch("https://lumina-protocol-production.up.railway.app/api/v2/dashboard")
+      .then(res => res.json())
+      .then(data => {
+        if (data.vaults) {
+          const addrMap: Record<string, string[]> = {
+            "0x2d7d735f71638730cbe9a143227a00fa64e94e88": ["bss", "il"],
+            "0x8f6e6a4ee6aed70757c16382ea7156ad4b33c078": ["depeg", "exploit"],
+          }
+          const utils: Record<string, number> = { bss: 20, il: 20, depeg: 20, exploit: 20 }
+          for (const v of data.vaults) {
+            const products = addrMap[v.address?.toLowerCase()]
+            if (products && !v.error) {
+              const total = Number(v.totalAssets)
+              const alloc = Number(v.allocatedAssets)
+              const util = total > 0 ? Math.round((alloc / total) * 100) : 0
+              for (const p of products) utils[p] = util
+            }
+          }
+          setVaultUtilizations(utils)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setRefreshing(false))
+  }
+
+  useEffect(() => { refreshUtilization() }, [])
 
   const [min, max, def] = CALC_DURATION_RANGES[product]
 
@@ -701,17 +741,19 @@ function PremiumCalculatorSection() {
   const clampedDuration = Math.min(Math.max(duration, min), max)
 
   const calculations = useMemo(() => {
-    const MU = 1.25
-    const params = getCalcParams(product, stablecoin, protocol)
-    const dd = getDurationDiscount(product, clampedDuration)
-    const premium = coverage * params.pBase * params.riskMult * dd * MU * (clampedDuration / 365)
+    const utilization = (vaultUtilizations[product] || 20) / 100
+    const riskType = CALC_RISK_TYPE[product]
+    const annualRate = calcKinkPremiumRate(utilization, riskType)
+    const durationYears = clampedDuration / 365
+    const premium = coverage * annualRate * durationYears
     const premiumFee = premium * 0.03
-    const maxPayout = coverage * (1 - params.deductible)
+    const deductible = getCalcDeductible(product, stablecoin, protocol)
+    const maxPayout = coverage * (1 - deductible)
     const payoutFee = maxPayout * 0.03
     const netPayout = maxPayout - payoutFee
     const returnOnPremium = premium > 0 ? netPayout / premium : 0
     return { premium, premiumFee, maxPayout, payoutFee, netPayout, returnOnPremium }
-  }, [product, coverage, clampedDuration, stablecoin, protocol])
+  }, [product, coverage, clampedDuration, stablecoin, protocol, vaultUtilizations])
 
   const { premium, premiumFee, maxPayout, payoutFee, netPayout, returnOnPremium } = calculations
 
@@ -860,9 +902,19 @@ function PremiumCalculatorSection() {
               </div>
 
               {/* Note */}
-              <p className="text-xs text-white/30 leading-relaxed">
-                Calculated at 40% vault utilization (M(U) = 1.25x). At higher utilization, premiums increase via the Kink Model.
-              </p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-white/30 leading-relaxed">
+                  Calculated at {vaultUtilizations[product] || 20}% vault utilization (live). Premiums adjust via the Kink Model.
+                </p>
+                <button
+                  onClick={refreshUtilization}
+                  disabled={refreshing}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all disabled:opacity-50 flex-shrink-0 ml-3"
+                >
+                  <span className={refreshing ? "animate-spin" : ""}>{"\u21BB"}</span>
+                  <span>{refreshing ? "Updating..." : "Refresh rates"}</span>
+                </button>
+              </div>
 
               {/* CTA */}
               <div className="text-center pt-2">
@@ -1147,37 +1199,73 @@ type YieldVaultKey = "volatile-short" | "volatile-long" | "stable-short" | "stab
 const YIELD_VAULTS: Record<YieldVaultKey, {
   label: string
   cooldown: number
-  premiumAPYmin: number
-  premiumAPYmax: number
-  usdyBase: number
+  productId: string
   products: string
   risk: string
   worstCase: number
 }> = {
-  "volatile-short": { label: "Volatile Short", cooldown: 30, premiumAPYmin: 0.09, premiumAPYmax: 0.21, usdyBase: 0.0355, products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
-  "volatile-long": { label: "Volatile Long", cooldown: 90, premiumAPYmin: 0.12, premiumAPYmax: 0.26, usdyBase: 0.0355, products: "IL Index + BSS overflow", risk: "Higher", worstCase: 0.28 },
-  "stable-short": { label: "Stable Short", cooldown: 90, premiumAPYmin: 0.08, premiumAPYmax: 0.18, usdyBase: 0.0355, products: "Depeg Shield", risk: "Low", worstCase: 0.20 },
-  "stable-long": { label: "Stable Long", cooldown: 365, premiumAPYmin: 0.15, premiumAPYmax: 0.36, usdyBase: 0.0355, products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
+  "volatile-short": { label: "Volatile Short", cooldown: 30, productId: "LIQSHIELD-001", products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
+  "volatile-long": { label: "Volatile Long", cooldown: 90, productId: "ILPROT-001", products: "IL Index + BSS overflow", risk: "Higher", worstCase: 0.28 },
+  "stable-short": { label: "Stable Short", cooldown: 90, productId: "DEPEG-USDC-001", products: "Depeg Shield", risk: "Low", worstCase: 0.20 },
+  "stable-long": { label: "Stable Long", cooldown: 365, productId: "DEPEG-USDT-001", products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
 }
 
 function YieldCalculatorSection() {
   const [vault, setVault] = useState<YieldVaultKey>("volatile-short")
   const [deposit, setDeposit] = useState(10000)
+  const [realUtilizations, setRealUtilizations] = useState<Record<string, number>>({
+    "volatile-short": 20, "volatile-long": 20, "stable-short": 20, "stable-long": 20,
+  })
+  const [refreshingYield, setRefreshingYield] = useState(false)
+
+  const refreshYieldUtilization = () => {
+    setRefreshingYield(true)
+    fetch("https://lumina-protocol-production.up.railway.app/api/v2/dashboard")
+      .then(res => res.json())
+      .then(data => {
+        if (data.vaults) {
+          const map: Record<string, string> = {
+            "0x2d7d735f71638730cbe9a143227a00fa64e94e88": "volatile-short",
+            "0xdf30548d46e77015a4dda82d3c263e81a60b075c": "volatile-long",
+            "0x8f6e6a4ee6aed70757c16382ea7156ad4b33c078": "stable-short",
+            "0x3e8df8746c42aa4b0cdb089174abbbaf2c3ad46c": "stable-long",
+          }
+          const utils: Record<string, number> = { "volatile-short": 20, "volatile-long": 20, "stable-short": 20, "stable-long": 20 }
+          for (const v of data.vaults) {
+            const key = map[v.address?.toLowerCase()]
+            if (key && !v.error) {
+              const total = Number(v.totalAssets)
+              const alloc = Number(v.allocatedAssets)
+              utils[key] = total > 0 ? Math.round((alloc / total) * 100) : 0
+            }
+          }
+          setRealUtilizations(utils)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setRefreshingYield(false))
+  }
+
+  useEffect(() => { refreshYieldUtilization() }, [])
 
   const v = YIELD_VAULTS[vault]
+  const utilization = realUtilizations[vault]
 
   const calculations = useMemo(() => {
     const vaultData = YIELD_VAULTS[vault]
-    const avgPremiumAPY = (vaultData.premiumAPYmin + vaultData.premiumAPYmax) / 2
-    const totalAPY = vaultData.usdyBase + avgPremiumAPY
-    const monthlyUSDY = deposit * vaultData.usdyBase / 12
-    const monthlyPremium = deposit * avgPremiumAPY / 12
-    const monthlyTotal = monthlyUSDY + monthlyPremium
-    const annualUSDY = deposit * vaultData.usdyBase
-    const annualPremium = deposit * avgPremiumAPY
-    const annualTotal = annualUSDY + annualPremium
+    const util = realUtilizations[vault]
+    const result = calculateYield({ productId: vaultData.productId, depositAmount: deposit, utilizationPct: util })
+    const usdyBase = 0.0355
+    const monthlyUSDY = deposit * usdyBase / 12
+    const monthlyPremium = (result.netYield - deposit * usdyBase) / 12
+    const monthlyTotal = result.netYield / 12
+    const annualUSDY = deposit * usdyBase
+    const annualPremium = result.netYield - annualUSDY
+    const annualTotal = result.netYield
+    const totalAPY = result.apyEstimate / 100
+    const avgPremiumAPY = totalAPY - usdyBase
     return { totalAPY, avgPremiumAPY, monthlyUSDY, monthlyPremium, monthlyTotal, annualUSDY, annualPremium, annualTotal }
-  }, [vault, deposit])
+  }, [vault, deposit, realUtilizations])
 
   const { totalAPY, avgPremiumAPY, monthlyUSDY, monthlyPremium, monthlyTotal, annualUSDY, annualPremium, annualTotal } = calculations
 
@@ -1224,6 +1312,21 @@ function YieldCalculatorSection() {
                 <div className="flex justify-between text-xs text-white/30 mt-1">
                   <span>$100</span><span>$100,000</span>
                 </div>
+              </div>
+
+              {/* Utilization (live) */}
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-white/30 leading-relaxed">
+                  Current Pool Utilization: <span className="text-cyan-400 font-mono font-semibold">{utilization}%</span> (live)
+                </p>
+                <button
+                  onClick={refreshYieldUtilization}
+                  disabled={refreshingYield}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:border-purple-500/50 transition-all disabled:opacity-50 flex-shrink-0 ml-3"
+                >
+                  <span className={refreshingYield ? "animate-spin" : ""}>{"\u21BB"}</span>
+                  <span>{refreshingYield ? "Updating..." : "Refresh rates"}</span>
+                </button>
               </div>
 
               {/* Indefinite deposit explanation */}
@@ -1315,7 +1418,7 @@ function YieldCalculatorSection() {
 
               {/* Warning */}
               <p className="text-xs text-white/30 leading-relaxed">
-                &#9888;&#65039; APYs are real-time estimates based on current utilization. They fluctuate with market demand. The USDY base yield (3.55%) is independent of Lumina — it comes from Ondo Finance US Treasuries. Premium yield depends on insurance policy volume.
+                Calculated using Lumina&apos;s Dynamic Kink Model at {utilization}% utilization. Actual APY depends on real-time pool utilization. The USDY base yield (3.55%) comes from Ondo Finance US Treasuries. Premium yield depends on insurance policy volume.
               </p>
 
               {/* CTA */}

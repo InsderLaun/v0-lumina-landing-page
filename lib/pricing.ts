@@ -222,20 +222,38 @@ export interface YieldCalcResult {
 }
 
 export function calculateYield(input: YieldCalcInput): YieldCalcResult {
-    const { depositAmount, utilizationPct } = input
+    const { productId, depositAmount, utilizationPct } = input
 
-    // Use average premium rate for the product
-    const avgPremiumRates: Record<string, number> = {
-        'LIQSHIELD-001': 460,
-        'DEPEG-USDC-001': 350,
-        'DEPEG-USDT-001': 455,
-        'DEPEG-DAI-001': 420,
-        'ILPROT-001': 600,
-        'GASSPIKE-001': 350,
-        'SLIPPAGE-001': 400,
-        'BRIDGE-001': 300,
+    const utilization = utilizationPct / 100  // convert to 0-1
+
+    // Determine risk type from product
+    const volatileProducts = ['LIQSHIELD-001', 'ILPROT-001']
+    const isVolatile = volatileProducts.includes(productId)
+
+    // Kink Model (same as on-chain contracts)
+    const usdyBase = 0.0355  // 3.55% base USDY yield
+    const params = isVolatile
+        ? { kink: 0.70, slopeBelow: 0.02, slopeAbove: 0.15, base: 0.01 }
+        : { kink: 0.80, slopeBelow: 0.005, slopeAbove: 0.10, base: 0.003 }
+
+    let premiumRate: number
+    if (utilization <= params.kink) {
+        premiumRate = params.base + params.slopeBelow * utilization
+    } else {
+        const rateAtKink = params.base + params.slopeBelow * params.kink
+        premiumRate = rateAtKink + params.slopeAbove * (utilization - params.kink)
     }
 
+    const apyEstimate = (usdyBase + premiumRate * utilization) * 100
+
+    // Break down into components
+    const usdyYieldAnnual = depositAmount * usdyBase
+    const premiumYieldAnnual = depositAmount * premiumRate * utilization
+    const protocolFee = premiumYieldAnnual * 0.03
+    const netPremiumYield = premiumYieldAnnual - protocolFee
+    const totalAnnualYield = usdyYieldAnnual + netPremiumYield
+
+    // Deductibles for max loss calculation
     const deductibles: Record<string, number> = {
         'LIQSHIELD-001': 500,
         'DEPEG-USDC-001': 300,
@@ -246,25 +264,15 @@ export function calculateYield(input: YieldCalcInput): YieldCalcResult {
         'SLIPPAGE-001': 300,
         'BRIDGE-001': 500,
     }
-
-    const avgRate = avgPremiumRates[input.productId] || 400
-    const deductBps = deductibles[input.productId] || 500
-
-    const utilizedAmount = depositAmount * (utilizationPct / 100)
-    const premiumIncome = (utilizedAmount * avgRate) / 10000
-    const protocolFee = premiumIncome * 0.03
-    const yieldIfNoClaims = premiumIncome - protocolFee
+    const deductBps = deductibles[productId] || 500
+    const utilizedAmount = depositAmount * utilization
     const maxLossIfClaim = utilizedAmount * (1 - deductBps / 10000)
-    const netYield = yieldIfNoClaims
-
-    // Annualized estimate (assuming 30-day avg policy)
-    const apyEstimate = depositAmount > 0 ? ((netYield / depositAmount) * (365 / 30) * 100) : 0
 
     return {
-        yieldIfNoClaims: Math.round(yieldIfNoClaims * 100) / 100,
+        yieldIfNoClaims: Math.round(totalAnnualYield * 100) / 100,
         maxLossIfClaim: Math.round(maxLossIfClaim * 100) / 100,
         protocolFee: Math.round(protocolFee * 100) / 100,
-        netYield: Math.round(netYield * 100) / 100,
+        netYield: Math.round(totalAnnualYield * 100) / 100,
         apyEstimate: Math.round(apyEstimate * 100) / 100,
     }
 }

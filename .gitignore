@@ -9,3 +9,10 @@ node_modules/
 .env*.local
 .DS_Store
 lumina-sign-key.json
+# Build output
+out/
+
+# Firebase
+.firebase/
+.firebaserc
+firebase.json
