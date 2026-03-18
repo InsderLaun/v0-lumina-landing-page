@@ -8,11 +8,12 @@ type Perspective = "protect" | "earn"
 
 export default function Home() {
   const [perspective, setPerspective] = useState<Perspective>("protect")
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   return (
     <main className="min-h-screen bg-[#0A0A0F] text-white">
       {/* NAVBAR */}
-      <Navbar perspective={perspective} />
+      <Navbar perspective={perspective} onConnectAgent={() => setShowOnboarding(true)} />
 
       {/* HERO */}
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 text-center">
@@ -325,6 +326,141 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Onboarding Modal */}
+      <AnimatePresence>
+        {showOnboarding && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowOnboarding(false)}
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-xl" />
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="relative w-full max-w-4xl bg-[#0a0a0f] border border-white/10 rounded-2xl p-8 overflow-y-auto max-h-[90vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowOnboarding(false)}
+                className="absolute top-4 right-4 text-white/40 hover:text-white/80 text-xl transition-colors"
+              >
+                ✕
+              </button>
+
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-white mb-2">Connect Your AI Agent to Lumina</h2>
+                <p className="text-white/50 text-sm">Choose your path — from zero to insured in 10 minutes</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Card A: For Humans */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white/[0.03] border border-cyan-500/20 rounded-xl p-6 flex flex-col"
+                >
+                  <div className="text-3xl mb-3">📖</div>
+                  <h3 className="text-lg font-bold text-cyan-400 mb-2">For Humans</h3>
+                  <p className="text-xs text-white/50 mb-4 flex-grow">Step-by-step guide to set up your wallet, approve spending, get your API Key, and configure your agent. No blockchain knowledge needed.</p>
+                  <div className="space-y-2">
+                    <a
+                      href="/docs/tutorial"
+                      className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all"
+                    >
+                      Read the Guide →
+                    </a>
+                    <p className="text-[10px] text-white/30 text-center">Visual walkthrough with examples</p>
+                  </div>
+                </motion.div>
+
+                {/* Card B: For Your AI Agent */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white/[0.03] border border-purple-500/20 rounded-xl p-6 flex flex-col"
+                >
+                  <div className="text-3xl mb-3">🤖</div>
+                  <h3 className="text-lg font-bold text-purple-400 mb-2">For Your AI Agent</h3>
+                  <p className="text-xs text-white/50 mb-4 flex-grow">Give this file to your ChatGPT, Claude, or custom agent. It contains all endpoints, products, and instructions to operate Lumina autonomously.</p>
+                  <div className="space-y-2">
+                    <a
+                      href="/LUMINA-SKILL.txt"
+                      download
+                      className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 transition-all"
+                    >
+                      Download SKILL File ↓
+                    </a>
+                    <p className="text-[10px] text-white/30 text-center">Plain text — paste into any LLM</p>
+                  </div>
+                </motion.div>
+
+                {/* Card C: Auto-Setup */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-white/[0.03] border border-green-500/20 rounded-xl p-6 flex flex-col"
+                >
+                  <div className="text-3xl mb-3">⚡</div>
+                  <h3 className="text-lg font-bold text-green-400 mb-2">Auto-Setup (Claude Code)</h3>
+                  <p className="text-xs text-white/50 mb-4 flex-grow">Copy-paste this prompt into Claude Code PowerShell. It configures your wallet, approves USDY, creates your API Key, and runs a test purchase — all automatically.</p>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => {
+                        const prompt = `I need to connect my AI agent to Lumina Protocol for DeFi insurance on Base L2.
+
+My wallet address is: [PASTE YOUR WALLET ADDRESS HERE]
+My private key is: [PASTE YOUR PRIVATE KEY HERE]
+
+Please do the following steps in order:
+
+1. Check API health:
+curl https://lumina-protocol-production.up.railway.app/api/v2/health
+
+2. Create my API Key:
+curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/keys/create -H "Content-Type: application/json" -d '{"wallet":"[MY_WALLET]","label":"my-agent"}'
+
+3. Approve CoverRouter to spend my USDY ($10,000 limit):
+cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 "approve(address,uint256)" 0x8407aF8a100812bFb5f9f188b44379E4268efF94 10000000000 --rpc-url https://base-mainnet.g.alchemy.com/v2/[MY_RPC] --private-key [MY_KEY]
+
+4. Buy a test policy - Black Swan Shield, $100 coverage, 7 days:
+curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase -H "Content-Type: application/json" -H "X-API-Key: [API_KEY_FROM_STEP_2]" -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'
+
+5. Verify my policies:
+curl https://lumina-protocol-production.up.railway.app/api/v2/policies?buyer=[MY_WALLET]
+
+Show me results after each step.`;
+                        navigator.clipboard.writeText(prompt);
+                        alert("Prompt copied! Paste it into Claude Code PowerShell.");
+                      }}
+                      className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20 transition-all"
+                    >
+                      Copy Setup Prompt 📋
+                    </button>
+                    <p className="text-[10px] text-white/30 text-center">Paste into Claude Code terminal</p>
+                  </div>
+                </motion.div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between text-xs text-white/30">
+                  <span>API: lumina-protocol-production.up.railway.app</span>
+                  <span>Chain: Base Mainnet (8453)</span>
+                  <a href="mailto:support@lumina-org.com" className="text-cyan-400/50 hover:text-cyan-400">support@lumina-org.com</a>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   )
 }
@@ -2362,7 +2498,7 @@ function FAQSection({ perspective }: { perspective: Perspective }) {
 /*  NAVBAR                                                   */
 /* ═══════════════════════════════════════════════════════════ */
 
-function Navbar({ perspective }: { perspective: Perspective }) {
+function Navbar({ perspective, onConnectAgent }: { perspective: Perspective; onConnectAgent: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const accent = perspective === "protect" ? "cyan" : "purple"
   const hoverColor = accent === "cyan" ? "hover:text-cyan-400" : "hover:text-purple-400"
@@ -2410,8 +2546,14 @@ function Navbar({ perspective }: { perspective: Perspective }) {
           ))}
         </div>
 
-        {/* Connect Wallet */}
-        <div className="hidden md:block">
+        {/* Connect Agent + Connect Wallet */}
+        <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={onConnectAgent}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all"
+          >
+            Connect Your Agent
+          </button>
           <a href="/dashboard" className={`px-6 py-2.5 rounded-full text-base font-medium transition-all inline-block ${
             accent === "cyan"
               ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
@@ -2452,7 +2594,13 @@ function Navbar({ perspective }: { perspective: Perspective }) {
                   </button>
                 )
               ))}
-              <div className="pt-2">
+              <div className="pt-2 space-y-2">
+                <button
+                  onClick={() => { setMenuOpen(false); onConnectAgent(); }}
+                  className="block w-full text-center px-6 py-2.5 rounded-xl text-sm font-medium border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                >
+                  Connect Your Agent
+                </button>
                 <a href="/dashboard" className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
                   accent === "cyan"
                     ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
