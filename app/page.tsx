@@ -364,7 +364,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="bg-white/[0.03] border border-cyan-500/20 rounded-xl p-6 flex flex-col h-full"
+                  className="bg-white/[0.03] border border-cyan-500/20 rounded-xl p-6 flex flex-col h-full min-h-[380px]"
                 >
                   <div className="text-3xl mb-3">📖</div>
                   <h3 className="text-lg font-bold text-cyan-300 mb-2">For Humans</h3>
@@ -385,7 +385,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="bg-white/[0.03] border border-purple-500/20 rounded-xl p-6 flex flex-col h-full"
+                  className="bg-white/[0.03] border border-purple-500/20 rounded-xl p-6 flex flex-col h-full min-h-[380px]"
                 >
                   <div className="text-3xl mb-3">🤖</div>
                   <h3 className="text-lg font-bold text-purple-300 mb-2">For Your AI Agent</h3>
@@ -407,7 +407,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-white/[0.03] border border-green-500/20 rounded-xl p-6 flex flex-col h-full"
+                  className="bg-white/[0.03] border border-green-500/20 rounded-xl p-6 flex flex-col h-full min-h-[380px]"
                 >
                   <div className="text-3xl mb-3">⚡</div>
                   <h3 className="text-lg font-bold text-green-300 mb-2">Auto-Setup (Claude Code)</h3>
