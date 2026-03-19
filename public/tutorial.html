@@ -55,50 +55,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <span class="step-number">1</span>
 <span class="step-title">Get your key (shown only once!)</span>
 
-<div id="key-widget" style="margin-top:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:20px">
-
-<div id="no-metamask" style="display:none">
-<p style="color:#ef4444;margin:0">MetaMask not detected. Install it from <a href="https://metamask.io" target="_blank" style="color:#ef4444;text-decoration:underline">metamask.io</a></p>
-</div>
-
-<div id="not-metamask" style="display:none">
-<p style="color:#eab308;margin:0">Please use MetaMask. Other wallets are not supported yet.</p>
-</div>
-
-<div id="connect-section">
-<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-<button id="btn-connect" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Connect Wallet</button>
-<span id="wallet-display" style="color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem"></span>
-<span id="base-badge" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#22c55e;font-size:12px;padding:2px 8px;border-radius:6px">Base &#x2713;</span>
-<span id="wrong-badge" style="display:none;align-items:center;gap:6px">
-<span style="background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);color:#eab308;font-size:12px;padding:2px 8px;border-radius:6px">&#x26A0;&#xFE0F; Wrong Network</span>
-<button id="btn-switch-inline" style="background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.4);color:#eab308;padding:2px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Switch to Base</button>
-</span>
-<button id="btn-disconnect" style="display:none;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Disconnect</button>
-</div>
-
-<div id="wrong-network" style="display:none;margin-top:12px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:8px;padding:12px;display:none;align-items:center;gap:10px;flex-wrap:wrap">
-<span style="color:#eab308;font-size:0.85rem">&#x26A0;&#xFE0F; Wrong network detected. Lumina runs on Base Mainnet.</span>
-<button id="btn-switch-base" style="background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.4);color:#eab308;padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:600;cursor:pointer">Switch to Base</button>
-</div>
-
-<div style="margin-top:10px">
-<button id="btn-what-network" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;text-decoration:underline;padding:0">&#x2139;&#xFE0F; What network do I need?</button>
-</div>
-
-<p style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">By connecting your wallet, you tell Lumina who you are. Then, when you generate your API Key, Lumina creates a unique key linked to your wallet. This key is what you give to your AI agent so it can operate on your behalf — like handing it an authorized card. Your agent uses this key on every API call to identify itself.</p>
-</div>
-
-<div id="network-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
-<div style="max-width:480px;width:90%;background:#12121a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px">
-<h3 style="color:white;font-size:1.1rem;margin-bottom:16px">About Base Network</h3>
-<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">Lumina Protocol runs on Base — a Layer 2 network built on Ethereum by Coinbase. It's faster and cheaper than Ethereum mainnet. Your agent operates exclusively on this network.</p>
-<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">To use Lumina, your wallet must be connected to Base Mainnet (Chain ID: 8453). If you don't have Base configured, click "Switch to Base" and MetaMask will set it up automatically.</p>
-<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:20px">You'll need a small amount of ETH on Base (~$0.01) for transaction fees, plus USDY (available at <a href="https://ondo.finance" target="_blank">ondo.finance</a>).</p>
-<div style="text-align:right">
-<button id="btn-got-it" style="background:#22d3ee;color:#0a0a0f;border:none;padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer">Got it</button>
-</div>
-</div>
+<div id="step1-widget" style="margin-top:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:20px">
+<!-- Content injected by JS -->
 </div>
 
 <div id="generate-section" style="display:none;margin-top:16px">
@@ -112,15 +70,13 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <button id="btn-copy" style="background:rgba(34,211,238,0.15);color:#22d3ee;border:1px solid rgba(34,211,238,0.3);padding:10px 16px;border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;white-space:nowrap">Copy</button>
 </div>
 <div class="warning" style="margin-top:12px">
-<p class="warning-title">⚠️ Save this key NOW</p>
+<p class="warning-title">&#x26A0;&#xFE0F; Save this key NOW</p>
 <p>The API Key is shown only once. If you lose it, you'll need to generate a new one.</p>
 </div>
 </div>
 
-<div id="key-error" style="display:none;margin-top:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px">
-<p id="error-msg" style="color:#ef4444;margin:0"></p>
-</div>
-
+<div id="step1-error" style="display:none;margin-top:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px">
+<p id="step1-error-msg" style="color:#ef4444;margin:0"></p>
 </div>
 
 <details style="margin-top:16px">
@@ -133,239 +89,18 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 </div>
 
-<script>
-window.__lumina = { connectedWallet: null, onBase: false };
-(function() {
-  var btnConnect = document.getElementById('btn-connect');
-  var btnDisconnect = document.getElementById('btn-disconnect');
-  var walletDisplay = document.getElementById('wallet-display');
-  var connectSection = document.getElementById('connect-section');
-  var generateSection = document.getElementById('generate-section');
-  var btnGenerate = document.getElementById('btn-generate');
-  var generateStatus = document.getElementById('generate-status');
-  var keyResult = document.getElementById('key-result');
-  var keyOutput = document.getElementById('key-output');
-  var btnCopy = document.getElementById('btn-copy');
-  var keyError = document.getElementById('key-error');
-  var errorMsg = document.getElementById('error-msg');
-  var noMetamask = document.getElementById('no-metamask');
-  var notMetamask = document.getElementById('not-metamask');
-  var wrongNetwork = document.getElementById('wrong-network');
-  var btnSwitchBase = document.getElementById('btn-switch-base');
-  var btnWhatNetwork = document.getElementById('btn-what-network');
-  var networkInfoModal = document.getElementById('network-info-modal');
-  var btnGotIt = document.getElementById('btn-got-it');
-
-  var BASE_CHAIN_ID = '0x2105';
-
-  // No ethereum at all
-  if (typeof window.ethereum === 'undefined') {
-    noMetamask.style.display = 'block';
-    connectSection.style.display = 'none';
-    return;
-  }
-
-  // Not MetaMask
-  if (!window.ethereum.isMetaMask) {
-    notMetamask.style.display = 'block';
-    connectSection.style.display = 'none';
-    return;
-  }
-
-  function truncate(addr) {
-    return addr.slice(0, 6) + '...' + addr.slice(-4);
-  }
-
-  async function switchToBase() {
-    try {
-      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
-    } catch (e) {
-      if (e.code === 4902) {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: BASE_CHAIN_ID,
-            chainName: 'Base',
-            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-            rpcUrls: ['https://mainnet.base.org'],
-            blockExplorerUrls: ['https://basescan.org']
-          }]
-        });
-      } else { throw e; }
-    }
-  }
-
-  var baseBadge = document.getElementById('base-badge');
-  var wrongBadge = document.getElementById('wrong-badge');
-  var btnSwitchInline = document.getElementById('btn-switch-inline');
-
-  function checkChain() {
-    var chainId = window.ethereum.chainId;
-    if (chainId && chainId.toLowerCase() === BASE_CHAIN_ID) {
-      window.__lumina.onBase = true;
-      wrongNetwork.style.display = 'none';
-      if (window.__lumina.connectedWallet) {
-        baseBadge.style.display = 'inline';
-        wrongBadge.style.display = 'none';
-        generateSection.style.display = 'block';
-      }
-    } else {
-      window.__lumina.onBase = false;
-      wrongNetwork.style.display = 'flex';
-      generateSection.style.display = 'none';
-      if (window.__lumina.connectedWallet) {
-        baseBadge.style.display = 'none';
-        wrongBadge.style.display = 'inline-flex';
-      }
-    }
-  }
-
-  btnSwitchInline.addEventListener('click', async function() {
-    try {
-      await switchToBase();
-      checkChain();
-    } catch(e) {
-      keyError.style.display = 'block';
-      errorMsg.textContent = e.message || 'Failed to switch network';
-    }
-  });
-
-  function setConnected(addr) {
-    window.__lumina.connectedWallet = addr;
-    localStorage.setItem('lumina_wallet', addr);
-    walletDisplay.textContent = truncate(addr);
-    btnConnect.textContent = 'Connected';
-    btnConnect.style.background = 'rgba(34,197,94,0.3)';
-    btnConnect.style.color = '#22c55e';
-    btnConnect.disabled = true;
-    btnDisconnect.style.display = 'inline-block';
-    checkChain();
-    window.dispatchEvent(new Event('lumina-wallet-connected'));
-  }
-
-  function setDisconnected() {
-    window.__lumina.connectedWallet = null;
-    localStorage.removeItem('lumina_wallet');
-    walletDisplay.textContent = '';
-    btnConnect.textContent = 'Connect Wallet';
-    btnConnect.style.background = '#22d3ee';
-    btnConnect.style.color = '#0a0a0f';
-    btnConnect.disabled = false;
-    btnDisconnect.style.display = 'none';
-    baseBadge.style.display = 'none';
-    wrongBadge.style.display = 'none';
-    generateSection.style.display = 'none';
-    wrongNetwork.style.display = 'none';
-    window.dispatchEvent(new Event('lumina-wallet-disconnected'));
-  }
-
-  // Restore from localStorage
-  (async function tryRestore() {
-    var saved = localStorage.getItem('lumina_wallet');
-    if (saved) {
-      try {
-        var accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        var found = accounts.find(function(a) { return a.toLowerCase() === saved.toLowerCase(); });
-        if (found) {
-          setConnected(found);
-          return;
-        }
-      } catch(e) {}
-      localStorage.removeItem('lumina_wallet');
-    }
-  })();
-
-  btnConnect.addEventListener('click', async function() {
-    btnConnect.disabled = true;
-    btnConnect.textContent = 'Connecting...';
-    keyError.style.display = 'none';
-    try {
-      var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      setConnected(accounts[0]);
-    } catch (e) {
-      btnConnect.textContent = 'Connect Wallet';
-      btnConnect.disabled = false;
-      keyError.style.display = 'block';
-      errorMsg.textContent = e.message || 'Failed to connect wallet';
-    }
-  });
-
-  btnDisconnect.addEventListener('click', function() {
-    setDisconnected();
-  });
-
-  btnSwitchBase.addEventListener('click', async function() {
-    try {
-      await switchToBase();
-      checkChain();
-    } catch(e) {
-      keyError.style.display = 'block';
-      errorMsg.textContent = e.message || 'Failed to switch network';
-    }
-  });
-
-  // Network info modal
-  btnWhatNetwork.addEventListener('click', function() {
-    networkInfoModal.style.display = 'flex';
-  });
-  btnGotIt.addEventListener('click', function() {
-    networkInfoModal.style.display = 'none';
-  });
-  networkInfoModal.addEventListener('click', function(e) {
-    if (e.target === networkInfoModal) networkInfoModal.style.display = 'none';
-  });
-
-  // Listen for account changes
-  window.ethereum.on('accountsChanged', function(accounts) {
-    if (accounts.length === 0) {
-      setDisconnected();
-    } else {
-      setConnected(accounts[0]);
-    }
-  });
-
-  // Listen for chain changes
-  window.ethereum.on('chainChanged', function() {
-    checkChain();
-  });
-
-  btnGenerate.addEventListener('click', async function() {
-    if (!window.__lumina.onBase) {
-      keyError.style.display = 'block';
-      errorMsg.textContent = 'Please switch to Base Mainnet first';
-      return;
-    }
-    btnGenerate.disabled = true;
-    generateStatus.textContent = 'Generating...';
-    keyError.style.display = 'none';
-    try {
-      var res = await fetch('https://lumina-protocol-production.up.railway.app/api/v2/keys/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: window.__lumina.connectedWallet, label: 'mi-agente' })
-      });
-      var data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.message || 'Request failed (' + res.status + ')');
-      var key = data.apiKey || data.key || data.api_key || JSON.stringify(data);
-      keyOutput.value = key;
-      keyResult.style.display = 'block';
-      generateSection.style.display = 'none';
-    } catch (e) {
-      keyError.style.display = 'block';
-      errorMsg.textContent = e.message || 'Failed to generate API key';
-      btnGenerate.disabled = false;
-      generateStatus.textContent = '';
-    }
-  });
-
-  btnCopy.addEventListener('click', function() {
-    navigator.clipboard.writeText(keyOutput.value).then(function() {
-      btnCopy.textContent = 'Copied!';
-      setTimeout(function() { btnCopy.textContent = 'Copy'; }, 2000);
-    });
-  });
-})();
-</script>
+<!-- Network Info Modal -->
+<div id="network-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
+<div style="max-width:480px;width:90%;background:#12121a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px">
+<h3 style="color:white;font-size:1.1rem;margin-bottom:16px">About Base Network</h3>
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">Lumina Protocol runs on Base — a Layer 2 network built on Ethereum by Coinbase. It's faster and cheaper than Ethereum mainnet. Your agent operates exclusively on this network.</p>
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">To use Lumina, your wallet must be connected to Base Mainnet (Chain ID: 8453). If you don't have Base configured, click "Switch to Base" and MetaMask will set it up automatically.</p>
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:20px">You'll need a small amount of ETH on Base (~$0.01) for transaction fees, plus USDY (available at <a href="https://ondo.finance" target="_blank">ondo.finance</a>).</p>
+<div style="text-align:right">
+<button id="btn-got-it" style="background:#22d3ee;color:#0a0a0f;border:none;padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer">Got it</button>
+</div>
+</div>
+</div>
 
 <h2>Step 2: Approve USDY Spending</h2>
 <div class="step">
@@ -374,7 +109,7 @@ window.__lumina = { connectedWallet: null, onBase: false };
 
 <div id="approve-widget" style="margin-top:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:20px">
 
-<div id="approve-no-wallet" style="color:rgba(255,255,255,0.4);font-size:0.9rem">&#11014; Connect your wallet in Step 1 first</div>
+<div id="approve-no-wallet" style="color:rgba(255,255,255,0.4);font-size:0.9rem">&#x2B06; Connect your wallet in Step 1 first</div>
 
 <div id="approve-form" style="display:none">
 
@@ -426,7 +161,8 @@ window.__lumina = { connectedWallet: null, onBase: false };
 
 </div>
 
-<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center">
+<!-- Confirm Modal -->
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
 <div style="max-width:480px;width:90%;background:#12121a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px">
 <h3 style="color:white;font-size:1.2rem;margin-bottom:16px">Confirm Approval</h3>
 <p id="modal-amount" style="color:#22d3ee;font-size:2rem;font-weight:700;margin-bottom:4px"></p>
@@ -440,6 +176,7 @@ window.__lumina = { connectedWallet: null, onBase: false };
 </div>
 </div>
 
+<!-- Unlimited Modal -->
 <div id="unlimited-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
 <div style="max-width:480px;width:90%;background:#12121a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px">
 <h3 style="color:#eab308;font-size:1.2rem;margin-bottom:16px">&#x26A0;&#xFE0F; Unlimited Approval</h3>
@@ -470,384 +207,6 @@ window.__lumina = { connectedWallet: null, onBase: false };
 </details>
 
 </div>
-
-<script>
-(function() {
-  var approveNoWallet = document.getElementById('approve-no-wallet');
-  var approveForm = document.getElementById('approve-form');
-  var approveAmount = document.getElementById('approve-amount');
-  var btnApprove = document.getElementById('btn-approve');
-  var approveSuccess = document.getElementById('approve-success');
-  var approveSuccessMsg = document.getElementById('approve-success-msg');
-  var approveError = document.getElementById('approve-error');
-  var approveErrorMsg = document.getElementById('approve-error-msg');
-  var tooltipTrigger = document.getElementById('tooltip-trigger');
-  var tooltipBox = document.getElementById('tooltip-box');
-  var modeInsurance = document.getElementById('mode-insurance');
-  var modeYield = document.getElementById('mode-yield');
-  var approveLabel = document.getElementById('approve-label');
-  var approveExplainer = document.getElementById('approve-explainer');
-  var vaultCheckboxes = document.getElementById('vault-checkboxes');
-  var confirmModal = document.getElementById('confirm-modal');
-  var modalAmount = document.getElementById('modal-amount');
-  var modalWords = document.getElementById('modal-words');
-  var modalExplain = document.getElementById('modal-explain');
-  var modalCancel = document.getElementById('modal-cancel');
-  var modalConfirm = document.getElementById('modal-confirm');
-
-  var USDY_ADDRESS = '0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9';
-  var COVER_ROUTER = '0x8407aF8a100812bFb5f9f188b44379E4268efF94';
-  var BASE_CHAIN_ID = '0x2105';
-  var currentMode = 'insurance';
-
-  var TOOLTIP_INSURANCE = '\uD83D\uDCB3 Your limit, your control: This amount is the maximum \'allowance\' your AI Agent is permitted to use. If the Agent detects a risk and wants to buy $100 of insurance but you only approved $50, the purchase will be blocked. You own the money; the Agent is just the manager.';
-  var TOOLTIP_YIELD = '\uD83D\uDCB0 Your deposit cap: This is the maximum amount each vault is allowed to receive from your agent. The agent can deposit and withdraw within this limit. You can adjust or revoke each vault\'s permission separately.';
-
-  // Number to words
-  function numberToWords(n) {
-    if (n === 0) return 'zero';
-    var ones = ['','one','two','three','four','five','six','seven','eight','nine',
-      'ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
-    var tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
-    function chunk(num) {
-      if (num === 0) return '';
-      if (num < 20) return ones[num];
-      if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? ' ' + ones[num%10] : '');
-      return ones[Math.floor(num/100)] + ' hundred' + (num%100 ? ' ' + chunk(num%100) : '');
-    }
-    var parts = [];
-    var scales = [
-      [1000000000, 'billion'], [1000000, 'million'], [1000, 'thousand']
-    ];
-    var rem = Math.round(Math.abs(n));
-    for (var i = 0; i < scales.length; i++) {
-      var s = scales[i][0], label = scales[i][1];
-      if (rem >= s) {
-        parts.push(chunk(Math.floor(rem / s)) + ' ' + label);
-        rem = rem % s;
-      }
-    }
-    if (rem > 0) parts.push(chunk(rem));
-    return (n < 0 ? 'negative ' : '') + parts.join(' ') + ' dollars';
-  }
-
-  function updateMode(mode) {
-    currentMode = mode;
-    if (mode === 'insurance') {
-      modeInsurance.style.background = 'rgba(34,211,238,0.15)';
-      modeInsurance.style.color = '#22d3ee';
-      modeInsurance.style.borderColor = '#22d3ee';
-      modeYield.style.background = 'transparent';
-      modeYield.style.color = 'rgba(255,255,255,0.5)';
-      modeYield.style.borderColor = 'rgba(255,255,255,0.2)';
-      approveLabel.textContent = "What's the maximum your agent can spend on insurance?";
-      tooltipBox.textContent = TOOLTIP_INSURANCE;
-      approveExplainer.textContent = 'This tells your USDY: "Lumina can charge me up to $X for insurance." You control the limit and can revoke it anytime by setting it to 0.';
-      vaultCheckboxes.style.display = 'none';
-      updateBtnText();
-    } else {
-      modeYield.style.background = 'rgba(34,211,238,0.15)';
-      modeYield.style.color = '#22d3ee';
-      modeYield.style.borderColor = '#22d3ee';
-      modeInsurance.style.background = 'transparent';
-      modeInsurance.style.color = 'rgba(255,255,255,0.5)';
-      modeInsurance.style.borderColor = 'rgba(255,255,255,0.2)';
-      approveLabel.textContent = "What's the maximum your agent can deposit into vaults?";
-      tooltipBox.textContent = TOOLTIP_YIELD;
-      approveExplainer.textContent = 'This tells your USDY: "Lumina vaults can hold up to $X of my deposit." Each vault gets its own approval. You can revoke any vault individually.';
-      vaultCheckboxes.style.display = 'block';
-      updateBtnText();
-    }
-    approveSuccess.style.display = 'none';
-    approveError.style.display = 'none';
-  }
-
-  function getSelectedVaults() {
-    var cbs = document.querySelectorAll('.vault-cb:checked');
-    var vaults = [];
-    cbs.forEach(function(cb) {
-      vaults.push({ address: cb.getAttribute('data-vault'), name: cb.getAttribute('data-name') });
-    });
-    return vaults;
-  }
-
-  function updateBtnText() {
-    if (currentMode === 'insurance') {
-      btnApprove.textContent = 'Approve with MetaMask';
-    } else {
-      var count = getSelectedVaults().length;
-      btnApprove.textContent = 'Approve with MetaMask (' + count + ' vault' + (count !== 1 ? 's' : '') + ')';
-    }
-  }
-
-  var btnUnlimited = document.getElementById('btn-unlimited');
-  var unlimitedBadge = document.getElementById('unlimited-badge');
-  var unlimitedModal = document.getElementById('unlimited-modal');
-  var unlimitedCheckbox = document.getElementById('unlimited-checkbox');
-  var unlimitedCancel = document.getElementById('unlimited-cancel');
-  var unlimitedConfirmBtn = document.getElementById('unlimited-confirm');
-  var isUnlimited = false;
-  var UINT256_MAX = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
-
-  function updateBtnState() {
-    if (isUnlimited) {
-      btnApprove.disabled = true;
-      btnApprove.style.opacity = '0.5';
-      btnApprove.style.cursor = 'not-allowed';
-      return;
-    }
-    var val = parseFloat(approveAmount.value);
-    if (val > 0) {
-      btnApprove.disabled = false;
-      btnApprove.style.opacity = '1';
-      btnApprove.style.cursor = 'pointer';
-    } else {
-      btnApprove.disabled = true;
-      btnApprove.style.opacity = '0.5';
-      btnApprove.style.cursor = 'not-allowed';
-    }
-  }
-
-  function exitUnlimitedMode() {
-    isUnlimited = false;
-    unlimitedBadge.style.display = 'none';
-    approveAmount.disabled = false;
-    approveAmount.value = '';
-    updateBtnState();
-  }
-
-  approveAmount.addEventListener('input', function() {
-    if (isUnlimited) exitUnlimitedMode();
-    updateBtnState();
-  });
-
-  modeInsurance.addEventListener('click', function() { updateMode('insurance'); });
-  modeYield.addEventListener('click', function() { updateMode('yield'); });
-
-  var vaultCbs = document.querySelectorAll('.vault-cb');
-  vaultCbs.forEach(function(cb) {
-    cb.addEventListener('change', updateBtnText);
-  });
-
-  tooltipBox.textContent = TOOLTIP_INSURANCE;
-
-  function checkWallet() {
-    if (window.__lumina.connectedWallet) {
-      approveNoWallet.style.display = 'none';
-      approveForm.style.display = 'block';
-    }
-  }
-  checkWallet();
-  window.addEventListener('lumina-wallet-connected', checkWallet);
-  window.addEventListener('lumina-wallet-disconnected', function() {
-    approveNoWallet.style.display = 'block';
-    approveForm.style.display = 'none';
-  });
-
-  tooltipTrigger.addEventListener('mouseenter', function() { tooltipBox.style.display = 'block'; });
-  tooltipTrigger.addEventListener('mouseleave', function() { tooltipBox.style.display = 'none'; });
-
-  function encodeApprove(spender, amountBigInt) {
-    var selector = '0x095ea7b3';
-    var addr = spender.toLowerCase().replace('0x', '').padStart(64, '0');
-    var amt = amountBigInt.toString(16).padStart(64, '0');
-    return selector + addr + amt;
-  }
-
-  async function switchToBase() {
-    try {
-      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
-    } catch (e) {
-      if (e.code === 4902) {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: BASE_CHAIN_ID,
-            chainName: 'Base',
-            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-            rpcUrls: ['https://mainnet.base.org'],
-            blockExplorerUrls: ['https://basescan.org']
-          }]
-        });
-      } else { throw e; }
-    }
-  }
-
-  function showModal() {
-    var usdAmount = parseFloat(approveAmount.value);
-    var formatted = usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    modalAmount.textContent = '$' + formatted + ' USDY';
-    modalWords.textContent = numberToWords(usdAmount);
-
-    if (currentMode === 'insurance') {
-      modalExplain.textContent = 'You are approving Lumina CoverRouter (insurance purchases) to spend up to this amount of your USDY. You can change or revoke this limit at any time.';
-    } else {
-      var vaults = getSelectedVaults();
-      var names = vaults.map(function(v) { return v.name; }).join(', ');
-      modalExplain.textContent = 'You are approving Lumina Vaults (' + names + ') to spend up to this amount of your USDY. You can change or revoke this limit at any time.';
-    }
-
-    confirmModal.style.display = 'flex';
-  }
-
-  function hideModal() {
-    confirmModal.style.display = 'none';
-  }
-
-  // Open modal on button click
-  btnApprove.addEventListener('click', function() {
-    if (btnApprove.disabled) return;
-    approveError.style.display = 'none';
-    approveSuccess.style.display = 'none';
-
-    if (currentMode === 'yield') {
-      var vaults = getSelectedVaults();
-      if (vaults.length === 0) {
-        approveError.style.display = 'block';
-        approveErrorMsg.textContent = 'Please select at least one vault';
-        return;
-      }
-    }
-    showModal();
-  });
-
-  modalCancel.addEventListener('click', hideModal);
-  confirmModal.addEventListener('click', function(e) {
-    if (e.target === confirmModal) hideModal();
-  });
-
-  // Confirm & execute
-  modalConfirm.addEventListener('click', async function() {
-    var usdAmount = parseFloat(approveAmount.value);
-    modalConfirm.disabled = true;
-    modalConfirm.textContent = 'Signing...';
-
-    try {
-      await switchToBase();
-      var amountRaw = BigInt(Math.round(usdAmount)) * BigInt(1000000);
-
-      if (currentMode === 'insurance') {
-        var calldata = encodeApprove(COVER_ROUTER, amountRaw);
-        await window.ethereum.request({
-          method: 'eth_sendTransaction',
-          params: [{ from: window.__lumina.connectedWallet, to: USDY_ADDRESS, data: calldata }]
-        });
-        hideModal();
-        approveSuccess.style.display = 'block';
-        approveSuccessMsg.innerHTML = '\u2705 Allowance set: $' + Math.round(usdAmount).toLocaleString() + ' USDY. Your agent can now spend up to this amount.';
-      } else {
-        var vaults = getSelectedVaults();
-        var results = [];
-        for (var i = 0; i < vaults.length; i++) {
-          modalConfirm.textContent = 'Signing vault ' + (i + 1) + '/' + vaults.length + '...';
-          var calldata = encodeApprove(vaults[i].address, amountRaw);
-          await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [{ from: window.__lumina.connectedWallet, to: USDY_ADDRESS, data: calldata }]
-          });
-          results.push('\u2705 ' + vaults[i].name + ': $' + Math.round(usdAmount).toLocaleString() + ' approved');
-        }
-        hideModal();
-        approveSuccess.style.display = 'block';
-        approveSuccessMsg.innerHTML = results.join('<br>');
-      }
-
-      btnApprove.textContent = 'Approved';
-      btnApprove.style.background = 'rgba(34,197,94,0.3)';
-      btnApprove.style.color = '#22c55e';
-      btnApprove.disabled = true;
-      btnApprove.style.opacity = '1';
-    } catch (e) {
-      hideModal();
-      approveError.style.display = 'block';
-      approveErrorMsg.textContent = e.message || 'Transaction failed';
-      updateBtnText();
-    }
-
-    modalConfirm.disabled = false;
-    modalConfirm.textContent = 'Confirm & Sign';
-  });
-
-  // Unlimited flow
-  btnUnlimited.addEventListener('click', function() {
-    unlimitedCheckbox.checked = false;
-    unlimitedConfirmBtn.disabled = true;
-    unlimitedConfirmBtn.style.opacity = '0.5';
-    unlimitedConfirmBtn.style.cursor = 'not-allowed';
-    unlimitedModal.style.display = 'flex';
-  });
-
-  unlimitedCheckbox.addEventListener('change', function() {
-    unlimitedConfirmBtn.disabled = !unlimitedCheckbox.checked;
-    unlimitedConfirmBtn.style.opacity = unlimitedCheckbox.checked ? '1' : '0.5';
-    unlimitedConfirmBtn.style.cursor = unlimitedCheckbox.checked ? 'pointer' : 'not-allowed';
-  });
-
-  unlimitedCancel.addEventListener('click', function() {
-    unlimitedModal.style.display = 'none';
-  });
-  unlimitedModal.addEventListener('click', function(e) {
-    if (e.target === unlimitedModal) unlimitedModal.style.display = 'none';
-  });
-
-  unlimitedConfirmBtn.addEventListener('click', async function() {
-    unlimitedModal.style.display = 'none';
-    isUnlimited = true;
-    approveAmount.value = '';
-    approveAmount.disabled = true;
-    approveAmount.placeholder = 'Unlimited';
-    unlimitedBadge.style.display = 'inline';
-    btnApprove.disabled = true;
-    btnApprove.style.opacity = '0.5';
-    approveError.style.display = 'none';
-    approveSuccess.style.display = 'none';
-
-    try {
-      await switchToBase();
-
-      if (currentMode === 'insurance') {
-        var calldata = encodeApprove(COVER_ROUTER, UINT256_MAX);
-        await window.ethereum.request({
-          method: 'eth_sendTransaction',
-          params: [{ from: window.__lumina.connectedWallet, to: USDY_ADDRESS, data: calldata }]
-        });
-        approveSuccess.style.display = 'block';
-        approveSuccessMsg.innerHTML = '\u2705 Unlimited allowance set. Your agent has no spending cap. You can set a specific limit anytime.';
-      } else {
-        var vaults = getSelectedVaults();
-        if (vaults.length === 0) {
-          approveError.style.display = 'block';
-          approveErrorMsg.textContent = 'Please select at least one vault';
-          exitUnlimitedMode();
-          return;
-        }
-        var results = [];
-        for (var i = 0; i < vaults.length; i++) {
-          var calldata = encodeApprove(vaults[i].address, UINT256_MAX);
-          await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [{ from: window.__lumina.connectedWallet, to: USDY_ADDRESS, data: calldata }]
-          });
-          results.push('\u2705 ' + vaults[i].name + ': Unlimited approved');
-        }
-        approveSuccess.style.display = 'block';
-        approveSuccessMsg.innerHTML = results.join('<br>');
-      }
-
-      btnApprove.textContent = 'Approved';
-      btnApprove.style.background = 'rgba(34,197,94,0.3)';
-      btnApprove.style.color = '#22c55e';
-      btnApprove.style.opacity = '1';
-    } catch (e) {
-      approveError.style.display = 'block';
-      approveErrorMsg.textContent = e.message || 'Transaction failed';
-      exitUnlimitedMode();
-      approveAmount.placeholder = 'Enter amount in USD';
-      updateBtnText();
-    }
-  });
-})();
-</script>
 
 <h2>Step 3: Give Your Agent the Key + SKILL File</h2>
 <div class="step">
@@ -895,5 +254,592 @@ window.__lumina = { connectedWallet: null, onBase: false };
 <p>Email <a href="mailto:support@lumina-org.com">support@lumina-org.com</a> or visit the <a href="/dashboard">Dashboard</a>.</p>
 <p style="margin-top:40px;color:rgba(255,255,255,0.3);font-size:0.8rem">Lumina Protocol — Insurance for the Machine Economy</p>
 </div>
+
+<script>
+// ============================================================
+// LUMINA TUTORIAL — UNIFIED WALLET + APPROVE LOGIC
+// ============================================================
+
+(function() {
+  'use strict';
+
+  // --- Constants ---
+  const USDY_ADDRESS = '0x12cc5bd1ab02A50285834eaF6e8dc2d95FB42cC9';
+  const COVER_ROUTER = '0x8407aF8a100812bFb5F9F188b44379E4268efF94';
+  const BASE_CHAIN_ID = '0x2105';
+  const UINT256_MAX = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+
+  const VAULTS = [
+    { address: '0x2D7D735f71638730cbe9A143227A00Fa64E94E88', name: 'Volatile Short' },
+    { address: '0xDF30548d46e770154AdA82D3c263e81a608075c', name: 'Volatile Long' },
+    { address: '0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078', name: 'Stable Short' },
+    { address: '0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c', name: 'Stable Long' }
+  ];
+
+  const TOOLTIP_INSURANCE = '\uD83D\uDCB3 Your limit, your control: This amount is the maximum \'allowance\' your AI Agent is permitted to use. If the Agent detects a risk and wants to buy $100 of insurance but you only approved $50, the purchase will be blocked. You own the money; the Agent is just the manager.';
+  const TOOLTIP_YIELD = '\uD83D\uDCB0 Your deposit cap: This is the maximum amount each vault is allowed to receive from your agent. The agent can deposit and withdraw within this limit. You can adjust or revoke each vault\'s permission separately.';
+
+  // --- State ---
+  let connectedAddress = null;
+  let isOnBase = false;
+  let currentMode = 'insurance';
+  let isUnlimited = false;
+
+  // --- Provider ---
+  function getMetaMaskProvider() {
+    if (window.ethereum?.providers) {
+      const mm = window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom);
+      if (mm) return mm;
+    }
+    if (window.ethereum?.isMetaMask && !window.ethereum?.isPhantom) return window.ethereum;
+    return null;
+  }
+
+  // --- Helpers ---
+  function truncateAddress(addr) {
+    return addr.slice(0, 6) + '...' + addr.slice(-4);
+  }
+
+  function encodeApprove(spender, amountBigInt) {
+    const selector = '0x095ea7b3';
+    const addr = spender.toLowerCase().replace('0x', '').padStart(64, '0');
+    const amt = amountBigInt.toString(16).padStart(64, '0');
+    return selector + addr + amt;
+  }
+
+  async function switchToBase() {
+    const provider = getMetaMaskProvider();
+    if (!provider) return;
+    try {
+      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
+    } catch (err) {
+      if (err.code === 4902) {
+        await provider.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: BASE_CHAIN_ID,
+            chainName: 'Base',
+            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.base.org'],
+            blockExplorerUrls: ['https://basescan.org']
+          }]
+        });
+      } else { throw err; }
+    }
+  }
+
+  function numberToWords(n) {
+    if (n === 0) return 'zero dollars';
+    const ones = ['','one','two','three','four','five','six','seven','eight','nine',
+      'ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+    const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+    function chunk(num) {
+      if (num === 0) return '';
+      if (num < 20) return ones[num];
+      if (num < 100) return tens[Math.floor(num/10)] + (num%10 ? ' ' + ones[num%10] : '');
+      return ones[Math.floor(num/100)] + ' hundred' + (num%100 ? ' ' + chunk(num%100) : '');
+    }
+    const parts = [];
+    const scales = [[1000000000,'billion'],[1000000,'million'],[1000,'thousand']];
+    let rem = Math.round(Math.abs(n));
+    for (const [s, label] of scales) {
+      if (rem >= s) { parts.push(chunk(Math.floor(rem/s)) + ' ' + label); rem = rem % s; }
+    }
+    if (rem > 0) parts.push(chunk(rem));
+    return (n < 0 ? 'negative ' : '') + parts.join(' ') + ' dollars';
+  }
+
+  // ============================================================
+  // STEP 1 — WALLET CONNECTION
+  // ============================================================
+
+  const step1Widget = document.getElementById('step1-widget');
+  const generateSection = document.getElementById('generate-section');
+  const btnGenerate = document.getElementById('btn-generate');
+  const generateStatus = document.getElementById('generate-status');
+  const keyResult = document.getElementById('key-result');
+  const keyOutput = document.getElementById('key-output');
+  const btnCopy = document.getElementById('btn-copy');
+  const step1Error = document.getElementById('step1-error');
+  const step1ErrorMsg = document.getElementById('step1-error-msg');
+  const networkInfoModal = document.getElementById('network-info-modal');
+  const btnGotIt = document.getElementById('btn-got-it');
+
+  // --- Render functions ---
+
+  function renderNoMetaMask() {
+    step1Widget.innerHTML = '<p style="color:#ef4444;margin:0">MetaMask not detected. Install it from <a href="https://metamask.io" target="_blank" style="color:#ef4444;text-decoration:underline">metamask.io</a></p>';
+    generateSection.style.display = 'none';
+    updateStep2State();
+  }
+
+  function renderDisconnected() {
+    connectedAddress = null;
+    isOnBase = false;
+    step1Widget.innerHTML = `
+      <div>
+        <button id="btn-connect" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Connect Wallet</button>
+      </div>
+      <div style="margin-top:10px">
+        <button id="btn-what-network" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;text-decoration:underline;padding:0">&#x2139;&#xFE0F; What network do I need?</button>
+      </div>
+      <p style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">By connecting your wallet, you tell Lumina who you are. Then, when you generate your API Key, Lumina creates a unique key linked to your wallet. This key is what you give to your AI agent so it can operate on your behalf — like handing it an authorized card. Your agent uses this key on every API call to identify itself.</p>
+    `;
+    document.getElementById('btn-connect').addEventListener('click', connectWallet);
+    document.getElementById('btn-what-network').addEventListener('click', () => { networkInfoModal.style.display = 'flex'; });
+    generateSection.style.display = 'none';
+    step1Error.style.display = 'none';
+    updateStep2State();
+  }
+
+  function renderConnectedWrongNetwork(address) {
+    connectedAddress = address;
+    isOnBase = false;
+    step1Widget.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="background:rgba(34,197,94,0.3);color:#22c55e;padding:6px 16px;border-radius:8px;font-weight:600;font-size:0.85rem">Connected</span>
+        <span style="color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem">${truncateAddress(address)}</span>
+        <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;font-size:12px;padding:2px 8px;border-radius:6px">&#x26A0;&#xFE0F; Wrong Network</span>
+        <button id="btn-disconnect" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Disconnect</button>
+      </div>
+      <div style="margin-top:12px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="color:#f59e0b;font-size:0.85rem">&#x26A0;&#xFE0F; Wrong network. Lumina only works on Base Mainnet.</span>
+        <button id="btn-switch-base" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#f59e0b;padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:600;cursor:pointer">Switch to Base Mainnet</button>
+      </div>
+      <div style="margin-top:10px">
+        <button id="btn-what-network" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;text-decoration:underline;padding:0">&#x2139;&#xFE0F; What network do I need?</button>
+      </div>
+    `;
+    document.getElementById('btn-disconnect').addEventListener('click', disconnectWallet);
+    document.getElementById('btn-switch-base').addEventListener('click', async () => {
+      try { await switchToBase(); } catch(e) { showStep1Error(e.message); }
+    });
+    document.getElementById('btn-what-network').addEventListener('click', () => { networkInfoModal.style.display = 'flex'; });
+    generateSection.style.display = 'none';
+    step1Error.style.display = 'none';
+    updateStep2State();
+  }
+
+  function renderConnectedBase(address) {
+    connectedAddress = address;
+    isOnBase = true;
+    step1Widget.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="background:rgba(34,197,94,0.3);color:#22c55e;padding:6px 16px;border-radius:8px;font-weight:600;font-size:0.85rem">Connected</span>
+        <span style="color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem">${truncateAddress(address)}</span>
+        <span style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#00ff88;font-size:12px;padding:2px 8px;border-radius:6px">Base &#x2713;</span>
+        <button id="btn-disconnect" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Disconnect</button>
+      </div>
+    `;
+    document.getElementById('btn-disconnect').addEventListener('click', disconnectWallet);
+    generateSection.style.display = 'block';
+    step1Error.style.display = 'none';
+    updateStep2State();
+  }
+
+  function showStep1Error(msg) {
+    step1Error.style.display = 'block';
+    step1ErrorMsg.textContent = msg || 'An error occurred';
+  }
+
+  // --- Actions ---
+
+  async function connectWallet() {
+    const provider = getMetaMaskProvider();
+    if (!provider) return;
+    const btn = document.getElementById('btn-connect');
+    if (btn) { btn.disabled = true; btn.textContent = 'Connecting...'; }
+    try {
+      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      localStorage.setItem('lumina_wallet', accounts[0]);
+      await checkAndRenderNetwork(accounts[0]);
+    } catch (err) {
+      renderDisconnected();
+      showStep1Error(err.message || 'Connection rejected');
+    }
+  }
+
+  function disconnectWallet() {
+    localStorage.removeItem('lumina_wallet');
+    renderDisconnected();
+  }
+
+  async function checkAndRenderNetwork(address) {
+    const provider = getMetaMaskProvider();
+    if (!provider) return;
+    const chainId = await provider.request({ method: 'eth_chainId' });
+    if (chainId === BASE_CHAIN_ID) {
+      renderConnectedBase(address);
+    } else {
+      renderConnectedWrongNetwork(address);
+    }
+  }
+
+  // --- Generate API Key ---
+
+  btnGenerate.addEventListener('click', async () => {
+    if (!isOnBase || !connectedAddress) return;
+    btnGenerate.disabled = true;
+    generateStatus.textContent = 'Generating...';
+    step1Error.style.display = 'none';
+    try {
+      const res = await fetch('https://lumina-protocol-production.up.railway.app/api/v2/keys/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet: connectedAddress, label: 'mi-agente' })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message || 'Request failed (' + res.status + ')');
+      const key = data.apiKey || data.key || data.api_key || JSON.stringify(data);
+      keyOutput.value = key;
+      keyResult.style.display = 'block';
+      generateSection.style.display = 'none';
+    } catch (e) {
+      showStep1Error(e.message || 'Failed to generate API key');
+      btnGenerate.disabled = false;
+      generateStatus.textContent = '';
+    }
+  });
+
+  btnCopy.addEventListener('click', () => {
+    navigator.clipboard.writeText(keyOutput.value).then(() => {
+      btnCopy.textContent = 'Copied!';
+      setTimeout(() => { btnCopy.textContent = 'Copy'; }, 2000);
+    });
+  });
+
+  // --- Network Info Modal ---
+  btnGotIt.addEventListener('click', () => { networkInfoModal.style.display = 'none'; });
+  networkInfoModal.addEventListener('click', (e) => { if (e.target === networkInfoModal) networkInfoModal.style.display = 'none'; });
+
+  // ============================================================
+  // STEP 2 — APPROVE LOGIC
+  // ============================================================
+
+  const approveNoWallet = document.getElementById('approve-no-wallet');
+  const approveForm = document.getElementById('approve-form');
+  const approveAmount = document.getElementById('approve-amount');
+  const btnApprove = document.getElementById('btn-approve');
+  const approveSuccess = document.getElementById('approve-success');
+  const approveSuccessMsg = document.getElementById('approve-success-msg');
+  const approveError = document.getElementById('approve-error');
+  const approveErrorMsg = document.getElementById('approve-error-msg');
+  const tooltipTrigger = document.getElementById('tooltip-trigger');
+  const tooltipBox = document.getElementById('tooltip-box');
+  const modeInsurance = document.getElementById('mode-insurance');
+  const modeYield = document.getElementById('mode-yield');
+  const approveLabel = document.getElementById('approve-label');
+  const approveExplainer = document.getElementById('approve-explainer');
+  const vaultCheckboxes = document.getElementById('vault-checkboxes');
+  const confirmModal = document.getElementById('confirm-modal');
+  const modalAmount = document.getElementById('modal-amount');
+  const modalWords = document.getElementById('modal-words');
+  const modalExplain = document.getElementById('modal-explain');
+  const modalCancel = document.getElementById('modal-cancel');
+  const modalConfirm = document.getElementById('modal-confirm');
+  const btnUnlimited = document.getElementById('btn-unlimited');
+  const unlimitedBadge = document.getElementById('unlimited-badge');
+  const unlimitedModal = document.getElementById('unlimited-modal');
+  const unlimitedCheckbox = document.getElementById('unlimited-checkbox');
+  const unlimitedCancel = document.getElementById('unlimited-cancel');
+  const unlimitedConfirmBtn = document.getElementById('unlimited-confirm');
+
+  function updateStep2State() {
+    if (!connectedAddress) {
+      approveNoWallet.textContent = '\u2B06 Connect your wallet in Step 1 first';
+      approveNoWallet.style.display = 'block';
+      approveForm.style.display = 'none';
+    } else if (!isOnBase) {
+      approveNoWallet.textContent = '\u2B06 Switch to Base network first';
+      approveNoWallet.style.display = 'block';
+      approveForm.style.display = 'none';
+    } else {
+      approveNoWallet.style.display = 'none';
+      approveForm.style.display = 'block';
+    }
+  }
+
+  // Tooltip
+  tooltipBox.textContent = TOOLTIP_INSURANCE;
+  tooltipTrigger.addEventListener('mouseenter', () => { tooltipBox.style.display = 'block'; });
+  tooltipTrigger.addEventListener('mouseleave', () => { tooltipBox.style.display = 'none'; });
+
+  // Mode toggle
+  function updateMode(mode) {
+    currentMode = mode;
+    if (mode === 'insurance') {
+      modeInsurance.style.background = 'rgba(34,211,238,0.15)';
+      modeInsurance.style.color = '#22d3ee';
+      modeInsurance.style.borderColor = '#22d3ee';
+      modeYield.style.background = 'transparent';
+      modeYield.style.color = 'rgba(255,255,255,0.5)';
+      modeYield.style.borderColor = 'rgba(255,255,255,0.2)';
+      approveLabel.textContent = "What's the maximum your agent can spend on insurance?";
+      tooltipBox.textContent = TOOLTIP_INSURANCE;
+      approveExplainer.textContent = 'This tells your USDY: "Lumina can charge me up to $X for insurance." You control the limit and can revoke it anytime by setting it to 0.';
+      vaultCheckboxes.style.display = 'none';
+    } else {
+      modeYield.style.background = 'rgba(34,211,238,0.15)';
+      modeYield.style.color = '#22d3ee';
+      modeYield.style.borderColor = '#22d3ee';
+      modeInsurance.style.background = 'transparent';
+      modeInsurance.style.color = 'rgba(255,255,255,0.5)';
+      modeInsurance.style.borderColor = 'rgba(255,255,255,0.2)';
+      approveLabel.textContent = "What's the maximum your agent can deposit into vaults?";
+      tooltipBox.textContent = TOOLTIP_YIELD;
+      approveExplainer.textContent = 'This tells your USDY: "Lumina vaults can hold up to $X of my deposit." Each vault gets its own approval. You can revoke any vault individually.';
+      vaultCheckboxes.style.display = 'block';
+    }
+    updateApproveBtnText();
+    approveSuccess.style.display = 'none';
+    approveError.style.display = 'none';
+  }
+
+  modeInsurance.addEventListener('click', () => updateMode('insurance'));
+  modeYield.addEventListener('click', () => updateMode('yield'));
+
+  // Vault checkboxes
+  function getSelectedVaults() {
+    return Array.from(document.querySelectorAll('.vault-cb:checked')).map(cb => ({
+      address: cb.getAttribute('data-vault'),
+      name: cb.getAttribute('data-name')
+    }));
+  }
+
+  document.querySelectorAll('.vault-cb').forEach(cb => {
+    cb.addEventListener('change', updateApproveBtnText);
+  });
+
+  // Approve button text
+  function updateApproveBtnText() {
+    if (currentMode === 'insurance') {
+      btnApprove.textContent = 'Approve with MetaMask';
+    } else {
+      const count = getSelectedVaults().length;
+      btnApprove.textContent = 'Approve with MetaMask (' + count + ' vault' + (count !== 1 ? 's' : '') + ')';
+    }
+  }
+
+  // Approve button state
+  function updateApproveBtnState() {
+    if (isUnlimited) {
+      btnApprove.disabled = true; btnApprove.style.opacity = '0.5'; btnApprove.style.cursor = 'not-allowed';
+      return;
+    }
+    const val = parseFloat(approveAmount.value);
+    if (val > 0) {
+      btnApprove.disabled = false; btnApprove.style.opacity = '1'; btnApprove.style.cursor = 'pointer';
+    } else {
+      btnApprove.disabled = true; btnApprove.style.opacity = '0.5'; btnApprove.style.cursor = 'not-allowed';
+    }
+  }
+
+  function exitUnlimitedMode() {
+    isUnlimited = false;
+    unlimitedBadge.style.display = 'none';
+    approveAmount.disabled = false;
+    approveAmount.value = '';
+    approveAmount.placeholder = 'Enter amount in USD';
+    updateApproveBtnState();
+  }
+
+  approveAmount.addEventListener('input', () => {
+    if (isUnlimited) exitUnlimitedMode();
+    updateApproveBtnState();
+  });
+
+  // --- Confirm Modal ---
+  function showConfirmModal() {
+    const usdAmount = parseFloat(approveAmount.value);
+    modalAmount.textContent = '$' + usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' USDY';
+    modalWords.textContent = numberToWords(usdAmount);
+    if (currentMode === 'insurance') {
+      modalExplain.textContent = 'You are approving Lumina CoverRouter (insurance purchases) to spend up to this amount of your USDY. You can change or revoke this limit at any time.';
+    } else {
+      const names = getSelectedVaults().map(v => v.name).join(', ');
+      modalExplain.textContent = 'You are approving Lumina Vaults (' + names + ') to spend up to this amount of your USDY. You can change or revoke this limit at any time.';
+    }
+    confirmModal.style.display = 'flex';
+  }
+
+  function hideConfirmModal() { confirmModal.style.display = 'none'; }
+
+  btnApprove.addEventListener('click', () => {
+    if (btnApprove.disabled) return;
+    approveError.style.display = 'none';
+    approveSuccess.style.display = 'none';
+    if (currentMode === 'yield' && getSelectedVaults().length === 0) {
+      approveError.style.display = 'block';
+      approveErrorMsg.textContent = 'Please select at least one vault';
+      return;
+    }
+    showConfirmModal();
+  });
+
+  modalCancel.addEventListener('click', hideConfirmModal);
+  confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirmModal(); });
+
+  modalConfirm.addEventListener('click', async () => {
+    const provider = getMetaMaskProvider();
+    if (!provider) return;
+    const usdAmount = parseFloat(approveAmount.value);
+    modalConfirm.disabled = true;
+    modalConfirm.textContent = 'Signing...';
+    try {
+      const amountRaw = BigInt(Math.round(usdAmount)) * 1000000n;
+      if (currentMode === 'insurance') {
+        const calldata = encodeApprove(COVER_ROUTER, amountRaw);
+        await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDY_ADDRESS, data: calldata }] });
+        hideConfirmModal();
+        approveSuccess.style.display = 'block';
+        approveSuccessMsg.innerHTML = '\u2705 Allowance set: $' + Math.round(usdAmount).toLocaleString() + ' USDY. Your agent can now spend up to this amount.';
+      } else {
+        const vaults = getSelectedVaults();
+        const results = [];
+        for (let i = 0; i < vaults.length; i++) {
+          modalConfirm.textContent = 'Signing vault ' + (i+1) + '/' + vaults.length + '...';
+          const calldata = encodeApprove(vaults[i].address, amountRaw);
+          await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDY_ADDRESS, data: calldata }] });
+          results.push('\u2705 ' + vaults[i].name + ': $' + Math.round(usdAmount).toLocaleString() + ' approved');
+        }
+        hideConfirmModal();
+        approveSuccess.style.display = 'block';
+        approveSuccessMsg.innerHTML = results.join('<br>');
+      }
+      btnApprove.textContent = 'Approved';
+      btnApprove.style.background = 'rgba(34,197,94,0.3)';
+      btnApprove.style.color = '#22c55e';
+      btnApprove.disabled = true;
+      btnApprove.style.opacity = '1';
+    } catch (e) {
+      hideConfirmModal();
+      approveError.style.display = 'block';
+      approveErrorMsg.textContent = e.message || 'Transaction failed';
+      updateApproveBtnText();
+    }
+    modalConfirm.disabled = false;
+    modalConfirm.textContent = 'Confirm & Sign';
+  });
+
+  // --- Unlimited flow ---
+  btnUnlimited.addEventListener('click', () => {
+    unlimitedCheckbox.checked = false;
+    unlimitedConfirmBtn.disabled = true;
+    unlimitedConfirmBtn.style.opacity = '0.5';
+    unlimitedConfirmBtn.style.cursor = 'not-allowed';
+    unlimitedModal.style.display = 'flex';
+  });
+
+  unlimitedCheckbox.addEventListener('change', () => {
+    unlimitedConfirmBtn.disabled = !unlimitedCheckbox.checked;
+    unlimitedConfirmBtn.style.opacity = unlimitedCheckbox.checked ? '1' : '0.5';
+    unlimitedConfirmBtn.style.cursor = unlimitedCheckbox.checked ? 'pointer' : 'not-allowed';
+  });
+
+  unlimitedCancel.addEventListener('click', () => { unlimitedModal.style.display = 'none'; });
+  unlimitedModal.addEventListener('click', (e) => { if (e.target === unlimitedModal) unlimitedModal.style.display = 'none'; });
+
+  unlimitedConfirmBtn.addEventListener('click', async () => {
+    const provider = getMetaMaskProvider();
+    if (!provider) return;
+    unlimitedModal.style.display = 'none';
+    isUnlimited = true;
+    approveAmount.value = '';
+    approveAmount.disabled = true;
+    approveAmount.placeholder = 'Unlimited';
+    unlimitedBadge.style.display = 'inline';
+    btnApprove.disabled = true;
+    btnApprove.style.opacity = '0.5';
+    approveError.style.display = 'none';
+    approveSuccess.style.display = 'none';
+
+    try {
+      if (currentMode === 'insurance') {
+        const calldata = encodeApprove(COVER_ROUTER, UINT256_MAX);
+        await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDY_ADDRESS, data: calldata }] });
+        approveSuccess.style.display = 'block';
+        approveSuccessMsg.innerHTML = '\u2705 Unlimited allowance set. Your agent has no spending cap. You can set a specific limit anytime.';
+      } else {
+        const vaults = getSelectedVaults();
+        if (vaults.length === 0) {
+          approveError.style.display = 'block';
+          approveErrorMsg.textContent = 'Please select at least one vault';
+          exitUnlimitedMode();
+          return;
+        }
+        const results = [];
+        for (let i = 0; i < vaults.length; i++) {
+          const calldata = encodeApprove(vaults[i].address, UINT256_MAX);
+          await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDY_ADDRESS, data: calldata }] });
+          results.push('\u2705 ' + vaults[i].name + ': Unlimited approved');
+        }
+        approveSuccess.style.display = 'block';
+        approveSuccessMsg.innerHTML = results.join('<br>');
+      }
+      btnApprove.textContent = 'Approved';
+      btnApprove.style.background = 'rgba(34,197,94,0.3)';
+      btnApprove.style.color = '#22c55e';
+      btnApprove.style.opacity = '1';
+    } catch (e) {
+      approveError.style.display = 'block';
+      approveErrorMsg.textContent = e.message || 'Transaction failed';
+      exitUnlimitedMode();
+      updateApproveBtnText();
+    }
+  });
+
+  // ============================================================
+  // INITIALIZATION
+  // ============================================================
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const provider = getMetaMaskProvider();
+
+    if (!provider) {
+      renderNoMetaMask();
+      return;
+    }
+
+    // Check for active account WITHOUT opening popup
+    try {
+      const accounts = await provider.request({ method: 'eth_accounts' });
+
+      if (accounts.length === 0) {
+        localStorage.removeItem('lumina_wallet');
+        renderDisconnected();
+      } else {
+        localStorage.setItem('lumina_wallet', accounts[0]);
+        await checkAndRenderNetwork(accounts[0]);
+      }
+    } catch (e) {
+      renderDisconnected();
+    }
+
+    // Listeners
+    provider.on('accountsChanged', (accounts) => {
+      if (accounts.length === 0) {
+        localStorage.removeItem('lumina_wallet');
+        renderDisconnected();
+      } else {
+        localStorage.setItem('lumina_wallet', accounts[0]);
+        checkAndRenderNetwork(accounts[0]);
+      }
+    });
+
+    provider.on('chainChanged', async () => {
+      try {
+        const accs = await provider.request({ method: 'eth_accounts' });
+        if (accs.length > 0) checkAndRenderNetwork(accs[0]);
+      } catch(e) {}
+    });
+  });
+
+  // Fallback: if DOMContentLoaded already fired
+  if (document.readyState !== 'loading') {
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+  }
+
+})();
+</script>
 </body>
 </html>
