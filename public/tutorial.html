@@ -310,31 +310,50 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   --rpc-url YOUR_RPC_URL --private-key YOUR_KEY</pre>
 </div>
 
-<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;margin-top:40px">
-<h2 style="margin-top:0;border:none;padding:0">&#x1F6E1; Insurance Products</h2>
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:0;margin-top:40px;box-shadow:0 -2px 20px rgba(0,212,255,0.05);overflow:hidden">
+<div style="height:3px;width:100%;background:linear-gradient(90deg,#00d4ff,transparent)"></div>
+<div style="padding:32px">
+<h2 style="margin-top:0;border:none;padding:0;color:#00d4ff">&#x1F6E1; Insurance Products</h2>
 <p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Parametric coverage for your AI agent's portfolio. Your agent buys these policies via the API to protect against specific risks.</p>
-<table>
+<div style="overflow-x:auto">
+<table class="table-insurance" style="width:100%">
 <tr><th>Product</th><th>ID</th><th>Protects Against</th><th>Duration</th><th>Deductible</th></tr>
 <tr><td>Black Swan Shield</td><td><code>BSS</code></td><td>ETH crash &#x2265;30%</td><td>7-30d</td><td>20%</td></tr>
 <tr><td>Depeg Shield</td><td><code>DEPEG</code></td><td>Stablecoin loses peg</td><td>14-365d</td><td>10%</td></tr>
 <tr><td>IL Index Cover</td><td><code>IL</code></td><td>Impermanent loss</td><td>14-90d</td><td>2%</td></tr>
 <tr><td>Exploit Shield</td><td><code>EXPLOIT</code></td><td>Smart contract hacks</td><td>90-365d</td><td>10%</td></tr>
 </table>
+</div>
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Your agent decides when to buy based on market conditions. Policies are purchased and claimed automatically via the API. You only set the spending limit.</p>
 </div>
+</div>
 
-<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;margin-top:32px">
-<h2 style="margin-top:0;border:none;padding:0">&#x1F4B0; Yield Vaults</h2>
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(139,92,246,0.2);border-radius:16px;padding:0;margin-top:24px;box-shadow:0 -2px 20px rgba(139,92,246,0.05);overflow:hidden">
+<div style="height:3px;width:100%;background:linear-gradient(90deg,#8b5cf6,transparent)"></div>
+<div style="padding:32px">
+<h2 style="margin-top:0;border:none;padding:0;color:#8b5cf6">&#x1F4B0; Yield Vaults</h2>
 <p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Deposit USDY into vaults to earn yield from insurance premiums. Your agent manages deposits and withdrawals.</p>
-<table>
+<div style="overflow-x:auto">
+<table class="table-vaults" style="width:100%">
 <tr><th>Vault</th><th>Lockup</th><th>Risk Profile</th><th>What it covers</th></tr>
-<tr><td>Volatile Short</td><td>30 days</td><td>Higher risk/yield</td><td>BSS + IL claims</td></tr>
-<tr><td>Volatile Long</td><td>90 days</td><td>Higher risk/yield</td><td>BSS + IL claims</td></tr>
-<tr><td>Stable Short</td><td>90 days</td><td>Lower risk/yield</td><td>DEPEG + EXPLOIT claims</td></tr>
-<tr><td>Stable Long</td><td>365 days</td><td>Lower risk/yield</td><td>DEPEG + EXPLOIT claims</td></tr>
+<tr><td><strong>Volatile Short</strong></td><td>30 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>BSS + IL claims</td></tr>
+<tr><td><strong>Volatile Long</strong></td><td>90 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>BSS + IL claims</td></tr>
+<tr><td><strong>Stable Short</strong></td><td>90 days</td><td><span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px">Lower risk/yield</span></td><td>DEPEG + EXPLOIT claims</td></tr>
+<tr><td><strong>Stable Long</strong></td><td>365 days</td><td><span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px">Lower risk/yield</span></td><td>DEPEG + EXPLOIT claims</td></tr>
 </table>
+</div>
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Yield = USDY base rate (~3.55% APY) + insurance premiums. Longer lockups generally offer higher yields. Your agent monitors APY and manages positions through the API.</p>
 </div>
+</div>
+
+<style>
+.table-insurance th{background:rgba(0,212,255,0.05);text-transform:uppercase;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.5);padding:12px 16px}
+.table-insurance td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.2s}
+.table-insurance tr:hover td{background:rgba(0,212,255,0.03)}
+.table-vaults th{background:rgba(139,92,246,0.05);text-transform:uppercase;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.5);padding:12px 16px}
+.table-vaults td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.2s}
+.table-vaults tr:hover td{background:rgba(139,92,246,0.03)}
+</style>
 
 <h2>Need Help?</h2>
 <p>Email <a href="mailto:support@lumina-org.com">support@lumina-org.com</a> or visit the <a href="/dashboard">Dashboard</a>.</p>
