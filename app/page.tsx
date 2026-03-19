@@ -459,7 +459,7 @@ curl https://lumina-protocol-production.up.railway.app/api/v2/health
 curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/keys/create -H "Content-Type: application/json" -d '{"wallet":"[MY_WALLET]","label":"my-agent"}'
 
 3. Approve CoverRouter to spend my USDC ($10,000 limit):
-cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 "approve(address,uint256)" 0x8407aF8a100812bFb5f9f188b44379E4268efF94 10000000000 --rpc-url https://base-mainnet.g.alchemy.com/v2/[MY_RPC] --private-key [MY_KEY]
+cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 "approve(address,uint256)" 0x8407aF8a100812bFb5f9f188b44379E4268efF94 10000000000 --rpc-url https://base-mainnet.g.alchemy.com/v2/[MY_RPC] --private-key [MY_KEY]
 
 4. Buy a test policy - Black Swan Shield, $100 coverage, 7 days:
 curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase -H "Content-Type: application/json" -H "X-API-Key: [API_KEY_FROM_STEP_2]" -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'
@@ -1379,11 +1379,12 @@ const YIELD_VAULTS: Record<YieldVaultKey, {
 }> = {
   "volatile-short": { label: "Volatile Short", cooldown: 30, productId: "LIQSHIELD-001", products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
   "volatile-long": { label: "Volatile Long", cooldown: 90, productId: "ILPROT-001", products: "IL Index + BSS overflow", risk: "Higher", worstCase: 0.28 },
-  "stable-short": { label: "Stable Short", cooldown: 90, productId: "DEPEG-USDC-001", products: "Depeg Shield", risk: "Low", worstCase: 0.20 },
+  "stable-short": { label: "Stable Short", cooldown: 90, productId: "DEPEG-USDC-001", products: "Depeg + Exploit Shield", risk: "Low", worstCase: 0.20 },
   "stable-long": { label: "Stable Long", cooldown: 365, productId: "DEPEG-USDT-001", products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
 }
 
 function YieldCalculatorSection() {
+  const aaveYield = useAaveYield()
   const [vault, setVault] = useState<YieldVaultKey>("volatile-short")
   const [deposit, setDeposit] = useState(10000)
   const [realUtilizations, setRealUtilizations] = useState<Record<string, number>>({
@@ -1428,19 +1429,19 @@ function YieldCalculatorSection() {
     const vaultData = YIELD_VAULTS[vault]
     const util = realUtilizations[vault]
     const result = calculateYield({ productId: vaultData.productId, depositAmount: deposit, utilizationPct: util })
-    const usdyBase = 0.0355
-    const monthlyUSDY = deposit * usdyBase / 12
-    const monthlyPremium = (result.netYield - deposit * usdyBase) / 12
+    const aaveBaseYield = (aaveYield || 3.5) / 100
+    const monthlyBase = deposit * aaveBaseYield / 12
+    const monthlyPremium = (result.netYield - deposit * aaveBaseYield) / 12
     const monthlyTotal = result.netYield / 12
-    const annualUSDY = deposit * usdyBase
-    const annualPremium = result.netYield - annualUSDY
+    const annualBase = deposit * aaveBaseYield
+    const annualPremium = result.netYield - annualBase
     const annualTotal = result.netYield
     const totalAPY = result.apyEstimate / 100
-    const avgPremiumAPY = totalAPY - usdyBase
-    return { totalAPY, avgPremiumAPY, monthlyUSDY, monthlyPremium, monthlyTotal, annualUSDY, annualPremium, annualTotal }
-  }, [vault, deposit, realUtilizations])
+    const avgPremiumAPY = totalAPY - aaveBaseYield
+    return { totalAPY, avgPremiumAPY, monthlyBase, monthlyPremium, monthlyTotal, annualBase, annualPremium, annualTotal }
+  }, [vault, deposit, realUtilizations, aaveYield])
 
-  const { totalAPY, avgPremiumAPY, monthlyUSDY, monthlyPremium, monthlyTotal, annualUSDY, annualPremium, annualTotal } = calculations
+  const { totalAPY, avgPremiumAPY, monthlyBase, monthlyPremium, monthlyTotal, annualBase, annualPremium, annualTotal } = calculations
 
   const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 })
   const fmt2 = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -1554,12 +1555,12 @@ function YieldCalculatorSection() {
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
                   <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Monthly Yield</div>
                   <div className="text-xl font-bold text-purple-400">${fmt2(monthlyTotal)}</div>
-                  <div className="text-xs text-white/30 mt-1">Aave ${fmt2(monthlyUSDY)} + Premiums ${fmt2(monthlyPremium)}</div>
+                  <div className="text-xs text-white/30 mt-1">Aave ${fmt2(monthlyBase)} + Premiums ${fmt2(monthlyPremium)}</div>
                 </div>
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
                   <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Annual Yield</div>
                   <div className="text-2xl font-bold text-purple-400">${fmt(annualTotal)}</div>
-                  <div className="text-xs text-white/30 mt-1">Aave ${fmt(annualUSDY)} + Premiums ${fmt(annualPremium)}</div>
+                  <div className="text-xs text-white/30 mt-1">Aave ${fmt(annualBase)} + Premiums ${fmt(annualPremium)}</div>
                 </div>
               </div>
 
@@ -1933,9 +1934,9 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
               </div>
               <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
                 <p className="text-sm text-white/70 leading-relaxed flex-1">
-                  Read {skillUrl} and buy {hl("$100K")} of Depeg coverage for my {hl("USDC")} position for {hl("90 days")}.
+                  Read {skillUrl} and buy {hl("$100K")} of Depeg coverage for my {hl("USDT")} position for {hl("90 days")}.
                 </p>
-                <CopyButton text={`Read ${skillUrl} and buy $100K of Depeg coverage for my USDC position for 90 days.`} accent={accent} />
+                <CopyButton text={`Read ${skillUrl} and buy $100K of Depeg coverage for my USDT position for 90 days.`} accent={accent} />
               </div>
             </div>
           ) : (

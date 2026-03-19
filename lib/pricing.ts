@@ -231,7 +231,7 @@ export function calculateYield(input: YieldCalcInput): YieldCalcResult {
     const isVolatile = volatileProducts.includes(productId)
 
     // Kink Model (same as on-chain contracts)
-    const usdyBase = 0.04  // ~4% base Aave V3 USDC lending yield (variable)
+    const aaveBaseYield = 0.04  // ~4% base Aave V3 USDC lending yield (variable)
     const params = isVolatile
         ? { kink: 0.70, slopeBelow: 0.02, slopeAbove: 0.15, base: 0.01 }
         : { kink: 0.80, slopeBelow: 0.005, slopeAbove: 0.10, base: 0.003 }
@@ -244,10 +244,10 @@ export function calculateYield(input: YieldCalcInput): YieldCalcResult {
         premiumRate = rateAtKink + params.slopeAbove * (utilization - params.kink)
     }
 
-    const apyEstimate = (usdyBase + premiumRate * utilization) * 100
+    const apyEstimate = (aaveBaseYield + premiumRate * utilization) * 100
 
     // Break down into components
-    const usdyYieldAnnual = depositAmount * usdyBase
+    const usdyYieldAnnual = depositAmount * aaveBaseYield
     const premiumYieldAnnual = depositAmount * premiumRate * utilization
     const protocolFee = premiumYieldAnnual * 0.03
     const netPremiumYield = premiumYieldAnnual - protocolFee

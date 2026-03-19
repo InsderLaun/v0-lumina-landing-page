@@ -236,7 +236,7 @@ const STATUS_LABELS: Record<number, { label: string; color: string; pulse?: bool
 // KINK MODEL
 // ════════════════════════════════════════════
 function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): number {
-  const usdyBase = 0.0355
+  const aaveBaseYield = 0.04 // ~4% Aave V3 USDC lending yield (variable)
   const params = riskType === "VOLATILE"
     ? { kink: 0.70, slopeBelow: 0.02, slopeAbove: 0.15, base: 0.01 }
     : { kink: 0.80, slopeBelow: 0.005, slopeAbove: 0.10, base: 0.003 }
@@ -249,7 +249,7 @@ function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): num
     premiumRate = rateAtKink + params.slopeAbove * (utilization - params.kink)
   }
 
-  return (usdyBase + premiumRate * utilization) * 100
+  return (aaveBaseYield + premiumRate * utilization) * 100
 }
 
 // ════════════════════════════════════════════
