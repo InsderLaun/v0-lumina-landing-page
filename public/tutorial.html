@@ -69,6 +69,11 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
 <button id="btn-connect" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Connect Wallet</button>
 <span id="wallet-display" style="color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem"></span>
+<span id="base-badge" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#22c55e;font-size:12px;padding:2px 8px;border-radius:6px">Base &#x2713;</span>
+<span id="wrong-badge" style="display:none;align-items:center;gap:6px">
+<span style="background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);color:#eab308;font-size:12px;padding:2px 8px;border-radius:6px">&#x26A0;&#xFE0F; Wrong Network</span>
+<button id="btn-switch-inline" style="background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.4);color:#eab308;padding:2px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Switch to Base</button>
+</span>
 <button id="btn-disconnect" style="display:none;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Disconnect</button>
 </div>
 
@@ -190,20 +195,40 @@ window.__lumina = { connectedWallet: null, onBase: false };
     }
   }
 
+  var baseBadge = document.getElementById('base-badge');
+  var wrongBadge = document.getElementById('wrong-badge');
+  var btnSwitchInline = document.getElementById('btn-switch-inline');
+
   function checkChain() {
     var chainId = window.ethereum.chainId;
     if (chainId && chainId.toLowerCase() === BASE_CHAIN_ID) {
       window.__lumina.onBase = true;
       wrongNetwork.style.display = 'none';
       if (window.__lumina.connectedWallet) {
+        baseBadge.style.display = 'inline';
+        wrongBadge.style.display = 'none';
         generateSection.style.display = 'block';
       }
     } else {
       window.__lumina.onBase = false;
       wrongNetwork.style.display = 'flex';
       generateSection.style.display = 'none';
+      if (window.__lumina.connectedWallet) {
+        baseBadge.style.display = 'none';
+        wrongBadge.style.display = 'inline-flex';
+      }
     }
   }
+
+  btnSwitchInline.addEventListener('click', async function() {
+    try {
+      await switchToBase();
+      checkChain();
+    } catch(e) {
+      keyError.style.display = 'block';
+      errorMsg.textContent = e.message || 'Failed to switch network';
+    }
+  });
 
   function setConnected(addr) {
     window.__lumina.connectedWallet = addr;
@@ -227,6 +252,8 @@ window.__lumina = { connectedWallet: null, onBase: false };
     btnConnect.style.color = '#0a0a0f';
     btnConnect.disabled = false;
     btnDisconnect.style.display = 'none';
+    baseBadge.style.display = 'none';
+    wrongBadge.style.display = 'none';
     generateSection.style.display = 'none';
     wrongNetwork.style.display = 'none';
     window.dispatchEvent(new Event('lumina-wallet-disconnected'));
