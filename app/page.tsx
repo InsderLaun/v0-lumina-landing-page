@@ -810,10 +810,10 @@ function calcKinkMultiplier(utilizationPct: number): number {
 //   IL      = 150 bps (1.50%)
 //   EXPLOIT = 300 bps (3.00%)
 const CALC_PRODUCT_CONFIG: Record<CalcProduct, { pBaseBps: number; riskType: "VOLATILE" | "STABLE" }> = {
-  bss:     { pBaseBps: 250, riskType: "VOLATILE" },
-  depeg:   { pBaseBps: 50,  riskType: "STABLE" },
-  il:      { pBaseBps: 150, riskType: "VOLATILE" },
-  exploit: { pBaseBps: 300, riskType: "STABLE" },
+  bss:     { pBaseBps: 2200, riskType: "VOLATILE" },  // 22% — actuarial spec
+  depeg:   { pBaseBps: 2400, riskType: "STABLE" },   // 24% — actuarial spec
+  il:      { pBaseBps: 2000, riskType: "VOLATILE" },  // 20% — actuarial spec
+  exploit: { pBaseBps: 300,  riskType: "STABLE" },    // 3%  — actuarial spec
 }
 
 // Deductibles per product (unchanged)

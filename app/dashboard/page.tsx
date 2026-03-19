@@ -238,12 +238,12 @@ const STATUS_LABELS: Record<number, { label: string; color: string; pulse?: bool
 // U_KINK = 80%, R_SLOPE1 = 0.5, R_SLOPE2 = 3.0, U_MAX = 95%
 // M(U) at 0%=1.0, 80%=1.5, 90%=3.0, 95%=3.75
 //
-// Blended pBase per vault type (weighted average of products):
-//   VOLATILE vaults back BSS(250bps) + IL(150bps) -> avg 200bps = 2.00%
-//   STABLE vaults back DEPEG(50bps) + EXPLOIT(300bps) -> avg 175bps = 1.75%
+// Blended pBase per vault type (weighted average of products — actuarial specs):
+//   VOLATILE vaults back BSS(2200bps) + IL(2000bps) -> avg 2100bps = 21%
+//   STABLE vaults back DEPEG(2400bps) + EXPLOIT(300bps) -> avg 1350bps = 13.5%
 function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): number {
   const aaveBaseYield = 0.04 // ~4% Aave V3 USDC lending yield (variable)
-  const pBaseBps = riskType === "VOLATILE" ? 200 : 175 // blended per vault
+  const pBaseBps = riskType === "VOLATILE" ? 2100 : 1350 // blended per vault (actuarial)
   const pBaseRate = pBaseBps / 10000
 
   // M(U) from PremiumMath.sol

@@ -33,23 +33,23 @@ function calcKinkMultiplier(utilizationPct: number): number {
     return 1.0 + SLOPE1 + ((util - U_KINK) / (1.0 - U_KINK)) * SLOPE2
 }
 
-// ─── Per-product config from API (pBase in bps) ─────────────
-// BSS (Black Swan Shield):  250 bps = 2.50%
-// DEPEG (Depeg Shield):      50 bps = 0.50%
-// IL (IL Index Cover):      150 bps = 1.50%
-// EXPLOIT (Exploit Shield): 300 bps = 3.00%
+// ─── Per-product config (pBase in bps) — from actuarial specs ─────────────
+// BSS (Black Swan Shield):  2200 bps = 22%
+// DEPEG (Depeg Shield):     2400 bps = 24%
+// IL (IL Index Cover):      2000 bps = 20%
+// EXPLOIT (Exploit Shield):  300 bps = 3%
 const PRODUCT_PBASE: Record<string, { pBaseBps: number; deductibleBps: number; triggerDesc: string }> = {
-    'LIQSHIELD-001':   { pBaseBps: 250, deductibleBps: 3000, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
-    'BLACKSWAN-001':   { pBaseBps: 250, deductibleBps: 3000, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
-    'DEPEG-USDC-001':  { pBaseBps: 50,  deductibleBps: 500,  triggerDesc: 'USDC/USD stays below $0.95 for 4h (Chainlink)' },
-    'DEPEG-USDT-001':  { pBaseBps: 50,  deductibleBps: 500,  triggerDesc: 'USDT/USD stays below $0.95 for 4h (Chainlink)' },
-    'DEPEG-DAI-001':   { pBaseBps: 50,  deductibleBps: 500,  triggerDesc: 'DAI/USD stays below $0.95 for 4h (Chainlink)' },
-    'DEPEG-STABLE-001':{ pBaseBps: 50,  deductibleBps: 500,  triggerDesc: 'Stablecoin/USD stays below $0.95 for 4h (Chainlink)' },
-    'ILPROT-001':      { pBaseBps: 150, deductibleBps: 200,  triggerDesc: 'IL% > 2% at expiry (European-style, Chainlink)' },
-    'EXPLOIT-001':     { pBaseBps: 300, deductibleBps: 0,    triggerDesc: 'Protocol exploit verified by Phala TEE oracle' },
-    'GASSPIKE-001':    { pBaseBps: 250, deductibleBps: 1000, triggerDesc: 'Base L2 gas >100 gwei for 15 min' },
-    'SLIPPAGE-001':    { pBaseBps: 250, deductibleBps: 300,  triggerDesc: 'Price moves >5% during execution (immediate)' },
-    'BRIDGE-001':      { pBaseBps: 250, deductibleBps: 500,  triggerDesc: 'Funds don\'t arrive at destination within 365 days' },
+    'LIQSHIELD-001':   { pBaseBps: 2200, deductibleBps: 3000, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
+    'BLACKSWAN-001':   { pBaseBps: 2200, deductibleBps: 3000, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
+    'DEPEG-USDC-001':  { pBaseBps: 2400, deductibleBps: 500,  triggerDesc: 'USDC/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-USDT-001':  { pBaseBps: 2400, deductibleBps: 500,  triggerDesc: 'USDT/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-DAI-001':   { pBaseBps: 2400, deductibleBps: 500,  triggerDesc: 'DAI/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-STABLE-001':{ pBaseBps: 2400, deductibleBps: 500,  triggerDesc: 'Stablecoin/USD stays below $0.95 for 4h (Chainlink)' },
+    'ILPROT-001':      { pBaseBps: 2000, deductibleBps: 200,  triggerDesc: 'IL% > 2% at expiry (European-style, Chainlink)' },
+    'EXPLOIT-001':     { pBaseBps: 300,  deductibleBps: 0,    triggerDesc: 'Protocol exploit verified by Phala TEE oracle' },
+    'GASSPIKE-001':    { pBaseBps: 2200, deductibleBps: 1000, triggerDesc: 'Base L2 gas >100 gwei for 15 min' },
+    'SLIPPAGE-001':    { pBaseBps: 2200, deductibleBps: 300,  triggerDesc: 'Price moves >5% during execution (immediate)' },
+    'BRIDGE-001':      { pBaseBps: 2200, deductibleBps: 500,  triggerDesc: 'Funds don\'t arrive at destination within 365 days' },
 }
 
 // ═══════════════════════════════════════════════════════════════
