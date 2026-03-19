@@ -233,23 +233,39 @@ const STATUS_LABELS: Record<number, { label: string; color: string; pulse?: bool
 }
 
 // ════════════════════════════════════════════
-// KINK MODEL
+// KINK MODEL — Mirror of PremiumMath.sol
 // ════════════════════════════════════════════
+// U_KINK = 80%, R_SLOPE1 = 0.5, R_SLOPE2 = 3.0, U_MAX = 95%
+// M(U) at 0%=1.0, 80%=1.5, 90%=3.0, 95%=3.75
+//
+// Blended pBase per vault type (weighted average of products):
+//   VOLATILE vaults back BSS(250bps) + IL(150bps) -> avg 200bps = 2.00%
+//   STABLE vaults back DEPEG(50bps) + EXPLOIT(300bps) -> avg 175bps = 1.75%
 function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): number {
   const aaveBaseYield = 0.04 // ~4% Aave V3 USDC lending yield (variable)
-  const params = riskType === "VOLATILE"
-    ? { kink: 0.70, slopeBelow: 0.02, slopeAbove: 0.15, base: 0.01 }
-    : { kink: 0.80, slopeBelow: 0.005, slopeAbove: 0.10, base: 0.003 }
+  const pBaseBps = riskType === "VOLATILE" ? 200 : 175 // blended per vault
+  const pBaseRate = pBaseBps / 10000
 
-  let premiumRate: number
-  if (utilization <= params.kink) {
-    premiumRate = params.base + params.slopeBelow * utilization
+  // M(U) from PremiumMath.sol
+  const U_KINK = 0.80
+  const SLOPE1 = 0.5
+  const SLOPE2 = 3.0
+  const U_MAX = 0.95
+  const util = Math.min(Math.max(utilization, 0), U_MAX)
+
+  let multiplier: number
+  if (util <= 0) {
+    multiplier = 1.0
+  } else if (util <= U_KINK) {
+    multiplier = 1.0 + (util / U_KINK) * SLOPE1
   } else {
-    const rateAtKink = params.base + params.slopeBelow * params.kink
-    premiumRate = rateAtKink + params.slopeAbove * (utilization - params.kink)
+    multiplier = 1.0 + SLOPE1 + ((util - U_KINK) / (1.0 - U_KINK)) * SLOPE2
   }
 
-  return (aaveBaseYield + premiumRate * utilization) * 100
+  // Annual premium rate per dollar of coverage = pBaseRate * M(U)
+  // LP yield from premiums = utilization * pBaseRate * M(U) (annualized)
+  const premiumRateAnnual = pBaseRate * multiplier
+  return (aaveBaseYield + premiumRateAnnual * utilization) * 100
 }
 
 // ════════════════════════════════════════════

@@ -1,105 +1,55 @@
 // ═══════════════════════════════════════════════════════════════
 // LUMINA PROTOCOL — PRICING ENGINE
-// Real formulas matching the API pricing engine
+// Mirror of PremiumMath.sol (on-chain source of truth)
 // ═══════════════════════════════════════════════════════════════
 
-type ThresholdMap = Record<number, number>
+// ─── Kink Model constants from PremiumMath.sol ───────────────
+// U_KINK       = 8000 bps (80%)
+// R_SLOPE1_WAD = 0.5
+// R_SLOPE2_WAD = 3.0
+// U_MAX        = 9500 bps (95%)
+const U_KINK = 0.80
+const SLOPE1 = 0.5
+const SLOPE2 = 3.0
+const U_MAX = 0.95
 
-// ─── Liquidation Shield ─────────────────────────────────────
-const LIQSHIELD_THRESHOLD_RISK: ThresholdMap = {
-    3000: 50,
-    2500: 100,
-    2000: 150,
-    1500: 300,
-    1000: 500,
+/**
+ * Calculate M(U) — the utilization multiplier from PremiumMath.sol
+ * M(0%)  = 1.000
+ * M(20%) = 1.125
+ * M(40%) = 1.250
+ * M(60%) = 1.375
+ * M(80%) = 1.500  (kink point)
+ * M(85%) = 2.250
+ * M(90%) = 3.000
+ * M(95%) = 3.750  (max before reject)
+ */
+function calcKinkMultiplier(utilizationPct: number): number {
+    const util = Math.min(Math.max(utilizationPct / 100, 0), U_MAX)
+    if (util <= 0) return 1.0
+    if (util <= U_KINK) {
+        return 1.0 + (util / U_KINK) * SLOPE1
+    }
+    return 1.0 + SLOPE1 + ((util - U_KINK) / (1.0 - U_KINK)) * SLOPE2
 }
 
-function liqshieldDurationAdj(days: number): number {
-    if (days <= 14) return 1.0
-    if (days <= 30) return 1.3
-    if (days <= 60) return 1.6
-    return 2.0
-}
-
-function amountAdj(amount: number): number {
-    if (amount < 1000) return 1.0
-    if (amount <= 10000) return 1.1
-    if (amount <= 50000) return 1.2
-    return 1.4
-}
-
-// ─── Depeg ──────────────────────────────────────────────────
-const DEPEG_THRESHOLD_RISK: Record<string, number> = {
-    '0.90': 30,
-    '0.95': 80,
-    '0.97': 200,
-    '0.99': 500,
-}
-
-const STABLECOIN_RISK: Record<string, number> = {
-    USDC: 1.0,
-    USDT: 1.3,
-    DAI: 1.2,
-}
-
-function depegDurationAdj(days: number): number {
-    if (days <= 30) return 1.0
-    if (days <= 60) return 1.3
-    if (days <= 90) return 1.6
-    if (days <= 180) return 1.62
-    if (days <= 270) return 1.6
-    return 1.43 // 271-365 discount for long term
-}
-
-// ─── IL Protection ──────────────────────────────────────────
-const IL_THRESHOLD_RISK: ThresholdMap = {
-    5000: 50,
-    3000: 200,
-    2000: 400,
-    1500: 700,
-}
-
-const PAIR_RISK: Record<string, number> = {
-    'ETH/USDC': 1.0,
-    'BTC/USDC': 1.0,
-    'ETH/BTC': 0.8,
-}
-
-function ilDurationAdj(days: number): number {
-    if (days <= 14) return 1.0
-    if (days <= 30) return 1.3
-    if (days <= 60) return 1.6
-    return 1.6
-}
-
-// ─── Gas Spike ──────────────────────────────────────────────
-const GAS_THRESHOLD_RISK: ThresholdMap = {
-    500: 20,
-    200: 80,
-    100: 200,
-    50: 400,
-}
-
-function gasDurationAdj(days: number): number {
-    if (days <= 14) return 1.0
-    if (days <= 30) return 1.3
-    return 1.3
-}
-
-// ─── Slippage ───────────────────────────────────────────────
-const SLIPPAGE_THRESHOLD_RISK: ThresholdMap = {
-    1000: 30,
-    500: 150,
-    300: 350,
-    200: 600,
-}
-
-// ─── Bridge ─────────────────────────────────────────────────
-const BRIDGE_RISK: Record<string, number> = {
-    'Base Bridge': 0.8,
-    'Across': 1.0,
-    'Stargate': 1.0,
-    'Hop': 1.0,
+// ─── Per-product config from API (pBase in bps) ─────────────
+// BSS (Black Swan Shield):  250 bps = 2.50%
+// DEPEG (Depeg Shield):      50 bps = 0.50%
+// IL (IL Index Cover):      150 bps = 1.50%
+// EXPLOIT (Exploit Shield): 300 bps = 3.00%
+const PRODUCT_PBASE: Record<string, { pBaseBps: number; deductibleBps: number; triggerDesc: string }> = {
+    'LIQSHIELD-001':   { pBaseBps: 250, deductibleBps: 3000, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
+    'BLACKSWAN-001':   { pBaseBps: 250, deductibleBps: 3000, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
+    'DEPEG-USDC-001':  { pBaseBps: 50,  deductibleBps: 500,  triggerDesc: 'USDC/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-USDT-001':  { pBaseBps: 50,  deductibleBps: 500,  triggerDesc: 'USDT/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-DAI-001':   { pBaseBps: 50,  deductibleBps: 500,  triggerDesc: 'DAI/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-STABLE-001':{ pBaseBps: 50,  deductibleBps: 500,  triggerDesc: 'Stablecoin/USD stays below $0.95 for 4h (Chainlink)' },
+    'ILPROT-001':      { pBaseBps: 150, deductibleBps: 200,  triggerDesc: 'IL% > 2% at expiry (European-style, Chainlink)' },
+    'EXPLOIT-001':     { pBaseBps: 300, deductibleBps: 0,    triggerDesc: 'Protocol exploit verified by Phala TEE oracle' },
+    'GASSPIKE-001':    { pBaseBps: 250, deductibleBps: 1000, triggerDesc: 'Base L2 gas >100 gwei for 15 min' },
+    'SLIPPAGE-001':    { pBaseBps: 250, deductibleBps: 300,  triggerDesc: 'Price moves >5% during execution (immediate)' },
+    'BRIDGE-001':      { pBaseBps: 250, deductibleBps: 500,  triggerDesc: 'Funds don\'t arrive at destination within 365 days' },
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -110,15 +60,16 @@ export interface PremiumCalcInput {
     productId: string
     coverageAmount: number
     durationDays: number
-    thresholdBps?: number        // for LIQSHIELD, IL, GAS, SLIPPAGE
-    thresholdPrice?: string      // for DEPEG ($0.99, $0.97, etc.)
-    stablecoin?: string          // USDC, USDT, DAI
-    pair?: string                // for IL (ETH/USDC, etc.)
-    bridge?: string              // for BRIDGE
+    utilizationPct?: number      // 0-100, defaults to 20
+    thresholdBps?: number        // legacy, ignored in new model
+    thresholdPrice?: string      // legacy, ignored in new model
+    stablecoin?: string
+    pair?: string
+    bridge?: string
 }
 
 export interface PremiumCalcResult {
-    premiumRate: number          // in bps
+    premiumRate: number          // effective annual rate in bps (pBase * M(U))
     premium: number              // in USDC
     maxPayout: number            // coverage - deductible
     deductiblePct: number
@@ -126,87 +77,37 @@ export interface PremiumCalcResult {
     triggerDescription: string
 }
 
+/**
+ * Calculate premium mirroring PremiumMath.sol exactly.
+ * Premium = Coverage * (pBaseBps / 10000) * M(U) * (durationDays / 365)
+ * riskMult and durationDiscount default to 1.0x for calculator purposes.
+ */
 export function calculatePremium(input: PremiumCalcInput): PremiumCalcResult {
     const { productId, coverageAmount, durationDays } = input
-    let premiumRate = 0
-    let deductibleBps = 500 // 5% default
-    let triggerDescription = ''
+    const utilizationPct = input.utilizationPct ?? 20
 
-    switch (productId) {
-        case 'LIQSHIELD-001': {
-            const tBps = input.thresholdBps || 2000
-            const tRisk = LIQSHIELD_THRESHOLD_RISK[tBps] || 150
-            premiumRate = 200 + (tRisk * liqshieldDurationAdj(durationDays) * amountAdj(coverageAmount))
-            deductibleBps = 500
-            triggerDescription = `ETH/USD drops >${tBps / 100}% for 30 min (Chainlink)`
-            break
-        }
-        case 'DEPEG-USDC-001':
-        case 'DEPEG-USDT-001':
-        case 'DEPEG-DAI-001': {
-            const threshold = input.thresholdPrice || '0.97'
-            const coin = input.stablecoin || (productId.includes('USDT') ? 'USDT' : productId.includes('DAI') ? 'DAI' : 'USDC')
-            const tRisk = DEPEG_THRESHOLD_RISK[threshold] || 200
-            const sRisk = STABLECOIN_RISK[coin] || 1.0
-            premiumRate = 100 + (tRisk * depegDurationAdj(durationDays) * sRisk)
-            deductibleBps = 300
-            triggerDescription = `${coin}/USD stays below $${threshold} for 4h (Chainlink)`
-            break
-        }
-        case 'ILPROT-001': {
-            const tBps = input.thresholdBps || 2000
-            const tRisk = IL_THRESHOLD_RISK[tBps] || 400
-            const pRisk = PAIR_RISK[input.pair || 'ETH/USDC'] || 1.0
-            premiumRate = 300 + (tRisk * ilDurationAdj(durationDays) * pRisk)
-            deductibleBps = 800
-            triggerDescription = `Price divergence >${tBps / 100}% for 2h (Chainlink)`
-            break
-        }
-        case 'GASSPIKE-001': {
-            const gwei = input.thresholdBps || 100 // reuse thresholdBps for gwei value
-            const tRisk = GAS_THRESHOLD_RISK[gwei] || 200
-            premiumRate = 150 + (tRisk * gasDurationAdj(durationDays))
-            deductibleBps = 1000
-            triggerDescription = `Base L2 gas >${gwei} gwei for 15 min`
-            break
-        }
-        case 'SLIPPAGE-001': {
-            const tBps = input.thresholdBps || 500
-            const tRisk = SLIPPAGE_THRESHOLD_RISK[tBps] || 150
-            premiumRate = 100 + tRisk
-            deductibleBps = 300
-            triggerDescription = `Price moves >${tBps / 100}% during execution (immediate)`
-            break
-        }
-        case 'BRIDGE-001': {
-            const bRisk = BRIDGE_RISK[input.bridge || 'Across'] || 1.0
-            premiumRate = 300 * bRisk
-            deductibleBps = 500
-            triggerDescription = `Funds don't arrive at destination within 365 days`
-            break
-        }
-        default:
-            premiumRate = 300
-    }
+    const config = PRODUCT_PBASE[productId] || { pBaseBps: 250, deductibleBps: 500, triggerDesc: 'Unknown product' }
+    const multiplier = calcKinkMultiplier(utilizationPct)
 
-    // Clamp premiumRate to reasonable range
-    premiumRate = Math.max(100, Math.min(premiumRate, 1500))
+    // Effective annual rate in bps = pBaseBps * M(U)
+    const effectiveRateBps = config.pBaseBps * multiplier
 
-    const premium = (coverageAmount * premiumRate) / 10000
-    const maxPayout = coverageAmount * (1 - deductibleBps / 10000)
+    // Premium = Coverage * (pBaseBps / 10000) * M(U) * (durationDays / 365)
+    const premium = coverageAmount * (config.pBaseBps / 10000) * multiplier * (durationDays / 365)
+    const maxPayout = coverageAmount * (1 - config.deductibleBps / 10000)
     const costPerDay = durationDays > 0 ? premium / durationDays : premium
 
     return {
-        premiumRate,
+        premiumRate: Math.round(effectiveRateBps),
         premium: Math.round(premium * 100) / 100,
         maxPayout: Math.round(maxPayout * 100) / 100,
-        deductiblePct: deductibleBps / 100,
+        deductiblePct: config.deductibleBps / 100,
         costPerDay: Math.round(costPerDay * 100) / 100,
-        triggerDescription,
+        triggerDescription: config.triggerDesc,
     }
 }
 
-// LP yield calculator
+// LP yield calculator — uses the same kink model as PremiumMath.sol
 export interface YieldCalcInput {
     productId: string
     depositAmount: number
@@ -226,45 +127,30 @@ export function calculateYield(input: YieldCalcInput): YieldCalcResult {
 
     const utilization = utilizationPct / 100  // convert to 0-1
 
-    // Determine risk type from product
-    const volatileProducts = ['LIQSHIELD-001', 'ILPROT-001']
-    const isVolatile = volatileProducts.includes(productId)
+    // Get pBase for this product
+    const config = PRODUCT_PBASE[productId] || { pBaseBps: 250, deductibleBps: 500, triggerDesc: '' }
+    const pBaseRate = config.pBaseBps / 10000  // e.g., 250 bps -> 0.025
 
-    // Kink Model (same as on-chain contracts)
+    // Kink Model M(U) from PremiumMath.sol
+    const multiplier = calcKinkMultiplier(utilizationPct)
+
+    // Annual premium rate per dollar of coverage = pBaseRate * M(U)
+    // LP yield from premiums = deposit * utilization * pBaseRate * M(U)
+    // (utilization portion of the deposit is "sold as coverage",
+    //  and premiums are pBaseRate * M(U) per year per dollar of coverage)
     const aaveBaseYield = 0.04  // ~4% base Aave V3 USDC lending yield (variable)
-    const params = isVolatile
-        ? { kink: 0.70, slopeBelow: 0.02, slopeAbove: 0.15, base: 0.01 }
-        : { kink: 0.80, slopeBelow: 0.005, slopeAbove: 0.10, base: 0.003 }
-
-    let premiumRate: number
-    if (utilization <= params.kink) {
-        premiumRate = params.base + params.slopeBelow * utilization
-    } else {
-        const rateAtKink = params.base + params.slopeBelow * params.kink
-        premiumRate = rateAtKink + params.slopeAbove * (utilization - params.kink)
-    }
-
-    const apyEstimate = (aaveBaseYield + premiumRate * utilization) * 100
+    const premiumRateAnnual = pBaseRate * multiplier
+    const apyEstimate = (aaveBaseYield + premiumRateAnnual * utilization) * 100
 
     // Break down into components
     const usdyYieldAnnual = depositAmount * aaveBaseYield
-    const premiumYieldAnnual = depositAmount * premiumRate * utilization
+    const premiumYieldAnnual = depositAmount * premiumRateAnnual * utilization
     const protocolFee = premiumYieldAnnual * 0.03
     const netPremiumYield = premiumYieldAnnual - protocolFee
     const totalAnnualYield = usdyYieldAnnual + netPremiumYield
 
-    // Deductibles for max loss calculation
-    const deductibles: Record<string, number> = {
-        'LIQSHIELD-001': 500,
-        'DEPEG-USDC-001': 300,
-        'DEPEG-USDT-001': 300,
-        'DEPEG-DAI-001': 300,
-        'ILPROT-001': 800,
-        'GASSPIKE-001': 1000,
-        'SLIPPAGE-001': 300,
-        'BRIDGE-001': 500,
-    }
-    const deductBps = deductibles[productId] || 500
+    // Max loss calculation
+    const deductBps = config.deductibleBps
     const utilizedAmount = depositAmount * utilization
     const maxLossIfClaim = utilizedAmount * (1 - deductBps / 10000)
 

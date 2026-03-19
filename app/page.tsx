@@ -768,26 +768,52 @@ type CalcProduct = "bss" | "depeg" | "il" | "exploit"
 
 const CALC_DURATION_RANGES: Record<CalcProduct, [number, number, number]> = {
   bss: [7, 30, 14],
-  depeg: [14, 365, 90],
-  il: [14, 90, 30],
-  exploit: [90, 365, 180],
+  depeg: [30, 365, 90],
+  il: [30, 90, 30],
+  exploit: [30, 365, 180],
 }
 
-// Kink Model premium rate (same as API V2 / on-chain)
-function calcKinkPremiumRate(utilization: number, riskType: "VOLATILE" | "STABLE") {
-  const params = riskType === "VOLATILE"
-    ? { kink: 0.70, slopeBelow: 0.02, slopeAbove: 0.15, base: 0.01 }
-    : { kink: 0.80, slopeBelow: 0.005, slopeAbove: 0.10, base: 0.003 }
-  if (utilization <= params.kink) {
-    return params.base + params.slopeBelow * utilization
+// ═══════════════════════════════════════════════════════════
+// KINK MODEL — Mirror of PremiumMath.sol (source of truth)
+// ═══════════════════════════════════════════════════════════
+// Constants from PremiumMath.sol:
+//   U_KINK       = 8000 bps (80%)
+//   R_SLOPE1_WAD = 0.5
+//   R_SLOPE2_WAD = 3.0
+//   U_MAX        = 9500 bps (95%)
+//
+// M(U) formula:
+//   U <= 80%: M(U) = 1 + (U / 0.80) * 0.5
+//   U >  80%: M(U) = 1 + 0.5 + ((U - 0.80) / (1 - 0.80)) * 3.0
+//   U >  95%: REJECT
+//
+// Premium formula (simplified for calculator — riskMult=1.0x, durationDiscount=1.0x):
+//   Premium = Coverage * (pBaseBps / 10000) * M(U) * (durationDays / 365)
+
+function calcKinkMultiplier(utilizationPct: number): number {
+  const U_KINK = 0.80
+  const SLOPE1 = 0.5
+  const SLOPE2 = 3.0
+  const U_MAX = 0.95
+  const util = Math.min(utilizationPct / 100, U_MAX)
+
+  if (util <= 0) return 1.0
+  if (util <= U_KINK) {
+    return 1.0 + (util / U_KINK) * SLOPE1
   }
-  const rateAtKink = params.base + params.slopeBelow * params.kink
-  return rateAtKink + params.slopeAbove * (utilization - params.kink)
+  return 1.0 + SLOPE1 + ((util - U_KINK) / (1.0 - U_KINK)) * SLOPE2
 }
 
-// Product → risk type mapping
-const CALC_RISK_TYPE: Record<CalcProduct, "VOLATILE" | "STABLE"> = {
-  bss: "VOLATILE", il: "VOLATILE", depeg: "STABLE", exploit: "STABLE",
+// Per-product config — pBaseBps from API product config (source of truth)
+//   BSS     = 250 bps (2.50%)
+//   DEPEG   =  50 bps (0.50%)
+//   IL      = 150 bps (1.50%)
+//   EXPLOIT = 300 bps (3.00%)
+const CALC_PRODUCT_CONFIG: Record<CalcProduct, { pBaseBps: number; riskType: "VOLATILE" | "STABLE" }> = {
+  bss:     { pBaseBps: 250, riskType: "VOLATILE" },
+  depeg:   { pBaseBps: 50,  riskType: "STABLE" },
+  il:      { pBaseBps: 150, riskType: "VOLATILE" },
+  exploit: { pBaseBps: 300, riskType: "STABLE" },
 }
 
 // Deductibles per product (unchanged)
@@ -912,11 +938,11 @@ function PremiumCalculatorSection() {
   const clampedDuration = Math.min(Math.max(duration, min), max)
 
   const calculations = useMemo(() => {
-    const utilization = (vaultUtilizations[product] || 20) / 100
-    const riskType = CALC_RISK_TYPE[product]
-    const annualRate = calcKinkPremiumRate(utilization, riskType)
-    const durationYears = clampedDuration / 365
-    const premium = coverage * annualRate * durationYears
+    const utilizationPct = vaultUtilizations[product] || 20
+    const { pBaseBps } = CALC_PRODUCT_CONFIG[product]
+    const multiplier = calcKinkMultiplier(utilizationPct)
+    // Mirror PremiumMath.sol: coverage * (pBaseBps/10000) * M(U) * (duration/365)
+    const premium = coverage * (pBaseBps / 10000) * multiplier * (clampedDuration / 365)
     const premiumFee = premium * 0.03
     const deductible = getCalcDeductible(product, stablecoin, protocol)
     const maxPayout = coverage * (1 - deductible)
