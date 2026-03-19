@@ -58,13 +58,42 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div id="key-widget" style="margin-top:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:20px">
 
 <div id="no-metamask" style="display:none">
-<p style="color:#ef4444;margin:0">You need MetaMask installed. Download it at <a href="https://metamask.io" target="_blank">metamask.io</a></p>
+<p style="color:#ef4444;margin:0">MetaMask not detected. Install it from <a href="https://metamask.io" target="_blank" style="color:#ef4444;text-decoration:underline">metamask.io</a></p>
+</div>
+
+<div id="not-metamask" style="display:none">
+<p style="color:#eab308;margin:0">Please use MetaMask. Other wallets are not supported yet.</p>
 </div>
 
 <div id="connect-section">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
 <button id="btn-connect" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Connect Wallet</button>
-<span id="wallet-display" style="margin-left:12px;color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem"></span>
+<span id="wallet-display" style="color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem"></span>
+<button id="btn-disconnect" style="display:none;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Disconnect</button>
+</div>
+
+<div id="wrong-network" style="display:none;margin-top:12px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:8px;padding:12px;display:none;align-items:center;gap:10px;flex-wrap:wrap">
+<span style="color:#eab308;font-size:0.85rem">&#x26A0;&#xFE0F; Wrong network detected. Lumina runs on Base Mainnet.</span>
+<button id="btn-switch-base" style="background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.4);color:#eab308;padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:600;cursor:pointer">Switch to Base</button>
+</div>
+
+<div style="margin-top:10px">
+<button id="btn-what-network" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;text-decoration:underline;padding:0">&#x2139;&#xFE0F; What network do I need?</button>
+</div>
+
 <p style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">By connecting your wallet, you tell Lumina who you are. Then, when you generate your API Key, Lumina creates a unique key linked to your wallet. This key is what you give to your AI agent so it can operate on your behalf — like handing it an authorized card. Your agent uses this key on every API call to identify itself.</p>
+</div>
+
+<div id="network-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
+<div style="max-width:480px;width:90%;background:#12121a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px">
+<h3 style="color:white;font-size:1.1rem;margin-bottom:16px">About Base Network</h3>
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">Lumina Protocol runs on Base — a Layer 2 network built on Ethereum by Coinbase. It's faster and cheaper than Ethereum mainnet. Your agent operates exclusively on this network.</p>
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">To use Lumina, your wallet must be connected to Base Mainnet (Chain ID: 8453). If you don't have Base configured, click "Switch to Base" and MetaMask will set it up automatically.</p>
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:20px">You'll need a small amount of ETH on Base (~$0.01) for transaction fees, plus USDY (available at <a href="https://ondo.finance" target="_blank">ondo.finance</a>).</p>
+<div style="text-align:right">
+<button id="btn-got-it" style="background:#22d3ee;color:#0a0a0f;border:none;padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer">Got it</button>
+</div>
+</div>
 </div>
 
 <div id="generate-section" style="display:none;margin-top:16px">
@@ -100,9 +129,10 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 </div>
 
 <script>
-window.__lumina = { connectedWallet: null };
+window.__lumina = { connectedWallet: null, onBase: false };
 (function() {
   var btnConnect = document.getElementById('btn-connect');
+  var btnDisconnect = document.getElementById('btn-disconnect');
   var walletDisplay = document.getElementById('wallet-display');
   var connectSection = document.getElementById('connect-section');
   var generateSection = document.getElementById('generate-section');
@@ -114,11 +144,25 @@ window.__lumina = { connectedWallet: null };
   var keyError = document.getElementById('key-error');
   var errorMsg = document.getElementById('error-msg');
   var noMetamask = document.getElementById('no-metamask');
+  var notMetamask = document.getElementById('not-metamask');
+  var wrongNetwork = document.getElementById('wrong-network');
+  var btnSwitchBase = document.getElementById('btn-switch-base');
+  var btnWhatNetwork = document.getElementById('btn-what-network');
+  var networkInfoModal = document.getElementById('network-info-modal');
+  var btnGotIt = document.getElementById('btn-got-it');
 
   var BASE_CHAIN_ID = '0x2105';
 
+  // No ethereum at all
   if (typeof window.ethereum === 'undefined') {
     noMetamask.style.display = 'block';
+    connectSection.style.display = 'none';
+    return;
+  }
+
+  // Not MetaMask
+  if (!window.ethereum.isMetaMask) {
+    notMetamask.style.display = 'block';
     connectSection.style.display = 'none';
     return;
   }
@@ -137,30 +181,80 @@ window.__lumina = { connectedWallet: null };
           params: [{
             chainId: BASE_CHAIN_ID,
             chainName: 'Base',
-            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
             rpcUrls: ['https://mainnet.base.org'],
             blockExplorerUrls: ['https://basescan.org']
           }]
         });
-      } else {
-        throw e;
-      }
+      } else { throw e; }
     }
   }
+
+  function checkChain() {
+    var chainId = window.ethereum.chainId;
+    if (chainId && chainId.toLowerCase() === BASE_CHAIN_ID) {
+      window.__lumina.onBase = true;
+      wrongNetwork.style.display = 'none';
+      if (window.__lumina.connectedWallet) {
+        generateSection.style.display = 'block';
+      }
+    } else {
+      window.__lumina.onBase = false;
+      wrongNetwork.style.display = 'flex';
+      generateSection.style.display = 'none';
+    }
+  }
+
+  function setConnected(addr) {
+    window.__lumina.connectedWallet = addr;
+    localStorage.setItem('lumina_wallet', addr);
+    walletDisplay.textContent = truncate(addr);
+    btnConnect.textContent = 'Connected';
+    btnConnect.style.background = 'rgba(34,197,94,0.3)';
+    btnConnect.style.color = '#22c55e';
+    btnConnect.disabled = true;
+    btnDisconnect.style.display = 'inline-block';
+    checkChain();
+    window.dispatchEvent(new Event('lumina-wallet-connected'));
+  }
+
+  function setDisconnected() {
+    window.__lumina.connectedWallet = null;
+    localStorage.removeItem('lumina_wallet');
+    walletDisplay.textContent = '';
+    btnConnect.textContent = 'Connect Wallet';
+    btnConnect.style.background = '#22d3ee';
+    btnConnect.style.color = '#0a0a0f';
+    btnConnect.disabled = false;
+    btnDisconnect.style.display = 'none';
+    generateSection.style.display = 'none';
+    wrongNetwork.style.display = 'none';
+    window.dispatchEvent(new Event('lumina-wallet-disconnected'));
+  }
+
+  // Restore from localStorage
+  (async function tryRestore() {
+    var saved = localStorage.getItem('lumina_wallet');
+    if (saved) {
+      try {
+        var accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        var found = accounts.find(function(a) { return a.toLowerCase() === saved.toLowerCase(); });
+        if (found) {
+          setConnected(found);
+          return;
+        }
+      } catch(e) {}
+      localStorage.removeItem('lumina_wallet');
+    }
+  })();
 
   btnConnect.addEventListener('click', async function() {
     btnConnect.disabled = true;
     btnConnect.textContent = 'Connecting...';
+    keyError.style.display = 'none';
     try {
-      await switchToBase();
       var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      window.__lumina.connectedWallet = accounts[0];
-      walletDisplay.textContent = truncate(window.__lumina.connectedWallet);
-      window.dispatchEvent(new Event('lumina-wallet-connected'));
-      btnConnect.textContent = 'Connected';
-      btnConnect.style.background = 'rgba(34,197,94,0.3)';
-      btnConnect.style.color = '#22c55e';
-      generateSection.style.display = 'block';
+      setConnected(accounts[0]);
     } catch (e) {
       btnConnect.textContent = 'Connect Wallet';
       btnConnect.disabled = false;
@@ -169,7 +263,51 @@ window.__lumina = { connectedWallet: null };
     }
   });
 
+  btnDisconnect.addEventListener('click', function() {
+    setDisconnected();
+  });
+
+  btnSwitchBase.addEventListener('click', async function() {
+    try {
+      await switchToBase();
+      checkChain();
+    } catch(e) {
+      keyError.style.display = 'block';
+      errorMsg.textContent = e.message || 'Failed to switch network';
+    }
+  });
+
+  // Network info modal
+  btnWhatNetwork.addEventListener('click', function() {
+    networkInfoModal.style.display = 'flex';
+  });
+  btnGotIt.addEventListener('click', function() {
+    networkInfoModal.style.display = 'none';
+  });
+  networkInfoModal.addEventListener('click', function(e) {
+    if (e.target === networkInfoModal) networkInfoModal.style.display = 'none';
+  });
+
+  // Listen for account changes
+  window.ethereum.on('accountsChanged', function(accounts) {
+    if (accounts.length === 0) {
+      setDisconnected();
+    } else {
+      setConnected(accounts[0]);
+    }
+  });
+
+  // Listen for chain changes
+  window.ethereum.on('chainChanged', function() {
+    checkChain();
+  });
+
   btnGenerate.addEventListener('click', async function() {
+    if (!window.__lumina.onBase) {
+      keyError.style.display = 'block';
+      errorMsg.textContent = 'Please switch to Base Mainnet first';
+      return;
+    }
     btnGenerate.disabled = true;
     generateStatus.textContent = 'Generating...';
     keyError.style.display = 'none';
@@ -474,6 +612,10 @@ window.__lumina = { connectedWallet: null };
   }
   checkWallet();
   window.addEventListener('lumina-wallet-connected', checkWallet);
+  window.addEventListener('lumina-wallet-disconnected', function() {
+    approveNoWallet.style.display = 'block';
+    approveForm.style.display = 'none';
+  });
 
   tooltipTrigger.addEventListener('mouseenter', function() { tooltipBox.style.display = 'block'; });
   tooltipTrigger.addEventListener('mouseleave', function() { tooltipBox.style.display = 'none'; });
