@@ -45,7 +45,8 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6"
           >
-            Parametric Insurance{" "}
+            <span className="text-white">Parametric Insurance</span>
+            <br />
             <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
               Built for AI Agents
             </span>
@@ -61,8 +62,8 @@ export default function Home() {
             <p className="text-lg sm:text-xl text-white/60 leading-relaxed">
               Your agent buys coverage, oracles verify triggers, payouts arrive in seconds.
             </p>
-            <p className="text-sm sm:text-base text-white/40 mt-3 tracking-wide font-medium">
-              No claims process <span className="text-white/20 mx-2">·</span> No human judges <span className="text-white/20 mx-2">·</span> No disputes <span className="text-white/20 mx-2">·</span> Just math.
+            <p className="text-sm sm:text-base text-white/70 mt-3 tracking-wide font-medium">
+              No claims process <span className="text-white/30 mx-2">·</span> No human judges <span className="text-white/30 mx-2">·</span> No disputes <span className="text-white/30 mx-2">·</span> Just math.
             </p>
           </motion.div>
 
