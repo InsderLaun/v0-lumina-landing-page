@@ -35,7 +35,7 @@ export default function Home() {
             </span>
             <span className="text-cyan-400">Built on Base L2</span>
             <span className="text-white/30 mx-1"> · </span>
-            <span className="text-purple-400">Powered by USDY</span>
+            <span className="text-purple-400">M2M</span>
           </motion.div>
 
           {/* Headline */}
@@ -56,7 +56,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-12"
+            className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mt-8 mb-12"
           >
             Your agent buys coverage, oracles verify triggers, payouts arrive in seconds.
             No claims process. No human judges. No disputes. Just math.
@@ -2499,6 +2499,7 @@ function Navbar({ perspective, onConnectAgent }: { perspective: Perspective; onC
     ...(perspective === "protect" ? [{ label: "Products", href: "#products" }] : []),
     ...(perspective === "earn" ? [{ label: "Vaults", href: "#vaults" }] : []),
     { label: "Pricing", href: "#kink-model" },
+    { label: "Calculator", href: "#calculator" },
     { label: "Skill", href: "https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md", external: true },
     { label: "Security", href: "#security" },
     { label: "FAQ", href: "#faq" },
