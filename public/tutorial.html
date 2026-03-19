@@ -212,10 +212,16 @@ window.__lumina = { connectedWallet: null };
 <div id="approve-no-wallet" style="color:rgba(255,255,255,0.4);font-size:0.9rem">&#11014; Connect your wallet in Step 1 first</div>
 
 <div id="approve-form" style="display:none">
+
+<div id="mode-toggle" style="display:flex;gap:0;margin-bottom:16px">
+<button id="mode-insurance" style="flex:1;padding:10px 16px;border:1px solid #22d3ee;border-radius:8px 0 0 8px;background:rgba(34,211,238,0.15);color:#22d3ee;font-weight:600;font-size:0.85rem;cursor:pointer">&#x1F6E1; Buy Insurance</button>
+<button id="mode-yield" style="flex:1;padding:10px 16px;border:1px solid rgba(255,255,255,0.2);border-left:none;border-radius:0 8px 8px 0;background:transparent;color:rgba(255,255,255,0.5);font-weight:600;font-size:0.85rem;cursor:pointer">&#x1F4B0; Earn Yield</button>
+</div>
+
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-<label style="color:rgba(255,255,255,0.8);font-size:0.95rem;font-weight:500">What's the maximum your agent can spend on insurance?</label>
+<label id="approve-label" style="color:rgba(255,255,255,0.8);font-size:0.95rem;font-weight:500">What's the maximum your agent can spend on insurance?</label>
 <span id="tooltip-trigger" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.5);font-size:11px;cursor:help;position:relative;flex-shrink:0">i
-<span id="tooltip-box" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:12px;font-size:12px;color:rgba(255,255,255,0.7);width:300px;line-height:1.5;font-weight:400;z-index:10;pointer-events:none">&#x1F4B3; Your limit, your control: This amount is the maximum 'allowance' your AI Agent is permitted to use. If the Agent detects a risk and wants to buy $100 of insurance but you only approved $50, the purchase will be blocked. You own the money; the Agent is just the manager.</span>
+<span id="tooltip-box" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:12px;font-size:12px;color:rgba(255,255,255,0.7);width:300px;line-height:1.5;font-weight:400;z-index:10;pointer-events:none"></span>
 </span>
 </div>
 
@@ -231,10 +237,22 @@ window.__lumina = { connectedWallet: null };
 <button class="amt-btn" data-amount="5000" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 14px;color:rgba(255,255,255,0.6);font-size:0.8rem;cursor:pointer">$5,000</button>
 </div>
 
+<div id="vault-checkboxes" style="display:none;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:14px">
+<p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:10px;font-weight:500">Select vaults to approve:</p>
+<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
+<input type="checkbox" class="vault-cb" data-vault="0x2D7D735f71638730cbe9A143227A00Fa64E94E88" data-name="Volatile Short" checked style="accent-color:#22d3ee"> Volatile Short (30d)</label>
+<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
+<input type="checkbox" class="vault-cb" data-vault="0xDF30548d46e770154AdA82D3c263e81a608075c" data-name="Volatile Long" checked style="accent-color:#22d3ee"> Volatile Long (90d)</label>
+<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
+<input type="checkbox" class="vault-cb" data-vault="0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078" data-name="Stable Short" checked style="accent-color:#22d3ee"> Stable Short (90d)</label>
+<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer">
+<input type="checkbox" class="vault-cb" data-vault="0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c" data-name="Stable Long" checked style="accent-color:#22d3ee"> Stable Long (365d)</label>
+</div>
+
 <button id="btn-approve" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Approve with MetaMask</button>
 
 <div id="approve-success" style="display:none;margin-top:14px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:8px;padding:14px">
-<p id="approve-success-msg" style="color:#22c55e;margin:0;font-weight:500"></p>
+<div id="approve-success-msg" style="color:#22c55e;margin:0;font-weight:500"></div>
 </div>
 
 <div id="approve-error" style="display:none;margin-top:14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px">
@@ -245,7 +263,7 @@ window.__lumina = { connectedWallet: null };
 
 </div>
 
-<p style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">This tells your USDY: "Lumina can charge me up to $X." You control the limit and can revoke it anytime by setting it to 0. Think of it as setting a spending cap on a credit card you hand to your agent.</p>
+<p id="approve-explainer" style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">This tells your USDY: "Lumina can charge me up to $X for insurance." You control the limit and can revoke it anytime by setting it to 0.</p>
 
 <details style="margin-top:16px">
 <summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">Alternative method (terminal)</summary>
@@ -273,10 +291,84 @@ window.__lumina = { connectedWallet: null };
   var approveErrorMsg = document.getElementById('approve-error-msg');
   var tooltipTrigger = document.getElementById('tooltip-trigger');
   var tooltipBox = document.getElementById('tooltip-box');
+  var modeInsurance = document.getElementById('mode-insurance');
+  var modeYield = document.getElementById('mode-yield');
+  var approveLabel = document.getElementById('approve-label');
+  var approveExplainer = document.getElementById('approve-explainer');
+  var vaultCheckboxes = document.getElementById('vault-checkboxes');
 
   var USDY_ADDRESS = '0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9';
-  var SPENDER = '0x8407aF8a100812bFb5f9f188b44379E4268efF94';
+  var COVER_ROUTER = '0x8407aF8a100812bFb5f9f188b44379E4268efF94';
   var BASE_CHAIN_ID = '0x2105';
+  var currentMode = 'insurance';
+
+  var TOOLTIP_INSURANCE = '\uD83D\uDCB3 Your limit, your control: This amount is the maximum \'allowance\' your AI Agent is permitted to use. If the Agent detects a risk and wants to buy $100 of insurance but you only approved $50, the purchase will be blocked. You own the money; the Agent is just the manager.';
+  var TOOLTIP_YIELD = '\uD83D\uDCB0 Your deposit cap: This is the maximum amount each vault is allowed to receive from your agent. The agent can deposit and withdraw within this limit. You can adjust or revoke each vault\'s permission separately.';
+
+  function updateMode(mode) {
+    currentMode = mode;
+    if (mode === 'insurance') {
+      modeInsurance.style.background = 'rgba(34,211,238,0.15)';
+      modeInsurance.style.color = '#22d3ee';
+      modeInsurance.style.borderColor = '#22d3ee';
+      modeYield.style.background = 'transparent';
+      modeYield.style.color = 'rgba(255,255,255,0.5)';
+      modeYield.style.borderColor = 'rgba(255,255,255,0.2)';
+      approveLabel.textContent = "What's the maximum your agent can spend on insurance?";
+      tooltipBox.textContent = TOOLTIP_INSURANCE;
+      approveExplainer.textContent = 'This tells your USDY: "Lumina can charge me up to $X for insurance." You control the limit and can revoke it anytime by setting it to 0.';
+      vaultCheckboxes.style.display = 'none';
+      updateBtnText();
+    } else {
+      modeYield.style.background = 'rgba(34,211,238,0.15)';
+      modeYield.style.color = '#22d3ee';
+      modeYield.style.borderColor = '#22d3ee';
+      modeInsurance.style.background = 'transparent';
+      modeInsurance.style.color = 'rgba(255,255,255,0.5)';
+      modeInsurance.style.borderColor = 'rgba(255,255,255,0.2)';
+      approveLabel.textContent = "What's the maximum your agent can deposit into vaults?";
+      tooltipBox.textContent = TOOLTIP_YIELD;
+      approveExplainer.textContent = 'This tells your USDY: "Lumina vaults can hold up to $X of my deposit." Each vault gets its own approval. You can revoke any vault individually.';
+      vaultCheckboxes.style.display = 'block';
+      updateBtnText();
+    }
+    // Reset states
+    approveSuccess.style.display = 'none';
+    approveError.style.display = 'none';
+    btnApprove.disabled = false;
+    btnApprove.style.background = '#22d3ee';
+    btnApprove.style.color = '#0a0a0f';
+  }
+
+  function getSelectedVaults() {
+    var cbs = document.querySelectorAll('.vault-cb:checked');
+    var vaults = [];
+    cbs.forEach(function(cb) {
+      vaults.push({ address: cb.getAttribute('data-vault'), name: cb.getAttribute('data-name') });
+    });
+    return vaults;
+  }
+
+  function updateBtnText() {
+    if (currentMode === 'insurance') {
+      btnApprove.textContent = 'Approve with MetaMask';
+    } else {
+      var count = getSelectedVaults().length;
+      btnApprove.textContent = 'Approve with MetaMask (' + count + ' vault' + (count !== 1 ? 's' : '') + ')';
+    }
+  }
+
+  modeInsurance.addEventListener('click', function() { updateMode('insurance'); });
+  modeYield.addEventListener('click', function() { updateMode('yield'); });
+
+  // Update vault count on checkbox change
+  var vaultCbs = document.querySelectorAll('.vault-cb');
+  vaultCbs.forEach(function(cb) {
+    cb.addEventListener('change', updateBtnText);
+  });
+
+  // Init tooltip text
+  tooltipBox.textContent = TOOLTIP_INSURANCE;
 
   function checkWallet() {
     if (window.__lumina.connectedWallet) {
@@ -287,11 +379,9 @@ window.__lumina = { connectedWallet: null };
   checkWallet();
   window.addEventListener('lumina-wallet-connected', checkWallet);
 
-  // Tooltip hover
   tooltipTrigger.addEventListener('mouseenter', function() { tooltipBox.style.display = 'block'; });
   tooltipTrigger.addEventListener('mouseleave', function() { tooltipBox.style.display = 'none'; });
 
-  // Suggested amount buttons
   var amtBtns = document.querySelectorAll('.amt-btn');
   amtBtns.forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -307,7 +397,6 @@ window.__lumina = { connectedWallet: null };
     });
   });
 
-  // Encode approve calldata
   function encodeApprove(spender, amountBigInt) {
     var selector = '0x095ea7b3';
     var addr = spender.toLowerCase().replace('0x', '').padStart(64, '0');
@@ -344,24 +433,43 @@ window.__lumina = { connectedWallet: null };
     approveError.style.display = 'none';
     approveSuccess.style.display = 'none';
     btnApprove.disabled = true;
-    btnApprove.textContent = 'Approving...';
 
     try {
       await switchToBase();
       var amountRaw = BigInt(usdAmount) * BigInt(1000000);
-      var calldata = encodeApprove(SPENDER, amountRaw);
 
-      await window.ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: window.__lumina.connectedWallet,
-          to: USDY_ADDRESS,
-          data: calldata
-        }]
-      });
+      if (currentMode === 'insurance') {
+        btnApprove.textContent = 'Approving...';
+        var calldata = encodeApprove(COVER_ROUTER, amountRaw);
+        await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{ from: window.__lumina.connectedWallet, to: USDY_ADDRESS, data: calldata }]
+        });
+        approveSuccess.style.display = 'block';
+        approveSuccessMsg.innerHTML = '\u2705 Allowance set: $' + usdAmount.toLocaleString() + ' USDY. Your agent can now spend up to this amount.';
+      } else {
+        var vaults = getSelectedVaults();
+        if (vaults.length === 0) {
+          approveError.style.display = 'block';
+          approveErrorMsg.textContent = 'Please select at least one vault';
+          btnApprove.disabled = false;
+          updateBtnText();
+          return;
+        }
+        var results = [];
+        for (var i = 0; i < vaults.length; i++) {
+          btnApprove.textContent = 'Approving vault ' + (i + 1) + '/' + vaults.length + '...';
+          var calldata = encodeApprove(vaults[i].address, amountRaw);
+          await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [{ from: window.__lumina.connectedWallet, to: USDY_ADDRESS, data: calldata }]
+          });
+          results.push('\u2705 ' + vaults[i].name + ': $' + usdAmount.toLocaleString() + ' approved');
+        }
+        approveSuccess.style.display = 'block';
+        approveSuccessMsg.innerHTML = results.join('<br>');
+      }
 
-      approveSuccess.style.display = 'block';
-      approveSuccessMsg.textContent = '\u2705 Allowance set: $' + usdAmount.toLocaleString() + ' USDY. Your agent can now spend up to this amount.';
       btnApprove.textContent = 'Approved';
       btnApprove.style.background = 'rgba(34,197,94,0.3)';
       btnApprove.style.color = '#22c55e';
@@ -369,7 +477,11 @@ window.__lumina = { connectedWallet: null };
       approveError.style.display = 'block';
       approveErrorMsg.textContent = e.message || 'Transaction failed';
       btnApprove.disabled = false;
-      btnApprove.textContent = 'Approve with MetaMask';
+      if (currentMode === 'insurance') {
+        btnApprove.textContent = 'Approve with MetaMask';
+      } else {
+        updateBtnText();
+      }
     }
   });
 })();
