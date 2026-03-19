@@ -587,8 +587,10 @@ function ProductsSection() {
   return (
     <section className="py-24 px-4">
       <div id="products" className="scroll-mt-20" />
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+      <div className="max-w-5xl mx-auto rounded-2xl bg-white/[0.02] border border-cyan-500/20 shadow-[0_-2px_20px_rgba(0,212,255,0.05)] overflow-hidden">
+        <div className="h-[3px] w-full bg-gradient-to-r from-cyan-500 to-transparent" />
+        <div className="p-8">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-cyan-400">
           Insurance Products
         </h2>
         <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
@@ -621,7 +623,7 @@ function ProductsSection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.25 }}
-            className="rounded-2xl bg-white/[0.02] border border-cyan-500/20 p-6 md:p-8"
+            className="rounded-2xl bg-white/[0.02] border border-cyan-500/10 hover:border-cyan-500/30 transition-all duration-300 p-6 md:p-8"
           >
             {/* Header */}
             <div className="mb-6">
@@ -673,6 +675,7 @@ function ProductsSection() {
             </div>
           </motion.div>
         </AnimatePresence>
+      </div>
       </div>
 
       {/* Technical Details Modal */}
@@ -1169,8 +1172,10 @@ function VaultsSection() {
   return (
     <section className="py-24 px-4">
       <div id="vaults" className="scroll-mt-20" />
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+      <div className="max-w-6xl mx-auto rounded-2xl bg-white/[0.02] border border-purple-500/20 shadow-[0_-2px_20px_rgba(139,92,246,0.05)] overflow-hidden">
+        <div className="h-[3px] w-full bg-gradient-to-r from-purple-500 to-transparent" />
+        <div className="p-8">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-purple-400">
           Yield Vaults
         </h2>
         <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
@@ -1188,7 +1193,7 @@ function VaultsSection() {
               transition={{ duration: 0.4 }}
               className="h-full"
             >
-              <div className="rounded-2xl bg-white/[0.02] border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 p-6 flex flex-col h-full">
+              <div className="rounded-2xl bg-white/[0.02] border border-purple-500/10 hover:border-purple-500/30 transition-all duration-300 p-6 flex flex-col h-full">
                 {/* APY */}
                 <div className="min-h-[120px]">
                   <div>
@@ -1313,6 +1318,7 @@ function VaultsSection() {
             Give Your Agent the Skill →
           </a>
         </div>
+      </div>
       </div>
     </section>
   )
