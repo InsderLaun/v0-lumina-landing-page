@@ -230,6 +230,11 @@ window.__lumina = { connectedWallet: null };
 <input id="approve-amount" type="number" min="0" placeholder="Enter amount in USD" style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:0 6px 6px 0;padding:10px 12px;color:white;font-size:0.95rem;outline:none">
 </div>
 
+<div style="margin-top:8px;margin-bottom:8px">
+<button id="btn-unlimited" style="background:transparent;border:1px solid rgba(234,179,8,0.5);color:#eab308;font-size:13px;padding:6px 16px;border-radius:8px;cursor:pointer">&#x26A1; No Limit (Unlimited)</button>
+<span id="unlimited-badge" style="display:none;margin-left:10px;color:#eab308;font-size:13px;font-weight:600">UNLIMITED MODE</span>
+</div>
+
 <div id="vault-checkboxes" style="display:none;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:14px">
 <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:10px;font-weight:500">Select vaults to approve:</p>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
@@ -266,6 +271,21 @@ window.__lumina = { connectedWallet: null };
 <div style="display:flex;gap:12px;justify-content:flex-end">
 <button id="modal-cancel" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:10px 20px;border-radius:8px;font-size:0.9rem;cursor:pointer">Cancel</button>
 <button id="modal-confirm" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 20px;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer">Confirm & Sign</button>
+</div>
+</div>
+</div>
+
+<div id="unlimited-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
+<div style="max-width:480px;width:90%;background:#12121a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px">
+<h3 style="color:#eab308;font-size:1.2rem;margin-bottom:16px">&#x26A0;&#xFE0F; Unlimited Approval</h3>
+<p style="color:rgba(255,255,255,0.7);font-size:0.9rem;line-height:1.6;margin-bottom:20px">You are about to grant UNLIMITED spending permission. This means the approved contract can spend ALL your USDY with no cap. This is common in DeFi but carries risk: if the contract were ever compromised, all your approved USDY could be at risk.</p>
+<label style="display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:20px;cursor:pointer">
+<input type="checkbox" id="unlimited-checkbox" style="accent-color:#eab308"> I understand the risks of unlimited approval
+</label>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,0.1);margin-bottom:20px">
+<div style="display:flex;gap:12px;justify-content:flex-end">
+<button id="unlimited-cancel" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:10px 20px;border-radius:8px;font-size:0.9rem;cursor:pointer">Cancel</button>
+<button id="unlimited-confirm" style="background:#eab308;color:#0a0a0f;border:none;padding:10px 20px;border-radius:8px;font-weight:600;font-size:0.9rem;cursor:not-allowed;opacity:0.5" disabled>Confirm Unlimited</button>
 </div>
 </div>
 </div>
@@ -395,7 +415,22 @@ window.__lumina = { connectedWallet: null };
     }
   }
 
+  var btnUnlimited = document.getElementById('btn-unlimited');
+  var unlimitedBadge = document.getElementById('unlimited-badge');
+  var unlimitedModal = document.getElementById('unlimited-modal');
+  var unlimitedCheckbox = document.getElementById('unlimited-checkbox');
+  var unlimitedCancel = document.getElementById('unlimited-cancel');
+  var unlimitedConfirmBtn = document.getElementById('unlimited-confirm');
+  var isUnlimited = false;
+  var UINT256_MAX = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+
   function updateBtnState() {
+    if (isUnlimited) {
+      btnApprove.disabled = true;
+      btnApprove.style.opacity = '0.5';
+      btnApprove.style.cursor = 'not-allowed';
+      return;
+    }
     var val = parseFloat(approveAmount.value);
     if (val > 0) {
       btnApprove.disabled = false;
@@ -408,7 +443,18 @@ window.__lumina = { connectedWallet: null };
     }
   }
 
-  approveAmount.addEventListener('input', updateBtnState);
+  function exitUnlimitedMode() {
+    isUnlimited = false;
+    unlimitedBadge.style.display = 'none';
+    approveAmount.disabled = false;
+    approveAmount.value = '';
+    updateBtnState();
+  }
+
+  approveAmount.addEventListener('input', function() {
+    if (isUnlimited) exitUnlimitedMode();
+    updateBtnState();
+  });
 
   modeInsurance.addEventListener('click', function() { updateMode('insurance'); });
   modeYield.addEventListener('click', function() { updateMode('yield'); });
@@ -551,6 +597,85 @@ window.__lumina = { connectedWallet: null };
 
     modalConfirm.disabled = false;
     modalConfirm.textContent = 'Confirm & Sign';
+  });
+
+  // Unlimited flow
+  btnUnlimited.addEventListener('click', function() {
+    unlimitedCheckbox.checked = false;
+    unlimitedConfirmBtn.disabled = true;
+    unlimitedConfirmBtn.style.opacity = '0.5';
+    unlimitedConfirmBtn.style.cursor = 'not-allowed';
+    unlimitedModal.style.display = 'flex';
+  });
+
+  unlimitedCheckbox.addEventListener('change', function() {
+    unlimitedConfirmBtn.disabled = !unlimitedCheckbox.checked;
+    unlimitedConfirmBtn.style.opacity = unlimitedCheckbox.checked ? '1' : '0.5';
+    unlimitedConfirmBtn.style.cursor = unlimitedCheckbox.checked ? 'pointer' : 'not-allowed';
+  });
+
+  unlimitedCancel.addEventListener('click', function() {
+    unlimitedModal.style.display = 'none';
+  });
+  unlimitedModal.addEventListener('click', function(e) {
+    if (e.target === unlimitedModal) unlimitedModal.style.display = 'none';
+  });
+
+  unlimitedConfirmBtn.addEventListener('click', async function() {
+    unlimitedModal.style.display = 'none';
+    isUnlimited = true;
+    approveAmount.value = '';
+    approveAmount.disabled = true;
+    approveAmount.placeholder = 'Unlimited';
+    unlimitedBadge.style.display = 'inline';
+    btnApprove.disabled = true;
+    btnApprove.style.opacity = '0.5';
+    approveError.style.display = 'none';
+    approveSuccess.style.display = 'none';
+
+    try {
+      await switchToBase();
+
+      if (currentMode === 'insurance') {
+        var calldata = encodeApprove(COVER_ROUTER, UINT256_MAX);
+        await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{ from: window.__lumina.connectedWallet, to: USDY_ADDRESS, data: calldata }]
+        });
+        approveSuccess.style.display = 'block';
+        approveSuccessMsg.innerHTML = '\u2705 Unlimited allowance set. Your agent has no spending cap. You can set a specific limit anytime.';
+      } else {
+        var vaults = getSelectedVaults();
+        if (vaults.length === 0) {
+          approveError.style.display = 'block';
+          approveErrorMsg.textContent = 'Please select at least one vault';
+          exitUnlimitedMode();
+          return;
+        }
+        var results = [];
+        for (var i = 0; i < vaults.length; i++) {
+          var calldata = encodeApprove(vaults[i].address, UINT256_MAX);
+          await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [{ from: window.__lumina.connectedWallet, to: USDY_ADDRESS, data: calldata }]
+          });
+          results.push('\u2705 ' + vaults[i].name + ': Unlimited approved');
+        }
+        approveSuccess.style.display = 'block';
+        approveSuccessMsg.innerHTML = results.join('<br>');
+      }
+
+      btnApprove.textContent = 'Approved';
+      btnApprove.style.background = 'rgba(34,197,94,0.3)';
+      btnApprove.style.color = '#22c55e';
+      btnApprove.style.opacity = '1';
+    } catch (e) {
+      approveError.style.display = 'block';
+      approveErrorMsg.textContent = e.message || 'Transaction failed';
+      exitUnlimitedMode();
+      approveAmount.placeholder = 'Enter amount in USD';
+      updateBtnText();
+    }
   });
 })();
 </script>
