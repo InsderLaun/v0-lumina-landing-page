@@ -100,8 +100,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 </div>
 
 <script>
+window.__lumina = { connectedWallet: null };
 (function() {
-  var connectedWallet = null;
   var btnConnect = document.getElementById('btn-connect');
   var walletDisplay = document.getElementById('wallet-display');
   var connectSection = document.getElementById('connect-section');
@@ -154,8 +154,9 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
     try {
       await switchToBase();
       var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      connectedWallet = accounts[0];
-      walletDisplay.textContent = truncate(connectedWallet);
+      window.__lumina.connectedWallet = accounts[0];
+      walletDisplay.textContent = truncate(window.__lumina.connectedWallet);
+      window.dispatchEvent(new Event('lumina-wallet-connected'));
       btnConnect.textContent = 'Connected';
       btnConnect.style.background = 'rgba(34,197,94,0.3)';
       btnConnect.style.color = '#22c55e';
@@ -176,7 +177,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
       var res = await fetch('https://lumina-protocol-production.up.railway.app/api/v2/keys/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: connectedWallet, label: 'mi-agente' })
+        body: JSON.stringify({ wallet: window.__lumina.connectedWallet, label: 'mi-agente' })
       });
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || data.message || 'Request failed (' + res.status + ')');
@@ -205,8 +206,50 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div class="step">
 <span class="step-number">2</span>
 <span class="step-title">Set your spending limit</span>
-<p style="margin-top:12px">This tells your USDY: "Lumina can charge me up to $X." You control the limit and can revoke it anytime.</p>
-<pre>cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 \
+
+<div id="approve-widget" style="margin-top:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:20px">
+
+<div id="approve-no-wallet" style="color:rgba(255,255,255,0.4);font-size:0.9rem">&#11014; Connect your wallet in Step 1 first</div>
+
+<div id="approve-form" style="display:none">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+<label style="color:rgba(255,255,255,0.8);font-size:0.95rem;font-weight:500">What's the maximum your agent can spend on insurance?</label>
+<span id="tooltip-trigger" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.5);font-size:11px;cursor:help;position:relative;flex-shrink:0">i
+<span id="tooltip-box" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:12px;font-size:12px;color:rgba(255,255,255,0.7);width:300px;line-height:1.5;font-weight:400;z-index:10;pointer-events:none">&#x1F4B3; Your limit, your control: This amount is the maximum 'allowance' your AI Agent is permitted to use. If the Agent detects a risk and wants to buy $100 of insurance but you only approved $50, the purchase will be blocked. You own the money; the Agent is just the manager.</span>
+</span>
+</div>
+
+<div style="display:flex;align-items:center;gap:0;margin-bottom:10px">
+<span style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-right:none;border-radius:6px 0 0 6px;padding:10px 12px;color:rgba(255,255,255,0.5);font-size:0.95rem">$</span>
+<input id="approve-amount" type="number" min="1" max="10000" placeholder="Enter amount in USD" style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:0 6px 6px 0;padding:10px 12px;color:white;font-size:0.95rem;outline:none">
+</div>
+
+<div id="suggested-amounts" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+<button class="amt-btn" data-amount="100" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 14px;color:rgba(255,255,255,0.6);font-size:0.8rem;cursor:pointer">$100</button>
+<button class="amt-btn" data-amount="500" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 14px;color:rgba(255,255,255,0.6);font-size:0.8rem;cursor:pointer">$500</button>
+<button class="amt-btn" data-amount="1000" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 14px;color:rgba(255,255,255,0.6);font-size:0.8rem;cursor:pointer">$1,000</button>
+<button class="amt-btn" data-amount="5000" style="background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:6px 14px;color:rgba(255,255,255,0.6);font-size:0.8rem;cursor:pointer">$5,000</button>
+</div>
+
+<button id="btn-approve" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Approve with MetaMask</button>
+
+<div id="approve-success" style="display:none;margin-top:14px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:8px;padding:14px">
+<p id="approve-success-msg" style="color:#22c55e;margin:0;font-weight:500"></p>
+</div>
+
+<div id="approve-error" style="display:none;margin-top:14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px">
+<p id="approve-error-msg" style="color:#ef4444;margin:0"></p>
+</div>
+
+</div>
+
+</div>
+
+<p style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">This tells your USDY: "Lumina can charge me up to $X." You control the limit and can revoke it anytime by setting it to 0. Think of it as setting a spending cap on a credit card you hand to your agent.</p>
+
+<details style="margin-top:16px">
+<summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">Alternative method (terminal)</summary>
+<pre style="margin-top:8px">cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 \
   "approve(address,uint256)" \
   0x8407aF8a100812bFb5f9f188b44379E4268efF94 \
   10000000000 \
@@ -214,7 +257,123 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div class="info">
 <p><strong>This is your risk limit.</strong> 10000000000 in 6 decimals = $10,000 max. Your agent cannot spend more than this. Revoke anytime by setting to 0.</p>
 </div>
+</details>
+
 </div>
+
+<script>
+(function() {
+  var approveNoWallet = document.getElementById('approve-no-wallet');
+  var approveForm = document.getElementById('approve-form');
+  var approveAmount = document.getElementById('approve-amount');
+  var btnApprove = document.getElementById('btn-approve');
+  var approveSuccess = document.getElementById('approve-success');
+  var approveSuccessMsg = document.getElementById('approve-success-msg');
+  var approveError = document.getElementById('approve-error');
+  var approveErrorMsg = document.getElementById('approve-error-msg');
+  var tooltipTrigger = document.getElementById('tooltip-trigger');
+  var tooltipBox = document.getElementById('tooltip-box');
+
+  var USDY_ADDRESS = '0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9';
+  var SPENDER = '0x8407aF8a100812bFb5f9f188b44379E4268efF94';
+  var BASE_CHAIN_ID = '0x2105';
+
+  function checkWallet() {
+    if (window.__lumina.connectedWallet) {
+      approveNoWallet.style.display = 'none';
+      approveForm.style.display = 'block';
+    }
+  }
+  checkWallet();
+  window.addEventListener('lumina-wallet-connected', checkWallet);
+
+  // Tooltip hover
+  tooltipTrigger.addEventListener('mouseenter', function() { tooltipBox.style.display = 'block'; });
+  tooltipTrigger.addEventListener('mouseleave', function() { tooltipBox.style.display = 'none'; });
+
+  // Suggested amount buttons
+  var amtBtns = document.querySelectorAll('.amt-btn');
+  amtBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      approveAmount.value = btn.getAttribute('data-amount');
+      amtBtns.forEach(function(b) {
+        b.style.borderColor = 'rgba(255,255,255,0.2)';
+        b.style.color = 'rgba(255,255,255,0.6)';
+        b.style.background = 'transparent';
+      });
+      btn.style.borderColor = '#22d3ee';
+      btn.style.color = '#22d3ee';
+      btn.style.background = 'rgba(34,211,238,0.1)';
+    });
+  });
+
+  // Encode approve calldata
+  function encodeApprove(spender, amountBigInt) {
+    var selector = '0x095ea7b3';
+    var addr = spender.toLowerCase().replace('0x', '').padStart(64, '0');
+    var amt = amountBigInt.toString(16).padStart(64, '0');
+    return selector + addr + amt;
+  }
+
+  async function switchToBase() {
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
+    } catch (e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: BASE_CHAIN_ID,
+            chainName: 'Base',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.base.org'],
+            blockExplorerUrls: ['https://basescan.org']
+          }]
+        });
+      } else { throw e; }
+    }
+  }
+
+  btnApprove.addEventListener('click', async function() {
+    var usdAmount = parseInt(approveAmount.value);
+    if (!usdAmount || usdAmount < 1 || usdAmount > 10000) {
+      approveError.style.display = 'block';
+      approveErrorMsg.textContent = 'Please enter an amount between $1 and $10,000';
+      return;
+    }
+    approveError.style.display = 'none';
+    approveSuccess.style.display = 'none';
+    btnApprove.disabled = true;
+    btnApprove.textContent = 'Approving...';
+
+    try {
+      await switchToBase();
+      var amountRaw = BigInt(usdAmount) * BigInt(1000000);
+      var calldata = encodeApprove(SPENDER, amountRaw);
+
+      await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: window.__lumina.connectedWallet,
+          to: USDY_ADDRESS,
+          data: calldata
+        }]
+      });
+
+      approveSuccess.style.display = 'block';
+      approveSuccessMsg.textContent = '\u2705 Allowance set: $' + usdAmount.toLocaleString() + ' USDY. Your agent can now spend up to this amount.';
+      btnApprove.textContent = 'Approved';
+      btnApprove.style.background = 'rgba(34,197,94,0.3)';
+      btnApprove.style.color = '#22c55e';
+    } catch (e) {
+      approveError.style.display = 'block';
+      approveErrorMsg.textContent = e.message || 'Transaction failed';
+      btnApprove.disabled = false;
+      btnApprove.textContent = 'Approve with MetaMask';
+    }
+  });
+})();
+</script>
 
 <h2>Step 3: Give Your Agent the Key + SKILL File</h2>
 <div class="step">
