@@ -1167,7 +1167,7 @@ export default function DashboardPage() {
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-white/40">Estimated APY<Tip text="This yield comes from premiums that AI agents pay for insurance coverage, plus the base USDY yield (3.55%)" /></span>
+                    <span className="text-white/40">Estimated APY<Tip text="This yield comes from premiums that AI agents pay for insurance coverage, plus the Aave V3 base lending yield (~3-5%)" /></span>
                     <span className="text-green-400 font-mono tabular-nums">{data.estimatedAPY.toFixed(1)}%</span>
                   </div>
                 </div>

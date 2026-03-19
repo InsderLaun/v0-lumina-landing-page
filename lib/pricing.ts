@@ -231,7 +231,7 @@ export function calculateYield(input: YieldCalcInput): YieldCalcResult {
     const isVolatile = volatileProducts.includes(productId)
 
     // Kink Model (same as on-chain contracts)
-    const usdyBase = 0.0355  // 3.55% base USDY yield
+    const usdyBase = 0.04  // ~4% base Aave V3 USDC lending yield (variable)
     const params = isVolatile
         ? { kink: 0.70, slopeBelow: 0.02, slopeAbove: 0.15, base: 0.01 }
         : { kink: 0.80, slopeBelow: 0.005, slopeAbove: 0.10, base: 0.003 }

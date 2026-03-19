@@ -8,10 +8,10 @@ Last updated: 2026-03-18
 
 Lumina Protocol is parametric insurance built exclusively for AI agents on Base L2.
 You buy insurance policies to protect portfolios against market crashes, stablecoin depegs, impermanent loss, and smart contract exploits.
-You can also deposit USDY into vaults to earn yield from insurance premiums.
+You can also deposit USDC into vaults to earn yield from insurance premiums.
 All operations happen via HTTP API calls. No blockchain knowledge needed.
 
-Settlement asset: USDY (Ondo Finance yield-bearing stablecoin, 6 decimals)
+Settlement asset: USDC (Circle stablecoin, 6 decimals)
 Chain: Base Mainnet (Chain ID: 8453)
 
 ════════════════════════════════════════════════════════════
@@ -58,8 +58,8 @@ GET /api/v2/products — returns full product details with current pricing
 5. HOW TO BUY A POLICY (step by step)
 ════════════════════════════════════════════════════════════
 
-STEP 1 — Check your USDY balance is sufficient:
-Your owner must have USDY on Base in their wallet and must have approved the CoverRouter to spend it.
+STEP 1 — Check your USDC balance is sufficient:
+Your owner must have USDC on Base in their wallet and must have approved the CoverRouter to spend it.
 
 STEP 2 — Get a quote (optional but recommended):
 GET /api/v2/quote?productId=BSS&coverageAmount=1000000000&durationSeconds=604800
@@ -143,7 +143,7 @@ To maintain continuous coverage:
 7. YIELD VAULTS (for earning, not insurance)
 ════════════════════════════════════════════════════════════
 
-Lumina has 4 vaults where you can deposit USDY to earn yield from insurance premiums:
+Lumina has 4 vaults where you can deposit USDC to earn yield from insurance premiums:
 
 ┌─────────────────┬──────────┬─────────────────────────────────────────────────┐
 │ Vault           │ Lockup   │ Contract Address                                │
@@ -159,13 +159,14 @@ GET /api/v2/vaults
 Returns: TVL, utilization, estimated APY for each vault
 
 YIELD SOURCES:
-- Base yield: USDY earns ~3.55% APY from US Treasuries (Ondo Finance)
-- Premium yield: additional yield from insurance premiums paid by policyholders
-- Total yield varies based on vault utilization and policy volume
+- Base yield: Aave V3 lending APY (~3-5%, variable)
+- Premium yield: from insurance policies purchased by agents
+- Total yield = Aave yield + premium yield
 
 DEPOSITING:
-Your owner must approve each vault contract to spend their USDY (done in tutorial Step 2).
+Your owner must approve each vault contract to spend their USDC (done in tutorial Step 2).
 Deposits and withdrawals are on-chain transactions — your owner's wallet interacts directly with the vault contracts.
+Your USDC is supplied to Aave V3. The vault holds aUSDC (Aave's receipt token) which grows in value as interest accrues.
 
 COOLDOWN PERIODS:
 After requesting a withdrawal, there is a cooldown:
@@ -207,7 +208,7 @@ EXPLOIT (Exploit Shield):
 - Note: Aave V3 cannot be insured. Lumina vaults deposit into Aave, so insuring it would be circular. Use this for other DeFi protocols.
 
 YIELD VAULTS — when to deposit:
-- Deposit when: You have idle USDY, you want passive income, you're comfortable with the lockup period
+- Deposit when: You have idle USDC, you want passive income, you're comfortable with the lockup period
 - Choose Volatile vaults: higher yield but higher risk (covers BSS and IL claims)
 - Choose Stable vaults: lower yield but lower risk (covers DEPEG and EXPLOIT claims)
 - Choose Short lockups: if you may need liquidity soon
@@ -231,7 +232,7 @@ Protocol fee: 3% on premiums + 3% on payouts.
 10. SMART CONTRACT ADDRESSES (Base Mainnet)
 ════════════════════════════════════════════════════════════
 
-MockUSDY (settlement token): 0x12cc5bd1ab02A50285834eaF6e8dc2d95FB42cC9
+USDC (settlement token):     0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
 CoverRouter (buy policies):  0x8407aF8a100812bFb5F9F188b44379E4268efF94
 PolicyManager:               0x615e9c32c70350192fCa98AC06Ba8eb49dC4fEF4
 Oracle:                      0x2F9d3DA66FCB84F47851636d9e0921373ede2176
@@ -249,11 +250,11 @@ Exploit Shield:  0x05170F9Ca560260001064F5242c6F9F7f181c6baA
 
 Common errors and how to handle them:
 
-"Insufficient USDY balance"
-→ Your owner needs more USDY. Alert them.
+"Insufficient USDC balance"
+→ Your owner needs more USDC. Alert them.
 
 "CoverRouter not approved" / "Insufficient allowance"
-→ Your owner needs to approve CoverRouter to spend USDY. Direct them to the tutorial.
+→ Your owner needs to approve CoverRouter to spend USDC. Direct them to the tutorial.
 
 "Policy expired"
 → You missed the claim window. Cannot recover. Set up better monitoring.

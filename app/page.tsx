@@ -6,9 +6,42 @@ import { calculateYield } from "@/lib/pricing"
 
 type Perspective = "protect" | "earn"
 
+function useAaveYield() {
+  const [apy, setApy] = useState<number | null>(null);
+
+  useEffect(() => {
+    const cached = localStorage.getItem('aave_usdc_apy');
+    const cachedTime = localStorage.getItem('aave_usdc_apy_time');
+    const FOUR_HOURS = 4 * 60 * 60 * 1000;
+
+    if (cached && cachedTime && (Date.now() - parseInt(cachedTime)) < FOUR_HOURS) {
+      setApy(parseFloat(cached));
+      return;
+    }
+
+    fetch('https://yields.llama.fi/pools')
+      .then(res => res.json())
+      .then(data => {
+        const pool = data.data.find((p: any) =>
+          p.project === 'aave-v3' &&
+          p.chain === 'Base' &&
+          p.symbol === 'USDC'
+        );
+        const rate = pool ? parseFloat(pool.apy.toFixed(2)) : 3.5;
+        setApy(rate);
+        localStorage.setItem('aave_usdc_apy', rate.toString());
+        localStorage.setItem('aave_usdc_apy_time', Date.now().toString());
+      })
+      .catch(() => setApy(3.5));
+  }, []);
+
+  return apy;
+}
+
 export default function Home() {
   const [perspective, setPerspective] = useState<Perspective>("protect")
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const aaveYield = useAaveYield()
 
   return (
     <main className="min-h-screen bg-[#0A0A0F] text-white">
@@ -94,7 +127,7 @@ export default function Home() {
               }`}
             >
               💰 EARN
-              <span className="hidden sm:inline text-xs font-normal opacity-70">Yield on USDY</span>
+              <span className="hidden sm:inline text-xs font-normal opacity-70">Yield on USDC</span>
             </button>
           </motion.div>
 
@@ -132,7 +165,7 @@ export default function Home() {
             <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
             <span className="text-purple-400"><span className="font-bold">3%</span> Protocol Fee</span>
             <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
-            <span className="text-cyan-400">USDY Base Yield <span className="font-bold">3.55%</span></span>
+            <span className="text-cyan-400">Aave V3 Base Yield <span className="font-bold">{aaveYield !== null ? `${aaveYield}%` : '...'}</span></span>
           </motion.div>
         </div>
       </section>
@@ -206,7 +239,7 @@ export default function Home() {
               ) : (
                 <>
                   <HowCard step="01" icon="📋" title="Connect & Instruct" description="Copy our Skill link and paste it into your agent platform. It's like giving a manual to your new financial employee — your agent instantly knows where to find the best yields." note="It's a manual, not code." accent="purple" />
-                  <HowCard step="02" icon="📈" title="Autonomous Yield" description="Your agent deposits USDY into the optimal vault and monitors yields 24/7. It earns from US Treasury rates (3.55%) PLUS insurance premiums. Everything happens autonomously on-chain." note="24/7 yield management without moving a finger." accent="purple" />
+                  <HowCard step="02" icon="📈" title="Autonomous Yield" description="Your agent deposits USDC into the optimal vault and monitors yields 24/7. It earns from Aave V3 lending rates PLUS insurance premiums. Everything happens autonomously on-chain." note="24/7 yield management without moving a finger." accent="purple" />
                   <HowCard step="03" icon="💰" title="Watch It Grow" description="Premiums flow into your vault every time an agent buys insurance. Your balance grows daily. When you want to exit, your agent handles the cooldown and withdrawal. You just watch." note="Your capital grows and you're always in control." accent="purple" />
                 </>
               )}
@@ -288,7 +321,7 @@ export default function Home() {
                 <span className="text-purple-400">M2M</span>
               </h4>
               <p className="text-sm text-white/50 mt-2">Parametric Insurance for AI Agents</p>
-              <p className="text-xs text-white/30 mt-1">Built on Base L2 · Settlement in USDY</p>
+              <p className="text-xs text-white/30 mt-1">Built on Base L2 · Settlement in USDC · Yield by Aave V3</p>
             </div>
 
             {/* Products */}
@@ -326,7 +359,7 @@ export default function Home() {
 
           <div className="border-t border-white/5 pt-8">
             <p className="text-xs text-white/20 text-center">
-              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 24 Audited Contracts · 0C/0H/0M
+              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 24 Audited Contracts · 0C/0H/0M · Yield by Aave V3
             </p>
           </div>
         </div>
@@ -407,7 +440,7 @@ export default function Home() {
                   <div>
                     <div className="text-3xl mb-3">⚡</div>
                     <h3 className="text-lg font-bold text-green-300 mb-2">Auto-Setup (Claude Code)</h3>
-                    <p className="text-sm text-white/70">Copy-paste this prompt into Claude Code PowerShell. It configures your wallet, approves USDY, creates your API Key, and runs a test purchase — all automatically.</p>
+                    <p className="text-sm text-white/70">Copy-paste this prompt into Claude Code PowerShell. It configures your wallet, approves USDC, creates your API Key, and runs a test purchase — all automatically.</p>
                   </div>
                   <div className="space-y-2 pt-6">
                     <button
@@ -425,7 +458,7 @@ curl https://lumina-protocol-production.up.railway.app/api/v2/health
 2. Create my API Key:
 curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/keys/create -H "Content-Type: application/json" -d '{"wallet":"[MY_WALLET]","label":"my-agent"}'
 
-3. Approve CoverRouter to spend my USDY ($10,000 limit):
+3. Approve CoverRouter to spend my USDC ($10,000 limit):
 cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 "approve(address,uint256)" 0x8407aF8a100812bFb5f9f188b44379E4268efF94 10000000000 --rpc-url https://base-mainnet.g.alchemy.com/v2/[MY_RPC] --private-key [MY_KEY]
 
 4. Buy a test policy - Black Swan Shield, $100 coverage, 7 days:
@@ -1078,10 +1111,10 @@ function PremiumCalculatorSection() {
 const VAULTS = [
   {
     name: "Volatile Short",
-    symbol: "lvsUSDY",
+    symbol: "lvsUSDC",
     cooldown: "30 days",
     apy: "12-25%",
-    base: "3.55%",
+    base: "Aave V3",
     premiums: "9-21%",
     backs: ["BSS 7-30d", "IL Index 14-30d"],
     risk: "Higher",
@@ -1096,17 +1129,17 @@ const VAULTS = [
       ["During Cooldown", "Capital still earns from existing policies, no new policies assigned"],
       ["Withdrawal", "requestWithdrawal() → wait 30d → completeWithdrawal()"],
       ["Cancel", "cancelWithdrawal() returns to full availability"],
-      ["USDY Yield", "3.55% from Ondo Finance (US Treasuries), independent of Lumina"],
+      ["USDC Yield", "Dynamic rate from Aave V3 lending on Base, independent of Lumina"],
       ["Premium Yield", "Dynamic, depends on # of policies and Kink multiplier"],
       ["Worst Case", "BSS crash + IL spike = ~30% TVL loss in a month (5-10yr event)"],
     ],
   },
   {
     name: "Volatile Long",
-    symbol: "lvlUSDY",
+    symbol: "lvlUSDC",
     cooldown: "90 days",
     apy: "15-30%",
-    base: "3.55%",
+    base: "Aave V3",
     premiums: "12-26%",
     backs: ["IL Index 60-90d", "BSS overflow"],
     risk: "Higher",
@@ -1125,10 +1158,10 @@ const VAULTS = [
   },
   {
     name: "Stable Short",
-    symbol: "lssUSDY",
+    symbol: "lssUSDC",
     cooldown: "90 days",
     apy: "11-22%",
-    base: "3.55%",
+    base: "Aave V3",
     premiums: "8-18%",
     backs: ["Depeg Shield 14-90d"],
     risk: "Low",
@@ -1147,10 +1180,10 @@ const VAULTS = [
   },
   {
     name: "Stable Long",
-    symbol: "lslUSDY",
+    symbol: "lslUSDC",
     cooldown: "365 days",
     apy: "18-40%",
-    base: "3.55%",
+    base: "Aave V3",
     premiums: "15-36%",
     backs: ["Depeg 365d", "Exploit Shield 90-365d"],
     risk: "Very low",
@@ -1206,7 +1239,7 @@ function VaultsSection() {
                     <span className="text-sm text-white/40 ml-2">APY</span>
                   </div>
                   <p className="text-sm text-white/50">
-                    USDY {v.base} + Premiums {v.premiums}
+                    {v.base} + Premiums {v.premiums}
                   </p>
                   <p className="text-xs text-white/30">Range reflects 20-90% utilization via Kink Model</p>
                 </div>
@@ -1215,6 +1248,7 @@ function VaultsSection() {
                 <div className="min-h-[70px]">
                   <h3 className="text-lg font-semibold mb-1">{v.name}</h3>
                   <span className="text-xs font-mono text-purple-400/60">{v.symbol}</span>
+                  <span className="ml-2 bg-[rgba(182,80,158,0.1)] border border-[rgba(182,80,158,0.3)] text-[#B6509E] text-[11px] px-2 py-0.5 rounded">Aave V3</span>
                 </div>
 
                 {/* Cooldown */}
@@ -1520,12 +1554,12 @@ function YieldCalculatorSection() {
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
                   <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Monthly Yield</div>
                   <div className="text-xl font-bold text-purple-400">${fmt2(monthlyTotal)}</div>
-                  <div className="text-xs text-white/30 mt-1">USDY ${fmt2(monthlyUSDY)} + Premiums ${fmt2(monthlyPremium)}</div>
+                  <div className="text-xs text-white/30 mt-1">Aave ${fmt2(monthlyUSDY)} + Premiums ${fmt2(monthlyPremium)}</div>
                 </div>
                 <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
                   <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Annual Yield</div>
                   <div className="text-2xl font-bold text-purple-400">${fmt(annualTotal)}</div>
-                  <div className="text-xs text-white/30 mt-1">USDY ${fmt(annualUSDY)} + Premiums ${fmt(annualPremium)}</div>
+                  <div className="text-xs text-white/30 mt-1">Aave ${fmt(annualUSDY)} + Premiums ${fmt(annualPremium)}</div>
                 </div>
               </div>
 
@@ -1534,7 +1568,7 @@ function YieldCalculatorSection() {
                 <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4">
                   <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Effective APY</div>
                   <div className="text-2xl font-bold text-purple-400">{(totalAPY * 100).toFixed(1)}%</div>
-                  <div className="text-xs text-white/30 mt-1">USDY 3.55% + Premiums ~{(avgPremiumAPY * 100).toFixed(0)}%</div>
+                  <div className="text-xs text-white/30 mt-1">Aave V3 + Premiums ~{(avgPremiumAPY * 100).toFixed(0)}%</div>
                 </div>
                 <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4">
                   <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-1">Exit Timeline</div>
@@ -1557,7 +1591,7 @@ function YieldCalculatorSection() {
 
               {/* Warning */}
               <p className="text-xs text-white/30 leading-relaxed">
-                Calculated using Lumina&apos;s Dynamic Kink Model at {utilization}% utilization. Actual APY depends on real-time pool utilization. The USDY base yield (3.55%) comes from Ondo Finance US Treasuries. Premium yield depends on insurance policy volume.
+                Calculated using Lumina&apos;s Dynamic Kink Model at {utilization}% utilization. Actual APY depends on real-time pool utilization. The base yield comes from Aave V3 USDC lending on Base. Premium yield depends on insurance policy volume.
               </p>
 
               {/* CTA */}
@@ -1908,15 +1942,15 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
             <div className="space-y-3">
               <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
                 <p className="text-sm text-white/70 leading-relaxed flex-1">
-                  Read {skillUrl} and deposit {hl("$10K")} USDY into the {hl("Stable Long")} vault for maximum yield.
+                  Read {skillUrl} and deposit {hl("$10K")} USDC into the {hl("Stable Long")} vault for maximum yield.
                 </p>
-                <CopyButton text={`Read ${skillUrl} and deposit $10K USDY into the Stable Long vault for maximum yield.`} accent={accent} />
+                <CopyButton text={`Read ${skillUrl} and deposit $10K USDC into the Stable Long vault for maximum yield.`} accent={accent} />
               </div>
               <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
                 <p className="text-sm text-white/70 leading-relaxed flex-1">
-                  Read {skillUrl} and deposit {hl("$5K")} USDY into the {hl("Volatile Short")} vault for quick access yield.
+                  Read {skillUrl} and deposit {hl("$5K")} USDC into the {hl("Volatile Short")} vault for quick access yield.
                 </p>
-                <CopyButton text={`Read ${skillUrl} and deposit $5K USDY into the Volatile Short vault for quick access yield.`} accent={accent} />
+                <CopyButton text={`Read ${skillUrl} and deposit $5K USDC into the Volatile Short vault for quick access yield.`} accent={accent} />
               </div>
             </div>
           )}
@@ -2010,7 +2044,7 @@ function getIntegrationModals(perspective: Perspective): Record<IntegrationKey, 
       whatIs: {
         q: "What is this?",
         a: isEarn
-          ? "A REST API is like a phone number for software. Your AI agent 'calls' Lumina's server, checks vault yields, and deposits USDY — all in code, no browser needed."
+          ? "A REST API is like a phone number for software. Your AI agent 'calls' Lumina's server, checks vault yields, and deposits USDC — all in code, no browser needed."
           : "A REST API is like a phone number for software. Your AI agent 'calls' Lumina's server, asks for a quote, and buys insurance — all in code, no browser needed. If your agent can send a message to the internet, it can use Lumina.",
       },
       howLabel: "How it works:",
@@ -2018,18 +2052,18 @@ function getIntegrationModals(perspective: Perspective): Record<IntegrationKey, 
         ? [
             "Your agent reads the Skill file (a document that teaches it everything about Lumina)",
             "Your agent calls our API: GET /api/v2/vaults → sees all 4 vaults with APY and utilization",
-            "Your agent approves USDY and calls the vault contract to deposit",
-            "Done. Your USDY earns yield indefinitely. Your agent monitors and manages withdrawals.",
+            "Your agent approves USDC and calls the vault contract to deposit",
+            "Done. Your USDC earns yield indefinitely. Your agent monitors and manages withdrawals.",
           ]
         : [
             "Your agent reads the Skill file (a document that teaches it everything about Lumina)",
             "Your agent calls our API: GET /api/v2/quote → receives premium price",
-            "Your agent approves USDY and calls the smart contract to purchase",
+            "Your agent approves USDC and calls the smart contract to purchase",
             "Done. Policy is active. Your agent monitors and claims automatically.",
           ],
       needs: [
         "An AI agent (Claude, GPT, any LLM with tool use)",
-        "A wallet with USDY on Base L2",
+        "A wallet with USDC on Base L2",
         "The Skill file (link below)",
       ],
       available: "This is available TODAY. No SDK needed, no plugin, just HTTP calls.",
@@ -2208,11 +2242,11 @@ const COMPARISON_ROWS: { feature: string; lumina: string; traditional: string }[
   { feature: "Trigger", lumina: "Parametric (trustless math)", traditional: "Subjective (human judgment)" },
   { feature: "Settlement", lumina: "Same-block", traditional: "Days/weeks" },
   { feature: "Chain", lumina: "Base L2 (low fees)", traditional: "Ethereum L1 / Multi-chain" },
-  { feature: "Settlement Token", lumina: "USDY (earns 3.55% while idle)", traditional: "ETH/DAI/Various" },
+  { feature: "Settlement Token", lumina: "USDC (earns Aave V3 yield while idle)", traditional: "ETH/DAI/Various" },
   { feature: "Agent-native", lumina: "✅ Built for M2M", traditional: "❌ Human UI only" },
   { feature: "Skill file", lumina: "✅ 736 lines", traditional: "❌" },
   { feature: "Oracle", lumina: "Chainlink + Phala TEE", traditional: "Proprietary or Chainlink" },
-  { feature: "LP Yield", lumina: "11-40% + USDY base", traditional: "~4-8%" },
+  { feature: "LP Yield", lumina: "11-40% + Aave V3 base", traditional: "~4-8%" },
 ]
 
 function ComparisonSection({ perspective }: { perspective: Perspective }) {
@@ -2377,9 +2411,9 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
 /* ═══════════════════════════════════════════════════════════ */
 
 const FAQ_GENERAL = [
-  { q: "What is Lumina Protocol?", a: "Lumina is parametric insurance built exclusively for AI agents on Base L2. Agents buy coverage, oracles verify triggers, and payouts are instant. No claims process, no human judges, no disputes. Settlement is in USDY, a yield-bearing stablecoin by Ondo Finance." },
+  { q: "What is Lumina Protocol?", a: "Lumina is parametric insurance built exclusively for AI agents on Base L2. Agents buy coverage, oracles verify triggers, and payouts are instant. No claims process, no human judges, no disputes. Settlement is in USDC, the native stablecoin on Base." },
   { q: "Can a human buy a policy or deposit from this website?", a: "No. This website is informational only. All operations — buying insurance, depositing in vaults, claiming payouts, withdrawing — are performed by your AI agent. The website explains, convinces, and provides the Skill file. Your agent does the rest." },
-  { q: "What is USDY?", a: "USDY is Ondo Finance's yield-bearing stablecoin, backed by US Treasuries. It currently earns ~3.55% APY automatically. When you deposit USDY in a Lumina vault, you earn the USDY base yield PLUS insurance premiums on top." },
+  { q: "What is USDC?", a: "USDC is Circle's native stablecoin on Base, backed 1:1 by US dollars and short-term treasuries. When you deposit USDC in a Lumina vault, your funds are lent on Aave V3 to earn a base yield PLUS insurance premiums on top." },
   { q: "What is the protocol fee?", a: "Lumina charges 3% on premiums (when your agent buys insurance) and 3% on payouts (when your agent collects a claim). This is the protocol's revenue model. For LPs, the fee reduces yield by ~0.3% — barely noticeable." },
   { q: "Is my money safe?", a: "Your funds are held in audited smart contracts on Base L2 — not in anyone's wallet. 24 contracts were audited across 3 phases by Claude Code Security + Gemini Pro with 0 Critical, 0 High, 0 Medium findings. The protocol uses TWAP verification, circuit breakers, L2 sequencer checks, and waiting periods to prevent manipulation." },
 ]
@@ -2394,7 +2428,7 @@ const FAQ_PROTECT = [
 ]
 
 const FAQ_EARN = [
-  { q: "Is the APY guaranteed?", a: "No. The USDY base yield (~3.55%) comes from Ondo Finance and depends on US Treasury rates. The premium yield depends on insurance policy volume and vault utilization. Both fluctuate. The numbers shown are estimates based on current conditions." },
+  { q: "Is the APY guaranteed?", a: "No. The base yield comes from Aave V3 lending on Base and fluctuates with market demand. The premium yield depends on insurance policy volume and vault utilization. Both fluctuate. The numbers shown are estimates based on current conditions." },
   { q: "What's the worst that can happen as an LP?", a: "In a severe event (market crash + stablecoin depeg simultaneously), a vault could lose 20-30% of TVL. This is extremely rare. In normal years, premiums far exceed claims. The Risk Scenarios section in the Yield Calculator shows detailed probabilities." },
   { q: "What is a cooldown? Is my money locked?", a: "No lock. Cooldown is an EXIT NOTICE. You deposit indefinitely and earn yield. When you want to leave, you give notice (30-365 days depending on vault). During cooldown, you KEEP earning. After cooldown, you withdraw everything." },
   { q: "Can I switch between vaults?", a: "Not directly. You request withdrawal from one vault, wait for cooldown, then deposit into another. Your agent handles all of this automatically." },

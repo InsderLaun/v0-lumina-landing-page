@@ -46,7 +46,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <table>
 <tr><th>Item</th><th>What It Is</th><th>Where to Get It</th></tr>
 <tr><td>Wallet</td><td>MetaMask, Coinbase Wallet, or Rainbow</td><td><a href="https://metamask.io">metamask.io</a></td></tr>
-<tr><td>USDY</td><td>Dollars on blockchain</td><td><a href="https://ondo.finance">ondo.finance</a></td></tr>
+<tr><td>USDC</td><td>USDC stablecoin by Circle</td><td><a href="https://coinbase.com">coinbase.com</a></td></tr>
 <tr><td>ETH on Base</td><td>For one-time approval (~$0.01)</td><td>Bridge or buy on Base</td></tr>
 </table>
 
@@ -95,14 +95,14 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <h3 style="color:white;font-size:1.1rem;margin-bottom:16px">About Base Network</h3>
 <p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">Lumina Protocol runs on Base — a Layer 2 network built on Ethereum by Coinbase. It's faster and cheaper than Ethereum mainnet. Your agent operates exclusively on this network.</p>
 <p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">To use Lumina, your wallet must be connected to Base Mainnet (Chain ID: 8453). If you don't have Base configured, click "Switch to Base" and MetaMask will set it up automatically.</p>
-<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:20px">You'll need a small amount of ETH on Base (~$0.01) for transaction fees, plus USDY (available at <a href="https://ondo.finance" target="_blank">ondo.finance</a>).</p>
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:20px">You'll need a small amount of ETH on Base (~$0.01) for transaction fees, plus USDC (available at <a href="https://coinbase.com" target="_blank">coinbase.com</a>).</p>
 <div style="text-align:right">
 <button id="btn-got-it" style="background:#22d3ee;color:#0a0a0f;border:none;padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer">Got it</button>
 </div>
 </div>
 </div>
 
-<h2>Step 2: Approve USDY Spending</h2>
+<h2>Step 2: Approve USDC Spending</h2>
 <div class="step">
 <span class="step-number">2</span>
 <span class="step-title">Set your spending limit</span>
@@ -180,7 +180,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div id="unlimited-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center">
 <div style="max-width:480px;width:90%;background:#12121a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px">
 <h3 style="color:#eab308;font-size:1.2rem;margin-bottom:16px">&#x26A0;&#xFE0F; Unlimited Approval</h3>
-<p style="color:rgba(255,255,255,0.7);font-size:0.9rem;line-height:1.6;margin-bottom:20px">You are about to grant UNLIMITED spending permission. This means the approved contract can spend ALL your USDY with no cap. This is common in DeFi but carries risk: if the contract were ever compromised, all your approved USDY could be at risk.</p>
+<p style="color:rgba(255,255,255,0.7);font-size:0.9rem;line-height:1.6;margin-bottom:20px">You are about to grant UNLIMITED spending permission. This means the approved contract can spend ALL your USDC with no cap. This is common in DeFi but carries risk: if the contract were ever compromised, all your approved USDC could be at risk.</p>
 <label style="display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:20px;cursor:pointer">
 <input type="checkbox" id="unlimited-checkbox" style="accent-color:#eab308"> I understand the risks of unlimited approval
 </label>
@@ -192,11 +192,11 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 </div>
 </div>
 
-<p id="approve-explainer" style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">This tells your USDY: "Lumina can charge me up to $X for insurance." You control the limit and can revoke it anytime by setting it to 0.</p>
+<p id="approve-explainer" style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">This tells your USDC: "Lumina can charge me up to $X for insurance." You control the limit and can revoke it anytime by setting it to 0.</p>
 
 <details style="margin-top:16px">
 <summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">Alternative method (terminal)</summary>
-<pre style="margin-top:8px">cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 \
+<pre style="margin-top:8px">cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
   "approve(address,uint256)" \
   0x8407aF8a100812bFb5f9f188b44379E4268efF94 \
   10000000000 \
@@ -245,7 +245,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 </div>
 
 <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:8px;padding:10px 14px">
-<p style="color:#eab308;font-size:0.8rem;margin:0;line-height:1.5">&#x26A0;&#xFE0F; Keep your API key secret. Anyone with this key can make your agent spend USDY. Never share it publicly.</p>
+<p style="color:#eab308;font-size:0.8rem;margin:0;line-height:1.5">&#x26A0;&#xFE0F; Keep your API key secret. Anyone with this key can make your agent spend USDC. Never share it publicly.</p>
 </div>
 </div>
 
@@ -304,7 +304,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div class="killswitch">
 <p class="killswitch-title">If something goes wrong — revoke the approve:</p>
 <p>Set approve to 0. This instantly stops all purchases.</p>
-<pre>cast send 0x12cc5bd1ab02A50285834eaF6eBdc2d95FB42cC9 \
+<pre>cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
   "approve(address,uint256)" \
   0x8407aF8a100812bFb5f9f188b44379E4268efF94 0 \
   --rpc-url YOUR_RPC_URL --private-key YOUR_KEY</pre>
@@ -332,7 +332,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div style="height:3px;width:100%;background:linear-gradient(90deg,#8b5cf6,transparent)"></div>
 <div style="padding:32px">
 <h2 style="margin-top:0;border:none;padding:0;color:#8b5cf6">&#x1F4B0; Yield Vaults</h2>
-<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Deposit USDY into vaults to earn yield from insurance premiums. Your agent manages deposits and withdrawals.</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Deposit USDC into vaults to earn yield from insurance premiums. Your agent manages deposits and withdrawals.</p>
 <div style="overflow-x:auto">
 <table class="table-vaults" style="width:100%">
 <tr><th>Vault</th><th>Lockup</th><th>Risk Profile</th><th>What it covers</th></tr>
@@ -342,7 +342,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <tr><td><strong>Stable Long</strong></td><td>365 days</td><td><span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px">Lower risk/yield</span></td><td>DEPEG + EXPLOIT claims</td></tr>
 </table>
 </div>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Yield = USDY base rate (~3.55% APY) + insurance premiums. Longer lockups generally offer higher yields. Your agent monitors APY and manages positions through the API.</p>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Yield = Aave V3 lending APY (~3-5%, variable) + insurance premiums. Your USDC is deposited into Aave V3, the largest lending protocol in DeFi. Longer lockups generally offer higher yields. Your agent monitors APY and manages positions through the API.</p>
 </div>
 </div>
 
@@ -369,7 +369,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   'use strict';
 
   // --- Constants ---
-  const USDY_ADDRESS = '0x12cc5bd1ab02A50285834eaF6e8dc2d95FB42cC9';
+  const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
   const COVER_ROUTER = '0x8407aF8a100812bFb5F9F188b44379E4268efF94';
   const BASE_CHAIN_ID = '0x2105';
   const UINT256_MAX = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
@@ -681,7 +681,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
       modeYield.style.borderColor = 'rgba(255,255,255,0.2)';
       approveLabel.textContent = "What's the maximum your agent can spend on insurance?";
       tooltipBox.textContent = TOOLTIP_INSURANCE;
-      approveExplainer.textContent = 'This tells your USDY: "Lumina can charge me up to $X for insurance." You control the limit and can revoke it anytime by setting it to 0.';
+      approveExplainer.textContent = 'This tells your USDC: "Lumina can charge me up to $X for insurance." You control the limit and can revoke it anytime by setting it to 0.';
       vaultCheckboxes.style.display = 'none';
     } else {
       modeYield.style.background = 'rgba(34,211,238,0.15)';
@@ -692,7 +692,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
       modeInsurance.style.borderColor = 'rgba(255,255,255,0.2)';
       approveLabel.textContent = "What's the maximum your agent can deposit into vaults?";
       tooltipBox.textContent = TOOLTIP_YIELD;
-      approveExplainer.textContent = 'This tells your USDY: "Lumina vaults can hold up to $X of my deposit." Each vault gets its own approval. You can revoke any vault individually.';
+      approveExplainer.textContent = 'This tells your USDC: "Lumina vaults can hold up to $X of my deposit." Each vault gets its own approval. You can revoke any vault individually.';
       vaultCheckboxes.style.display = 'block';
     }
     updateApproveBtnText();
@@ -756,13 +756,13 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   // --- Confirm Modal ---
   function showConfirmModal() {
     const usdAmount = parseFloat(approveAmount.value);
-    modalAmount.textContent = '$' + usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' USDY';
+    modalAmount.textContent = '$' + usdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' USDC';
     modalWords.textContent = numberToWords(usdAmount);
     if (currentMode === 'insurance') {
-      modalExplain.textContent = 'You are approving Lumina CoverRouter (insurance purchases) to spend up to this amount of your USDY. You can change or revoke this limit at any time.';
+      modalExplain.textContent = 'You are approving Lumina CoverRouter (insurance purchases) to spend up to this amount of your USDC. You can change or revoke this limit at any time.';
     } else {
       const names = getSelectedVaults().map(v => v.name).join(', ');
-      modalExplain.textContent = 'You are approving Lumina Vaults (' + names + ') to spend up to this amount of your USDY. You can change or revoke this limit at any time.';
+      modalExplain.textContent = 'You are approving Lumina Vaults (' + names + ') to spend up to this amount of your USDC. You can change or revoke this limit at any time.';
     }
     confirmModal.style.display = 'flex';
   }
@@ -794,17 +794,17 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
       const amountRaw = BigInt(Math.round(usdAmount)) * 1000000n;
       if (currentMode === 'insurance') {
         const calldata = encodeApprove(COVER_ROUTER, amountRaw);
-        await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDY_ADDRESS, data: calldata }] });
+        await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDC_ADDRESS, data: calldata }] });
         hideConfirmModal();
         approveSuccess.style.display = 'block';
-        approveSuccessMsg.innerHTML = '\u2705 Allowance set: $' + Math.round(usdAmount).toLocaleString() + ' USDY. Your agent can now spend up to this amount.';
+        approveSuccessMsg.innerHTML = '\u2705 Allowance set: $' + Math.round(usdAmount).toLocaleString() + ' USDC. Your agent can now spend up to this amount.';
       } else {
         const vaults = getSelectedVaults();
         const results = [];
         for (let i = 0; i < vaults.length; i++) {
           modalConfirm.textContent = 'Signing vault ' + (i+1) + '/' + vaults.length + '...';
           const calldata = encodeApprove(vaults[i].address, amountRaw);
-          await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDY_ADDRESS, data: calldata }] });
+          await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDC_ADDRESS, data: calldata }] });
           results.push('\u2705 ' + vaults[i].name + ': $' + Math.round(usdAmount).toLocaleString() + ' approved');
         }
         hideConfirmModal();
@@ -861,7 +861,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
     try {
       if (currentMode === 'insurance') {
         const calldata = encodeApprove(COVER_ROUTER, UINT256_MAX);
-        await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDY_ADDRESS, data: calldata }] });
+        await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDC_ADDRESS, data: calldata }] });
         approveSuccess.style.display = 'block';
         approveSuccessMsg.innerHTML = '\u2705 Unlimited allowance set. Your agent has no spending cap. You can set a specific limit anytime.';
       } else {
@@ -875,7 +875,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
         const results = [];
         for (let i = 0; i < vaults.length; i++) {
           const calldata = encodeApprove(vaults[i].address, UINT256_MAX);
-          await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDY_ADDRESS, data: calldata }] });
+          await provider.request({ method: 'eth_sendTransaction', params: [{ from: connectedAddress, to: USDC_ADDRESS, data: calldata }] });
           results.push('\u2705 ' + vaults[i].name + ': Unlimited approved');
         }
         approveSuccess.style.display = 'block';
