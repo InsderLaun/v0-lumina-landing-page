@@ -212,9 +212,56 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div class="step">
 <span class="step-number">3</span>
 <span class="step-title">Two things your agent needs</span>
-<p style="margin-top:12px"><strong>1. API Key:</strong> Set as environment variable: <code>LUMINA_API_KEY=lum_your_key</code></p>
-<p><strong>2. SKILL File:</strong> <a href="/LUMINA-SKILL.txt" download>Download LUMINA-SKILL.txt</a> — give it to your agent as context.</p>
+
+<div id="step3-grid" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+<!-- Card A: The Key -->
+<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(34,211,238,0.2);border-radius:16px;padding:24px">
+<h4 style="color:white;font-size:1rem;margin-bottom:4px">&#x1F511; The Key (API Key)</h4>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:12px">Your agent's authorization to spend</p>
+<p style="color:rgba(255,255,255,0.6);font-size:0.85rem;line-height:1.6;margin-bottom:12px">Set this as an environment variable so your agent can authenticate with Lumina on every call.</p>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+<code id="env-code" style="flex:1;display:block;padding:10px 12px;font-size:0.8rem">LUMINA_API_KEY=lum_your_key</code>
+<button id="btn-copy-env" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap">Copy to Clipboard</button>
 </div>
+<p style="color:rgba(255,255,255,0.35);font-size:0.75rem;margin:0;font-style:italic">Replace lum_your_key with the actual key from Step 1.</p>
+</div>
+
+<!-- Card B: The Map -->
+<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(167,139,250,0.2);border-radius:16px;padding:24px">
+<h4 style="color:white;font-size:1rem;margin-bottom:4px">&#x1F9E0; The Map (SKILL File)</h4>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:12px">Your agent's knowledge of Lumina</p>
+<p style="color:rgba(255,255,255,0.6);font-size:0.85rem;line-height:1.6;margin-bottom:16px">This file teaches your agent everything: products, endpoints, pricing, and rules. Without it, your agent doesn't know Lumina exists.</p>
+<a href="/LUMINA-SKILL.txt" download style="display:block;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);color:#a78bfa;padding:12px 24px;border-radius:8px;font-size:15px;font-weight:600;text-align:center;text-decoration:none;width:100%">&#x1F4E5; Download LUMINA-SKILL.txt</a>
+<p style="color:rgba(255,255,255,0.35);font-size:0.75rem;margin-top:10px;margin-bottom:0">&#x1F4A1; Tip: Paste this file into your agent's chat (ChatGPT, Claude, or any LLM) so it learns the protocol rules automatically.</p>
+</div>
+
+</div>
+
+<!-- Verification Zone -->
+<div style="margin-top:20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px">
+<h4 style="color:white;font-size:0.95rem;margin-bottom:14px">&#x2705; Checklist before moving to Step 4</h4>
+<label class="step3-check" data-key="saved_key" style="display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:8px;cursor:pointer">
+<input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px"> <span>I saved my API Key somewhere safe</span>
+</label>
+<label class="step3-check" data-key="downloaded_skill" style="display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:8px;cursor:pointer">
+<input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px"> <span>I downloaded the SKILL file</span>
+</label>
+<label class="step3-check" data-key="gave_to_agent" style="display:flex;align-items:center;gap:10px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:8px;cursor:pointer">
+<input type="checkbox" style="accent-color:#22c55e;width:16px;height:16px"> <span>I gave both to my AI agent</span>
+</label>
+<div id="step3-complete" style="display:none;margin-top:12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:8px;padding:12px;transition:opacity 0.3s ease">
+<p style="color:#22c55e;margin:0;font-weight:500">&#x1F389; Your agent is ready for its first test! Proceed to Step 4.</p>
+</div>
+</div>
+
+</div>
+
+<style>
+@media (max-width: 640px) {
+  #step3-grid { grid-template-columns: 1fr !important; }
+}
+</style>
 
 <h2>Step 4: Test — Buy Your First Policy</h2>
 <div class="step">
@@ -787,6 +834,49 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
       updateApproveBtnText();
     }
   });
+
+  // ============================================================
+  // STEP 3 — COPY + CHECKLIST
+  // ============================================================
+
+  const btnCopyEnv = document.getElementById('btn-copy-env');
+  btnCopyEnv.addEventListener('click', () => {
+    navigator.clipboard.writeText('LUMINA_API_KEY=lum_your_key').then(() => {
+      btnCopyEnv.textContent = '\u2713 Copied!';
+      setTimeout(() => { btnCopyEnv.textContent = 'Copy to Clipboard'; }, 2000);
+    });
+  });
+
+  const step3Complete = document.getElementById('step3-complete');
+  const step3Checks = document.querySelectorAll('.step3-check');
+
+  function updateStep3Checklist() {
+    let allChecked = true;
+    step3Checks.forEach(label => {
+      const cb = label.querySelector('input');
+      const span = label.querySelector('span');
+      const key = 'lumina_check_' + label.getAttribute('data-key');
+      localStorage.setItem(key, cb.checked ? '1' : '0');
+      if (cb.checked) {
+        span.style.color = '#22c55e';
+        span.style.textDecoration = 'line-through';
+      } else {
+        span.style.color = 'rgba(255,255,255,0.7)';
+        span.style.textDecoration = 'none';
+        allChecked = false;
+      }
+    });
+    step3Complete.style.display = allChecked ? 'block' : 'none';
+  }
+
+  // Restore from localStorage
+  step3Checks.forEach(label => {
+    const cb = label.querySelector('input');
+    const key = 'lumina_check_' + label.getAttribute('data-key');
+    if (localStorage.getItem(key) === '1') cb.checked = true;
+    cb.addEventListener('change', updateStep3Checklist);
+  });
+  updateStep3Checklist();
 
   // ============================================================
   // INITIALIZATION
