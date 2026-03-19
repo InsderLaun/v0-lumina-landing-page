@@ -223,7 +223,15 @@ Premiums are dynamic based on vault utilization (Kink Model):
 - Medium utilization (60-80%) → moderate premiums
 - High utilization (>80%) → expensive premiums (kink kicks in)
 
-Premium formula: premium = coverageAmount × premiumRate / 10000
+Premium formula: premium = coverageAmount × pBase × M(U) × (durationSeconds / 31,536,000)
+
+Base annual premium rates (pBase) per product:
+- BSS:     6.5%  (650 bps)  — Black Swan Shield
+- DEPEG:   2.5%  (250 bps)  — Stablecoin Depeg Shield
+- IL:      8.5%  (850 bps)  — IL Index Cover
+- EXPLOIT: 4.0%  (400 bps)  — Exploit Shield (Tier 1 base)
+
+These are V2 market-aligned rates (Kink Model, multiplicative). V1 used higher additive values.
 Always GET /api/v2/quote before purchasing to see current pricing.
 
 Protocol fee: 3% on premiums + 3% on payouts.

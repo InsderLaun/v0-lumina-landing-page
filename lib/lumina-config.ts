@@ -75,7 +75,7 @@ export const PRODUCTS = {
   BSS: {
     id: "BSS",
     name: "Black Swan Shield",
-    pBaseBps: 2200,        // 22% annual — BLACKSWAN-SHIELD-ACTUARIAL-SPEC.md
+    pBaseBps: 650,         // 6.5% annual — tail risk (ETH -30%), ~0.5 events/year, competitive with Deribit puts
     deductibleBps: 2000,   // 20%
     riskType: "VOLATILE" as const,
     minDurationDays: 7,
@@ -88,7 +88,7 @@ export const PRODUCTS = {
   DEPEG: {
     id: "DEPEG",
     name: "Depeg Shield",
-    pBaseBps: 2400,        // 24% annual — DEPEG-SHIELD-ACTUARIAL-SPEC.md
+    pBaseBps: 250,         // 2.5% annual — systemic but rare (<$0.95 depeg), aligned with InsurAce market
     deductibleBps: { USDT: 1500, DAI: 1200 } as Record<string, number>,  // varies by stablecoin — per actuarial spec
     riskType: "STABLE" as const,
     minDurationDays: 14,
@@ -102,7 +102,7 @@ export const PRODUCTS = {
   IL: {
     id: "IL",
     name: "IL Index Cover",
-    pBaseBps: 2000,        // 20% annual — ILPROT-ACTUARIAL-SPEC.md
+    pBaseBps: 850,         // 8.5% annual — most frequent risk, LPs lose 5-7% annually to IL
     deductibleBps: 200,    // 2%
     riskType: "VOLATILE" as const,
     minDurationDays: 14,
@@ -115,7 +115,7 @@ export const PRODUCTS = {
   EXPLOIT: {
     id: "EXPLOIT",
     name: "Exploit Shield",
-    pBaseBps: 300,         // 3% annual — EXPLOIT-SHIELD-ACTUARIAL-SPEC.md
+    pBaseBps: 400,         // 4.0% annual — binary risk, 2-5% of protocols fail, aligned with Nexus Mutual
     deductibleBps: 1000,   // 10%
     riskType: "STABLE" as const,
     minDurationDays: 90,
