@@ -499,23 +499,24 @@ const PRODUCTS = [
     key: "depeg",
     emoji: "🔥",
     label: "Depeg Shield",
-    tagline: "Protection when stablecoins lose their peg",
-    analogy: "Like fire insurance — 24h waiting because you can smell the smoke before it burns",
+    tagline: "Protection when USDT or DAI loses peg",
+    analogy: "Like fire insurance — 24h waiting because you can smell the smoke before it burns. Covers USDT and DAI depegs. USDC excluded (settlement token).",
+    description: "Protects your agent's stablecoin holdings against depeg events. Covers USDT and DAI. USDC is excluded because it's Lumina's settlement token — insuring it would create circular risk.",
     rows: [
       ["Trigger", "Stablecoin TWAP 30 min < $0.95"],
-      ["Covers", "USDC (net 87.3%), DAI (net 85.4%), USDT (net 82.5%)"],
+      ["Covers", "USDT (net 82.5%), DAI (net 85.4%). USDC excluded — it's Lumina's settlement token."],
       ["Duration", "14–365 days"],
       ["Waiting Period", "24 hours"],
       ["Price", "Discounts for longer durations: 10% off at 91d, 20% off at 181d"],
     ],
-    example: "$100K USDC, 90 days → Premium $3,699 → If triggered: receive $87,300",
+    example: "$100K USDT, 90 days → Premium $3,699 → If triggered: receive $82,500",
     technicalDetails: [
       ["Product ID", "DEPEG-STABLE-001"],
       ["Risk Type", "STABLE"],
       ["Oracle", "Chainlink TWAP 30 min or 5 consecutive roundIds"],
       ["Threshold", "Absolute $0.95 (not relative)"],
-      ["Risk Multipliers", "USDC 1.0x, DAI 1.2x, USDT 1.4x"],
-      ["Deductibles", "USDC 10%, DAI 12%, USDT 15%"],
+      ["Risk Multipliers", "DAI 1.2x, USDT 1.4x (USDC excluded — settlement token)"],
+      ["Deductibles", "DAI 12%, USDT 15%"],
       ["Duration Discount", "0.90x (91-180d), 0.80x (181-365d)"],
       ["Max Allocation", "20% of vault"],
       ["Vault", "StableShort (90d) → overflow to StableLong (365d)"],
@@ -554,15 +555,16 @@ const PRODUCTS = [
     key: "exploit",
     emoji: "🏦",
     label: "Exploit Shield",
-    tagline: "Coverage against protocol hacks",
-    analogy: "Like bank robbery insurance — dual trigger prevents false alarms",
+    tagline: "Coverage against smart contract hacks (external protocols)",
+    analogy: "Like bank robbery insurance — dual trigger prevents false alarms. Covers DeFi protocols except Aave V3 (Lumina's yield infrastructure).",
+    description: "Protects your agent's funds in DeFi protocols against exploits and hacks. Covers any protocol except Aave V3, which is Lumina's yield infrastructure — insuring it would create circular risk.",
     rows: [
       ["Trigger", "DUAL: Governance token −25% in 24h AND receipt token −30% for 4h (or contract paused)"],
       ["Payout", "90% of coverage (net 87.3% after fee)"],
       ["Duration", "90–365 days"],
       ["Waiting Period", "14 days (anti-insider)"],
       ["Cap", "$50,000 per wallet"],
-      ["Protocols", "Aave, Compound, Uniswap, MakerDAO, Curve, Morpho"],
+      ["Protocols", "Compound, Uniswap, MakerDAO, Curve, Morpho. Aave V3 excluded — it's Lumina's yield infrastructure."],
       ["Why Dual Trigger", "Bear market drops gov tokens but aUSDC stays at $1 = NOT an exploit. Only real hacks trigger BOTH."],
     ],
     example: "",
@@ -573,7 +575,7 @@ const PRODUCTS = [
       ["Condition 1", "Governance token drops >25% in 24h"],
       ["Condition 2", "Receipt token drops >30% sustained 4h OR contract paused"],
       ["Both Required", "Both conditions must be met simultaneously"],
-      ["Protocol Tiers", "Tier 1 (Aave, Compound, Uniswap) 1.0x, MakerDAO 1.1x, Curve 1.5x, Morpho 1.8x"],
+      ["Protocol Tiers", "Tier 1 (Compound, Uniswap) 1.0x, MakerDAO 1.1x, Curve 1.5x, Morpho 1.8x. Aave V3 excluded — Lumina's yield infrastructure."],
       ["Max Coverage", "$50,000 per wallet"],
       ["Max Allocation", "10% of vault (combined for all Exploit policies)"],
       ["Vault", "StableLong (365d) only"],
@@ -973,9 +975,8 @@ function PremiumCalculatorSection() {
                   value={stablecoin}
                   onChange={setStablecoin}
                   options={[
-                    { value: "USDC", label: "USDC" },
-                    { value: "DAI", label: "DAI" },
                     { value: "USDT", label: "USDT" },
+                    { value: "DAI", label: "DAI" },
                   ]}
                 />
               )}
@@ -987,7 +988,6 @@ function PremiumCalculatorSection() {
                   value={protocol}
                   onChange={setProtocol}
                   options={[
-                    { value: "Aave", label: "Aave v3 (Tier 1)" },
                     { value: "Compound", label: "Compound III (Tier 1)" },
                     { value: "Uniswap", label: "Uniswap v3 (Tier 1)" },
                     { value: "MakerDAO", label: "MakerDAO (1.1x)" },
@@ -2389,6 +2389,8 @@ const FAQ_PROTECT = [
   { q: "Can I cancel a policy?", a: "No. Policies are non-cancellable. The premium is paid upfront and non-refundable. This is by design — it ensures the vault always has premium income to offset potential claims." },
   { q: "How does auto-repurchase work?", a: "Your agent monitors policy expiry and buys a new policy before the current one expires. For Depeg (24h waiting), your agent repurchases at least 24h before expiry. For Exploit (14d waiting), at least 14 days before. The Skill file has the complete logic." },
   { q: "What if the trigger is met but my agent doesn't claim?", a: "You have 24 hours after policy expiry (the grace period) to submit the claim. If your agent misses it, the policy expires and funds return to the vault. Set up monitoring alerts in your agent to avoid this." },
+  { q: "Why can't I insure USDC with the Depeg Shield?", a: "USDC is Lumina's settlement token — all premiums and payouts are in USDC. If USDC lost its peg, the payout would also be devalued, making the insurance ineffective. Use the Depeg Shield for USDT or DAI instead." },
+  { q: "Why can't I insure Aave with the Exploit Shield?", a: "Lumina's vaults deposit USDC into Aave V3 to generate yield. If Aave were exploited, the vault funds would also be affected, making it impossible to pay claims. You can insure any other DeFi protocol." },
 ]
 
 const FAQ_EARN = [

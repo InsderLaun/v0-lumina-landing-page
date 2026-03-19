@@ -47,9 +47,9 @@ Expected: {"status":"ok","chain":"base","chainId":8453}
 │ Product  │ What it covers       │ Duration   │ Deductible │ Trigger      │
 ├──────────┼──────────────────────┼────────────┼────────────┼──────────────┤
 │ BSS      │ ETH crash ≥30%       │ 7-30 days  │ 20%        │ ETH price    │
-│ DEPEG    │ Stablecoin loses peg │ 14-365 days│ 10%        │ Peg deviation│
+│ DEPEG    │ USDT/DAI loses peg (USDC excluded) │ 14-365 days│ 10%        │ Peg deviation│
 │ IL       │ Impermanent loss     │ 14-90 days │ 2%         │ IL index     │
-│ EXPLOIT  │ Smart contract hack  │ 90-365 days│ 10%        │ Oracle report│
+│ EXPLOIT  │ Smart contract hack (Aave V3 excluded) │ 90-365 days│ 10%        │ Oracle report│
 └──────────┴──────────────────────┴────────────┴────────────┴──────────────┘
 
 GET /api/v2/products — returns full product details with current pricing
@@ -192,6 +192,7 @@ DEPEG (Depeg Shield):
 - Don't buy when: You hold small stablecoin amounts, the stablecoin has strong reserves
 - Recommended coverage: 70-100% of stablecoin holdings
 - Remember: 24-hour waiting period — buy BEFORE you think you'll need it
+- Note: USDC cannot be insured. Lumina settles in USDC, so insuring it would be circular. Use this for USDT or DAI holdings.
 
 IL (IL Index Cover):
 - Buy when: You provide liquidity in volatile pairs, the pair's price ratio is diverging, you want to hedge IL risk
@@ -203,6 +204,7 @@ EXPLOIT (Exploit Shield):
 - Don't buy when: Protocol is battle-tested, your exposure is small
 - Remember: 14-day waiting period — buy well in advance
 - Recommended coverage: 80-100% of funds in the protocol
+- Note: Aave V3 cannot be insured. Lumina vaults deposit into Aave, so insuring it would be circular. Use this for other DeFi protocols.
 
 YIELD VAULTS — when to deposit:
 - Deposit when: You have idle USDY, you want passive income, you're comfortable with the lockup period
@@ -270,6 +272,12 @@ Common errors and how to handle them:
 
 "Duration out of range"
 → Check the min/max duration for each product in the products table.
+
+"Cannot insure settlement token"
+→ You tried to buy Depeg Shield for USDC. USDC is excluded. Choose USDT or DAI.
+
+"Cannot insure vault infrastructure"
+→ You tried to buy Exploit Shield for Aave V3. Aave is excluded. Choose another protocol.
 
 RETRY STRATEGY:
 - On rate limit: wait 60s, retry once
