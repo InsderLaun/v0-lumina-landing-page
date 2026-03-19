@@ -864,8 +864,8 @@ function PremiumCalculatorSection() {
   const [coverage, setCoverage] = useState(10000)
   const [duration, setDuration] = useState(14)
   const [asset, setAsset] = useState("ETH")
-  const [stablecoin, setStablecoin] = useState("USDC")
-  const [protocol, setProtocol] = useState("Aave")
+  const [stablecoin, setStablecoin] = useState("USDT")
+  const [protocol, setProtocol] = useState("Compound")
   const [vaultUtilizations, setVaultUtilizations] = useState<Record<string, number>>({
     bss: 20, il: 20, depeg: 20, exploit: 20,
   })
