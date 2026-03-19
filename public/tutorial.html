@@ -219,12 +219,34 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(34,211,238,0.2);border-radius:16px;padding:24px">
 <h4 style="color:white;font-size:1rem;margin-bottom:4px">&#x1F511; The Key (API Key)</h4>
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:12px">Your agent's authorization to spend</p>
-<p style="color:rgba(255,255,255,0.6);font-size:0.85rem;line-height:1.6;margin-bottom:12px">Set this as an environment variable so your agent can authenticate with Lumina on every call.</p>
-<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-<code id="env-code" style="flex:1;display:block;padding:10px 12px;font-size:0.8rem">LUMINA_API_KEY=lum_your_key</code>
-<button id="btn-copy-env" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap">Copy to Clipboard</button>
+<p style="color:rgba(255,255,255,0.6);font-size:0.85rem;line-height:1.6;margin-bottom:14px">Give this key to your AI agent so it can authenticate with Lumina. How you do it depends on your agent:</p>
+
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;margin-bottom:10px">
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:600;margin-bottom:6px">&#x1F4AC; Using ChatGPT or Claude?</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Paste your API key directly in the chat along with the SKILL file. Tell your agent: <em>"My Lumina API key is: lum_xxxxx. Use it for all Lumina API calls."</em></p>
 </div>
-<p style="color:rgba(255,255,255,0.35);font-size:0.75rem;margin:0;font-style:italic">Replace lum_your_key with the actual key from Step 1.</p>
+
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;margin-bottom:10px">
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:600;margin-bottom:6px">&#x1F916; Using ElizaOS or a custom framework?</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin-bottom:8px">Set it as an environment variable:</p>
+<div style="display:flex;align-items:center;gap:8px">
+<code id="env-code" style="flex:1;display:block;padding:10px 12px;font-size:0.8rem">LUMINA_API_KEY=lum_your_key</code>
+<button class="btn-copy-step3" data-text="LUMINA_API_KEY=lum_your_key" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap">Copy</button>
+</div>
+</div>
+
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;margin-bottom:12px">
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:600;margin-bottom:6px">&#x1F527; Building your own agent?</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin-bottom:8px">Include the key in the X-API-Key header of every API call:</p>
+<div style="display:flex;align-items:center;gap:8px">
+<code style="flex:1;display:block;padding:10px 12px;font-size:0.8rem">-H "X-API-Key: lum_your_key"</code>
+<button class="btn-copy-step3" data-text='-H "X-API-Key: lum_your_key"' style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap">Copy</button>
+</div>
+</div>
+
+<div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:8px;padding:10px 14px">
+<p style="color:#eab308;font-size:0.8rem;margin:0;line-height:1.5">&#x26A0;&#xFE0F; Keep your API key secret. Anyone with this key can make your agent spend USDY. Never share it publicly.</p>
+</div>
 </div>
 
 <!-- Card B: The Map -->
@@ -839,11 +861,14 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   // STEP 3 — COPY + CHECKLIST
   // ============================================================
 
-  const btnCopyEnv = document.getElementById('btn-copy-env');
-  btnCopyEnv.addEventListener('click', () => {
-    navigator.clipboard.writeText('LUMINA_API_KEY=lum_your_key').then(() => {
-      btnCopyEnv.textContent = '\u2713 Copied!';
-      setTimeout(() => { btnCopyEnv.textContent = 'Copy to Clipboard'; }, 2000);
+  document.querySelectorAll('.btn-copy-step3').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.getAttribute('data-text');
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '\u2713 Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 2000);
+      });
     });
   });
 
