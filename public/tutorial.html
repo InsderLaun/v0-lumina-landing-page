@@ -310,14 +310,31 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   --rpc-url YOUR_RPC_URL --private-key YOUR_KEY</pre>
 </div>
 
-<h2>Products</h2>
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;margin-top:40px">
+<h2 style="margin-top:0;border:none;padding:0">&#x1F6E1; Insurance Products</h2>
+<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Parametric coverage for your AI agent's portfolio. Your agent buys these policies via the API to protect against specific risks.</p>
 <table>
-<tr><th>Product</th><th>ID</th><th>Covers</th><th>Duration</th><th>Deductible</th></tr>
-<tr><td>Black Swan Shield</td><td><code>BSS</code></td><td>ETH crash 30%+</td><td>7-30d</td><td>20%</td></tr>
-<tr><td>Depeg Shield</td><td><code>DEPEG</code></td><td>Stablecoin depeg</td><td>14-365d</td><td>10%</td></tr>
+<tr><th>Product</th><th>ID</th><th>Protects Against</th><th>Duration</th><th>Deductible</th></tr>
+<tr><td>Black Swan Shield</td><td><code>BSS</code></td><td>ETH crash &#x2265;30%</td><td>7-30d</td><td>20%</td></tr>
+<tr><td>Depeg Shield</td><td><code>DEPEG</code></td><td>Stablecoin loses peg</td><td>14-365d</td><td>10%</td></tr>
 <tr><td>IL Index Cover</td><td><code>IL</code></td><td>Impermanent loss</td><td>14-90d</td><td>2%</td></tr>
 <tr><td>Exploit Shield</td><td><code>EXPLOIT</code></td><td>Smart contract hacks</td><td>90-365d</td><td>10%</td></tr>
 </table>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Your agent decides when to buy based on market conditions. Policies are purchased and claimed automatically via the API. You only set the spending limit.</p>
+</div>
+
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;margin-top:32px">
+<h2 style="margin-top:0;border:none;padding:0">&#x1F4B0; Yield Vaults</h2>
+<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Deposit USDY into vaults to earn yield from insurance premiums. Your agent manages deposits and withdrawals.</p>
+<table>
+<tr><th>Vault</th><th>Lockup</th><th>Risk Profile</th><th>What it covers</th></tr>
+<tr><td>Volatile Short</td><td>30 days</td><td>Higher risk/yield</td><td>BSS + IL claims</td></tr>
+<tr><td>Volatile Long</td><td>90 days</td><td>Higher risk/yield</td><td>BSS + IL claims</td></tr>
+<tr><td>Stable Short</td><td>90 days</td><td>Lower risk/yield</td><td>DEPEG + EXPLOIT claims</td></tr>
+<tr><td>Stable Long</td><td>365 days</td><td>Lower risk/yield</td><td>DEPEG + EXPLOIT claims</td></tr>
+</table>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Yield = USDY base rate (~3.55% APY) + insurance premiums. Longer lockups generally offer higher yields. Your agent monitors APY and manages positions through the API.</p>
+</div>
 
 <h2>Need Help?</h2>
 <p>Email <a href="mailto:support@lumina-org.com">support@lumina-org.com</a> or visit the <a href="/dashboard">Dashboard</a>.</p>
