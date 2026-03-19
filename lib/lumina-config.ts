@@ -89,7 +89,7 @@ export const PRODUCTS = {
     id: "DEPEG",
     name: "Depeg Shield",
     pBaseBps: 2400,        // 24% annual — DEPEG-SHIELD-ACTUARIAL-SPEC.md
-    deductibleBps: 1000,   // 10%
+    deductibleBps: { USDT: 1500, DAI: 1200 } as Record<string, number>,  // varies by stablecoin — per actuarial spec
     riskType: "STABLE" as const,
     minDurationDays: 14,
     maxDurationDays: 365,
