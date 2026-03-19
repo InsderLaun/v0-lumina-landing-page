@@ -54,15 +54,151 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div class="step">
 <span class="step-number">1</span>
 <span class="step-title">Get your key (shown only once!)</span>
-<p style="margin-top:12px">Replace YOUR_WALLET with your actual wallet address:</p>
+
+<div id="key-widget" style="margin-top:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:20px">
+
+<div id="no-metamask" style="display:none">
+<p style="color:#ef4444;margin:0">You need MetaMask installed. Download it at <a href="https://metamask.io" target="_blank">metamask.io</a></p>
+</div>
+
+<div id="connect-section">
+<button id="btn-connect" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Connect Wallet</button>
+<span id="wallet-display" style="margin-left:12px;color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem"></span>
+</div>
+
+<div id="generate-section" style="display:none;margin-top:16px">
+<button id="btn-generate" style="background:#a78bfa;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Generate API Key</button>
+<span id="generate-status" style="margin-left:12px;color:rgba(255,255,255,0.5);font-size:0.85rem"></span>
+</div>
+
+<div id="key-result" style="display:none;margin-top:16px">
+<div style="display:flex;gap:8px;align-items:center">
+<input id="key-output" type="text" readonly style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(34,211,238,0.4);border-radius:6px;padding:10px 12px;color:#22d3ee;font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem">
+<button id="btn-copy" style="background:rgba(34,211,238,0.15);color:#22d3ee;border:1px solid rgba(34,211,238,0.3);padding:10px 16px;border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;white-space:nowrap">Copy</button>
+</div>
+<div class="warning" style="margin-top:12px">
+<p class="warning-title">⚠️ Save this key NOW</p>
+<p>The API Key is shown only once. If you lose it, you'll need to generate a new one.</p>
+</div>
+</div>
+
+<div id="key-error" style="display:none;margin-top:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px">
+<p id="error-msg" style="color:#ef4444;margin:0"></p>
+</div>
+
+</div>
+
+<details style="margin-top:16px">
+<summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">Alternative method (terminal)</summary>
+<p style="margin-top:8px;color:rgba(255,255,255,0.5);font-size:0.85rem">Replace YOUR_WALLET with your actual wallet address:</p>
 <pre>curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/keys/create \
   -H "Content-Type: application/json" \
   -d '{"wallet":"YOUR_WALLET_ADDRESS","label":"my-agent"}'</pre>
-<div class="warning">
-<p class="warning-title">Save this key NOW</p>
-<p>The API Key is shown only once. If you lose it, create a new one.</p>
+</details>
+
 </div>
-</div>
+
+<script>
+(function() {
+  var connectedWallet = null;
+  var btnConnect = document.getElementById('btn-connect');
+  var walletDisplay = document.getElementById('wallet-display');
+  var connectSection = document.getElementById('connect-section');
+  var generateSection = document.getElementById('generate-section');
+  var btnGenerate = document.getElementById('btn-generate');
+  var generateStatus = document.getElementById('generate-status');
+  var keyResult = document.getElementById('key-result');
+  var keyOutput = document.getElementById('key-output');
+  var btnCopy = document.getElementById('btn-copy');
+  var keyError = document.getElementById('key-error');
+  var errorMsg = document.getElementById('error-msg');
+  var noMetamask = document.getElementById('no-metamask');
+
+  var BASE_CHAIN_ID = '0x2105';
+
+  if (typeof window.ethereum === 'undefined') {
+    noMetamask.style.display = 'block';
+    connectSection.style.display = 'none';
+    return;
+  }
+
+  function truncate(addr) {
+    return addr.slice(0, 6) + '...' + addr.slice(-4);
+  }
+
+  async function switchToBase() {
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
+    } catch (e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: BASE_CHAIN_ID,
+            chainName: 'Base',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.base.org'],
+            blockExplorerUrls: ['https://basescan.org']
+          }]
+        });
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  btnConnect.addEventListener('click', async function() {
+    btnConnect.disabled = true;
+    btnConnect.textContent = 'Connecting...';
+    try {
+      await switchToBase();
+      var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      connectedWallet = accounts[0];
+      walletDisplay.textContent = truncate(connectedWallet);
+      btnConnect.textContent = 'Connected';
+      btnConnect.style.background = 'rgba(34,197,94,0.3)';
+      btnConnect.style.color = '#22c55e';
+      generateSection.style.display = 'block';
+    } catch (e) {
+      btnConnect.textContent = 'Connect Wallet';
+      btnConnect.disabled = false;
+      keyError.style.display = 'block';
+      errorMsg.textContent = e.message || 'Failed to connect wallet';
+    }
+  });
+
+  btnGenerate.addEventListener('click', async function() {
+    btnGenerate.disabled = true;
+    generateStatus.textContent = 'Generating...';
+    keyError.style.display = 'none';
+    try {
+      var res = await fetch('https://lumina-protocol-production.up.railway.app/api/v2/keys/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet: connectedWallet, label: 'mi-agente' })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message || 'Request failed (' + res.status + ')');
+      var key = data.apiKey || data.key || data.api_key || JSON.stringify(data);
+      keyOutput.value = key;
+      keyResult.style.display = 'block';
+      generateSection.style.display = 'none';
+    } catch (e) {
+      keyError.style.display = 'block';
+      errorMsg.textContent = e.message || 'Failed to generate API key';
+      btnGenerate.disabled = false;
+      generateStatus.textContent = '';
+    }
+  });
+
+  btnCopy.addEventListener('click', function() {
+    navigator.clipboard.writeText(keyOutput.value).then(function() {
+      btnCopy.textContent = 'Copied!';
+      setTimeout(function() { btnCopy.textContent = 'Copy'; }, 2000);
+    });
+  });
+})();
+</script>
 
 <h2>Step 2: Approve USDY Spending</h2>
 <div class="step">
