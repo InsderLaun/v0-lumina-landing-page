@@ -1,39 +1,41 @@
 // ═══════════════════════════════════════════════════════════════
 // LUMINA PROTOCOL — CONSTANTS
-// All data is REAL and VERIFIABLE on-chain.
+// Protocol data imported from lumina-config.ts (single source of truth)
+// UI-specific constants defined here
 // ═══════════════════════════════════════════════════════════════
 
+import { CONTRACTS as CONFIG_CONTRACTS, TOKENS, PROTOCOL, CHAIN, ORACLES } from './lumina-config'
+
+// Re-export contracts with backwards-compatible shape
 export const CONTRACTS = {
-    MutualLumina: '0x1c5Ec90aC46e960aACbfCeAE9d6C2F79ce806b07',
-    DisputeResolver: '0x2e4D0112A65C2e2DCE73e7F85bF5C2889c7709cA',
-    AutoResolver: '0x8D919F0BEf46736906e190da598570255FF02754',
-    USDC: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    ...CONFIG_CONTRACTS,
+    USDC: TOKENS.USDC.address,
 } as const
 
 export const CHAINLINK_FEEDS = {
-    'ETH/USD': '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70',
-    'BTC/USD': '0x64c911996D3c6aC71f9b455B1E8E7266BcbD848F',
+    'ETH/USD': ORACLES.ETH_USD,
+    'BTC/USD': ORACLES.BTC_USD,
     'USDC/USD': '0x7e860098F58bBFC8648a4311b374B1D669a2bc6B',
     'USDT/USD': '0xf19d560eB8d2ADf07BD6D13ed03e1D11215721F9',
     'DAI/USD': '0x591e79239a7d679378eC8c847e5038150364C78F',
 } as const
 
-export const API_BASE_URL = 'https://moltagentinsurance-production-6e3d.up.railway.app'
+export const API_BASE_URL = PROTOCOL.apiBaseUrl
 
 export const API_ENDPOINTS = {
-    products: '/api/v1/products',
-    register: '/api/v1/register',
-    quote: '/api/v1/quote',
-    purchase: '/api/v1/purchase',
-    policy: '/api/v1/policy',
-    dashboard: '/api/v1/agent/dashboard',
-    health: '/health',
+    products: '/api/v2/products',
+    register: '/api/v2/keys/create',
+    quote: '/api/v2/quote',
+    purchase: '/api/v2/purchase',
+    policy: '/api/v2/policies',
+    dashboard: '/api/v2/vaults',
+    health: '/api/v2/health',
 } as const
 
-export const BASESCAN_URL = 'https://basescan.org/address'
-export const GITHUB_URL = 'https://github.com/agustintiberio10/LUMINA-PROTOCOL'
-export const CHAIN_ID = 8453
-export const CHAIN_NAME = 'Base L2'
+export const BASESCAN_URL = `${CHAIN.explorer}/address`
+export const GITHUB_URL = PROTOCOL.github
+export const CHAIN_ID = CHAIN.id
+export const CHAIN_NAME = CHAIN.name
 
 // Tooltip definitions for technical terms
 export const GLOSSARY: Record<string, string> = {

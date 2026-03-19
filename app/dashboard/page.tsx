@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
+import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -14,10 +15,10 @@ const SIDEBAR_SECTIONS: { label: string; items: Tab[] }[] = [
 ]
 
 // ════════════════════════════════════════════
-// CONTRACT ADDRESSES
+// CONTRACT ADDRESSES — from lumina-config.ts
 // ════════════════════════════════════════════
-const POLICY_MANAGER = "0x615e9c32c70350192fCa9BAC06Ba8ebA9dC4fEF4"
-const COVER_ROUTER = "0x8407afBa100812bFb5f9f188b44379E4268eff94"
+const POLICY_MANAGER = CONTRACTS.PolicyManager
+const COVER_ROUTER = CONTRACTS.CoverRouter
 
 // ════════════════════════════════════════════
 // VAULT CONFIG
@@ -25,7 +26,7 @@ const COVER_ROUTER = "0x8407afBa100812bFb5f9f188b44379E4268eff94"
 const VAULT_CONFIG = [
   {
     name: "Volatile Short",
-    address: "0x2D7D735f71638730cbe9A143227A00Fa64E94E88",
+    address: CONTRACTS.vaults.VolatileShort,
     cooldown: "30 days",
     riskType: "VOLATILE" as const,
     products: "BSS + IL Index",
@@ -35,7 +36,7 @@ const VAULT_CONFIG = [
   },
   {
     name: "Volatile Long",
-    address: "0xDf30548d46e77015A4dDA82D3c263e81a60B075c",
+    address: CONTRACTS.vaults.VolatileLong,
     cooldown: "90 days",
     riskType: "VOLATILE" as const,
     products: "BSS + IL Index",
@@ -45,7 +46,7 @@ const VAULT_CONFIG = [
   },
   {
     name: "Stable Short",
-    address: "0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078",
+    address: CONTRACTS.vaults.StableShort,
     cooldown: "90 days",
     riskType: "STABLE" as const,
     products: "Depeg + Exploit",
@@ -55,7 +56,7 @@ const VAULT_CONFIG = [
   },
   {
     name: "Stable Long",
-    address: "0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c",
+    address: CONTRACTS.vaults.StableLong,
     cooldown: "365 days",
     riskType: "STABLE" as const,
     products: "Depeg + Exploit",
@@ -71,26 +72,26 @@ const VAULT_CONFIG = [
 // Shield addresses (verified with eth_getCode) + display info
 const SHIELD_LIST = [
   {
-    address: "0xC01ED8eF52506B29545f08BBf9aAe5Fe59b15CF7",
-    name: "Black Swan Shield",
+    address: CONTRACTS.shields.BSS,
+    name: PRODUCTS_CONFIG.BSS.name,
     icon: "🛡️",
     vaultName: "Volatile Short",
   },
   {
-    address: "0xCdA417909d43F252f63034346db9121441BfE70F",
-    name: "Depeg Shield",
+    address: CONTRACTS.shields.Depeg,
+    name: PRODUCTS_CONFIG.DEPEG.name,
     icon: "🔒",
     vaultName: "Stable Short",
   },
   {
-    address: "0x73fB5CB9Aa0BeBAf74a3a4b6Cfb09d3Fd66C9FB6",
-    name: "IL Index Cover",
+    address: CONTRACTS.shields.ILIndex,
+    name: PRODUCTS_CONFIG.IL.name,
     icon: "📊",
     vaultName: "Volatile Short",
   },
   {
-    address: "0x05170F9Ca56026001064F5242c6F9F7f181c6baA",
-    name: "Exploit Shield",
+    address: CONTRACTS.shields.Exploit,
+    name: PRODUCTS_CONFIG.EXPLOIT.name,
     icon: "🔐",
     vaultName: "Stable Short",
   },
@@ -120,11 +121,11 @@ const SHIELD_DESCRIPTIONS: Record<string, string> = {
 }
 
 const RPC_URLS = [
-  "https://mainnet.base.org",
+  CHAIN.rpc,
   "https://base.llamarpc.com",
 ]
-const MOCK_WALLET = "0x2b4D825417f568231e809E31B9332ED146760337"
-const API_URL = "https://lumina-protocol-production.up.railway.app"
+const MOCK_WALLET = PROTOCOL.feeReceiver
+const API_URL = PROTOCOL.apiBaseUrl
 
 // ════════════════════════════════════════════
 // RPC HELPERS (global batch, minimal HTTP requests)
@@ -233,34 +234,21 @@ const STATUS_LABELS: Record<number, { label: string; color: string; pulse?: bool
 }
 
 // ════════════════════════════════════════════
-// KINK MODEL — Mirror of PremiumMath.sol
+// KINK MODEL — imported from lumina-config.ts
 // ════════════════════════════════════════════
-// U_KINK = 80%, R_SLOPE1 = 0.5, R_SLOPE2 = 3.0, U_MAX = 95%
-// M(U) at 0%=1.0, 80%=1.5, 90%=3.0, 95%=3.75
-//
 // Blended pBase per vault type (weighted average of products — actuarial specs):
-//   VOLATILE vaults back BSS(2200bps) + IL(2000bps) -> avg 2100bps = 21%
-//   STABLE vaults back DEPEG(2400bps) + EXPLOIT(300bps) -> avg 1350bps = 13.5%
+//   VOLATILE vaults back BSS + IL -> avg pBase
+//   STABLE vaults back DEPEG + EXPLOIT -> avg pBase
 function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): number {
   const aaveBaseYield = 0.04 // ~4% Aave V3 USDC lending yield (variable)
-  const pBaseBps = riskType === "VOLATILE" ? 2100 : 1350 // blended per vault (actuarial)
+  const volatileBlendedBps = (PRODUCTS_CONFIG.BSS.pBaseBps + PRODUCTS_CONFIG.IL.pBaseBps) / 2
+  const stableBlendedBps = (PRODUCTS_CONFIG.DEPEG.pBaseBps + PRODUCTS_CONFIG.EXPLOIT.pBaseBps) / 2
+  const pBaseBps = riskType === "VOLATILE" ? volatileBlendedBps : stableBlendedBps
   const pBaseRate = pBaseBps / 10000
 
-  // M(U) from PremiumMath.sol
-  const U_KINK = 0.80
-  const SLOPE1 = 0.5
-  const SLOPE2 = 3.0
-  const U_MAX = 0.95
-  const util = Math.min(Math.max(utilization, 0), U_MAX)
-
-  let multiplier: number
-  if (util <= 0) {
-    multiplier = 1.0
-  } else if (util <= U_KINK) {
-    multiplier = 1.0 + (util / U_KINK) * SLOPE1
-  } else {
-    multiplier = 1.0 + SLOPE1 + ((util - U_KINK) / (1.0 - U_KINK)) * SLOPE2
-  }
+  // M(U) from PremiumMath.sol — uses imported calcKinkMultiplier
+  const util = Math.min(Math.max(utilization, 0), KINK_MODEL.U_MAX)
+  const multiplier = util > 0 ? calcKinkMultiplier(util * 100) : 1.0
 
   // Annual premium rate per dollar of coverage = pBaseRate * M(U)
   // LP yield from premiums = utilization * pBaseRate * M(U) (annualized)

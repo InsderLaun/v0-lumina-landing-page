@@ -1,55 +1,30 @@
 // ═══════════════════════════════════════════════════════════════
 // LUMINA PROTOCOL — PRICING ENGINE
 // Mirror of PremiumMath.sol (on-chain source of truth)
+// All constants and product data imported from lumina-config.ts
 // ═══════════════════════════════════════════════════════════════
 
-// ─── Kink Model constants from PremiumMath.sol ───────────────
-// U_KINK       = 8000 bps (80%)
-// R_SLOPE1_WAD = 0.5
-// R_SLOPE2_WAD = 3.0
-// U_MAX        = 9500 bps (95%)
-const U_KINK = 0.80
-const SLOPE1 = 0.5
-const SLOPE2 = 3.0
-const U_MAX = 0.95
+import {
+  KINK_MODEL,
+  PRODUCTS,
+  PROTOCOL,
+  calcKinkMultiplier,
+} from './lumina-config'
 
-/**
- * Calculate M(U) — the utilization multiplier from PremiumMath.sol
- * M(0%)  = 1.000
- * M(20%) = 1.125
- * M(40%) = 1.250
- * M(60%) = 1.375
- * M(80%) = 1.500  (kink point)
- * M(85%) = 2.250
- * M(90%) = 3.000
- * M(95%) = 3.750  (max before reject)
- */
-function calcKinkMultiplier(utilizationPct: number): number {
-    const util = Math.min(Math.max(utilizationPct / 100, 0), U_MAX)
-    if (util <= 0) return 1.0
-    if (util <= U_KINK) {
-        return 1.0 + (util / U_KINK) * SLOPE1
-    }
-    return 1.0 + SLOPE1 + ((util - U_KINK) / (1.0 - U_KINK)) * SLOPE2
-}
-
-// ─── Per-product config (pBase in bps) — from actuarial specs ─────────────
-// BSS (Black Swan Shield):  2200 bps = 22%
-// DEPEG (Depeg Shield):     2400 bps = 24%
-// IL (IL Index Cover):      2000 bps = 20%
-// EXPLOIT (Exploit Shield):  300 bps = 3%
+// ─── Per-product config (pBase in bps) — from lumina-config.ts ─────────────
+// Maps legacy product IDs to the canonical config
 const PRODUCT_PBASE: Record<string, { pBaseBps: number; deductibleBps: number; triggerDesc: string }> = {
-    'LIQSHIELD-001':   { pBaseBps: 2200, deductibleBps: 3000, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
-    'BLACKSWAN-001':   { pBaseBps: 2200, deductibleBps: 3000, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
-    'DEPEG-USDC-001':  { pBaseBps: 2400, deductibleBps: 500,  triggerDesc: 'USDC/USD stays below $0.95 for 4h (Chainlink)' },
-    'DEPEG-USDT-001':  { pBaseBps: 2400, deductibleBps: 500,  triggerDesc: 'USDT/USD stays below $0.95 for 4h (Chainlink)' },
-    'DEPEG-DAI-001':   { pBaseBps: 2400, deductibleBps: 500,  triggerDesc: 'DAI/USD stays below $0.95 for 4h (Chainlink)' },
-    'DEPEG-STABLE-001':{ pBaseBps: 2400, deductibleBps: 500,  triggerDesc: 'Stablecoin/USD stays below $0.95 for 4h (Chainlink)' },
-    'ILPROT-001':      { pBaseBps: 2000, deductibleBps: 200,  triggerDesc: 'IL% > 2% at expiry (European-style, Chainlink)' },
-    'EXPLOIT-001':     { pBaseBps: 300,  deductibleBps: 0,    triggerDesc: 'Protocol exploit verified by Phala TEE oracle' },
-    'GASSPIKE-001':    { pBaseBps: 2200, deductibleBps: 1000, triggerDesc: 'Base L2 gas >100 gwei for 15 min' },
-    'SLIPPAGE-001':    { pBaseBps: 2200, deductibleBps: 300,  triggerDesc: 'Price moves >5% during execution (immediate)' },
-    'BRIDGE-001':      { pBaseBps: 2200, deductibleBps: 500,  triggerDesc: 'Funds don\'t arrive at destination within 365 days' },
+    'LIQSHIELD-001':   { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: PRODUCTS.BSS.deductibleBps, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
+    'BLACKSWAN-001':   { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: PRODUCTS.BSS.deductibleBps, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
+    'DEPEG-USDC-001':  { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'USDC/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-USDT-001':  { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'USDT/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-DAI-001':   { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'DAI/USD stays below $0.95 for 4h (Chainlink)' },
+    'DEPEG-STABLE-001':{ pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'Stablecoin/USD stays below $0.95 for 4h (Chainlink)' },
+    'ILPROT-001':      { pBaseBps: PRODUCTS.IL.pBaseBps, deductibleBps: PRODUCTS.IL.deductibleBps,  triggerDesc: 'IL% > 2% at expiry (European-style, Chainlink)' },
+    'EXPLOIT-001':     { pBaseBps: PRODUCTS.EXPLOIT.pBaseBps,  deductibleBps: PRODUCTS.EXPLOIT.deductibleBps,    triggerDesc: 'Protocol exploit verified by Phala TEE oracle' },
+    'GASSPIKE-001':    { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: 1000, triggerDesc: 'Base L2 gas >100 gwei for 15 min' },
+    'SLIPPAGE-001':    { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: 300,  triggerDesc: 'Price moves >5% during execution (immediate)' },
+    'BRIDGE-001':      { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: 500,  triggerDesc: 'Funds don\'t arrive at destination within 365 days' },
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -145,7 +120,8 @@ export function calculateYield(input: YieldCalcInput): YieldCalcResult {
     // Break down into components
     const usdyYieldAnnual = depositAmount * aaveBaseYield
     const premiumYieldAnnual = depositAmount * premiumRateAnnual * utilization
-    const protocolFee = premiumYieldAnnual * 0.03
+    const protocolFeeRate = PROTOCOL.feeBps / 10000
+    const protocolFee = premiumYieldAnnual * protocolFeeRate
     const netPremiumYield = premiumYieldAnnual - protocolFee
     const totalAnnualYield = usdyYieldAnnual + netPremiumYield
 
