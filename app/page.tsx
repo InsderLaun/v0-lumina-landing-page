@@ -52,15 +52,19 @@ export default function Home() {
           </motion.h1>
 
           {/* Subheadline */}
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mt-8 mb-12"
+            className="max-w-2xl mx-auto text-center mt-8 mb-12"
           >
-            Your agent buys coverage, oracles verify triggers, payouts arrive in seconds.
-            No claims process. No human judges. No disputes. Just math.
-          </motion.p>
+            <p className="text-lg sm:text-xl text-white/60 leading-relaxed">
+              Your agent buys coverage, oracles verify triggers, payouts arrive in seconds.
+            </p>
+            <p className="text-sm sm:text-base text-white/40 mt-3 tracking-wide font-medium">
+              No claims process <span className="text-white/20 mx-2">·</span> No human judges <span className="text-white/20 mx-2">·</span> No disputes <span className="text-white/20 mx-2">·</span> Just math.
+            </p>
+          </motion.div>
 
           {/* SWITCH PROTECT / EARN */}
           <motion.div
