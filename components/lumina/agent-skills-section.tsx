@@ -15,7 +15,7 @@ const FRAMEWORKS = [
 const luminaService = {
   name: "lumina-insurance",
   description: "Parametric DeFi insurance for AI agents",
-  endpoint: "https://moltagentinsurance-production-6e3d.up.railway.app",
+  endpoint: "https://lumina-protocol-production.up.railway.app",
   capabilities: ["quote", "purchase", "monitor"],
 };
 

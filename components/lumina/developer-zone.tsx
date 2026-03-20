@@ -10,7 +10,7 @@ const TABS = [
     {
         title: "Discover Products",
         command:
-            "curl https://moltagentinsurance-production-6e3d.up.railway.app/api/v1/products",
+            "curl https://lumina-protocol-production.up.railway.app/api/v1/products",
         response: `{
   "products": [
     {

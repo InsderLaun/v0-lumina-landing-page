@@ -143,13 +143,13 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div id="vault-checkboxes" style="display:none;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:14px">
 <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:10px;font-weight:500">Select vaults to approve:</p>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0x2D7D735f71638730cbe9A143227A00Fa64E94E88" data-name="Volatile Short" checked style="accent-color:#22d3ee"> Volatile Short (30d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0xe74d19551cbB809AaDcAb568c0E150B6BF0e3354" data-name="Volatile Short" checked style="accent-color:#22d3ee"> Volatile Short (30d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0xDf30548d46e77015A4dDA82D3c263e81a60B075c" data-name="Volatile Long" checked style="accent-color:#22d3ee"> Volatile Long (90d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0xc0016248E171b2A20Fb0C212AB917AB7fa07502a" data-name="Volatile Long" checked style="accent-color:#22d3ee"> Volatile Long (90d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078" data-name="Stable Short" checked style="accent-color:#22d3ee"> Stable Short (90d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0xa682DC763e6A99607797989C5F44C8aA05a8511e" data-name="Stable Short" checked style="accent-color:#22d3ee"> Stable Short (90d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c" data-name="Stable Long" checked style="accent-color:#22d3ee"> Stable Long (365d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0xE5e3F6898eeecEa4245558429CBFaE9CE255C05e" data-name="Stable Long" checked style="accent-color:#22d3ee"> Stable Long (365d)</label>
 </div>
 
 <button id="btn-approve" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:not-allowed;opacity:0.5" disabled>Approve with MetaMask</button>
@@ -201,9 +201,9 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <details style="margin-top:16px">
 <summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">Alternative method (terminal)</summary>
-<pre style="margin-top:8px">cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
+<pre style="margin-top:8px">cast send 0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1 \
   "approve(address,uint256)" \
-  0x8407afBa100812bFb5f9f188b44379E4268eff94 \
+  0x5755af9cd293b9A0a798B7e2e816eAbE659750C0 \
   10000000000 \
   --rpc-url YOUR_RPC_URL --private-key YOUR_KEY</pre>
 <div class="info">
@@ -309,9 +309,9 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div class="killswitch">
 <p class="killswitch-title">If something goes wrong — revoke the approve:</p>
 <p>Set approve to 0. This instantly stops all purchases.</p>
-<pre>cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
+<pre>cast send 0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1 \
   "approve(address,uint256)" \
-  0x8407afBa100812bFb5f9f188b44379E4268eff94 0 \
+  0x5755af9cd293b9A0a798B7e2e816eAbE659750C0 0 \
   --rpc-url YOUR_RPC_URL --private-key YOUR_KEY</pre>
 </div>
 
@@ -374,16 +374,16 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   'use strict';
 
   // --- Constants ---
-  const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-  const COVER_ROUTER = '0x8407afBa100812bFb5f9f188b44379E4268eff94';
+  const USDC_ADDRESS = '0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1';
+  const COVER_ROUTER = '0x5755af9cd293b9A0a798B7e2e816eAbE659750C0';
   const BASE_CHAIN_ID = '0x2105';
   const UINT256_MAX = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
 
   const VAULTS = [
-    { address: '0x2D7D735f71638730cbe9A143227A00Fa64E94E88', name: 'Volatile Short' },
-    { address: '0xDf30548d46e77015A4dDA82D3c263e81a60B075c', name: 'Volatile Long' },
-    { address: '0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078', name: 'Stable Short' },
-    { address: '0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c', name: 'Stable Long' }
+    { address: '0xe74d19551cbB809AaDcAb568c0E150B6BF0e3354', name: 'Volatile Short' },
+    { address: '0xc0016248E171b2A20Fb0C212AB917AB7fa07502a', name: 'Volatile Long' },
+    { address: '0xa682DC763e6A99607797989C5F44C8aA05a8511e', name: 'Stable Short' },
+    { address: '0xE5e3F6898eeecEa4245558429CBFaE9CE255C05e', name: 'Stable Long' }
   ];
 
   const TOOLTIP_INSURANCE = '\uD83D\uDCB3 Your limit, your control: This amount is the maximum \'allowance\' your AI Agent is permitted to use. If the Agent detects a risk and wants to buy $100 of insurance but you only approved $50, the purchase will be blocked. You own the money; the Agent is just the manager.';

@@ -7,7 +7,7 @@ import { usePerspective } from "./perspective-context"
 import { GITHUB_URL } from "@/lib/constants"
 
 const PROMPT_TEXT =
-    "You are an AI agent with access to HTTP requests. Connect to Lumina Protocol's REST API at https://moltagentinsurance-production-6e3d.up.railway.app/api/v1/products to discover parametric insurance products. Full documentation: https://github.com/agustintiberio10/LUMINA-PROTOCOL/tree/main/docs"
+    "You are an AI agent with access to HTTP requests. Connect to Lumina Protocol's REST API at https://lumina-protocol-production.up.railway.app/api/v1/products to discover parametric insurance products. Full documentation: https://github.com/agustintiberio10/LUMINA-PROTOCOL/tree/main/docs"
 
 interface DualEngineSectionProps {
     onRegisterAgent: () => void

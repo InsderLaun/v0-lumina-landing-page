@@ -18,7 +18,8 @@ export const CHAIN = {
 
 export const TOKENS = {
   USDC: {
-    address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as `0x${string}`,
+    // TEST DEPLOYMENT - MockUSDC. Production will use real USDC: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+    address: "0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1" as `0x${string}`,
     symbol: "USDC",
     name: "USD Coin",
     decimals: 6,
@@ -42,23 +43,23 @@ export const ORACLES = {
   BTC_USD: "0x45c32AEd995834F0A484FD092953258814774393" as `0x${string}`,
 } as const
 
-// CONTRACTS — update these addresses post-deploy
+// CONTRACTS — TEST DEPLOYMENT on Base Mainnet (March 2026)
 export const CONTRACTS = {
-  CoverRouter: "0x8407afBa100812bFb5f9f188b44379E4268eff94" as `0x${string}`,
-  PolicyManager: "0x615e9c32c70350192fCa9BAC06Ba8ebA9dC4fEF4" as `0x${string}`,
-  Oracle: "0x2F9d3DA66FCB84F47851636d9e0921373ede2176" as `0x${string}`,
-  Phala: "0xa2d461f4A7eC7089A7e414986d9d9b43514a82EC" as `0x${string}`,
+  CoverRouter: "0x5755af9cd293b9A0a798B7e2e816eAbE659750C0" as `0x${string}`,
+  PolicyManager: "0x5B337325b854a68Cd262aa2b6fE48EBe18073902" as `0x${string}`,
+  Oracle: "0x4916aC095c3B64443E87f3bc70A39146eC0B065d" as `0x${string}`,
+  Phala: "0xE44a263ccBc70DC761D955A590FDdA4F7a14Ccaf" as `0x${string}`,
   vaults: {
-    VolatileShort: "0x2D7D735f71638730cbe9A143227A00Fa64E94E88" as `0x${string}`,
-    VolatileLong: "0xDf30548d46e77015A4dDA82D3c263e81a60B075c" as `0x${string}`,
-    StableShort: "0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078" as `0x${string}`,
-    StableLong: "0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c" as `0x${string}`,
+    VolatileShort: "0xe74d19551cbB809AaDcAb568c0E150B6BF0e3354" as `0x${string}`,
+    VolatileLong: "0xc0016248E171b2A20Fb0C212AB917AB7fa07502a" as `0x${string}`,
+    StableShort: "0xa682DC763e6A99607797989C5F44C8aA05a8511e" as `0x${string}`,
+    StableLong: "0xE5e3F6898eeecEa4245558429CBFaE9CE255C05e" as `0x${string}`,
   },
   shields: {
-    BSS: "0xC01ED8eF52506B29545f08BBf9aAe5Fe59b15CF7" as `0x${string}`,
-    Depeg: "0xCdA417909d43F252f63034346db9121441BfE70F" as `0x${string}`,
-    ILIndex: "0x73fB5CB9Aa0BeBAf74a3a4b6Cfb09d3Fd66C9FB6" as `0x${string}`,
-    Exploit: "0x05170F9Ca56026001064F5242c6F9F7f181c6baA" as `0x${string}`,
+    BSS: "0x149e1d0474a7c212a5eAA78432863B01b98479d8" as `0x${string}`,
+    Depeg: "0xaD1EB669b4a9DC6C9432B904F65B360962E1d381" as `0x${string}`,
+    ILIndex: "0xc2262311eD02E9c937cBC33F34426D5D9134F6CF" as `0x${string}`,
+    Exploit: "0x931427cED326eB49a3E5268b9b3e713Eb2EC5440" as `0x${string}`,
   },
 } as const
 
