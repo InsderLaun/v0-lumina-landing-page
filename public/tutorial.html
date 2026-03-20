@@ -145,7 +145,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
 <input type="checkbox" class="vault-cb" data-vault="0x2D7D735f71638730cbe9A143227A00Fa64E94E88" data-name="Volatile Short" checked style="accent-color:#22d3ee"> Volatile Short (30d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0xDF30548d46e770154AdA82D3c263e81a608075c" data-name="Volatile Long" checked style="accent-color:#22d3ee"> Volatile Long (90d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0xDf30548d46e77015A4dDA82D3c263e81a60B075c" data-name="Volatile Long" checked style="accent-color:#22d3ee"> Volatile Long (90d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
 <input type="checkbox" class="vault-cb" data-vault="0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078" data-name="Stable Short" checked style="accent-color:#22d3ee"> Stable Short (90d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer">
@@ -203,7 +203,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">Alternative method (terminal)</summary>
 <pre style="margin-top:8px">cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
   "approve(address,uint256)" \
-  0x8407aF8a100812bFb5f9f188b44379E4268efF94 \
+  0x8407afBa100812bFb5f9f188b44379E4268eff94 \
   10000000000 \
   --rpc-url YOUR_RPC_URL --private-key YOUR_KEY</pre>
 <div class="info">
@@ -311,7 +311,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <p>Set approve to 0. This instantly stops all purchases.</p>
 <pre>cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
   "approve(address,uint256)" \
-  0x8407aF8a100812bFb5f9f188b44379E4268efF94 0 \
+  0x8407afBa100812bFb5f9f188b44379E4268eff94 0 \
   --rpc-url YOUR_RPC_URL --private-key YOUR_KEY</pre>
 </div>
 
@@ -375,13 +375,13 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
   // --- Constants ---
   const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-  const COVER_ROUTER = '0x8407aF8a100812bFb5F9F188b44379E4268efF94';
+  const COVER_ROUTER = '0x8407afBa100812bFb5f9f188b44379E4268eff94';
   const BASE_CHAIN_ID = '0x2105';
   const UINT256_MAX = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
 
   const VAULTS = [
     { address: '0x2D7D735f71638730cbe9A143227A00Fa64E94E88', name: 'Volatile Short' },
-    { address: '0xDF30548d46e770154AdA82D3c263e81a608075c', name: 'Volatile Long' },
+    { address: '0xDf30548d46e77015A4dDA82D3c263e81a60B075c', name: 'Volatile Long' },
     { address: '0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078', name: 'Stable Short' },
     { address: '0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c', name: 'Stable Long' }
   ];

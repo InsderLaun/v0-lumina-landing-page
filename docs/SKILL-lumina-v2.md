@@ -149,7 +149,7 @@ Lumina has 4 vaults where you can deposit USDC to earn yield from insurance prem
 │ Vault           │ Lockup   │ Contract Address                                │
 ├─────────────────┼──────────┼─────────────────────────────────────────────────┤
 │ Volatile Short  │ 30 days  │ 0x2D7D735f71638730cbe9A143227A00Fa64E94E88     │
-│ Volatile Long   │ 90 days  │ 0xDF30548d46e770154AdA82D3c263e81a608075c      │
+│ Volatile Long   │ 90 days  │ 0xDf30548d46e77015A4dDA82D3c263e81a60B075c      │
 │ Stable Short    │ 90 days  │ 0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078    │
 │ Stable Long     │ 365 days │ 0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c    │
 └─────────────────┴──────────┴─────────────────────────────────────────────────┘
@@ -241,8 +241,8 @@ Protocol fee: 3% on premiums + 3% on payouts.
 ════════════════════════════════════════════════════════════
 
 USDC (settlement token):     0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-CoverRouter (buy policies):  0x8407aF8a100812bFb5F9F188b44379E4268efF94
-PolicyManager:               0x615e9c32c70350192fCa98AC06Ba8eb49dC4fEF4
+CoverRouter (buy policies):  0x8407afBa100812bFb5f9f188b44379E4268eff94
+PolicyManager:               0x615e9c32c70350192fCa9BAC06Ba8ebA9dC4fEF4
 Oracle:                      0x2F9d3DA66FCB84F47851636d9e0921373ede2176
 Phala Verifier:              0xa2d461f4A7eC7089A7e414986d9d9b43514a82EC
 

@@ -44,21 +44,21 @@ export const ORACLES = {
 
 // CONTRACTS — update these addresses post-deploy
 export const CONTRACTS = {
-  CoverRouter: "0x8407aF8a100812bFb5F9F188b44379E4268efF94" as `0x${string}`,
-  PolicyManager: "0x615e9c32c70350192fCa98AC06Ba8eb49dC4fEF4" as `0x${string}`,
+  CoverRouter: "0x8407afBa100812bFb5f9f188b44379E4268eff94" as `0x${string}`,
+  PolicyManager: "0x615e9c32c70350192fCa9BAC06Ba8ebA9dC4fEF4" as `0x${string}`,
   Oracle: "0x2F9d3DA66FCB84F47851636d9e0921373ede2176" as `0x${string}`,
   Phala: "0xa2d461f4A7eC7089A7e414986d9d9b43514a82EC" as `0x${string}`,
   vaults: {
     VolatileShort: "0x2D7D735f71638730cbe9A143227A00Fa64E94E88" as `0x${string}`,
-    VolatileLong: "0xDF30548d46e770154AdA82D3c263e81a608075c" as `0x${string}`,
+    VolatileLong: "0xDf30548d46e77015A4dDA82D3c263e81a60B075c" as `0x${string}`,
     StableShort: "0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078" as `0x${string}`,
     StableLong: "0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c" as `0x${string}`,
   },
   shields: {
-    BSS: "0xC01ED8eF525068290545f08BBf9aAe5Fe59b15CF7" as `0x${string}`,
-    Depeg: "0xCdA417909d43F252F63034346db91244188fE70F" as `0x${string}`,
-    ILIndex: "0x73fB5CB9Aa08e8Af74a3a4b6Cfb09d3Fd66C9FB6" as `0x${string}`,
-    Exploit: "0x05170F9Ca560260001064F5242c6F9F7f181c6baA" as `0x${string}`,
+    BSS: "0xC01ED8eF52506B29545f08BBf9aAe5Fe59b15CF7" as `0x${string}`,
+    Depeg: "0xCdA417909d43F252f63034346db9121441BfE70F" as `0x${string}`,
+    ILIndex: "0x73fB5CB9Aa0BeBAf74a3a4b6Cfb09d3Fd66C9FB6" as `0x${string}`,
+    Exploit: "0x05170F9Ca56026001064F5242c6F9F7f181c6baA" as `0x${string}`,
   },
 } as const
 
