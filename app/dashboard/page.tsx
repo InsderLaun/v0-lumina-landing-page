@@ -120,11 +120,7 @@ const SHIELD_DESCRIPTIONS: Record<string, string> = {
   "Exploit Shield": "Covers smart contract exploits and hacks",
 }
 
-const RPC_URLS = [
-  "https://1rpc.io/base",
-  "https://base.llamarpc.com",
-  CHAIN.rpc,
-]
+const RPC_URLS = ["/api/rpc"]
 const MOCK_WALLET = PROTOCOL.feeReceiver
 const API_URL = PROTOCOL.apiBaseUrl
 
