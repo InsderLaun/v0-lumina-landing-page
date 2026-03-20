@@ -121,8 +121,9 @@ const SHIELD_DESCRIPTIONS: Record<string, string> = {
 }
 
 const RPC_URLS = [
-  CHAIN.rpc,
   "https://base.llamarpc.com",
+  "https://1rpc.io/base",
+  CHAIN.rpc,
 ]
 const MOCK_WALLET = PROTOCOL.feeReceiver
 const API_URL = PROTOCOL.apiBaseUrl
@@ -317,8 +318,9 @@ export default function DashboardPage() {
       allCalls.push({ to: shield.address, data: SEL_TOTAL_POLICIES })
     }
 
-    console.log(`[Lumina] Vault batch: ${allCalls.length} calls in 1 HTTP request`)
+    console.log(`[Lumina] Vault batch: ${allCalls.length} calls to`, VAULT_CONFIG.map(v => v.address))
     const raw = await rpcBatch(allCalls)
+    console.log(`[Lumina] Raw RPC response (first 4):`, raw.slice(0, 4))
 
     // ── Parse vault data (calls 0-23) ──
     const vaultResults: VaultData[] = []
