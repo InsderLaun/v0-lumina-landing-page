@@ -43,14 +43,16 @@ Expected: {"status":"ok","chain":"base","chainId":8453}
 4. INSURANCE PRODUCTS
 ════════════════════════════════════════════════════════════
 
-┌──────────┬──────────────────────┬────────────┬────────────┬──────────────┐
-│ Product  │ What it covers       │ Duration   │ Deductible │ Trigger      │
-├──────────┼──────────────────────┼────────────┼────────────┼──────────────┤
-│ BSS      │ ETH crash ≥30%       │ 7-30 days  │ 20%        │ ETH price    │
-│ DEPEG    │ USDT/DAI loses peg (USDC excluded) │ 14-365 days│ 10%        │ Peg deviation│
-│ IL       │ Impermanent loss     │ 14-90 days │ 2%         │ IL index     │
-│ EXPLOIT  │ Smart contract hack (Aave V3 excluded) │ 90-365 days│ 10%        │ Oracle report│
-└──────────┴──────────────────────┴────────────┴────────────┴──────────────┘
+┌──────────┬──────────────────────────┬────────────┬────────────┬──────────────┐
+│ Product  │ What it covers           │ Duration   │ Deductible │ Trigger      │
+├──────────┼──────────────────────────┼────────────┼────────────┼──────────────┤
+│ BSS      │ ETH crash ≥30%           │ 7-30 days  │ 20%        │ ETH price    │
+│ DEPEG    │ USDT or DAI loses peg    │ 14-365 days│ USDT:15%   │ Peg deviation│
+│          │ (USDC excluded)          │            │ DAI:12%    │              │
+│ IL       │ Impermanent loss         │ 14-90 days │ 2%         │ IL index     │
+│ EXPLOIT  │ Smart contract hack      │ 90-365 days│ 10%        │ Oracle+TEE   │
+│          │ (Aave V3 excluded)       │            │            │              │
+└──────────┴──────────────────────────┴────────────┴────────────┴──────────────┘
 
 GET /api/v2/products — returns full product details with current pricing
 
@@ -63,7 +65,9 @@ Your owner must have USDC on Base in their wallet and must have approved the Cov
 
 STEP 2 — Get a quote (optional but recommended):
 GET /api/v2/quote?productId=BSS&coverageAmount=1000000000&durationSeconds=604800
-Response: {"premium":25000000,"premiumUSD":25.00,"product":"BSS","coverage":1000000000}
+Response: {"premium":1635000,"premiumUSD":1.64,"product":"BSS","coverage":1000000000}
+
+Premium varies based on vault utilization. This example assumes ~50% utilization.
 
 This tells you the cost BEFORE buying. Always quote first to avoid surprises.
 
@@ -95,7 +99,7 @@ durationSeconds reference:
 Min coverage: $100 | Max coverage: $100,000
 
 Response on success:
-{"success":true,"policyId":"...","premium":25000000,"txHash":"0x..."}
+{"success":true,"policyId":"...","premium":1635000,"txHash":"0x..."}
 
 STEP 4 — Verify your policy:
 GET /api/v2/policies?buyer=0xYOUR_WALLET
@@ -122,8 +126,29 @@ Body: {"policyId":"YOUR_POLICY_ID"}
 
 Response: {"success":true,"payout":800000000,"txHash":"0x..."}
 
-Payout = coverageAmount × (1 - deductibleBps/10000)
-Example: $1000 BSS with 20% deductible → payout = $800
+Gross Payout = coverageAmount × (1 - deductibleBps/10000)
+Protocol Fee = Gross Payout × 3%
+Net Payout = Gross Payout - Protocol Fee
+
+Example: $1000 BSS with 20% deductible:
+  Gross Payout = $1000 × 0.80 = $800
+  Protocol Fee = $800 × 0.03 = $24
+  Net Payout (you receive) = $776
+
+PENDING PAYOUTS (if Aave has low liquidity):
+If the vault cannot withdraw USDC from Aave at the time of your claim (rare, only during extreme Aave utilization), your payout is queued automatically. You will NOT lose your payout.
+
+To claim a pending payout:
+POST /api/v2/claim-pending
+Headers: X-API-Key: YOUR_KEY
+Body: {"policyId":"YOUR_POLICY_ID"}
+
+Or on-chain: call claimPendingPayout() on the vault contract.
+
+The payout will execute as soon as Aave has sufficient liquidity. Check periodically (every hour) until you receive it.
+
+LARGE PAYOUT DELAY:
+Payouts above the large payout threshold may be delayed by up to 6 hours as a security measure. This is automatic and the payout executes after the delay. The protocol owner can cancel suspicious payouts during this window.
 
 IMPORTANT TIMING:
 - You have a 24-HOUR GRACE PERIOD after policy expiry to claim
@@ -159,9 +184,10 @@ GET /api/v2/vaults
 Returns: TVL, utilization, estimated APY for each vault
 
 YIELD SOURCES:
-- Base yield: Aave V3 lending APY (~3-5%, variable)
-- Premium yield: from insurance policies purchased by agents
-- Total yield = Aave yield + premium yield
+- Base yield: USDC is deposited into Aave V3 on Base, earning lending APY (~3-5%, variable)
+- Premium yield: additional yield from insurance premiums paid by AI agents
+- Total yield = Aave V3 yield + premium yield
+- Your USDC is supplied to Aave V3. The vault holds aUSDC (Aave's receipt token) which grows in value automatically as interest accrues.
 
 DEPOSITING:
 Your owner must approve each vault contract to spend their USDC (done in tutorial Step 2).
@@ -194,6 +220,7 @@ DEPEG (Depeg Shield):
 - Recommended coverage: 70-100% of stablecoin holdings
 - Remember: 24-hour waiting period — buy BEFORE you think you'll need it
 - Note: USDC cannot be insured. Lumina settles in USDC, so insuring it would be circular. Use this for USDT or DAI holdings.
+- Deductible varies by stablecoin: USDT = 15% (higher risk, opaque reserves), DAI = 12% (crypto-collateralized, cascade risk). This means for $10,000 USDT coverage, max payout is $8,500. For DAI, max payout is $8,800.
 
 IL (IL Index Cover):
 - Buy when: You provide liquidity in volatile pairs, the pair's price ratio is diverging, you want to hedge IL risk
@@ -239,6 +266,8 @@ Protocol fee: 3% on premiums + 3% on payouts.
 ════════════════════════════════════════════════════════════
 10. SMART CONTRACT ADDRESSES (Base Mainnet)
 ════════════════════════════════════════════════════════════
+
+NOTE: These addresses correspond to the current deployment. They will be updated when new contracts are deployed. Always verify addresses at https://www.lumina-org.com or via the API.
 
 USDC (settlement token):     0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
 CoverRouter (buy policies):  0x8407afBa100812bFb5f9f188b44379E4268eff94
