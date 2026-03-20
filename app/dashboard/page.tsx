@@ -592,7 +592,7 @@ export default function DashboardPage() {
   // ════════════════════════════════════════════
   // FORMAT HELPERS (centralized)
   // ════════════════════════════════════════════
-  function formatUSDY(amount: number): string {
+  function formatUSD(amount: number): string {
     const usd = amount / 1e6
     return usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
@@ -826,17 +826,17 @@ export default function DashboardPage() {
 
       <div className="mb-6">
         <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Protocol TVL</p>
-        <p className="text-2xl font-bold text-white font-mono tabular-nums">${formatUSDY(protocolTVL)}</p>
+        <p className="text-2xl font-bold text-white font-mono tabular-nums">${formatUSD(protocolTVL)}</p>
         <div className="mt-2 space-y-1">
           <p className="text-xs text-cyan-400 font-mono tabular-nums">
-            Coverage: ${formatUSDY(activeCoverage)}
+            Coverage: ${formatUSD(activeCoverage)}
           </p>
           <p className="text-xs text-purple-400 font-mono tabular-nums">
-            Your Deposits: ${formatUSDY(totalUserValue)}
+            Your Deposits: ${formatUSD(totalUserValue)}
           </p>
           {totalPendingWithdrawals > 0 && (
             <p className="text-xs text-amber-400 font-mono tabular-nums">
-              Pending withdrawals: ${formatUSDY(totalPendingWithdrawals)}
+              Pending withdrawals: ${formatUSD(totalPendingWithdrawals)}
             </p>
           )}
         </div>
@@ -917,15 +917,15 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
           <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Protocol TVL<Tip text="Total Value Locked — the sum of all capital deposited across the four insurance vaults" /></p>
-          <p className="text-2xl font-bold text-purple-400 font-mono tabular-nums">${formatUSDY(protocolTVL)}</p>
+          <p className="text-2xl font-bold text-purple-400 font-mono tabular-nums">${formatUSD(protocolTVL)}</p>
           <p className="text-[10px] text-white/30 mt-1 font-mono tabular-nums">
-            Your deposits: ${formatUSDY(totalUserValue)}
+            Your deposits: ${formatUSD(totalUserValue)}
           </p>
         </div>
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
           <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Active Coverage<Tip text="Total insured amount across all active policies purchased by AI agents" /></p>
           <p className="text-2xl font-bold text-cyan-400 font-mono tabular-nums">
-            ${formatUSDY(activeCoverage)}
+            ${formatUSD(activeCoverage)}
           </p>
           <p className="text-[10px] text-white/30 mt-1">
             {activePolicies.length} active {activePolicies.length === 1 ? "policy" : "policies"}
@@ -933,14 +933,14 @@ export default function DashboardPage() {
         </div>
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
           <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Total Premiums Collected</p>
-          <p className="text-2xl font-bold text-green-400 font-mono tabular-nums">${formatUSDY(totalPremiums)}</p>
+          <p className="text-2xl font-bold text-green-400 font-mono tabular-nums">${formatUSD(totalPremiums)}</p>
           <p className="text-[10px] text-white/30 mt-1">
-            Protocol fee: <span className="font-mono tabular-nums">${formatUSDY(Math.round(totalPremiums * 0.03))}</span>
+            Protocol fee: <span className="font-mono tabular-nums">${formatUSD(Math.round(totalPremiums * 0.03))}</span>
           </p>
         </div>
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5">
           <p className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Capital Allocated<Tip text="Capital reserved to back active insurance policies. Higher allocation = higher premiums for new policies" /></p>
-          <p className="text-2xl font-bold text-white font-mono tabular-nums">${formatUSDY(totalAllocated)}</p>
+          <p className="text-2xl font-bold text-white font-mono tabular-nums">${formatUSD(totalAllocated)}</p>
           <p className="text-[10px] text-white/30 mt-1 font-mono tabular-nums">
             {protocolTVL > 0 ? ((totalAllocated / protocolTVL) * 100).toFixed(1) : "0.0"}% utilization
           </p>
@@ -960,7 +960,7 @@ export default function DashboardPage() {
                 <div key={vault.address} className="flex items-center gap-3">
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${vault.color === "purple" ? "bg-purple-500" : "bg-cyan-500"}`} />
                   <span className="text-xs text-white/70 flex-1">{vault.name}</span>
-                  <span className="text-xs font-mono tabular-nums text-white/50">${formatUSDY(data.totalAssets)}</span>
+                  <span className="text-xs font-mono tabular-nums text-white/50">${formatUSD(data.totalAssets)}</span>
                   <div className="w-20 h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${vault.color === "purple" ? "bg-purple-500" : "bg-cyan-500"}`}
@@ -980,7 +980,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Volume Protected</p>
-            <p className="text-lg font-bold text-cyan-400 font-mono tabular-nums">${formatUSDY(policies.reduce((s, p) => s + p.coverageAmount, 0))}</p>
+            <p className="text-lg font-bold text-cyan-400 font-mono tabular-nums">${formatUSD(policies.reduce((s, p) => s + p.coverageAmount, 0))}</p>
           </div>
           <div>
             <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Policies Issued</p>
@@ -988,7 +988,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Claims Paid</p>
-            <p className="text-lg font-bold text-white font-mono tabular-nums">${formatUSDY(policies.filter(p => p.status === 5).reduce((s, p) => s + p.maxPayout, 0))}</p>
+            <p className="text-lg font-bold text-white font-mono tabular-nums">${formatUSD(policies.filter(p => p.status === 5).reduce((s, p) => s + p.maxPayout, 0))}</p>
             <p className="text-[10px] text-white/20">{policies.filter(p => p.status === 5).length} claims</p>
           </div>
           <div>
@@ -1015,10 +1015,10 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${vault.color === "purple" ? "bg-purple-500" : "bg-cyan-500"}`} />
                   <span className="text-xs text-white/60">{vault.name}</span>
-                  <span className="text-[10px] text-white/20 font-mono">TVL ${formatUSDY(data.totalAssets)}</span>
+                  <span className="text-[10px] text-white/20 font-mono">TVL ${formatUSD(data.totalAssets)}</span>
                 </div>
                 <span className={`text-xs font-mono tabular-nums font-semibold ${isPositive ? "text-green-400" : "text-red-400"}`}>
-                  {isPositive ? "+" : "-"}${formatUSDY(Math.abs(yieldEarned))}
+                  {isPositive ? "+" : "-"}${formatUSD(Math.abs(yieldEarned))}
                 </span>
               </div>
             )
@@ -1037,7 +1037,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
               <span className="text-xs text-purple-400 font-semibold">Total Yield Earned</span>
               <span className={`text-sm font-bold font-mono tabular-nums ${isPositive ? "text-green-400" : "text-red-400"}`}>
-                {isPositive ? "+" : "-"}${formatUSDY(Math.abs(totalYield))}
+                {isPositive ? "+" : "-"}${formatUSD(Math.abs(totalYield))}
               </span>
             </div>
           )
@@ -1139,16 +1139,16 @@ export default function DashboardPage() {
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-xs">
                       <span className="text-white/40">Your Deposit</span>
-                      <span className="text-white font-mono tabular-nums">${formatUSDY(depositedValue)}</span>
+                      <span className="text-white font-mono tabular-nums">${formatUSD(depositedValue)}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-white/40">Current Value</span>
-                      <span className="text-white font-mono tabular-nums">${formatUSDY(data.userValue)}</span>
+                      <span className="text-white font-mono tabular-nums">${formatUSD(data.userValue)}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-white/40">Yield Earned</span>
                       <span className="text-green-400 font-mono tabular-nums">
-                        +${formatUSDY(Math.max(0, yieldEarned))}
+                        +${formatUSD(Math.max(0, yieldEarned))}
                       </span>
                     </div>
                   </div>
@@ -1162,7 +1162,7 @@ export default function DashboardPage() {
                 <div className="border-t border-white/10 pt-3 space-y-2">
                   <div className="flex justify-between text-xs">
                     <span className="text-white/40">Vault TVL</span>
-                    <span className="text-white/70 font-mono tabular-nums">${formatUSDY(data.totalAssets)}</span>
+                    <span className="text-white/70 font-mono tabular-nums">${formatUSD(data.totalAssets)}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-white/40">Utilization<Tip text="Percentage of vault capital backing active policies. Higher utilization means higher yields but also higher risk" /></span>
@@ -1213,14 +1213,14 @@ export default function DashboardPage() {
                     <div className="mt-3 bg-green-500/10 border border-green-500/20 rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] text-green-400 uppercase tracking-wider font-semibold">Ready to Withdraw</span>
-                        <span className="text-green-400 font-mono tabular-nums text-xs">${formatUSDY(withdrawalValue)}</span>
+                        <span className="text-green-400 font-mono tabular-nums text-xs">${formatUSD(withdrawalValue)}</span>
                       </div>
                     </div>
                   ) : (
                     <div className="mt-3 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[10px] text-amber-400 uppercase tracking-wider font-semibold">Withdrawal Pending</span>
-                        <span className="text-[10px] text-amber-400/70 font-mono tabular-nums">${formatUSDY(withdrawalValue)} requested</span>
+                        <span className="text-[10px] text-amber-400/70 font-mono tabular-nums">${formatUSD(withdrawalValue)} requested</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] text-white/40">Available to withdraw:</span>
@@ -1239,14 +1239,14 @@ export default function DashboardPage() {
                     <div key={`v2-${qi}`} className="mt-3 bg-green-500/10 border border-green-500/20 rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] text-green-400 uppercase tracking-wider font-semibold">Ready to Withdraw</span>
-                        <span className="text-green-400 font-mono tabular-nums text-xs">${formatUSDY(reqValue)}</span>
+                        <span className="text-green-400 font-mono tabular-nums text-xs">${formatUSD(reqValue)}</span>
                       </div>
                     </div>
                   ) : (
                     <div key={`v2-${qi}`} className="mt-3 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[10px] text-amber-400 uppercase tracking-wider font-semibold">Withdrawal Pending</span>
-                        <span className="text-[10px] text-amber-400/70 font-mono tabular-nums">${formatUSDY(reqValue)} requested</span>
+                        <span className="text-[10px] text-amber-400/70 font-mono tabular-nums">${formatUSD(reqValue)} requested</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] text-white/40">Available to withdraw:</span>
@@ -1346,19 +1346,19 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-5">
                   <div>
                     <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Coverage</p>
-                    <p className="text-sm font-semibold font-mono tabular-nums text-white">${formatUSDY(policy.coverageAmount)}</p>
+                    <p className="text-sm font-semibold font-mono tabular-nums text-white">${formatUSD(policy.coverageAmount)}</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Premium Paid</p>
-                    <p className="text-sm font-semibold font-mono tabular-nums text-white">${formatUSDY(policy.premiumPaid)}</p>
+                    <p className="text-sm font-semibold font-mono tabular-nums text-white">${formatUSD(policy.premiumPaid)}</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Max Payout (<span className="font-mono tabular-nums">{payoutPct}%</span>)</p>
-                    <p className="text-sm font-semibold font-mono tabular-nums text-cyan-400">${formatUSDY(policy.maxPayout)}</p>
+                    <p className="text-sm font-semibold font-mono tabular-nums text-cyan-400">${formatUSD(policy.maxPayout)}</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Net Payout (after 3% fee)</p>
-                    <p className="text-sm font-semibold font-mono tabular-nums text-cyan-400">${formatUSDY(netPayout)}</p>
+                    <p className="text-sm font-semibold font-mono tabular-nums text-cyan-400">${formatUSD(netPayout)}</p>
                   </div>
                 </div>
 
@@ -1433,12 +1433,12 @@ export default function DashboardPage() {
       }
       if (v.withdrawalShares > 0n && v.cooldownEnd > 0 && v.cooldownEnd < nowTs) {
         const val = v.totalSupply > 0n ? Number((v.withdrawalShares * BigInt(v.totalAssets)) / v.totalSupply) : 0
-        alerts.push({ icon: "\u2705", color: "text-green-400", borderColor: "border-green-500/40", text: `$${formatUSDY(val)} ready to withdraw from ${VAULT_CONFIG[vi].name}` })
+        alerts.push({ icon: "\u2705", color: "text-green-400", borderColor: "border-green-500/40", text: `$${formatUSD(val)} ready to withdraw from ${VAULT_CONFIG[vi].name}` })
       }
       for (const req of v.withdrawalQueueV2) {
         if (req.cooldownEnd > 0 && req.cooldownEnd < nowTs) {
           const val = v.totalSupply > 0n ? Number((req.shares * BigInt(v.totalAssets)) / v.totalSupply) : 0
-          alerts.push({ icon: "\u2705", color: "text-green-400", borderColor: "border-green-500/40", text: `$${formatUSDY(val)} ready to withdraw from ${VAULT_CONFIG[vi].name}` })
+          alerts.push({ icon: "\u2705", color: "text-green-400", borderColor: "border-green-500/40", text: `$${formatUSD(val)} ready to withdraw from ${VAULT_CONFIG[vi].name}` })
         }
       }
     }
@@ -1455,11 +1455,11 @@ export default function DashboardPage() {
           </div>
           <div className="bg-white/[0.03] border border-white/10 rounded-xl p-3">
             <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Total Coverage</p>
-            <p className="text-lg font-bold text-cyan-400 font-mono tabular-nums">${formatUSDY(activeCoverage)}</p>
+            <p className="text-lg font-bold text-cyan-400 font-mono tabular-nums">${formatUSD(activeCoverage)}</p>
           </div>
           <div className="bg-white/[0.03] border border-white/10 rounded-xl p-3">
             <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Premiums Paid</p>
-            <p className="text-lg font-bold text-purple-400 font-mono tabular-nums">${formatUSDY(totalPremiums)}</p>
+            <p className="text-lg font-bold text-purple-400 font-mono tabular-nums">${formatUSD(totalPremiums)}</p>
           </div>
           <div className="bg-white/[0.03] border border-white/10 rounded-xl p-3">
             <p className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Avg Premium Rate</p>
@@ -1525,7 +1525,7 @@ export default function DashboardPage() {
                           </span>
                         </div>
                         <p className="text-xs text-white/50 font-mono">
-                          ${formatUSDY(policy.coverageAmount)} coverage · {durationDays}d · ${formatUSDY(policy.premiumPaid)} premium
+                          ${formatUSD(policy.coverageAmount)} coverage · {durationDays}d · ${formatUSD(policy.premiumPaid)} premium
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0">
@@ -1565,8 +1565,8 @@ export default function DashboardPage() {
       { category: "VAULTS", items: VAULT_CONFIG.map(v => ({ alias: v.name, addr: v.address })) },
       { category: "SHIELDS", items: SHIELD_LIST.map(s => ({ alias: s.name, addr: s.address })) },
       { category: "ORACLE", items: [
-        { alias: "Oracle", addr: "0x2F9d3DA66FCB84F47851636d9e0921373ede2176" },
-        { alias: "Phala Verifier", addr: "0xa2d461f4A7eC7089A7e414986d9d9b43514a82EC" },
+        { alias: "Oracle", addr: CONTRACTS.Oracle },
+        { alias: "Phala Verifier", addr: CONTRACTS.Phala },
       ]},
     ]
 
@@ -1667,7 +1667,7 @@ export default function DashboardPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-white/40">Protocol Admin</span>
-              <a href="https://basescan.org/address/0x2b4D825417f568231e809E31B9332ED146760337" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 font-mono hover:text-cyan-300">0x2b4D825417f568231e809E31B9332ED146760337 &nearr;</a>
+              <a href={`${CHAIN.explorer}/address/${PROTOCOL.feeReceiver}`} target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 font-mono hover:text-cyan-300">{PROTOCOL.feeReceiver} &nearr;</a>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs text-white/40">Technical Support</span>
@@ -1679,7 +1679,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-xs text-white/40">Chain</span>
-              <span className="text-xs text-white/70 font-mono">Base Mainnet (Chain ID: 8453)</span>
+              <span className="text-xs text-white/70 font-mono">{CHAIN.name} (Chain ID: {CHAIN.id})</span>
             </div>
           </div>
         </div>
