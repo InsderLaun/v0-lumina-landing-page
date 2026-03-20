@@ -121,8 +121,8 @@ const SHIELD_DESCRIPTIONS: Record<string, string> = {
 }
 
 const RPC_URLS = [
-  "https://base.llamarpc.com",
   "https://1rpc.io/base",
+  "https://base.llamarpc.com",
   CHAIN.rpc,
 ]
 const MOCK_WALLET = PROTOCOL.feeReceiver
