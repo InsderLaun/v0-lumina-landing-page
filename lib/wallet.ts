@@ -1,7 +1,7 @@
 // lib/wallet.ts
 // ════════════════════════════════════════════════════════════
 // LUMINA PROTOCOL — Shared Wallet Module
-// Used by landing page, dashboard, and any future pages.
+// Supports ALL wallets that inject window.ethereum (MetaMask, Phantom, Coinbase, etc.)
 // State persisted in localStorage for cross-page sharing.
 // ════════════════════════════════════════════════════════════
 
@@ -9,6 +9,7 @@ declare global {
   interface Window {
     ethereum?: {
       isMetaMask?: boolean;
+      providers?: unknown[];
       request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
       on: (event: string, handler: (...args: unknown[]) => void) => void;
       removeListener: (event: string, handler: (...args: unknown[]) => void) => void;
@@ -19,53 +20,65 @@ declare global {
 const BASE_CHAIN_ID = '0x2105'
 const STORAGE_KEY = 'lumina_wallet'
 
-export function isMetaMaskInstalled(): boolean {
-  return typeof window !== 'undefined' && !!window.ethereum?.isMetaMask
+export function isWalletAvailable(): boolean {
+  return typeof window !== 'undefined' && !!window.ethereum
 }
 
 export async function connectWallet(): Promise<string | null> {
   if (typeof window === 'undefined') return null
 
   if (!window.ethereum) {
-    throw new Error('MetaMask not detected. Please install MetaMask to use Lumina Protocol.')
+    alert('No wallet detected. Please install MetaMask, Phantom, or Coinbase Wallet.')
+    window.open('https://metamask.io', '_blank')
+    return null
   }
 
-  // Request accounts (triggers MetaMask popup)
-  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[]
-  if (!accounts || accounts.length === 0) {
-    throw new Error('Connection rejected. Please approve in MetaMask.')
-  }
+  try {
+    // Request accounts — browser shows wallet selector if multiple wallets installed
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[]
+    if (!accounts || accounts.length === 0) return null
 
-  // Verify/switch to Base network
-  const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string
-  if (chainId !== BASE_CHAIN_ID) {
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: BASE_CHAIN_ID }],
-      })
-    } catch (switchError: unknown) {
-      const err = switchError as { code?: number }
-      if (err.code === 4902) {
+    // Verify/switch to Base network
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string
+    if (chainId !== BASE_CHAIN_ID) {
+      try {
         await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: BASE_CHAIN_ID,
-            chainName: 'Base',
-            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-            rpcUrls: ['https://mainnet.base.org'],
-            blockExplorerUrls: ['https://basescan.org'],
-          }],
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: BASE_CHAIN_ID }],
         })
-      } else {
-        throw new Error('Please switch to Base network to use Lumina.')
+      } catch (switchError: unknown) {
+        const err = switchError as { code?: number }
+        if (err.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BASE_CHAIN_ID,
+              chainName: 'Base',
+              nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+              rpcUrls: ['https://mainnet.base.org'],
+              blockExplorerUrls: ['https://basescan.org'],
+            }],
+          })
+        } else {
+          alert('Please switch to Base network to use Lumina Protocol')
+          return null
+        }
       }
     }
-  }
 
-  // Persist
-  localStorage.setItem(STORAGE_KEY, accounts[0])
-  return accounts[0]
+    // Persist
+    localStorage.setItem(STORAGE_KEY, accounts[0])
+    return accounts[0]
+  } catch (err: unknown) {
+    const error = err as { code?: number }
+    if (error.code === 4001) {
+      // User rejected — silent
+      return null
+    }
+    console.error('Wallet connection error:', err)
+    alert('Connection failed. Please try again.')
+    return null
+  }
 }
 
 export function getStoredWallet(): string | null {
