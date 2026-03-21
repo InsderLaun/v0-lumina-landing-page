@@ -719,7 +719,7 @@ export default function DashboardPage() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0F]/90 backdrop-blur-md border-b border-white/10">
       <div className="flex items-center justify-between px-6 h-16">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-white/40 hover:text-white transition-colors text-lg">←</Link>
+          <Link href="/" className="text-white/40 hover:text-white transition-colors text-lg px-2 py-1 -ml-2 rounded hover:bg-white/5">←</Link>
           <span className="text-sm font-bold">
             <span className="text-cyan-400">LUMINA</span>
             <span className="text-white/20"> · </span>
