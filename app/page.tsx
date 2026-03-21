@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { calculateYield } from "@/lib/pricing"
 import { PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, CONTRACTS, TOKENS, PROTOCOL, CHAIN, calcKinkMultiplier as calcKinkMultiplierFromConfig, calculatePremium } from '@/lib/lumina-config'
+import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, onAccountsChanged, onChainChanged } from '@/lib/wallet'
 
 type Perspective = "protect" | "earn"
 
@@ -42,12 +43,34 @@ function useAaveYield() {
 export default function Home() {
   const [perspective, setPerspective] = useState<Perspective>("protect")
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const aaveYield = useAaveYield()
+
+  // Auto-connect on mount
+  useEffect(() => {
+    tryAutoConnect().then(addr => { if (addr) setWalletAddress(addr) })
+  }, [])
+
+  // Listen for account/chain changes
+  useEffect(() => {
+    const removeAccounts = onAccountsChanged((accounts) => {
+      if (accounts.length === 0) {
+        disconnectWallet()
+        setWalletAddress(null)
+      } else {
+        setWalletAddress(accounts[0])
+      }
+    })
+    const removeChain = onChainChanged(() => {
+      window.location.reload()
+    })
+    return () => { removeAccounts(); removeChain() }
+  }, [])
 
   return (
     <main className="min-h-screen bg-[#0A0A0F] text-white">
       {/* NAVBAR */}
-      <Navbar perspective={perspective} onConnectAgent={() => setShowOnboarding(true)} />
+      <Navbar perspective={perspective} onConnectAgent={() => setShowOnboarding(true)} walletAddress={walletAddress} setWalletAddress={setWalletAddress} />
 
       {/* HERO */}
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 text-center">
@@ -2540,7 +2563,7 @@ function FAQSection({ perspective }: { perspective: Perspective }) {
 /*  NAVBAR                                                   */
 /* ═══════════════════════════════════════════════════════════ */
 
-function Navbar({ perspective, onConnectAgent }: { perspective: Perspective; onConnectAgent: () => void }) {
+function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }: { perspective: Perspective; onConnectAgent: () => void; walletAddress: string | null; setWalletAddress: (addr: string | null) => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const accent = perspective === "protect" ? "cyan" : "purple"
   const hoverColor = accent === "cyan" ? "hover:text-cyan-400" : "hover:text-purple-400"
@@ -2597,13 +2620,38 @@ function Navbar({ perspective, onConnectAgent }: { perspective: Perspective; onC
           >
             📖 Beginner Guide
           </button>
-          <a href="/dashboard" className={`px-6 py-2.5 rounded-full text-base font-medium transition-all inline-block ${
-            accent === "cyan"
-              ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
-              : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
-          }`}>
-            Connect Wallet
-          </a>
+          {walletAddress ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/5">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-xs font-mono text-cyan-400">{truncateAddress(walletAddress)}</span>
+              </div>
+              <button
+                onClick={() => { disconnectWallet(); setWalletAddress(null) }}
+                className="text-xs text-white/40 hover:text-red-400 transition-colors"
+              >
+                Disconnect
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={async () => {
+                try {
+                  const addr = await connectWallet()
+                  if (addr) setWalletAddress(addr)
+                } catch (err) {
+                  alert(err instanceof Error ? err.message : 'Failed to connect wallet')
+                }
+              }}
+              className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+                accent === "cyan"
+                  ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
+                  : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
+              }`}
+            >
+              Connect Wallet
+            </button>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -2644,13 +2692,37 @@ function Navbar({ perspective, onConnectAgent }: { perspective: Perspective; onC
                 >
                   📖 Beginner Guide
                 </button>
-                <a href="/dashboard" className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
-                  accent === "cyan"
-                    ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
-                    : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
-                }`}>
-                  Connect Wallet
-                </a>
+                {walletAddress ? (
+                  <div className="flex items-center justify-center gap-2 py-2">
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-xs font-mono text-cyan-400">{truncateAddress(walletAddress)}</span>
+                    <button
+                      onClick={() => { disconnectWallet(); setWalletAddress(null); setMenuOpen(false) }}
+                      className="text-xs text-white/40 hover:text-red-400 transition-colors ml-2"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const addr = await connectWallet()
+                        if (addr) setWalletAddress(addr)
+                        setMenuOpen(false)
+                      } catch (err) {
+                        alert(err instanceof Error ? err.message : 'Failed to connect wallet')
+                      }
+                    }}
+                    className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+                      accent === "cyan"
+                        ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
+                        : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
+                    }`}
+                  >
+                    Connect Wallet
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>

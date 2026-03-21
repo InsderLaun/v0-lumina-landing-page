@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
+import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, onAccountsChanged, onChainChanged } from '@/lib/wallet'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -121,7 +122,7 @@ const SHIELD_DESCRIPTIONS: Record<string, string> = {
 }
 
 const RPC_URLS = ["/api/rpc"]
-const MOCK_WALLET = PROTOCOL.feeReceiver
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 const API_URL = PROTOCOL.apiBaseUrl
 
 // ════════════════════════════════════════════
@@ -257,7 +258,7 @@ function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): num
 // COMPONENT
 // ════════════════════════════════════════════
 export default function DashboardPage() {
-  const [connected, setConnected] = useState(false)
+  const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<Tab>("Overview")
   const [vaultData, setVaultData] = useState<VaultData[]>([])
   const [vaultsLoading, setVaultsLoading] = useState(true)
@@ -267,7 +268,28 @@ export default function DashboardPage() {
   const [copiedAddr, setCopiedAddr] = useState<string | null>(null)
   const [now, setNow] = useState(Date.now())
 
-  const mockAddress = "0x2b4D...0337"
+  const connected = !!walletAddress
+
+  // Auto-connect on mount
+  useEffect(() => {
+    tryAutoConnect().then(addr => { if (addr) setWalletAddress(addr) })
+  }, [])
+
+  // Listen for account/chain changes
+  useEffect(() => {
+    const removeAccounts = onAccountsChanged((accounts) => {
+      if (accounts.length === 0) {
+        disconnectWallet()
+        setWalletAddress(null)
+      } else {
+        setWalletAddress(accounts[0])
+      }
+    })
+    const removeChain = onChainChanged(() => {
+      window.location.reload()
+    })
+    return () => { removeAccounts(); removeChain() }
+  }, [])
 
   // ════════════════════════════════════════════
   // ethCall with retry (single RPC call)
@@ -291,9 +313,10 @@ export default function DashboardPage() {
   // ════════════════════════════════════════════
   // FETCH VAULT DATA — 28-call batch (1 HTTP request)
   // ════════════════════════════════════════════
-  const fetchVaultData = useCallback(async (): Promise<number[]> => {
+  const fetchVaultData = useCallback(async (userWallet?: string | null): Promise<number[]> => {
     setVaultsLoading(true)
 
+    const userAddr = userWallet || ZERO_ADDRESS
     const allCalls: { to: string; data: string }[] = []
 
     // Vault calls (28): 7 per vault × 4 vaults
@@ -301,11 +324,11 @@ export default function DashboardPage() {
       allCalls.push(
         { to: vault.address, data: SEL_TOTAL_ASSETS },
         { to: vault.address, data: SEL_TOTAL_SUPPLY },
-        { to: vault.address, data: encodeFnCall(SEL_BALANCE_OF, MOCK_WALLET) },
+        { to: vault.address, data: encodeFnCall(SEL_BALANCE_OF, userAddr) },
         { to: vault.address, data: SEL_ALLOCATED },
         { to: vault.address, data: SEL_UTILIZATION },
-        { to: vault.address, data: encodeFnCall(SEL_WITHDRAWAL_REQUEST, MOCK_WALLET) },
-        { to: vault.address, data: encodeFnCall(SEL_WITHDRAWAL_QUEUE, MOCK_WALLET) },
+        { to: vault.address, data: encodeFnCall(SEL_WITHDRAWAL_REQUEST, userAddr) },
+        { to: vault.address, data: encodeFnCall(SEL_WITHDRAWAL_QUEUE, userAddr) },
       )
     }
 
@@ -411,7 +434,7 @@ export default function DashboardPage() {
 
           const insuredAgent = "0x" + chunks[1].slice(24)
           console.log(`[Lumina] Policy: shield=${shield.name} id=${id} agent=${insuredAgent}`)
-          if (insuredAgent.toLowerCase() !== MOCK_WALLET.toLowerCase()) continue
+          if (!walletAddress || insuredAgent.toLowerCase() !== walletAddress.toLowerCase()) continue
 
           allPolicies.push({
             policyId: Number(BigInt("0x" + chunks[0])),
@@ -451,7 +474,7 @@ export default function DashboardPage() {
   // ════════════════════════════════════════════
   async function fetchFromAPI(): Promise<boolean> {
     try {
-      const res = await fetch(`${API_URL}/api/v2/dashboard?wallet=${MOCK_WALLET}`)
+      const res = await fetch(`${API_URL}/api/v2/dashboard?wallet=${walletAddress || ZERO_ADDRESS}`)
       if (!res.ok) return false
       const data = await res.json()
 
@@ -503,13 +526,14 @@ export default function DashboardPage() {
   // FETCH USER DATA — 12-call RPC batch for per-user data
   // ════════════════════════════════════════════
   async function fetchUserData() {
+    const userAddr = walletAddress || ZERO_ADDRESS
     const calls: { to: string; data: string }[] = []
     // 3 calls per vault × 4 vaults = 12
     for (const vault of VAULT_CONFIG) {
       calls.push(
-        { to: vault.address, data: encodeFnCall(SEL_BALANCE_OF, MOCK_WALLET) },
-        { to: vault.address, data: encodeFnCall(SEL_WITHDRAWAL_REQUEST, MOCK_WALLET) },
-        { to: vault.address, data: encodeFnCall(SEL_WITHDRAWAL_QUEUE, MOCK_WALLET) },
+        { to: vault.address, data: encodeFnCall(SEL_BALANCE_OF, userAddr) },
+        { to: vault.address, data: encodeFnCall(SEL_WITHDRAWAL_REQUEST, userAddr) },
+        { to: vault.address, data: encodeFnCall(SEL_WITHDRAWAL_QUEUE, userAddr) },
       )
     }
     const raw = await rpcBatch(calls)
@@ -558,12 +582,13 @@ export default function DashboardPage() {
         await fetchUserData()
       } else {
         // Fallback to direct RPC
-        const counts = await fetchVaultData()
+        const counts = await fetchVaultData(walletAddress)
         setTimeout(() => fetchPolicies(counts), 3000)
       }
     }
     loadAll()
-  }, [fetchVaultData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchVaultData, walletAddress])
 
   // Auto-refresh every 4 hours
   useEffect(() => {
@@ -574,12 +599,13 @@ export default function DashboardPage() {
       if (apiOk) {
         await fetchUserData()
       } else {
-        const counts = await fetchVaultData()
+        const counts = await fetchVaultData(walletAddress)
         setTimeout(() => fetchPolicies(counts), 3000)
       }
     }, 14400000)
     return () => clearInterval(interval)
-  }, [fetchVaultData])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchVaultData, walletAddress])
 
   // Tick every second for "Updated Xs ago"
   useEffect(() => {
@@ -705,15 +731,22 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-full px-4 py-1.5">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs font-mono text-white/70">{mockAddress}</span>
+              <span className="text-xs font-mono text-white/70">{truncateAddress(walletAddress!)}</span>
             </div>
-            <button onClick={() => setConnected(false)} className="text-xs text-white/40 hover:text-red-400 transition-colors">
+            <button onClick={() => { disconnectWallet(); setWalletAddress(null) }} className="text-xs text-white/40 hover:text-red-400 transition-colors">
               Disconnect
             </button>
           </div>
         ) : (
           <button
-            onClick={() => setConnected(true)}
+            onClick={async () => {
+              try {
+                const addr = await connectWallet()
+                if (addr) setWalletAddress(addr)
+              } catch (err) {
+                alert(err instanceof Error ? err.message : 'Failed to connect wallet')
+              }
+            }}
             className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-white"
           >
             Connect Wallet
@@ -745,7 +778,14 @@ export default function DashboardPage() {
             Connect your wallet to monitor your agent&apos;s activity
           </p>
           <button
-            onClick={() => setConnected(true)}
+            onClick={async () => {
+              try {
+                const addr = await connectWallet()
+                if (addr) setWalletAddress(addr)
+              } catch (err) {
+                alert(err instanceof Error ? err.message : 'Failed to connect wallet')
+              }
+            }}
             className="px-8 py-3.5 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-base mb-4"
           >
             Connect Wallet
@@ -817,7 +857,7 @@ export default function DashboardPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-xs font-mono text-white/60">{mockAddress}</span>
+          <span className="text-xs font-mono text-white/60">{walletAddress ? truncateAddress(walletAddress) : "Not connected"}</span>
         </div>
         <span className="text-[10px] text-green-400/70 uppercase tracking-wider">Connected</span>
       </div>
