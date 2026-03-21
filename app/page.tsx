@@ -2629,7 +2629,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
             onClick={onConnectAgent}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all"
           >
-            📖 Beginner Guide
+            📖 Getting Started
           </button>
           {walletAddress ? (
             <div className="flex items-center gap-3">
@@ -2694,7 +2694,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
                   onClick={() => { setMenuOpen(false); onConnectAgent(); }}
                   className="block w-full text-center px-6 py-2.5 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-all"
                 >
-                  📖 Beginner Guide
+                  📖 Getting Started
                 </button>
                 {walletAddress ? (
                   <>
