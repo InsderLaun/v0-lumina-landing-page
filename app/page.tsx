@@ -2632,14 +2632,14 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
             📖 Beginner Guide
           </button>
           {walletAddress ? (
-            <div className="flex items-center gap-2">
-              <a href="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10 transition-colors">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs font-mono text-cyan-400">{truncateAddress(walletAddress)}</span>
+            <div className="flex items-center gap-3">
+              <a href="/dashboard" className="px-5 py-2 rounded-full text-sm font-semibold bg-cyan-500/15 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500/25 transition-all">
+                Dashboard
               </a>
+              <span className="text-xs font-mono text-white/40">{truncateAddress(walletAddress)}</span>
               <button
                 onClick={() => { disconnectWallet(); setWalletAddress(null) }}
-                className="text-xs text-white/40 hover:text-red-400 transition-colors"
+                className="text-xs text-white/30 hover:text-red-400 transition-colors"
               >
                 Disconnect
               </button>
@@ -2697,16 +2697,24 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
                   📖 Beginner Guide
                 </button>
                 {walletAddress ? (
-                  <div className="flex items-center justify-center gap-2 py-2">
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-xs font-mono text-cyan-400">{truncateAddress(walletAddress)}</span>
-                    <button
-                      onClick={() => { disconnectWallet(); setWalletAddress(null); setMenuOpen(false) }}
-                      className="text-xs text-white/40 hover:text-red-400 transition-colors ml-2"
+                  <>
+                    <a
+                      href="/dashboard"
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full text-center px-6 py-2.5 rounded-full text-sm font-semibold bg-cyan-500/15 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500/25 transition-all"
                     >
-                      Disconnect
-                    </button>
-                  </div>
+                      Dashboard
+                    </a>
+                    <div className="flex items-center justify-center gap-3 py-1">
+                      <span className="text-xs font-mono text-white/40">{truncateAddress(walletAddress)}</span>
+                      <button
+                        onClick={() => { disconnectWallet(); setWalletAddress(null); setMenuOpen(false) }}
+                        className="text-xs text-white/30 hover:text-red-400 transition-colors"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  </>
                 ) : (
                   <a
                     href="/dashboard"
