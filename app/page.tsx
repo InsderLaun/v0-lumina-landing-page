@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { calculateYield } from "@/lib/pricing"
 import { PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, CONTRACTS, TOKENS, PROTOCOL, CHAIN, calcKinkMultiplier as calcKinkMultiplierFromConfig, calculatePremium } from '@/lib/lumina-config'
-import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, onAccountsChanged, onChainChanged } from '@/lib/wallet'
+import { disconnectWallet, tryAutoConnect, truncateAddress, onAccountsChanged, onChainChanged } from '@/lib/wallet'
 
 type Perspective = "protect" | "earn"
 
@@ -2622,10 +2622,10 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
           </button>
           {walletAddress ? (
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/5">
+              <a href="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10 transition-colors">
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <span className="text-xs font-mono text-cyan-400">{truncateAddress(walletAddress)}</span>
-              </div>
+              </a>
               <button
                 onClick={() => { disconnectWallet(); setWalletAddress(null) }}
                 className="text-xs text-white/40 hover:text-red-400 transition-colors"
@@ -2634,15 +2634,8 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
               </button>
             </div>
           ) : (
-            <button
-              onClick={async () => {
-                try {
-                  const addr = await connectWallet()
-                  if (addr) setWalletAddress(addr)
-                } catch (err) {
-                  alert(err instanceof Error ? err.message : 'Failed to connect wallet')
-                }
-              }}
+            <a
+              href="/dashboard"
               className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
                 accent === "cyan"
                   ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
@@ -2650,7 +2643,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
               }`}
             >
               Connect Wallet
-            </button>
+            </a>
           )}
         </div>
 
@@ -2704,16 +2697,9 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={async () => {
-                      try {
-                        const addr = await connectWallet()
-                        if (addr) setWalletAddress(addr)
-                        setMenuOpen(false)
-                      } catch (err) {
-                        alert(err instanceof Error ? err.message : 'Failed to connect wallet')
-                      }
-                    }}
+                  <a
+                    href="/dashboard"
+                    onClick={() => setMenuOpen(false)}
                     className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
                       accent === "cyan"
                         ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
@@ -2721,7 +2707,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
                     }`}
                   >
                     Connect Wallet
-                  </button>
+                  </a>
                 )}
               </div>
             </div>
