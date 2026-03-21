@@ -381,9 +381,20 @@ export default function Home() {
             </div>
           </div>
 
+          <div className="flex justify-center gap-3 flex-wrap mb-6">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400" /> Read-Only RPC Proxy
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[11px] font-medium">
+              No Private Keys Stored
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[11px] font-medium">
+              MetaMask Approval Required
+            </span>
+          </div>
           <div className="border-t border-white/5 pt-8">
             <p className="text-xs text-white/20 text-center">
-              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 24 Audited Contracts · 0C/0H/0M · Yield by Aave V3
+              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 52 Tests Passing · 0C/0H/0M · Yield by Aave V3
             </p>
           </div>
         </div>

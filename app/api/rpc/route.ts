@@ -6,9 +6,62 @@ const RPC_URLS = [
   'https://mainnet.base.org',
 ]
 
+// Only allow read-only RPC methods
+const ALLOWED_METHODS = [
+  'eth_call',
+  'eth_getBalance',
+  'eth_blockNumber',
+  'eth_chainId',
+  'eth_getTransactionReceipt',
+  'eth_getTransactionByHash',
+  'eth_getLogs',
+  'eth_getBlockByNumber',
+  'eth_getCode',
+]
+
+// Rate limiting: 100 requests per minute per IP
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT = 100
+const WINDOW_MS = 60 * 1000
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + WINDOW_MS })
+    return true
+  }
+
+  if (entry.count >= RATE_LIMIT) return false
+  entry.count++
+  return true
+}
+
+function validateMethods(body: unknown): boolean {
+  if (Array.isArray(body)) {
+    return body.every(item => item && typeof item.method === 'string' && ALLOWED_METHODS.includes(item.method))
+  }
+  if (body && typeof body === 'object' && 'method' in body) {
+    return ALLOWED_METHODS.includes((body as { method: string }).method)
+  }
+  return false
+}
+
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+    }
+
     const body = await req.json()
+
+    // Method validation
+    if (!validateMethods(body)) {
+      return NextResponse.json({ error: 'Method not allowed' }, { status: 403 })
+    }
 
     for (const rpcUrl of RPC_URLS) {
       try {
