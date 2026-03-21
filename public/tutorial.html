@@ -218,6 +218,34 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <span class="step-number">3</span>
 <span class="step-title">Two things your agent needs</span>
 
+<div style="margin-top:16px;margin-bottom:20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:24px">
+<h4 style="color:white;font-size:1rem;margin-bottom:12px">What is an AI Agent?</h4>
+<p style="color:rgba(255,255,255,0.6);font-size:0.85rem;line-height:1.6;margin-bottom:16px">An AI agent is a ChatGPT, Claude, or custom bot that can take actions on your behalf. In Lumina, your agent monitors markets and buys insurance automatically — you just set the rules.</p>
+
+<p style="color:rgba(255,255,255,0.5);font-size:0.85rem;font-weight:600;margin-bottom:12px">Don't have an agent yet? Here are 3 easy ways to start:</p>
+
+<div style="margin-bottom:12px;padding:14px;background:rgba(34,211,238,0.05);border:1px solid rgba(34,211,238,0.15);border-radius:8px">
+<p style="color:#22d3ee;font-size:0.85rem;font-weight:600;margin-bottom:6px">💬 Option A — ChatGPT or Claude (easiest, 2 minutes)</p>
+<ol style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.8;margin:0;padding-left:20px">
+<li>Open <a href="https://chat.openai.com" target="_blank">ChatGPT</a> or <a href="https://claude.ai" target="_blank">Claude</a></li>
+<li>Start a new conversation</li>
+<li>Paste the SKILL file content (download below)</li>
+<li>Tell it: <em>"My Lumina API key is: lum_xxxxx. You are now my insurance agent."</em></li>
+<li>That's it — the AI now knows how to use Lumina</li>
+</ol>
+</div>
+
+<div style="margin-bottom:12px;padding:14px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:8px">
+<p style="color:#a78bfa;font-size:0.85rem;font-weight:600;margin-bottom:6px">🤖 Option B — Claude Code (automated setup)</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Go back to the main page and click "Getting Started" → "Auto-Setup (Claude Code)". Copy the setup prompt and paste it into Claude Code terminal. It configures everything automatically.</p>
+</div>
+
+<div style="padding:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:8px">
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:600;margin-bottom:6px">🔧 Option C — Custom Agent (developers)</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">If you're building with ElizaOS, LangChain, or a custom framework: set LUMINA_API_KEY as an environment variable, include the SKILL file in your agent's knowledge base, and use the API endpoints documented in the SKILL file.</p>
+</div>
+</div>
+
 <div id="step3-grid" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
 <!-- Card A: The Key -->
@@ -293,16 +321,31 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <h2>Step 4: Test — Buy Your First Policy</h2>
 <div class="step">
 <span class="step-number">4</span>
-<span class="step-title">One HTTP call to verify</span>
-<pre>curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
+<span class="step-title">Verify Everything Works</span>
+<p style="margin-top:12px;color:rgba(255,255,255,0.6);font-size:0.9rem">Your agent is ready! Here's how to test:</p>
+
+<div style="margin-top:16px;margin-bottom:12px;padding:14px;background:rgba(34,211,238,0.05);border:1px solid rgba(34,211,238,0.15);border-radius:8px">
+<p style="color:#22d3ee;font-size:0.85rem;font-weight:600;margin-bottom:6px">💬 Using ChatGPT or Claude?</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Tell your agent: <em>"Buy a Black Swan Shield for $100, 7 days duration."</em> Your agent will call the Lumina API and respond with a confirmation including the policy ID.</p>
+</div>
+
+<div style="margin-bottom:12px;padding:14px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:8px">
+<p style="color:#a78bfa;font-size:0.85rem;font-weight:600;margin-bottom:6px">🤖 Using Claude Code?</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">The auto-setup already ran a test purchase. Check the output for <code>"success": true</code>.</p>
+</div>
+
+<details style="margin-bottom:16px">
+<summary style="color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.8rem">🔧 For developers: test with curl</summary>
+<pre style="margin-top:8px">curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
   -H "Content-Type: application/json" \
   -H "X-API-Key: lum_your_key_here" \
   -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'</pre>
-<p>This buys $100 Black Swan Shield for 7 days.</p>
-<div class="success">
-<p class="success-title">If you see "success": true — you're done!</p>
-<p>Your agent can now buy insurance on its own. Monitor on the <a href="/dashboard">Dashboard</a>.</p>
-</div>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This buys $100 Black Swan Shield for 7 days.</p>
+</details>
+
+<p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the Dashboard to see your active policy.</p>
+
+<a href="/dashboard" style="display:inline-block;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.3);color:#22d3ee;padding:10px 24px;border-radius:8px;font-size:0.9rem;font-weight:600;text-decoration:none">Open Dashboard →</a>
 </div>
 
 <h2>Emergency Stop (Kill Switch)</h2>
@@ -396,13 +439,9 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   let isUnlimited = false;
 
   // --- Provider ---
-  function getMetaMaskProvider() {
-    if (window.ethereum?.providers) {
-      const mm = window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom);
-      if (mm) return mm;
-    }
-    if (window.ethereum?.isMetaMask && !window.ethereum?.isPhantom) return window.ethereum;
-    return null;
+  function getWalletProvider() {
+    if (!window.ethereum) return null;
+    return window.ethereum;
   }
 
   // --- Helpers ---
@@ -418,7 +457,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   }
 
   async function switchToBase() {
-    const provider = getMetaMaskProvider();
+    const provider = getWalletProvider();
     if (!provider) return;
     try {
       await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
@@ -478,7 +517,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   // --- Render functions ---
 
   function renderNoMetaMask() {
-    step1Widget.innerHTML = '<p style="color:#ef4444;margin:0">MetaMask not detected. Install it from <a href="https://metamask.io" target="_blank" style="color:#ef4444;text-decoration:underline">metamask.io</a></p>';
+    step1Widget.innerHTML = '<p style="color:#ef4444;margin:0">No wallet detected. Please install MetaMask, Phantom, or Coinbase Wallet.</p>';
     generateSection.style.display = 'none';
     updateStep2State();
   }
@@ -555,7 +594,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   // --- Actions ---
 
   async function connectWallet() {
-    const provider = getMetaMaskProvider();
+    const provider = getWalletProvider();
     if (!provider) return;
     const btn = document.getElementById('btn-connect');
     if (btn) { btn.disabled = true; btn.textContent = 'Connecting...'; }
@@ -575,7 +614,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   }
 
   async function checkAndRenderNetwork(address) {
-    const provider = getMetaMaskProvider();
+    const provider = getWalletProvider();
     if (!provider) return;
     const chainId = await provider.request({ method: 'eth_chainId' });
     if (chainId === BASE_CHAIN_ID) {
@@ -790,7 +829,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) hideConfirmModal(); });
 
   modalConfirm.addEventListener('click', async () => {
-    const provider = getMetaMaskProvider();
+    const provider = getWalletProvider();
     if (!provider) return;
     const usdAmount = parseFloat(approveAmount.value);
     modalConfirm.disabled = true;
@@ -850,7 +889,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   unlimitedModal.addEventListener('click', (e) => { if (e.target === unlimitedModal) unlimitedModal.style.display = 'none'; });
 
   unlimitedConfirmBtn.addEventListener('click', async () => {
-    const provider = getMetaMaskProvider();
+    const provider = getWalletProvider();
     if (!provider) return;
     unlimitedModal.style.display = 'none';
     isUnlimited = true;
@@ -949,7 +988,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   // ============================================================
 
   document.addEventListener('DOMContentLoaded', async () => {
-    const provider = getMetaMaskProvider();
+    const provider = getWalletProvider();
 
     if (!provider) {
       renderNoMetaMask();
