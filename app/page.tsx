@@ -2593,8 +2593,11 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
   const handleClick = (href: string, external?: boolean) => {
     setMenuOpen(false)
     if (!external && href.startsWith("#")) {
-      const el = document.querySelector(href)
-      el?.scrollIntoView({ behavior: "smooth" })
+      // Small delay to let mobile drawer close before scrolling
+      setTimeout(() => {
+        const el = document.querySelector(href)
+        el?.scrollIntoView({ behavior: "smooth" })
+      }, 100)
     }
   }
 
