@@ -475,7 +475,7 @@ export default function Home() {
                   <div>
                     <div className="text-3xl mb-3">⚡</div>
                     <h3 className="text-lg font-bold text-green-300 mb-2">Auto-Setup (Claude Code)</h3>
-                    <p className="text-sm text-white/70">Copy-paste this prompt into Claude Code PowerShell. It configures your wallet, approves USDC, creates your API Key, and runs a test purchase — all automatically.</p>
+                    <p className="text-sm text-white/70">Copy-paste this prompt into Claude Code PowerShell. It creates your API Key, guides you through the secure wallet approval, buys a test policy, and downloads the SKILL file — all without ever asking for your private key.</p>
                   </div>
                   <div className="space-y-2 pt-6">
                     <button
@@ -483,24 +483,67 @@ export default function Home() {
                         const prompt = `I need to connect my AI agent to Lumina Protocol for DeFi insurance on Base L2.
 
 My wallet address is: [PASTE YOUR WALLET ADDRESS HERE]
-My private key is: [PASTE YOUR PRIVATE KEY HERE]
 
-Please do the following steps in order:
+SECURITY NOTE: This setup does NOT require your private key. Never paste your private key in any chat, terminal, or website. The blockchain approval step is done through MetaMask in your browser where your key stays safe.
 
-1. Check API health:
+Please do the following steps in order. After each step, show me the result and wait for my confirmation before continuing.
+
+STEP 1 — Check that the Lumina API is online:
 curl ${PROTOCOL.apiBaseUrl}/api/v2/health
 
-2. Create my API Key:
+Expected: {"status":"ok"}. If it fails, wait 30 seconds and retry.
+
+STEP 2 — Create my API Key:
 curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/keys/create -H "Content-Type: application/json" -d '{"wallet":"[MY_WALLET]","label":"my-agent"}'
 
-3. Approve CoverRouter to spend my USDC ($10,000 limit):
-cast send ${TOKENS.USDC.address} "approve(address,uint256)" ${CONTRACTS.CoverRouter} 10000000000 --rpc-url https://base-mainnet.g.alchemy.com/v2/[MY_RPC] --private-key [MY_KEY]
+IMPORTANT: The API key in the response is shown ONLY ONCE. Display it clearly and tell me to save it somewhere safe before continuing.
 
-4. Buy a test policy - Black Swan Shield, $100 coverage, 7 days:
+STEP 3 — Approve USDC spending (I need to do this myself in my browser):
+
+STOP HERE and give me these instructions:
+
+"I cannot do this step for you, and here is why: approving USDC spending requires your wallet signature. Your private key lives inside MetaMask and must NEVER be shared with anyone — not even me. This is what protects your money.
+
+Please follow these steps in your browser:
+
+1. Open https://www.lumina-org.com/tutorial.html
+2. Click Connect Wallet and approve the connection in MetaMask
+3. In Step 2 of the tutorial, you will see two tabs: Buy Insurance and Earn Yield
+   - For insurance: enter the maximum amount your agent can spend on policies (e.g. $1,000)
+   - For yield: select the vault and enter the deposit amount
+4. Click Approve with MetaMask
+5. MetaMask will open showing exactly how much you are authorizing — verify the amount and click Confirm
+6. Done! Come back here and tell me approved so I can continue with the next step.
+
+This is a one-time setup. Once approved, your agent can operate automatically without needing your wallet again."
+
+Wait for the user to confirm they completed the approval before continuing.
+
+STEP 4 — Buy a test policy (Black Swan Shield, $100 coverage, 7 days):
 curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/purchase -H "Content-Type: application/json" -H "X-API-Key: [API_KEY_FROM_STEP_2]" -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'
 
-5. Verify my policies:
+If successful, show the policy ID and tell me: "Your first policy is active! Your agent is now connected to Lumina."
+If it fails with "Insufficient allowance", tell me I need to go back to Step 3 and complete the approve.
+
+STEP 5 — Verify my active policies:
 curl ${PROTOCOL.apiBaseUrl}/api/v2/policies?buyer=[MY_WALLET]
+
+Show the list of policies with their status, coverage, and expiration.
+
+STEP 6 — Download the SKILL file:
+curl -O https://www.lumina-org.com/LUMINA-SKILL.txt
+
+After downloading, tell me:
+
+"Setup complete! Here is what was configured:
+- API Key: created and active
+- USDC Approval: authorized via MetaMask (your key never left your wallet)
+- Test Policy: [show policy details]
+- SKILL File: downloaded — give this to your AI agent (paste it into ChatGPT, Claude, or your custom agent)
+
+Your agent can now buy and manage insurance policies autonomously using the API key. Monitor everything at https://www.lumina-org.com/dashboard
+
+To give your agent full knowledge of Lumina, paste the contents of LUMINA-SKILL.txt into your agent chat."
 
 Show me results after each step.`;
                         navigator.clipboard.writeText(prompt);
