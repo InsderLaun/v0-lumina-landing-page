@@ -72,6 +72,24 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <div style="margin-bottom:24px;padding:20px;border:2px solid rgba(34,211,238,0.4);border-radius:12px;background:rgba(34,211,238,0.03)">
 <p style="color:#22d3ee;font-size:0.8rem;margin-bottom:6px;font-weight:500">&rarr; Step 1 of 2: Connect your wallet</p>
+
+<div id="wallet-disconnected-new" style="display:block;margin-top:8px">
+<button onclick="handleConnectWallet()" style="background:linear-gradient(135deg,#00e5ff,#7c4dff);color:white;border:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;width:100%">
+&#x1F517; Connect Wallet
+</button>
+</div>
+
+<div id="wallet-connected-new" style="display:none;margin-top:8px">
+<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,229,255,0.08);padding:12px 16px;border-radius:8px;border:1px solid rgba(0,229,255,0.3)">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="color:#00e5ff;font-size:14px">&#x25CF;</span>
+<span id="wallet-addr-new" style="color:white;font-weight:600;font-size:15px"></span>
+<span style="background:#1a3a2a;color:#4ade80;padding:2px 8px;border-radius:4px;font-size:12px">Base &#x2713;</span>
+</div>
+<button onclick="handleDisconnectWallet()" style="background:transparent;color:#ff5555;border:1px solid rgba(255,85,85,0.4);padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer">Disconnect</button>
+</div>
+</div>
+
 <div id="step1-widget" style="margin-top:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:20px">
 <!-- Content injected by JS -->
 </div>
@@ -1070,6 +1088,76 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
     document.dispatchEvent(new Event('DOMContentLoaded'));
   }
 
+})();
+
+// ════════════════════════════════════════════════════════════
+// PROMINENT WALLET CONNECT/DISCONNECT (Step 1 top buttons)
+// ════════════════════════════════════════════════════════════
+
+async function handleConnectWallet() {
+  if (!window.ethereum) {
+    alert('No wallet detected. Please install MetaMask, Phantom, or Coinbase Wallet.');
+    window.open('https://metamask.io', '_blank');
+    return;
+  }
+  try {
+    var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (!accounts || accounts.length === 0) return;
+    var chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    if (chainId !== '0x2105') {
+      try {
+        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2105' }] });
+      } catch (e) {
+        if (e.code === 4902) {
+          await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x2105', chainName: 'Base', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.base.org'], blockExplorerUrls: ['https://basescan.org'] }] });
+        } else {
+          alert('Please switch to Base network');
+          return;
+        }
+      }
+    }
+    var addr = accounts[0];
+    localStorage.setItem('lumina_wallet', addr);
+    showWalletConnected(addr);
+    // Also trigger the existing tutorial wallet logic
+    window.dispatchEvent(new Event('lumina-wallet-connected'));
+  } catch (err) {
+    if (err.code !== 4001) alert('Connection failed. Please try again.');
+  }
+}
+
+function handleDisconnectWallet() {
+  localStorage.removeItem('lumina_wallet');
+  showWalletDisconnected();
+  window.dispatchEvent(new Event('lumina-wallet-disconnected'));
+}
+
+function showWalletConnected(addr) {
+  var el1 = document.getElementById('wallet-disconnected-new');
+  var el2 = document.getElementById('wallet-connected-new');
+  var el3 = document.getElementById('wallet-addr-new');
+  if (el1) el1.style.display = 'none';
+  if (el2) el2.style.display = 'block';
+  if (el3) el3.textContent = addr.slice(0,6) + '...' + addr.slice(-4);
+}
+
+function showWalletDisconnected() {
+  var el1 = document.getElementById('wallet-disconnected-new');
+  var el2 = document.getElementById('wallet-connected-new');
+  if (el1) el1.style.display = 'block';
+  if (el2) el2.style.display = 'none';
+}
+
+// Auto-reconnect on page load
+(function() {
+  var saved = localStorage.getItem('lumina_wallet');
+  if (saved && window.ethereum) {
+    window.ethereum.request({ method: 'eth_accounts' }).then(function(accounts) {
+      if (accounts.length > 0 && accounts[0].toLowerCase() === saved.toLowerCase()) {
+        showWalletConnected(accounts[0]);
+      }
+    }).catch(function() {});
+  }
 })();
 </script>
 </body>
