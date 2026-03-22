@@ -90,8 +90,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 </div>
 </div>
 
-<div id="step1-widget" style="margin-top:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:20px">
-<!-- Content injected by JS -->
+<div id="step1-widget" style="display:none">
+<!-- Old widget hidden — replaced by wallet-disconnected-new/wallet-connected-new above -->
 </div>
 </div>
 
@@ -571,7 +571,9 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   // --- Render functions ---
 
   function renderNoMetaMask() {
-    step1Widget.innerHTML = '<p style="color:#ef4444;margin:0">No wallet detected. Please install MetaMask, Phantom, or Coinbase Wallet.</p>';
+    step1Widget.innerHTML = '';
+    step1Error.style.display = 'block';
+    step1ErrorMsg.textContent = 'No wallet detected. Please install MetaMask, Phantom, or Coinbase Wallet.';
     generateSection.style.display = 'none';
     updateStep2State();
   }
@@ -579,17 +581,9 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   function renderDisconnected() {
     connectedAddress = null;
     isOnBase = false;
-    step1Widget.innerHTML = `
-      <div>
-        <button id="btn-connect" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:pointer">Connect Wallet</button>
-      </div>
-      <div style="margin-top:10px">
-        <button id="btn-what-network" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;text-decoration:underline;padding:0">&#x2139;&#xFE0F; What network do I need?</button>
-      </div>
-      <p style="margin-top:14px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">By connecting your wallet, you tell Lumina who you are. Then, when you generate your API Key, Lumina creates a unique key linked to your wallet. This key is what you give to your AI agent so it can operate on your behalf — like handing it an authorized card. Your agent uses this key on every API call to identify itself.</p>
-    `;
-    document.getElementById('btn-connect').addEventListener('click', connectWallet);
-    document.getElementById('btn-what-network').addEventListener('click', () => { networkInfoModal.style.display = 'flex'; });
+    step1Widget.innerHTML = '';
+    // Sync with new prominent buttons
+    if (typeof showWalletDisconnected === 'function') showWalletDisconnected();
     generateSection.style.display = 'none';
     step1Error.style.display = 'none';
     updateStep2State();
@@ -598,43 +592,22 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
   function renderConnectedWrongNetwork(address) {
     connectedAddress = address;
     isOnBase = false;
-    step1Widget.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="background:rgba(34,197,94,0.3);color:#22c55e;padding:6px 16px;border-radius:8px;font-weight:600;font-size:0.85rem">Connected</span>
-        <span style="color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem">${truncateAddress(address)}</span>
-        <span style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;font-size:12px;padding:2px 8px;border-radius:6px">&#x26A0;&#xFE0F; Wrong Network</span>
-        <button id="btn-disconnect" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Disconnect</button>
-      </div>
-      <div style="margin-top:12px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="color:#f59e0b;font-size:0.85rem">&#x26A0;&#xFE0F; Wrong network. Lumina only works on Base Mainnet.</span>
-        <button id="btn-switch-base" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);color:#f59e0b;padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:600;cursor:pointer">Switch to Base Mainnet</button>
-      </div>
-      <div style="margin-top:10px">
-        <button id="btn-what-network" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;text-decoration:underline;padding:0">&#x2139;&#xFE0F; What network do I need?</button>
-      </div>
-    `;
-    document.getElementById('btn-disconnect').addEventListener('click', disconnectWallet);
-    document.getElementById('btn-switch-base').addEventListener('click', async () => {
-      try { await switchToBase(); } catch(e) { showStep1Error(e.message); }
-    });
-    document.getElementById('btn-what-network').addEventListener('click', () => { networkInfoModal.style.display = 'flex'; });
+    step1Widget.innerHTML = '';
+    // Show connected in new UI but warn about wrong network
+    if (typeof showWalletConnected === 'function') showWalletConnected(address);
+    // Show wrong network alert below
+    step1Error.style.display = 'block';
+    step1ErrorMsg.textContent = 'Wrong network — please switch to Base Mainnet. Click Connect Wallet again to switch.';
     generateSection.style.display = 'none';
-    step1Error.style.display = 'none';
     updateStep2State();
   }
 
   function renderConnectedBase(address) {
     connectedAddress = address;
     isOnBase = true;
-    step1Widget.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="background:rgba(34,197,94,0.3);color:#22c55e;padding:6px 16px;border-radius:8px;font-weight:600;font-size:0.85rem">Connected</span>
-        <span style="color:rgba(255,255,255,0.6);font-family:'SF Mono','Fira Code',monospace;font-size:0.85rem">${truncateAddress(address)}</span>
-        <span style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#00ff88;font-size:12px;padding:2px 8px;border-radius:6px">Base &#x2713;</span>
-        <button id="btn-disconnect" style="background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">Disconnect</button>
-      </div>
-    `;
-    document.getElementById('btn-disconnect').addEventListener('click', disconnectWallet);
+    step1Widget.innerHTML = '';
+    // Sync with new prominent buttons
+    if (typeof showWalletConnected === 'function') showWalletConnected(address);
     generateSection.style.display = 'block';
     step1Error.style.display = 'none';
     updateStep2State();
