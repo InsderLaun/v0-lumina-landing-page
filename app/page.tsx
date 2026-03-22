@@ -480,9 +480,10 @@ export default function Home() {
                   <div className="space-y-2 pt-6">
                     <button
                       onClick={() => {
+                        const userWallet = walletAddress || '[PASTE YOUR WALLET ADDRESS HERE]'
                         const prompt = `I need to connect my AI agent to Lumina Protocol for DeFi insurance on Base L2.
 
-My wallet address is: [PASTE YOUR WALLET ADDRESS HERE]
+My wallet address is: ${userWallet}
 
 SECURITY NOTE: This setup does NOT require your private key. Never paste your private key in any chat, terminal, or website. The blockchain approval step is done through MetaMask in your browser where your key stays safe.
 
@@ -494,7 +495,7 @@ curl ${PROTOCOL.apiBaseUrl}/api/v2/health
 Expected: {"status":"ok"}. If it fails, wait 30 seconds and retry.
 
 STEP 2 — Create my API Key:
-curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/keys/create -H "Content-Type: application/json" -d '{"wallet":"[MY_WALLET]","label":"my-agent"}'
+curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/keys/create -H "Content-Type: application/json" -d '{"wallet":"${userWallet}","label":"my-agent"}'
 
 IMPORTANT: The API key in the response is shown ONLY ONCE. Display it clearly and tell me to save it somewhere safe before continuing.
 
@@ -526,7 +527,7 @@ If successful, show the policy ID and tell me: "Your first policy is active! You
 If it fails with "Insufficient allowance", tell me I need to go back to Step 3 and complete the approve.
 
 STEP 5 — Verify my active policies:
-curl ${PROTOCOL.apiBaseUrl}/api/v2/policies?buyer=[MY_WALLET]
+curl ${PROTOCOL.apiBaseUrl}/api/v2/policies?buyer=${userWallet}
 
 Show the list of policies with their status, coverage, and expiration.
 
