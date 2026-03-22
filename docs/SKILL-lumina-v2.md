@@ -158,11 +158,23 @@ IMPORTANT TIMING:
 - For EXPLOIT: there is a 14-day waiting period after purchase before coverage starts
 
 AUTO-REPURCHASE STRATEGY:
-To maintain continuous coverage:
-- For BSS (no waiting period): repurchase on the day of expiry
-- For DEPEG (24h waiting): repurchase at least 24 hours before expiry
-- For EXPLOIT (14d waiting): repurchase at least 14 days before expiry
-- For IL (no waiting period): repurchase on the day of expiry
+To maintain continuous coverage without gaps:
+
+┌─────────┬────────────────┬────────────────────────────────────────────────────┐
+│ Product │ Waiting Period │ Repurchase Window                                  │
+├─────────┼────────────────┼────────────────────────────────────────────────────┤
+│ BSS     │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
+│ DEPEG   │ 86400s (24h)   │ Repurchase when expiresAt - now < 90000 (25 hours) │
+│ IL      │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
+│ EXPLOIT │ 1209600s (14d) │ Repurchase when expiresAt - now < 1296000 (15 days)│
+└─────────┴────────────────┴────────────────────────────────────────────────────┘
+
+Logic for your agent loop:
+  currentTime = Math.floor(Date.now() / 1000)
+  timeLeft = policy.expiresAt - currentTime
+  if (timeLeft < repurchaseWindowSeconds) → GET /quote → POST /purchase
+
+This ensures zero coverage gaps. The extra buffer (1h for BSS/IL, 25h for DEPEG, 15d for EXPLOIT) accounts for the waiting period of the new policy.
 
 ════════════════════════════════════════════════════════════
 7. YIELD VAULTS (for earning, not insurance)
@@ -240,6 +252,23 @@ YIELD VAULTS — when to deposit:
 - Choose Stable vaults: lower yield but lower risk (covers DEPEG and EXPLOIT claims)
 - Choose Short lockups: if you may need liquidity soon
 - Choose Long lockups: for higher yield if you can lock funds longer
+
+MARKET DATA SOURCES (for autonomous decision-making):
+
+Your agent needs external data to make buy/sell decisions. Recommended free sources:
+
+- ETH price: GET https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
+- ETH volatility: Fetch ETH price hourly, compute stddev over 24 points. If stddev > 5% of price → high volatility → consider BSS
+- Stablecoin peg: GET https://api.coingecko.com/api/v3/simple/price?ids=tether,dai&vs_currencies=usd — if price < 0.98 → consider DEPEG
+- Vault utilization: GET /api/v2/vaults → use utilizationPct. If > 80% → premiums expensive. If < 40% → premiums cheap
+- DeFi exploits: Monitor https://rekt.news for hack reports
+- USDC balance: Not available via API. If purchase fails with "Insufficient USDC balance", alert owner immediately
+
+OWNER ALERT STRATEGY:
+- ChatGPT/Claude: tell the user in the chat
+- ElizaOS/custom: log to stderr or send webhook
+- Via API: return error, owner monitors logs
+There is no built-in notification endpoint in Lumina. Alerting is your responsibility.
 
 ════════════════════════════════════════════════════════════
 9. PRICING MODEL
@@ -351,3 +380,37 @@ SUPPORT:
 Email: support@lumina-org.com
 Website: https://www.lumina-org.com
 GitHub: https://github.com/agustintiberio10/LUMINA-PROTOCOL
+
+════════════════════════════════════════════════════════════
+13. API RESPONSE SCHEMAS
+════════════════════════════════════════════════════════════
+
+Every endpoint's exact response format. Parse these to make decisions.
+
+GET /api/v2/health
+{"status":"ok","chain":"base","chainId":8453}
+
+GET /api/v2/products
+[{"id":"BSS","name":"Black Swan Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":0,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
+
+GET /api/v2/vaults
+[{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":30,"products":["BSS","IL"],"riskProfile":"higher"}]
+
+Key fields for decision-making:
+- currentUtilizationPct: if > 80 → post-kink, premiums expensive
+- estimatedAPY: total yield for LPs (Aave + premiums)
+- allocatedAssets: how much is locked for active policies
+
+GET /api/v2/quote?productId=BSS&coverageAmount=1000000000&durationSeconds=604800
+{"premium":1635000,"premiumUSD":1.64,"product":"BSS","coverage":1000000000,"utilizationPct":20.6}
+
+POST /api/v2/purchase (requires X-API-Key header)
+Success: {"success":true,"policyId":"1","premium":1635000,"txHash":"0x..."}
+Error: {"error":"Insufficient USDC balance","required":"1635000","balance":"0"}
+
+GET /api/v2/policies?buyer=0x...
+[{"policyId":1,"product":"BSS","coverageAmount":1000000000,"premiumPaid":1635000,"maxPayout":800000000,"status":"active","expiresAt":1775237483}]
+
+POST /api/v2/claim (requires X-API-Key header)
+Success: {"success":true,"payout":776000000,"txHash":"0x..."}
+Error: {"error":"Policy not claimable"}
