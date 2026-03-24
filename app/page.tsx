@@ -322,7 +322,7 @@ export default function Home() {
       <KinkModelSection perspective={perspective} />
 
       {/* AGENT SKILLS (shared) */}
-      <AgentSkillsSection perspective={perspective} />
+      <AgentSkillsSection perspective={perspective} onStartSetup={() => setShowOnboarding(true)} />
 
       {/* COMPARISON TABLE (shared) */}
       <ComparisonSection perspective={perspective} />
@@ -1962,7 +1962,7 @@ function CopyButton({ text, accent }: { text: string; accent: "cyan" | "purple" 
   )
 }
 
-function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
+function AgentSkillsSection({ perspective, onStartSetup }: { perspective: Perspective; onStartSetup: () => void }) {
   const accent = perspective === "protect" ? "cyan" : "purple"
   const borderAccent = accent === "cyan" ? "border-cyan-500/20" : "border-purple-500/20"
   const textAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
@@ -1988,6 +1988,33 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
         <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
           Lumina publishes a machine-readable Skill file. Give it to your agent and it knows what to do.
         </p>
+
+        {/* 3-Step Visual */}
+        <div className="text-center mb-8">
+          <h3 className="text-xl font-bold text-white mb-2">Set up insurance in 3 steps</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className={`${accent === "cyan" ? "bg-cyan-500/5 border-cyan-500/20" : "bg-purple-500/5 border-purple-500/20"} border rounded-xl p-6 text-center`}>
+            <div className={`w-9 h-9 rounded-full ${accent === "cyan" ? "bg-cyan-500" : "bg-purple-500"} text-[#0a0a1a] flex items-center justify-center font-bold mx-auto mb-3`}>1</div>
+            <h4 className={`${accent === "cyan" ? "text-cyan-400" : "text-purple-400"} font-semibold mb-2`}>Get your API Key</h4>
+            <p className="text-white/50 text-sm">Connect your wallet and generate an API key in the tutorial. This is your agent&apos;s authorization.</p>
+          </div>
+          <div className={`${accent === "cyan" ? "bg-cyan-500/5 border-cyan-500/20" : "bg-purple-500/5 border-purple-500/20"} border rounded-xl p-6 text-center`}>
+            <div className={`w-9 h-9 rounded-full ${accent === "cyan" ? "bg-cyan-500" : "bg-purple-500"} text-[#0a0a1a] flex items-center justify-center font-bold mx-auto mb-3`}>2</div>
+            <h4 className={`${accent === "cyan" ? "text-cyan-400" : "text-purple-400"} font-semibold mb-2`}>Give the SKILL file</h4>
+            <p className="text-white/50 text-sm">Download the SKILL file and paste it into your AI agent (ChatGPT, Claude, or custom).</p>
+          </div>
+          <div className={`${accent === "cyan" ? "bg-cyan-500/5 border-cyan-500/20" : "bg-purple-500/5 border-purple-500/20"} border rounded-xl p-6 text-center`}>
+            <div className={`w-9 h-9 rounded-full ${accent === "cyan" ? "bg-cyan-500" : "bg-purple-500"} text-[#0a0a1a] flex items-center justify-center font-bold mx-auto mb-3`}>3</div>
+            <h4 className={`${accent === "cyan" ? "text-cyan-400" : "text-purple-400"} font-semibold mb-2`}>{perspective === "protect" ? "Your agent buys coverage" : "Your agent deposits USDC"}</h4>
+            <p className="text-white/50 text-sm">{perspective === "protect" ? 'Tell your agent: "Buy Black Swan coverage for $10K, 14 days." Your portfolio is protected.' : 'Tell your agent: "Deposit $10K USDC into the Stable Long vault." Your capital earns yield.'}</p>
+          </div>
+        </div>
+        <div className="text-center mb-12">
+          <button onClick={onStartSetup} className={`px-8 py-3 rounded-full font-semibold bg-gradient-to-r ${accent === "cyan" ? "from-cyan-500 to-purple-500" : "from-purple-500 to-cyan-500"} text-white hover:opacity-90 transition-opacity`}>
+            Start Setup &rarr;
+          </button>
+        </div>
 
         {/* BLOQUE 1 — Skill Link */}
         <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 sm:p-8 mb-6">
@@ -2071,6 +2098,16 @@ function AgentSkillsSection({ perspective }: { perspective: Perspective }) {
             Your agent reads the Skill once and can autonomously manage insurance and yield for your entire portfolio.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={onStartSetup}
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
+                accent === "cyan"
+                  ? "bg-cyan-500 text-black hover:bg-cyan-400"
+                  : "bg-purple-500 text-black hover:bg-purple-400"
+              }`}
+            >
+              Getting Started →
+            </button>
             <a
               href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
               target="_blank"

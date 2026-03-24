@@ -769,6 +769,11 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-[#0A0A0F] text-white">
         {header}
         <div className="flex flex-col items-center justify-center min-h-screen px-4 pt-16">
+          <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-2 border-cyan-500/30 rounded-xl p-6 mb-6 text-center max-w-lg w-full">
+            <h2 className="text-cyan-400 text-xl font-bold mb-2">Dashboard is for monitoring your agent</h2>
+            <p className="text-white/50 text-base mb-3">Connect your wallet to see your deposits, policies, and yields.</p>
+            <p className="text-white/40 text-sm">Don&apos;t have an agent yet? <a href="/" className="text-cyan-400 hover:text-cyan-300">Go to Getting Started &rarr;</a></p>
+          </div>
           <h1 className="text-2xl font-bold mb-2">
             <span className="text-cyan-400">LUMINA</span>
             <span className="text-white/20"> · </span>
