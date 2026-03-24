@@ -2016,57 +2016,6 @@ function AgentSkillsSection({ perspective, onStartSetup }: { perspective: Perspe
           </button>
         </div>
 
-        {/* BLOQUE 1 — Skill Link */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 sm:p-8 mb-6">
-          <p className="text-sm text-white/60 mb-4">Ask your agent to read:</p>
-          <div className="flex items-center gap-2 min-w-0 bg-white/[0.03] border border-white/10 rounded-lg px-3 sm:px-4 py-3 mb-3">
-            <span className="text-xs sm:text-sm text-white/70 font-mono truncate">{skillUrl}</span>
-            <CopyButton text={skillUrl} accent={accent} />
-          </div>
-          <p className="text-sm text-white/60 mb-3">Or from GitHub:</p>
-          <div className="flex items-center gap-2 min-w-0 bg-white/[0.03] border border-white/10 rounded-lg px-3 sm:px-4 py-3">
-            <span className="text-xs sm:text-sm text-white/70 font-mono truncate">{githubUrl}</span>
-            <CopyButton text={`https://${githubUrl}`} accent={accent} />
-          </div>
-        </div>
-
-        {/* BLOQUE 2 — Ready-made Prompts */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl p-5 sm:p-8 mb-6">
-          <p className="text-sm text-white/60 mb-4">Or copy a ready-made prompt for your agent:</p>
-
-          {perspective === "protect" ? (
-            <div className="space-y-3">
-              <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
-                <p className="text-sm text-white/70 leading-relaxed flex-1">
-                  Read {skillUrl} and buy {hl("$50K")} of Black Swan coverage for my {hl("ETH")} position for {hl("14 days")}.
-                </p>
-                <CopyButton text={`Read ${skillUrl} and buy $50K of Black Swan coverage for my ETH position for 14 days.`} accent={accent} />
-              </div>
-              <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
-                <p className="text-sm text-white/70 leading-relaxed flex-1">
-                  Read {skillUrl} and buy {hl("$100K")} of Depeg coverage for my {hl("USDT")} position for {hl("90 days")}.
-                </p>
-                <CopyButton text={`Read ${skillUrl} and buy $100K of Depeg coverage for my USDT position for 90 days.`} accent={accent} />
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
-                <p className="text-sm text-white/70 leading-relaxed flex-1">
-                  Read {skillUrl} and deposit {hl("$10K")} USDC into the {hl("Stable Long")} vault for maximum yield.
-                </p>
-                <CopyButton text={`Read ${skillUrl} and deposit $10K USDC into the Stable Long vault for maximum yield.`} accent={accent} />
-              </div>
-              <div className={`flex flex-col sm:flex-row items-start gap-3 border ${borderAccent} rounded-lg p-4`}>
-                <p className="text-sm text-white/70 leading-relaxed flex-1">
-                  Read {skillUrl} and deposit {hl("$5K")} USDC into the {hl("Volatile Short")} vault for quick access yield.
-                </p>
-                <CopyButton text={`Read ${skillUrl} and deposit $5K USDC into the Volatile Short vault for quick access yield.`} accent={accent} />
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* BLOQUE 3 — Compatibility */}
         <CompatibilityCards accent={accent} borderAccent={borderAccent} skillUrl={skillUrl} perspective={perspective} />
 
