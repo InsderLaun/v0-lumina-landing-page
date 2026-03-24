@@ -1,6 +1,6 @@
 LUMINA PROTOCOL — SKILL FILE FOR AI AGENTS
-Version: 2.2 | Chain: Base Mainnet (8453) | March 2026
-Last updated: 2026-03-22
+Version: 2.3 | Chain: Base Mainnet (8453) | March 2026
+Last updated: 2026-03-24
 
 ════════════════════════════════════════════════════════════
 1. WHAT IS LUMINA?
