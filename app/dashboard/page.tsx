@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
-import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, onAccountsChanged, onChainChanged } from '@/lib/wallet'
+import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners } from '@/lib/wallet'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -271,26 +271,22 @@ export default function DashboardPage() {
 
   const connected = !!walletAddress
 
-  // Auto-connect on mount
+  // Initialize dashboard: public data first, then silent wallet reconnect
   useEffect(() => {
-    tryAutoConnect().then(addr => { if (addr) setWalletAddress(addr) }).finally(() => setWalletChecked(true))
-  }, [])
-
-  // Listen for account/chain changes
-  useEffect(() => {
-    const removeAccounts = onAccountsChanged((accounts) => {
-      if (accounts.length === 0) {
-        disconnectWallet()
-        setWalletAddress(null)
-      } else {
-        setWalletAddress(accounts[0])
+    const initDashboard = async () => {
+      // 1. Silent auto-reconnect (NO popup)
+      const activeAddress = await tryAutoConnect()
+      if (activeAddress) {
+        setWalletAddress(activeAddress)
       }
-    })
-    const removeChain = onChainChanged(() => {
-      // Re-check wallet instead of full reload to avoid black page flash
-      tryAutoConnect().then(addr => { if (addr) setWalletAddress(addr) })
-    })
-    return () => { removeAccounts(); removeChain() }
+      setWalletChecked(true)
+
+      // 2. Wallet listeners
+      setupWalletListeners((newAddr) => {
+        setWalletAddress(newAddr)
+      })
+    }
+    initDashboard()
   }, [])
 
   // ════════════════════════════════════════════

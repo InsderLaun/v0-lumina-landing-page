@@ -1,8 +1,8 @@
 // lib/wallet.ts
 // ════════════════════════════════════════════════════════════
-// LUMINA PROTOCOL — Shared Wallet Module
-// Supports ALL wallets that inject window.ethereum (MetaMask, Phantom, Coinbase, etc.)
-// State persisted in localStorage for cross-page sharing.
+// LUMINA PROTOCOL — Shared Wallet Module (audited version)
+// tryAutoConnect = SILENT (eth_accounts, no popup)
+// connectWallet = PROACTIVE (eth_requestAccounts, opens popup) — ONLY on onClick
 // ════════════════════════════════════════════════════════════
 
 declare global {
@@ -10,118 +10,125 @@ declare global {
     ethereum?: {
       isMetaMask?: boolean;
       providers?: unknown[];
-      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on: (event: string, handler: (...args: unknown[]) => void) => void;
-      removeListener: (event: string, handler: (...args: unknown[]) => void) => void;
+      request: (args: { method: string; params?: unknown[] }) => Promise<any>;
+      on: (event: string, handler: (...args: any[]) => void) => void;
+      removeListener: (event: string, handler: (...args: any[]) => void) => void;
     };
   }
 }
 
-const BASE_CHAIN_ID = '0x2105'
-const STORAGE_KEY = 'lumina_wallet'
+export const BASE_CHAIN_ID = '0x2105';
 
-export function isWalletAvailable(): boolean {
-  return typeof window !== 'undefined' && !!window.ethereum
-}
+export const getStoredWallet = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('lumina_wallet');
+};
 
-export async function connectWallet(): Promise<string | null> {
-  if (typeof window === 'undefined') return null
+const setStoredWallet = (address: string | null) => {
+  if (typeof window === 'undefined') return;
+  if (address) {
+    localStorage.setItem('lumina_wallet', address);
+  } else {
+    localStorage.removeItem('lumina_wallet');
+  }
+};
+
+// SILENT: No popup. Used on page load for auto-reconnect.
+export const tryAutoConnect = async (): Promise<string | null> => {
+  if (typeof window === 'undefined' || !window.ethereum) return null;
+
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+
+    if (accounts && accounts.length > 0) {
+      const address = accounts[0].toLowerCase();
+      setStoredWallet(address);
+      return address;
+    }
+
+    setStoredWallet(null);
+    return null;
+  } catch (error) {
+    console.error('[Lumina] Silent reconnection failed:', error);
+    return null;
+  }
+};
+
+// PROACTIVE: Opens wallet popup. ONLY call from onClick handlers.
+export const connectWallet = async (): Promise<string | null> => {
+  if (typeof window === 'undefined') return null;
 
   if (!window.ethereum) {
-    alert('No wallet detected. Please install MetaMask, Phantom, or Coinbase Wallet.')
-    window.open('https://metamask.io', '_blank')
-    return null
+    alert('No Web3 wallet detected. Please install MetaMask, Phantom, or Coinbase Wallet.');
+    return null;
   }
 
   try {
-    // Request accounts — browser shows wallet selector if multiple wallets installed
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[]
-    if (!accounts || accounts.length === 0) return null
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (!accounts || accounts.length === 0) return null;
 
-    // Verify/switch to Base network
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string
-    if (chainId !== BASE_CHAIN_ID) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: BASE_CHAIN_ID }],
-        })
-      } catch (switchError: unknown) {
-        const err = switchError as { code?: number }
-        if (err.code === 4902) {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: BASE_CHAIN_ID,
-              chainName: 'Base',
-              nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-              rpcUrls: ['https://mainnet.base.org'],
-              blockExplorerUrls: ['https://basescan.org'],
-            }],
-          })
-        } else {
-          alert('Please switch to Base network to use Lumina Protocol')
-          return null
-        }
-      }
-    }
-
-    // Persist
-    localStorage.setItem(STORAGE_KEY, accounts[0])
-    return accounts[0]
-  } catch (err: unknown) {
-    const error = err as { code?: number }
+    const address = accounts[0].toLowerCase();
+    await ensureBaseNetwork();
+    setStoredWallet(address);
+    return address;
+  } catch (error: any) {
     if (error.code === 4001) {
-      // User rejected — silent
-      return null
+      console.log('[Lumina] User rejected connection.');
     }
-    console.error('Wallet connection error:', err)
-    alert('Connection failed. Please try again.')
-    return null
+    return null;
   }
-}
+};
 
-export function getStoredWallet(): string | null {
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem(STORAGE_KEY)
-}
+export const disconnectWallet = () => {
+  setStoredWallet(null);
+};
 
-export function disconnectWallet(): void {
-  if (typeof window === 'undefined') return
-  localStorage.removeItem(STORAGE_KEY)
-}
-
-export async function tryAutoConnect(): Promise<string | null> {
-  if (typeof window === 'undefined') return null
-  const stored = getStoredWallet()
-  if (!stored || !window.ethereum) return null
-
+export const ensureBaseNetwork = async () => {
+  if (typeof window === 'undefined' || !window.ethereum) return;
   try {
-    const accounts = await window.ethereum.request({ method: 'eth_accounts' }) as string[]
-    const found = accounts.find(a => a.toLowerCase() === stored.toLowerCase())
-    if (found) return found
-  } catch {
-    // Silent fail
+    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    if (chainId === BASE_CHAIN_ID) return;
+
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: BASE_CHAIN_ID }],
+    });
+  } catch (switchError: any) {
+    if (switchError.code === 4902) {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: BASE_CHAIN_ID,
+          chainName: 'Base Mainnet',
+          nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+          rpcUrls: ['https://mainnet.base.org'],
+          blockExplorerUrls: ['https://basescan.org'],
+        }],
+      });
+    }
   }
+};
 
-  localStorage.removeItem(STORAGE_KEY)
-  return null
-}
+export const setupWalletListeners = (onAccountChange: (addr: string | null) => void) => {
+  if (typeof window === 'undefined' || !window.ethereum) return;
 
-export function truncateAddress(addr: string): string {
-  return addr.slice(0, 6) + '...' + addr.slice(-4)
-}
+  window.ethereum.on('accountsChanged', (accounts: string[]) => {
+    if (accounts.length > 0) {
+      const addr = accounts[0].toLowerCase();
+      setStoredWallet(addr);
+      onAccountChange(addr);
+    } else {
+      setStoredWallet(null);
+      onAccountChange(null);
+    }
+  });
 
-export function onAccountsChanged(callback: (accounts: string[]) => void): () => void {
-  if (typeof window === 'undefined' || !window.ethereum) return () => {}
-  const handler = (...args: unknown[]) => callback(args[0] as string[])
-  window.ethereum.on('accountsChanged', handler)
-  return () => window.ethereum?.removeListener('accountsChanged', handler)
-}
+  window.ethereum.on('chainChanged', () => {
+    // Re-check wallet silently on chain change
+    tryAutoConnect().then(addr => onAccountChange(addr));
+  });
+};
 
-export function onChainChanged(callback: (chainId: string) => void): () => void {
-  if (typeof window === 'undefined' || !window.ethereum) return () => {}
-  const handler = (...args: unknown[]) => callback(args[0] as string)
-  window.ethereum.on('chainChanged', handler)
-  return () => window.ethereum?.removeListener('chainChanged', handler)
-}
+export const truncateAddress = (addr: string): string => {
+  return addr.slice(0, 6) + '...' + addr.slice(-4);
+};
