@@ -391,6 +391,9 @@ export default function Home() {
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[11px] font-medium">
               MetaMask Approval Required
             </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(124,77,255,0.1)] border border-[rgba(124,77,255,0.2)] text-[#7c4dff] text-[11px] font-medium">
+              OWS Compatible
+            </span>
           </div>
           <div className="border-t border-white/5 pt-8">
             <p className="text-xs text-white/20 text-center">
@@ -2450,6 +2453,18 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
               <span className="text-sm font-bold text-green-400">{p.badge}</span>
             </div>
           ))}
+        </div>
+
+        {/* OWS Integration */}
+        <div className="bg-[rgba(124,77,255,0.05)] border border-[rgba(124,77,255,0.3)] rounded-xl p-6 mb-8">
+          <div className="flex items-start gap-4">
+            <span className="text-2xl">🔒</span>
+            <div>
+              <h4 className="text-sm font-bold text-[#7c4dff] mb-2">Open Wallet Standard (OWS)</h4>
+              <p className="text-xs text-white/60 leading-relaxed">Policy-gated signing for AI agents. Private keys are encrypted at rest and only decrypted after all policies pass — chain restrictions, contract allowlists, spending limits, and auto-expiry. No raw keys in environment variables.</p>
+              <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/OWS-INTEGRATION.md" target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-xs text-[#7c4dff] hover:text-[#9c7cff] transition-colors">OWS Integration Guide →</a>
+            </div>
+          </div>
         </div>
 
         <p className="text-xs text-white/40 text-center mb-8 leading-relaxed">
