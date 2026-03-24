@@ -124,11 +124,20 @@ export const setupWalletListeners = (onAccountChange: (addr: string | null) => v
   });
 
   window.ethereum.on('chainChanged', () => {
-    // Re-check wallet silently on chain change
-    tryAutoConnect().then(addr => onAccountChange(addr));
+    if (typeof window !== 'undefined') window.location.reload();
   });
 };
 
 export const truncateAddress = (addr: string): string => {
   return addr.slice(0, 6) + '...' + addr.slice(-4);
+};
+
+export const hasCompletedSetup = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem('lumina_setup_complete') === 'true';
+};
+
+export const markSetupComplete = () => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('lumina_setup_complete', 'true');
 };

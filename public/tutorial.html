@@ -392,7 +392,15 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the Dashboard to see your active policy.</p>
 
-<a href="/dashboard" style="display:inline-block;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.3);color:#22d3ee;padding:10px 24px;border-radius:8px;font-size:0.9rem;font-weight:600;text-decoration:none">Open Dashboard →</a>
+<button onclick="finishSetup()" style="display:block;width:100%;background:linear-gradient(135deg,#00e5ff,#7c4dff);color:white;border:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:16px">
+Setup Complete — Go to Dashboard →
+</button>
+<script>
+function finishSetup() {
+  localStorage.setItem('lumina_setup_complete', 'true');
+  window.location.href = '/dashboard';
+}
+</script>
 </div>
 
 <h2>Emergency Stop (Kill Switch)</h2>
