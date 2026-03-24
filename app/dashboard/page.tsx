@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
-import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners } from '@/lib/wallet'
+import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners, isOnboardingComplete } from '@/lib/wallet'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -271,17 +271,32 @@ export default function DashboardPage() {
 
   const connected = !!walletAddress
 
-  // Initialize dashboard: public data first, then silent wallet reconnect
+  // Initialize dashboard
   useEffect(() => {
     const initDashboard = async () => {
-      // 1. Silent auto-reconnect (NO popup)
-      const activeAddress = await tryAutoConnect()
-      if (activeAddress) {
-        setWalletAddress(activeAddress)
+      // 1. Silent auto-reconnect
+      const address = await tryAutoConnect()
+      const done = isOnboardingComplete()
+
+      // No wallet → show public data only
+      if (!address) {
+        try { await fetchVaultData() } catch(e) { console.error('[Lumina] Public data:', e) }
+        setWalletChecked(true)
+        return
       }
+
+      // Wallet but no onboarding → redirect to tutorial
+      if (!done) {
+        window.location.href = '/tutorial.html'
+        return
+      }
+
+      // All good → load user data
+      setWalletAddress(address)
+      try { await fetchVaultData(address) } catch(e) { console.error('[Lumina] Vault data:', e) }
       setWalletChecked(true)
 
-      // 2. Wallet listeners
+      // Listeners
       setupWalletListeners((newAddr) => {
         setWalletAddress(newAddr)
       })

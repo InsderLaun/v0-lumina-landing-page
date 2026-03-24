@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { calculateYield } from "@/lib/pricing"
 import { PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, CONTRACTS, TOKENS, PROTOCOL, CHAIN, calcKinkMultiplier as calcKinkMultiplierFromConfig, calculatePremium } from '@/lib/lumina-config'
-import { disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners } from '@/lib/wallet'
+import { disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners, isOnboardingComplete } from '@/lib/wallet'
 
 type Perspective = "protect" | "earn"
 
@@ -46,10 +46,15 @@ export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const aaveYield = useAaveYield()
 
-  // Silent auto-connect on mount + wallet listeners
+  // Silent auto-connect on mount (only show as connected if onboarding complete)
   useEffect(() => {
-    tryAutoConnect().then(addr => { if (addr) setWalletAddress(addr) })
-    setupWalletListeners((newAddr) => setWalletAddress(newAddr))
+    tryAutoConnect().then(addr => {
+      if (addr && isOnboardingComplete()) setWalletAddress(addr)
+    })
+    setupWalletListeners((newAddr) => {
+      if (newAddr && isOnboardingComplete()) setWalletAddress(newAddr)
+      else setWalletAddress(null)
+    })
   }, [])
 
   return (
@@ -2691,7 +2696,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
             </div>
           ) : (
             <a
-              href="/dashboard"
+              href="/tutorial.html"
               className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
                 accent === "cyan"
                   ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
@@ -2762,7 +2767,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
                   </>
                 ) : (
                   <a
-                    href="/dashboard"
+                    href="/tutorial.html"
                     onClick={() => setMenuOpen(false)}
                     className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
                       accent === "cyan"
