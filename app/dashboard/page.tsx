@@ -259,6 +259,7 @@ function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): num
 // ════════════════════════════════════════════
 export default function DashboardPage() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
+  const [walletChecked, setWalletChecked] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>("Overview")
   const [vaultData, setVaultData] = useState<VaultData[]>([])
   const [vaultsLoading, setVaultsLoading] = useState(true)
@@ -272,7 +273,7 @@ export default function DashboardPage() {
 
   // Auto-connect on mount
   useEffect(() => {
-    tryAutoConnect().then(addr => { if (addr) setWalletAddress(addr) })
+    tryAutoConnect().then(addr => { if (addr) setWalletAddress(addr) }).finally(() => setWalletChecked(true))
   }, [])
 
   // Listen for account/chain changes
@@ -764,6 +765,17 @@ export default function DashboardPage() {
   // ════════════════════════════════════════════
   // NOT CONNECTED
   // ════════════════════════════════════════════
+  if (!walletChecked) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0F] text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/50 text-sm">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!connected) {
     return (
       <div className="min-h-screen bg-[#0A0A0F] text-white">
