@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { connectWallet, truncateAddress, isOnboardingComplete } from "@/lib/wallet"
+import { connectWallet, truncateAddress } from "@/lib/wallet"
 
 export default function ConnectPage() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
@@ -16,10 +16,7 @@ export default function ConnectPage() {
       const addr = await connectWallet()
       if (addr) {
         setWalletAddress(addr)
-        // If onboarding already done, go to dashboard. Otherwise go to tutorial.
-        if (isOnboardingComplete()) {
-          window.location.href = "/dashboard"
-        }
+        window.location.href = "/dashboard"
       }
     } catch (e: any) {
       setError(e.message || "Connection failed")
