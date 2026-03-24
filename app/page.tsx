@@ -62,7 +62,7 @@ export default function Home() {
       }
     })
     const removeChain = onChainChanged(() => {
-      window.location.reload()
+      tryAutoConnect().then(addr => setWalletAddress(addr))
     })
     return () => { removeAccounts(); removeChain() }
   }, [])

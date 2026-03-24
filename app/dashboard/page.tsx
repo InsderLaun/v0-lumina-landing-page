@@ -287,7 +287,8 @@ export default function DashboardPage() {
       }
     })
     const removeChain = onChainChanged(() => {
-      window.location.reload()
+      // Re-check wallet instead of full reload to avoid black page flash
+      tryAutoConnect().then(addr => { if (addr) setWalletAddress(addr) })
     })
     return () => { removeAccounts(); removeChain() }
   }, [])
