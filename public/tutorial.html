@@ -277,6 +277,18 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <p style="color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:600;margin-bottom:6px">🔧 Option C — Custom Agent (developers)</p>
 <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">If you're building with ElizaOS, LangChain, or a custom framework: set LUMINA_API_KEY as an environment variable, include the SKILL file in your agent's knowledge base, and use the API endpoints documented in the SKILL file.</p>
 </div>
+
+<div style="margin-top:12px;padding:14px;background:rgba(124,77,255,0.08);border:1px solid rgba(124,77,255,0.3);border-radius:8px">
+<p style="color:#7c4dff;font-size:0.85rem;font-weight:600;margin-bottom:6px">&#x1F512; Option D — OWS Wallet (most secure)</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin-bottom:8px">For autonomous agents running 24/7. Uses <a href="https://openwallet.sh" target="_blank" style="color:#22d3ee">Open Wallet Standard</a> for policy-gated signing — your private key is encrypted and every transaction is validated before signing.</p>
+<ol style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.8;margin:0;padding-left:20px">
+<li>Install OWS: <code>curl -fsSL https://openwallet.sh/install.sh | bash</code></li>
+<li>Run setup: <code>git clone https://github.com/agustintiberio10/LUMINA-PROTOCOL.git && cd LUMINA-PROTOCOL/ows && ./setup-lumina-agent.sh my-agent</code></li>
+<li>Save the <code>ows_key_xxx</code> token and fund the wallet with USDC + ETH on Base</li>
+<li>Your agent now has: Base-only restriction, contract allowlist, $10K/day limit, auto-expiry</li>
+</ol>
+<p style="color:rgba(255,255,255,0.3);font-size:0.75rem;margin-top:8px;margin-bottom:0">Requires Linux or macOS. <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/OWS-INTEGRATION.md" target="_blank" style="color:#7c4dff">Full OWS documentation &#x2192;</a></p>
+</div>
 </div>
 
 <div id="step3-grid" style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -406,6 +418,13 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <code>spender</code> = <code>0x5755af9cd293b9A0a798B7e2e816eAbE659750C0</code> (CoverRouter)<br>
 <code>amount</code> = <code>0</code></li>
 </ol>
+</div>
+
+<div style="margin-top:12px;padding:14px;background:rgba(124,77,255,0.05);border:1px solid rgba(124,77,255,0.2);border-radius:8px">
+<p style="color:#7c4dff;font-size:0.85rem;font-weight:600;margin-bottom:6px">Option 3 — Revoke OWS key (if using OWS)</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin-bottom:6px">If your agent uses OWS, revoke its API key:</p>
+<code style="display:block;background:rgba(255,255,255,0.05);padding:10px 12px;border-radius:6px;color:#22d3ee;font-size:0.8rem">ows key revoke --name my-agent-key</code>
+<p style="color:rgba(255,255,255,0.3);font-size:0.75rem;margin-top:6px;margin-bottom:0">This instantly disables the agent's signing capability. The wallet and funds are unaffected.</p>
 </div>
 
 <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;font-style:italic;margin:0">Both options instantly revoke your agent's ability to spend USDC. No private key needed.</p>
