@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
-import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners, isOnboardingComplete } from '@/lib/wallet'
+import { disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners } from '@/lib/wallet'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -276,7 +276,6 @@ export default function DashboardPage() {
     const initDashboard = async () => {
       // 1. Silent auto-reconnect
       const address = await tryAutoConnect()
-      const done = isOnboardingComplete()
 
       // No wallet → show public data only
       if (!address) {
@@ -285,13 +284,7 @@ export default function DashboardPage() {
         return
       }
 
-      // Wallet but no onboarding → redirect to tutorial
-      if (!done) {
-        window.location.href = '/tutorial.html'
-        return
-      }
-
-      // All good → load user data
+      // Wallet connected → load user data
       setWalletAddress(address)
       try { await fetchVaultData(address) } catch(e) { console.error('[Lumina] Vault data:', e) }
       setWalletChecked(true)
@@ -751,19 +744,12 @@ export default function DashboardPage() {
             </button>
           </div>
         ) : (
-          <button
-            onClick={async () => {
-              try {
-                const addr = await connectWallet()
-                if (addr) setWalletAddress(addr)
-              } catch (err) {
-                alert(err instanceof Error ? err.message : 'Failed to connect wallet')
-              }
-            }}
+          <a
+            href="/connect"
             className="px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-white"
           >
             Connect Wallet
-          </button>
+          </a>
         )}
       </div>
       {(vaultsLoading || policiesLoading) && (
@@ -806,19 +792,12 @@ export default function DashboardPage() {
           <p className="text-white/50 text-sm mb-8 text-center max-w-md">
             Connect your wallet to monitor your agent&apos;s activity
           </p>
-          <button
-            onClick={async () => {
-              try {
-                const addr = await connectWallet()
-                if (addr) setWalletAddress(addr)
-              } catch (err) {
-                alert(err instanceof Error ? err.message : 'Failed to connect wallet')
-              }
-            }}
-            className="px-8 py-3.5 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-base mb-4"
+          <a
+            href="/connect"
+            className="inline-block px-8 py-3.5 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-base mb-4"
           >
             Connect Wallet
-          </button>
+          </a>
           <p className="text-white/30 text-xs">Read-only dashboard. Your agent operates, you supervise.</p>
         </div>
       </div>
