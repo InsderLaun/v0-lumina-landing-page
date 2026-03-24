@@ -2457,13 +2457,25 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
 
         {/* OWS Integration */}
         <div className="bg-[rgba(124,77,255,0.05)] border border-[rgba(124,77,255,0.3)] rounded-xl p-6 mb-8">
-          <div className="flex items-start gap-4">
-            <span className="text-2xl">🔒</span>
+          <h4 className="text-base font-bold text-[#7c4dff] mb-1">🔒 Open Wallet Standard (OWS)</h4>
+          <p className="text-xs text-white/40 mb-4">Defense-in-depth for every AI agent</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
-              <h4 className="text-sm font-bold text-[#7c4dff] mb-2">Open Wallet Standard (OWS)</h4>
-              <p className="text-xs text-white/60 leading-relaxed">Policy-gated signing for AI agents. Private keys are encrypted at rest and only decrypted after all policies pass — chain restrictions, contract allowlists, spending limits, and auto-expiry. No raw keys in environment variables.</p>
-              <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/OWS-INTEGRATION.md" target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-xs text-[#7c4dff] hover:text-[#9c7cff] transition-colors">OWS Integration Guide →</a>
+              <p className="text-xs font-semibold text-white/80 mb-1">🔐 Encrypted Keys</p>
+              <p className="text-xs text-white/50">Private keys encrypted with AES-256-GCM. Never in plaintext. Decrypted only inside the signing path.</p>
             </div>
+            <div>
+              <p className="text-xs font-semibold text-white/80 mb-1">🛡️ Policy Engine</p>
+              <p className="text-xs text-white/50">Every transaction validated before signing. Chain restrictions, contract allowlists, spending limits.</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-white/80 mb-1">⚡ Instant Revocation</p>
+              <p className="text-xs text-white/50">Revoke agent access with one command. No on-chain transaction needed. Funds always safe.</p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <a href="https://openwallet.sh" target="_blank" rel="noopener noreferrer" className="text-xs text-[#7c4dff] hover:text-[#9c7cff] transition-colors">openwallet.sh →</a>
+            <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/OWS-INTEGRATION.md" target="_blank" rel="noopener noreferrer" className="text-xs text-[#7c4dff] hover:text-[#9c7cff] transition-colors">Integration Guide →</a>
           </div>
         </div>
 
