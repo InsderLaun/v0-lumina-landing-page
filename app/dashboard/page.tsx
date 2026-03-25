@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
-import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners } from '@/lib/wallet'
+import { disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners, isDisclaimerAccepted } from '@/lib/wallet'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -274,17 +274,17 @@ export default function DashboardPage() {
   // Initialize dashboard
   useEffect(() => {
     const initDashboard = async () => {
-      // 1. Silent auto-reconnect
       const address = await tryAutoConnect()
+      const accepted = isDisclaimerAccepted()
 
-      // No wallet → show public data only
-      if (!address) {
+      // No wallet or no disclaimer → show public data + connect banner
+      if (!address || !accepted) {
         try { await fetchVaultData() } catch(e) { console.error('[Lumina] Public data:', e) }
         setWalletChecked(true)
         return
       }
 
-      // Wallet connected → load user data
+      // All good → load user data
       setWalletAddress(address)
       try { await fetchVaultData(address) } catch(e) { console.error('[Lumina] Vault data:', e) }
       setWalletChecked(true)
@@ -739,7 +739,7 @@ export default function DashboardPage() {
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               <span className="text-xs font-mono text-white/70">{truncateAddress(walletAddress!)}</span>
             </div>
-            <button onClick={() => { disconnectWallet(); setWalletAddress(null) }} className="text-xs text-white/40 hover:text-red-400 transition-colors">
+            <button onClick={() => { disconnectWallet(); window.location.href = '/' }} className="text-xs text-white/40 hover:text-red-400 transition-colors">
               Disconnect
             </button>
           </div>
@@ -779,46 +779,19 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-[#0A0A0F] text-white">
         {header}
         <div className="flex flex-col items-center justify-center min-h-screen px-4 pt-16">
-          <div className="max-w-md w-full">
-            <div className="text-center mb-8">
-              <div className="text-4xl mb-4">🔒</div>
-              <h1 className="text-2xl font-bold mb-2">Connect Your Wallet</h1>
-              <p className="text-white/50 text-sm">Lumina Protocol runs on Base L2</p>
-            </div>
+          <div className="max-w-md w-full text-center">
+            <div className="text-4xl mb-4">📊</div>
+            <h1 className="text-2xl font-bold mb-2">Dashboard</h1>
+            <p className="text-white/50 text-sm mb-8">Connect your wallet to see your deposits, policies, and yields.</p>
 
-            <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6 mb-6">
-              <h3 className="text-sm font-semibold text-white/80 mb-3">Before you connect:</h3>
-              <ul className="space-y-3 text-sm text-white/50">
-                <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-0.5">✓</span>
-                  <span>Your private key <strong className="text-white/70">never leaves your wallet</strong>. Lumina only reads your public address.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-0.5">✓</span>
-                  <span>You will be asked to <strong className="text-white/70">switch to Base network</strong> if you&apos;re on a different chain.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-green-400 mt-0.5">✓</span>
-                  <span>No transaction will be signed. <strong className="text-white/70">Connecting is free</strong> — no gas needed.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-cyan-400 mt-0.5">ℹ</span>
-                  <span>Works with <strong className="text-white/70">MetaMask, Phantom, Coinbase Wallet</strong>, and any Web3 wallet.</span>
-                </li>
-              </ul>
-            </div>
-
-            <button
-              onClick={async () => {
-                const addr = await connectWallet()
-                if (addr) setWalletAddress(addr)
-              }}
-              className="w-full py-4 rounded-xl font-semibold text-lg bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400 transition-all"
+            <a
+              href="/connect"
+              className="inline-block w-full py-4 rounded-xl font-semibold text-lg bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400 transition-all text-center"
             >
-              Connect Wallet
-            </button>
+              Connect Wallet →
+            </a>
 
-            <p className="text-center text-white/30 text-xs mt-4">
+            <p className="text-white/30 text-xs mt-4">
               Don&apos;t have an agent yet? <a href="/" className="text-cyan-400/50 hover:text-cyan-400">Go to Getting Started →</a>
             </p>
           </div>

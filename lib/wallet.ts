@@ -1,5 +1,5 @@
 // lib/wallet.ts — Lumina Protocol Wallet Module
-// eth_accounts = silencioso. eth_requestAccounts = popup (solo onClick en tutorial).
+// eth_accounts = silencioso (auto-reconnect). eth_requestAccounts = popup (solo onClick en /connect).
 
 declare global {
   interface Window {
@@ -9,7 +9,7 @@ declare global {
 
 export const BASE_CHAIN_ID = '0x2105';
 
-// ── Storage ──
+// ── Storage: Wallet ──
 export const getStoredWallet = (): string | null => {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('lumina_wallet');
@@ -24,23 +24,23 @@ const setStoredWallet = (address: string | null) => {
   }
 };
 
-// ── Onboarding flag ──
-export const isOnboardingComplete = (): boolean => {
+// ── Storage: Disclaimer ──
+export const isDisclaimerAccepted = (): boolean => {
   if (typeof window === 'undefined') return false;
-  return localStorage.getItem('lumina_onboarding_done') === 'true';
+  return localStorage.getItem('lumina_disclaimer_accepted') === 'true';
 };
 
-export const setOnboardingComplete = () => {
+export const setDisclaimerAccepted = () => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem('lumina_onboarding_done', 'true');
+  localStorage.setItem('lumina_disclaimer_accepted', 'true');
 };
 
-export const clearOnboarding = () => {
+const clearDisclaimer = () => {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem('lumina_onboarding_done');
+  localStorage.removeItem('lumina_disclaimer_accepted');
 };
 
-// ── SILENCIOSO: No abre popup. Solo para auto-reconnect. ──
+// ── SILENCIOSO: No abre popup. Usar en useEffect al montar páginas. ──
 export const tryAutoConnect = async (): Promise<string | null> => {
   if (typeof window === 'undefined' || !window.ethereum) return null;
   try {
@@ -58,7 +58,7 @@ export const tryAutoConnect = async (): Promise<string | null> => {
   }
 };
 
-// ── PROACTIVO: Abre popup. SOLO llamar en onClick del tutorial/dashboard. ──
+// ── PROACTIVO: Abre popup. SOLO llamar en onClick de /connect. ──
 export const connectWallet = async (): Promise<string | null> => {
   if (typeof window === 'undefined') return null;
   if (!window.ethereum) {
@@ -69,13 +69,8 @@ export const connectWallet = async (): Promise<string | null> => {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (!accounts || accounts.length === 0) return null;
     const address = accounts[0].toLowerCase();
-    // Save wallet immediately — network switch is best-effort
     setStoredWallet(address);
-    try {
-      await ensureBaseNetwork();
-    } catch (e) {
-      console.warn('[Lumina] Network switch failed, continuing anyway:', e);
-    }
+    try { await ensureBaseNetwork(); } catch(e) { console.warn('[Lumina] Network switch:', e); }
     return address;
   } catch (error: any) {
     if (error.code === 4001) console.log('[Lumina] User rejected connection.');
@@ -86,10 +81,10 @@ export const connectWallet = async (): Promise<string | null> => {
 // ── Disconnect: limpia TODO ──
 export const disconnectWallet = () => {
   setStoredWallet(null);
-  clearOnboarding();
+  clearDisclaimer();
 };
 
-// ── Base network ──
+// ── Base network enforcement ──
 export const ensureBaseNetwork = async () => {
   if (typeof window === 'undefined' || !window.ethereum) return;
   try {
@@ -124,12 +119,11 @@ export const setupWalletListeners = (onAccountChange: (addr: string | null) => v
       setStoredWallet(addr);
       onAccountChange(addr);
     } else {
-      setStoredWallet(null);
+      disconnectWallet();
       onAccountChange(null);
     }
   });
   window.ethereum.on('chainChanged', () => {
-    // Silent re-check — NO reload, NO popup
     tryAutoConnect().then(addr => onAccountChange(addr));
   });
 };

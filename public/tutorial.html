@@ -393,12 +393,12 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the Dashboard to see your active policy.</p>
 
 <button onclick="finishSetup()" style="display:block;width:100%;background:linear-gradient(135deg,#00e5ff,#7c4dff);color:white;border:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:16px">
-Setup Complete — Go to Dashboard →
+✅ Setup Complete — Back to Lumina →
 </button>
 <script>
 function finishSetup() {
-  localStorage.setItem('lumina_onboarding_done', 'true');
-  window.location.href = '/dashboard';
+  localStorage.setItem('lumina_disclaimer_accepted', 'true');
+  window.location.href = '/';
 }
 </script>
 </div>
