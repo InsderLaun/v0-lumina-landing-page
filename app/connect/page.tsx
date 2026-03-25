@@ -23,7 +23,7 @@ export default function ConnectPage() {
     const addr = await connectWallet()
     if (addr) {
       setDisclaimerAccepted()
-      window.location.href = '/dashboard'
+      window.location.href = '/'
     } else {
       setError('Connection cancelled or failed. Please try again.')
     }

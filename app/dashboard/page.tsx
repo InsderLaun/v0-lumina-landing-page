@@ -291,7 +291,12 @@ export default function DashboardPage() {
 
       // Listeners
       setupWalletListeners((newAddr) => {
-        setWalletAddress(newAddr)
+        if (newAddr) {
+          setWalletAddress(newAddr)
+        } else {
+          disconnectWallet()
+          window.location.href = '/'
+        }
       })
     }
     initDashboard()

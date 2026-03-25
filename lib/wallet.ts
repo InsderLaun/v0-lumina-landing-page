@@ -1,6 +1,3 @@
-// lib/wallet.ts — Lumina Protocol Wallet Module
-// eth_accounts = silencioso (auto-reconnect). eth_requestAccounts = popup (solo onClick en /connect).
-
 declare global {
   interface Window {
     ethereum?: any;
@@ -58,7 +55,7 @@ export const tryAutoConnect = async (): Promise<string | null> => {
   }
 };
 
-// ── PROACTIVO: Abre popup. SOLO llamar en onClick de /connect. ──
+// ── PROACTIVO: Abre popup. SOLO llamar en onClick. ──
 export const connectWallet = async (): Promise<string | null> => {
   if (typeof window === 'undefined') return null;
   if (!window.ethereum) {
@@ -69,8 +66,8 @@ export const connectWallet = async (): Promise<string | null> => {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (!accounts || accounts.length === 0) return null;
     const address = accounts[0].toLowerCase();
+    await ensureBaseNetwork();
     setStoredWallet(address);
-    try { await ensureBaseNetwork(); } catch(e) { console.warn('[Lumina] Network switch:', e); }
     return address;
   } catch (error: any) {
     if (error.code === 4001) console.log('[Lumina] User rejected connection.');
@@ -124,7 +121,7 @@ export const setupWalletListeners = (onAccountChange: (addr: string | null) => v
     }
   });
   window.ethereum.on('chainChanged', () => {
-    tryAutoConnect().then(addr => onAccountChange(addr));
+    if (typeof window !== 'undefined') window.location.reload();
   });
 };
 
