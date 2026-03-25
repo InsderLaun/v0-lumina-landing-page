@@ -162,6 +162,27 @@ export default function Home() {
             </a>
           </motion.div>
 
+          {/* Agent vs Wallet explainer */}
+          <div style={{ maxWidth: 700, margin: '40px auto 0', padding: '24px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap', justifyContent: 'center' }}>
+              <div style={{ flex: 1, minWidth: 250, textAlign: 'center' }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>🤖</div>
+                <h4 style={{ color: '#00e5ff', margin: '0 0 8px', fontSize: 15 }}>Set Up Your Agent</h4>
+                <p style={{ color: '#888', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                  Create an API key, approve a spending limit, and give your agent the SKILL file. Your agent then buys insurance and manages yield <strong style={{ color: '#aaa' }}>autonomously via API</strong> — no wallet needed.
+                </p>
+              </div>
+              <div style={{ width: 1, background: 'rgba(255,255,255,0.1)', alignSelf: 'stretch' }}></div>
+              <div style={{ flex: 1, minWidth: 250, textAlign: 'center' }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>👁️</div>
+                <h4 style={{ color: '#7c4dff', margin: '0 0 8px', fontSize: 15 }}>Monitor via Dashboard</h4>
+                <p style={{ color: '#888', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                  Connect your wallet to view your agent&apos;s activity — active policies, vault deposits, yields, and claims. <strong style={{ color: '#aaa' }}>This is read-only monitoring</strong>, your agent operates independently.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Stats bar */}
           <motion.div
             initial={{ opacity: 0 }}
