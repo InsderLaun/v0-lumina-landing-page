@@ -188,7 +188,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base font-medium"
+            className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base font-medium mt-[60px]"
           >
             <span className="text-cyan-400"><span className="font-bold">4</span> Products</span>
             <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
