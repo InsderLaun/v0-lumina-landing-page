@@ -25,7 +25,11 @@ const config = createConfig({
     chains: [base],
     transports: { [base.id]: http() },
     ssr: true,
+    multiInjectedProviderDiscovery: false,
 })
+
+// Disable wagmi auto-reconnect to prevent wallet popup on page load
+config._internal.reconnectOnMount = false
 
 const queryClient = new QueryClient()
 
