@@ -1517,6 +1517,7 @@ function YieldCalculatorSection() {
 
   return (
     <section className="py-24 px-4">
+      <div id="yield-calculator" className="scroll-mt-20" />
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
           Yield Calculator
@@ -2626,7 +2627,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
     ...(perspective === "protect" ? [{ label: "Products", href: "#products" }] : []),
     ...(perspective === "earn" ? [{ label: "Vaults", href: "#vaults" }] : []),
     { label: "Pricing", href: "#kink-model" },
-    { label: "Calculator", href: "#calculator" },
+    { label: "Calculator", href: perspective === "earn" ? "#yield-calculator" : "#calculator" },
     { label: "Skill", href: "https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md", external: true },
     { label: "Security", href: "#security" },
     { label: "FAQ", href: "#faq" },
