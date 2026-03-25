@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
-import { disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners } from '@/lib/wallet'
+import { connectWallet, disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners } from '@/lib/wallet'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -779,26 +779,49 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-[#0A0A0F] text-white">
         {header}
         <div className="flex flex-col items-center justify-center min-h-screen px-4 pt-16">
-          <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-2 border-cyan-500/30 rounded-xl p-6 mb-6 text-center max-w-lg w-full">
-            <h2 className="text-cyan-400 text-xl font-bold mb-2">Dashboard is for monitoring your agent</h2>
-            <p className="text-white/50 text-base mb-3">Connect your wallet to see your deposits, policies, and yields.</p>
-            <p className="text-white/40 text-sm">Don&apos;t have an agent yet? <a href="/" className="text-cyan-400 hover:text-cyan-300">Go to Getting Started &rarr;</a></p>
+          <div className="max-w-md w-full">
+            <div className="text-center mb-8">
+              <div className="text-4xl mb-4">🔒</div>
+              <h1 className="text-2xl font-bold mb-2">Connect Your Wallet</h1>
+              <p className="text-white/50 text-sm">Lumina Protocol runs on Base L2</p>
+            </div>
+
+            <div className="bg-white/[0.03] border border-white/10 rounded-xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-white/80 mb-3">Before you connect:</h3>
+              <ul className="space-y-3 text-sm text-white/50">
+                <li className="flex items-start gap-3">
+                  <span className="text-green-400 mt-0.5">✓</span>
+                  <span>Your private key <strong className="text-white/70">never leaves your wallet</strong>. Lumina only reads your public address.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-green-400 mt-0.5">✓</span>
+                  <span>You will be asked to <strong className="text-white/70">switch to Base network</strong> if you&apos;re on a different chain.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-green-400 mt-0.5">✓</span>
+                  <span>No transaction will be signed. <strong className="text-white/70">Connecting is free</strong> — no gas needed.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-cyan-400 mt-0.5">ℹ</span>
+                  <span>Works with <strong className="text-white/70">MetaMask, Phantom, Coinbase Wallet</strong>, and any Web3 wallet.</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              onClick={async () => {
+                const addr = await connectWallet()
+                if (addr) setWalletAddress(addr)
+              }}
+              className="w-full py-4 rounded-xl font-semibold text-lg bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400 transition-all"
+            >
+              Connect Wallet
+            </button>
+
+            <p className="text-center text-white/30 text-xs mt-4">
+              Don&apos;t have an agent yet? <a href="/" className="text-cyan-400/50 hover:text-cyan-400">Go to Getting Started →</a>
+            </p>
           </div>
-          <h1 className="text-2xl font-bold mb-2">
-            <span className="text-cyan-400">LUMINA</span>
-            <span className="text-white/20"> · </span>
-            <span className="text-purple-400">M2M</span>
-          </h1>
-          <p className="text-white/50 text-sm mb-8 text-center max-w-md">
-            Connect your wallet to monitor your agent&apos;s activity
-          </p>
-          <a
-            href="/connect"
-            className="inline-block px-8 py-3.5 rounded-full font-semibold text-white bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-base mb-4"
-          >
-            Connect Wallet
-          </a>
-          <p className="text-white/30 text-xs">Read-only dashboard. Your agent operates, you supervise.</p>
         </div>
       </div>
     )

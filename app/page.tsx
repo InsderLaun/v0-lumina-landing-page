@@ -437,7 +437,7 @@ export default function Home() {
                     <p className="text-sm text-white/70">Step-by-step guide to set up your wallet, approve spending, get your API Key, and configure your agent. No blockchain knowledge needed.</p>
                   </div>
                   <div className="space-y-2 pt-6">
-                    <a href="/connect" className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all">Read the Guide →</a>
+                    <a href="/dashboard" className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all">Read the Guide →</a>
                     <p className="text-[10px] text-white/30 text-center">Visual walkthrough with examples</p>
                   </div>
                 </motion.div>
@@ -2696,7 +2696,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
             </div>
           ) : (
             <a
-              href="/connect"
+              href="/dashboard"
               className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
                 accent === "cyan"
                   ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
@@ -2767,7 +2767,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
                   </>
                 ) : (
                   <a
-                    href="/connect"
+                    href="/dashboard"
                     onClick={() => setMenuOpen(false)}
                     className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
                       accent === "cyan"
