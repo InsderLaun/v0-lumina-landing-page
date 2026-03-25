@@ -2672,15 +2672,15 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
 
         {/* Connect Agent + Connect Wallet */}
         <div className="hidden md:flex items-center gap-3">
-          <button
-            onClick={onConnectAgent}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all"
-          >
-            📖 Getting Started
-          </button>
           {walletAddress ? (
-            <div className="flex items-center gap-3">
-              <a href="/dashboard" className="px-5 py-2 rounded-full text-sm font-semibold bg-cyan-500/15 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500/25 transition-all">
+            <>
+              <button
+                onClick={onConnectAgent}
+                className="text-xs text-white/40 hover:text-amber-400 transition-colors px-2 py-1"
+              >
+                Setup Guide
+              </button>
+              <a href="/dashboard" className="px-5 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400 transition-all">
                 Dashboard
               </a>
               <span className="text-xs font-mono text-white/40">{truncateAddress(walletAddress)}</span>
@@ -2690,18 +2690,26 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
               >
                 Disconnect
               </button>
-            </div>
+            </>
           ) : (
-            <a
-              href="/connect"
-              className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
-                accent === "cyan"
-                  ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
-                  : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
-              }`}
-            >
-              Connect Wallet
-            </a>
+            <>
+              <button
+                onClick={onConnectAgent}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all"
+              >
+                Getting Started
+              </button>
+              <a
+                href="/connect"
+                className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+                  accent === "cyan"
+                    ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
+                    : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
+                }`}
+              >
+                Connect Wallet
+              </a>
+            </>
           )}
         </div>
 
@@ -2737,18 +2745,18 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
                 )
               ))}
               <div className="pt-2 space-y-2">
-                <button
-                  onClick={() => { setMenuOpen(false); onConnectAgent(); }}
-                  className="block w-full text-center px-6 py-2.5 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-all"
-                >
-                  📖 Getting Started
-                </button>
                 {walletAddress ? (
                   <>
+                    <button
+                      onClick={() => { setMenuOpen(false); onConnectAgent(); }}
+                      className="block w-full text-center text-xs text-white/40 hover:text-amber-400 transition-colors py-2"
+                    >
+                      Setup Guide
+                    </button>
                     <a
                       href="/dashboard"
                       onClick={() => setMenuOpen(false)}
-                      className="block w-full text-center px-6 py-2.5 rounded-full text-sm font-semibold bg-cyan-500/15 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500/25 transition-all"
+                      className="block w-full text-center px-6 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400 transition-all"
                     >
                       Dashboard
                     </a>
@@ -2763,17 +2771,25 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
                     </div>
                   </>
                 ) : (
-                  <a
-                    href="/connect"
-                    onClick={() => setMenuOpen(false)}
-                    className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
-                      accent === "cyan"
-                        ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
-                        : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
-                    }`}
-                  >
-                    Connect Wallet
-                  </a>
+                  <>
+                    <button
+                      onClick={() => { setMenuOpen(false); onConnectAgent(); }}
+                      className="block w-full text-center px-6 py-2.5 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-all"
+                    >
+                      Getting Started
+                    </button>
+                    <a
+                      href="/connect"
+                      onClick={() => setMenuOpen(false)}
+                      className={`block w-full text-center px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+                        accent === "cyan"
+                          ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
+                          : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
+                      }`}
+                    >
+                      Connect Wallet
+                    </a>
+                  </>
                 )}
               </div>
             </div>

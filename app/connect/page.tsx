@@ -71,6 +71,19 @@ export default function ConnectPage() {
             </ul>
           </div>
 
+          <div className="rounded-xl p-5 mb-6 text-left" style={{ background: 'rgba(255,170,0,0.08)', border: '1px solid rgba(255,170,0,0.3)' }}>
+            <h3 className="text-base font-semibold mb-3" style={{ color: '#ffaa00' }}>Before connecting your wallet</h3>
+            <p className="text-sm text-white/60 mb-3 leading-relaxed">
+              Connecting your wallet gives you access to the Dashboard where you can monitor your agent&apos;s activity, view your policies, and track vault yields.
+            </p>
+            <p className="text-sm text-white/60 mb-3 leading-relaxed">
+              <strong className="text-white/80">If you haven&apos;t set up your AI agent yet</strong>, you can still connect your wallet — but the Dashboard will be empty until your agent starts operating.
+            </p>
+            <p className="text-xs text-white/40">
+              Need to set up your agent first? <a href="/" className="text-cyan-400 hover:text-cyan-300">Go back and click &quot;Getting Started&quot;</a> for a step-by-step guide.
+            </p>
+          </div>
+
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-4 text-center">
               <p className="text-red-400 text-sm">{error}</p>
