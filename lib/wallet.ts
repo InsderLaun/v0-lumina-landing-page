@@ -129,7 +129,8 @@ export const setupWalletListeners = (onAccountChange: (addr: string | null) => v
     }
   });
   window.ethereum.on('chainChanged', () => {
-    if (typeof window !== 'undefined') window.location.reload();
+    // Silent re-check — NO reload, NO popup
+    tryAutoConnect().then(addr => onAccountChange(addr));
   });
 };
 
