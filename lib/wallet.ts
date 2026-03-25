@@ -69,8 +69,13 @@ export const connectWallet = async (): Promise<string | null> => {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (!accounts || accounts.length === 0) return null;
     const address = accounts[0].toLowerCase();
-    await ensureBaseNetwork();
+    // Save wallet immediately — network switch is best-effort
     setStoredWallet(address);
+    try {
+      await ensureBaseNetwork();
+    } catch (e) {
+      console.warn('[Lumina] Network switch failed, continuing anyway:', e);
+    }
     return address;
   } catch (error: any) {
     if (error.code === 4001) console.log('[Lumina] User rejected connection.');
