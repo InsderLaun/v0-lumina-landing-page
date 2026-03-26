@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { connectWallet, tryAutoConnect, isDisclaimerAccepted, setDisclaimerAccepted } from "@/lib/wallet"
+import { connectWallet, getStoredWallet, isDisclaimerAccepted, setDisclaimerAccepted } from "@/lib/wallet"
 
 export default function ConnectPage() {
   const [connecting, setConnecting] = useState(false)
@@ -12,11 +12,10 @@ export default function ConnectPage() {
 
   // If already connected + disclaimer accepted → go to landing (will show Dashboard)
   useEffect(() => {
-    tryAutoConnect().then(addr => {
-      if (addr && isDisclaimerAccepted()) {
-        window.location.href = '/'
-      }
-    })
+    const stored = getStoredWallet()
+    if (stored && isDisclaimerAccepted()) {
+      window.location.href = '/'
+    }
   }, [])
 
   const handleAcceptAndConnect = async () => {

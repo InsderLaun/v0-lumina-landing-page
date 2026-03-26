@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
-import { disconnectWallet, tryAutoConnect, truncateAddress, setupWalletListeners, isDisclaimerAccepted } from '@/lib/wallet'
+import { disconnectWallet, getStoredWallet, truncateAddress, setupWalletListeners, isDisclaimerAccepted } from '@/lib/wallet'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -273,25 +273,25 @@ export default function DashboardPage() {
 
   const connected = !!walletAddress
 
-  // Initialize dashboard
+  // Initialize dashboard — read from localStorage, never trigger wallet popup
   useEffect(() => {
     const initDashboard = async () => {
-      const address = await tryAutoConnect()
+      const stored = getStoredWallet()
       const accepted = isDisclaimerAccepted()
 
       // No wallet or no disclaimer → show public data + connect banner
-      if (!address || !accepted) {
+      if (!stored || !accepted) {
         try { await fetchVaultData() } catch(e) { console.error('[Lumina] Public data:', e) }
         setWalletChecked(true)
         return
       }
 
-      // All good → load user data
-      setWalletAddress(address)
-      try { await fetchVaultData(address) } catch(e) { console.error('[Lumina] Vault data:', e) }
+      // All good → load user data using stored address
+      setWalletAddress(stored)
+      try { await fetchVaultData(stored) } catch(e) { console.error('[Lumina] Vault data:', e) }
       setWalletChecked(true)
 
-      // Listeners
+      // Listeners (only registers if wallet in localStorage)
       setupWalletListeners((newAddr) => {
         if (newAddr) {
           setWalletAddress(newAddr)

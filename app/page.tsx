@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { calculateYield } from "@/lib/pricing"
 import { PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, CONTRACTS, TOKENS, PROTOCOL, CHAIN, calcKinkMultiplier as calcKinkMultiplierFromConfig, calculatePremium } from '@/lib/lumina-config'
-import { disconnectWallet, tryAutoConnect, truncateAddress, isDisclaimerAccepted } from '@/lib/wallet'
+import { disconnectWallet, getStoredWallet, truncateAddress, isDisclaimerAccepted } from '@/lib/wallet'
 
 type Perspective = "protect" | "earn"
 
@@ -48,11 +48,10 @@ export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const aaveYield = useAaveYield()
 
-  // Silent auto-connect on mount (only show as connected if disclaimer accepted)
+  // Check localStorage only — never touch window.ethereum on landing
   useEffect(() => {
-    tryAutoConnect().then(addr => {
-      if (addr && isDisclaimerAccepted()) setWalletAddress(addr)
-    })
+    const stored = getStoredWallet()
+    if (stored && isDisclaimerAccepted()) setWalletAddress(stored)
   }, [])
 
   return (
