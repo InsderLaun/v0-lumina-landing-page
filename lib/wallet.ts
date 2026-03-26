@@ -38,8 +38,18 @@ const clearDisclaimer = () => {
 };
 
 // ── SILENCIOSO: No abre popup. Usar en useEffect al montar páginas. ──
+// Solo toca window.ethereum si hay una wallet previamente guardada.
+// Esto evita que Chrome muestre el selector de proveedor (MetaMask/Phantom)
+// cuando hay múltiples wallets instaladas.
 export const tryAutoConnect = async (): Promise<string | null> => {
-  if (typeof window === 'undefined' || !window.ethereum) return null;
+  if (typeof window === 'undefined') return null;
+
+  // Si nunca se conectó, no tocar window.ethereum
+  const stored = localStorage.getItem('lumina_wallet');
+  if (!stored) return null;
+
+  if (!window.ethereum) return null;
+
   try {
     const accounts = await window.ethereum.request({ method: 'eth_accounts' });
     if (accounts && accounts.length > 0) {
@@ -47,6 +57,7 @@ export const tryAutoConnect = async (): Promise<string | null> => {
       setStoredWallet(address);
       return address;
     }
+    // Wallet was stored but no longer authorized — clean up
     setStoredWallet(null);
     return null;
   } catch (error) {
@@ -107,9 +118,10 @@ export const ensureBaseNetwork = async () => {
   }
 };
 
-// ── Listeners ──
+// ── Listeners (solo registrar si hay wallet guardada) ──
 export const setupWalletListeners = (onAccountChange: (addr: string | null) => void) => {
   if (typeof window === 'undefined' || !window.ethereum) return;
+  if (!localStorage.getItem('lumina_wallet')) return;
   window.ethereum.on('accountsChanged', (accounts: string[]) => {
     if (accounts.length > 0) {
       const addr = accounts[0].toLowerCase();
