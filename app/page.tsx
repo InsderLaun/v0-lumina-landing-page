@@ -402,10 +402,13 @@ export default function Home() {
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(124,77,255,0.1)] border border-[rgba(124,77,255,0.2)] text-[#7c4dff] text-[11px] font-medium">
               OWS Compatible
             </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[11px] font-medium">
+              🔐 Multisig Oracle
+            </span>
           </div>
           <div className="border-t border-white/5 pt-8">
             <p className="text-xs text-white/20 text-center">
-              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 52 Tests Passing · 0C/0H/0M · Yield by Aave V3
+              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 72 Tests Passing · 0C/0H/0M · Yield by Aave V3
             </p>
           </div>
         </div>
@@ -2425,6 +2428,7 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
     "$50K per-wallet cap on Exploit Shield",
     "Dual trigger (Chainlink + Phala TEE) for exploits",
     "Soulbound vault shares (anti-cooldown bypass)",
+    "Multisig oracle verification (3-of-5 signatures)",
   ]
 
   return (
@@ -2471,6 +2475,30 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
           <div className="flex gap-4">
             <a href="https://openwallet.sh" target="_blank" rel="noopener noreferrer" className="text-xs text-[#7c4dff] hover:text-[#9c7cff] transition-colors">openwallet.sh →</a>
             <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/docs/OWS-INTEGRATION.md" target="_blank" rel="noopener noreferrer" className="text-xs text-[#7c4dff] hover:text-[#9c7cff] transition-colors">Integration Guide →</a>
+          </div>
+        </div>
+
+        {/* Multisig Oracle */}
+        <div className="bg-[rgba(0,188,212,0.05)] border border-[rgba(0,188,212,0.3)] rounded-xl p-6 mb-8">
+          <h4 className="text-base font-bold text-cyan-400 mb-1">🔐 Multisig Oracle (N-of-M)</h4>
+          <p className="text-xs text-white/40 mb-4">No single point of failure for claim resolution</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <p className="text-xs font-semibold text-white/80 mb-1">🛡️ N-of-M Verification</p>
+              <p className="text-xs text-white/50">Oracle reports require 3-of-5 independent cryptographic signatures before any claim is resolved on-chain.</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-white/80 mb-1">🔄 Signer Rotation</p>
+              <p className="text-xs text-white/50">Add or remove signers without redeploying contracts. Quorum adjustable from 1-of-1 to any N-of-M configuration.</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-white/80 mb-1">✅ Backwards Compatible</p>
+              <p className="text-xs text-white/50">Existing integrations keep working. Single-signer mode supported. Upgrade to multisig with zero downtime.</p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/src/oracles/LuminaOracle.sol" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">LuminaOracle.sol →</a>
+            <a href="https://github.com/agustintiberio10/LUMINA-PROTOCOL/blob/main/test/MultisigOracle.t.sol" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">72 Tests Passing →</a>
           </div>
         </div>
 

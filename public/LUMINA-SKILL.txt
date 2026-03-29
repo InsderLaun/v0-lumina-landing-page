@@ -1,6 +1,6 @@
 LUMINA PROTOCOL — SKILL FILE FOR AI AGENTS
-Version: 2.3 | Chain: Base Mainnet (8453) | March 2026
-Last updated: 2026-03-24
+Version: 2.4 | Chain: Base Mainnet (8453) | March 2026
+Last updated: 2026-03-29
 
 ════════════════════════════════════════════════════════════
 1. WHAT IS LUMINA?
@@ -491,3 +491,55 @@ getRepurchaseWindow(product):
   DEPEG   → 90000    (25 hours before expiry)
   IL      → 3600     (1 hour before expiry)
   EXPLOIT → 1296000  (15 days before expiry)
+
+════════════════════════════════════════════════════════════
+15. MULTISIG ORACLE
+════════════════════════════════════════════════════════════
+
+HOW IT WORKS:
+  The LuminaOracle now supports N-of-M multisig verification for claim resolution.
+  Default configuration: 3-of-5 independent cryptographic signatures required.
+  Oracle reports are signed by multiple independent signers. Their ECDSA signatures
+  are concatenated (packed) into a single bytes payload (65 bytes per signature).
+  Signatures MUST be ordered by signer address (ascending) to prevent duplicates.
+
+  When requiredSignatures == 1: single-signer mode (backwards compatible).
+  When requiredSignatures > 1: packed multisig mode via verifyPackedMultisig().
+  The verifySignature() function automatically detects and routes to the correct mode.
+
+KEY FUNCTIONS (LuminaOracle.sol):
+  verifyPackedMultisig(bytes32 dataHash, bytes packedSignatures) → bool
+    Verifies N packed ECDSA signatures. Each signature = 65 bytes (r, s, v).
+    Requires signatures ordered by signer address ascending. Reverts on duplicates.
+
+  verifySignature(bytes32 digest, bytes signature) → address
+    IOracle interface. In multisig mode, verifies packed signatures and returns
+    oracleKey address for BaseShield compatibility. In single mode, works as before.
+
+  addSigner(address signer) → onlyOwner
+    Register a new authorized signer. Cannot add duplicates or zero address.
+
+  removeSigner(address signer) → onlyOwner
+    Remove a signer. Reverts if removal would break the required quorum.
+
+  setRequiredSignatures(uint256 required) → onlyOwner
+    Change the quorum threshold. Must be > 0 and <= totalSigners.
+
+  getSignerInfo() → (uint256 required, uint256 total)
+    Query current quorum configuration.
+
+  isSigner(address addr) → bool
+    Check if an address is an authorized signer.
+
+SECURITY PROPERTIES:
+  - No single point of failure: compromising 1 key cannot forge oracle reports
+  - Quorum protection: removeSigner reverts if it would break quorum
+  - Duplicate prevention: signatures must be ordered by address (ascending)
+  - Unauthorized signer detection: every recovered address checked against mapping
+  - Owner-only management: addSigner, removeSigner, setRequiredSignatures
+  - Backwards compatible: existing shields work without modification
+
+AGENT INTEGRATION:
+  No changes needed in agent integration. The API handles signature aggregation
+  server-side. Agents continue using the same /claim endpoint as before.
+  The multisig verification happens transparently at the smart contract level.
