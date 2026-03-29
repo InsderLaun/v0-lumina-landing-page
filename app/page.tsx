@@ -497,30 +497,30 @@ export default function Home() {
                         const userWallet = walletAddress || '[PASTE YOUR WALLET ADDRESS HERE]'
                         const prompt = `I need to connect my AI agent to Lumina Protocol for DeFi insurance on Base L2.
 
-My wallet address is: ${userWallet}
+BEFORE STARTING — I need to provide my information:
+- Wallet address: ${userWallet}
+- Agent label (optional, default "my-agent"): [CHOOSE A NAME OR LEAVE DEFAULT]
 
 SECURITY NOTE: This setup does NOT require your private key. Never paste your private key in any chat, terminal, or website. The blockchain approval step is done through MetaMask in your browser where your key stays safe.
+
+Use my wallet address everywhere it's needed below. Do NOT ask me for it again.
 
 Please do the following steps in order. After each step, show me the result and wait for my confirmation before continuing.
 
 STEP 1 — Check that the Lumina API is online:
 curl ${PROTOCOL.apiBaseUrl}/api/v2/health
-
 Expected: {"status":"ok"}. If it fails, wait 30 seconds and retry.
 
 STEP 2 — Create my API Key:
-curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/keys/create -H "Content-Type: application/json" -d '{"wallet":"${userWallet}","label":"my-agent"}'
-
+curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/keys/create -H "Content-Type: application/json" -d '{"wallet":"${userWallet}","label":"<my agent label>"}'
 IMPORTANT: The API key in the response is shown ONLY ONCE. Display it clearly and tell me to save it somewhere safe before continuing.
 
 STEP 3 — Approve USDC spending (I need to do this myself in my browser):
-
 STOP HERE and give me these instructions:
 
 "I cannot do this step for you, and here is why: approving USDC spending requires your wallet signature. Your private key lives inside MetaMask and must NEVER be shared with anyone — not even me. This is what protects your money.
 
 Please follow these steps in your browser:
-
 1. Open https://www.lumina-org.com/tutorial.html
 2. Click Connect Wallet and approve the connection in MetaMask
 3. In Step 2 of the tutorial, you will see two tabs: Buy Insurance and Earn Yield
@@ -528,29 +528,28 @@ Please follow these steps in your browser:
    - For yield: select the vault and enter the deposit amount
 4. Click Approve with MetaMask
 5. MetaMask will open showing exactly how much you are authorizing — verify the amount and click Confirm
-6. Done! Come back here and tell me approved so I can continue with the next step.
+6. Done! Come back here and tell me 'approved' so I can continue with the next step.
 
 This is a one-time setup. Once approved, your agent can operate automatically without needing your wallet again."
 
 Wait for the user to confirm they completed the approval before continuing.
 
 STEP 4 — Buy a test policy (Black Swan Shield, $100 coverage, 7 days):
-curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/purchase -H "Content-Type: application/json" -H "X-API-Key: [API_KEY_FROM_STEP_2]" -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'
-
+curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/purchase -H "Content-Type: application/json" -H "X-API-Key: <API key from Step 2>" -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'
 If successful, show the policy ID and tell me: "Your first policy is active! Your agent is now connected to Lumina."
 If it fails with "Insufficient allowance", tell me I need to go back to Step 3 and complete the approve.
 
 STEP 5 — Verify my active policies:
 curl ${PROTOCOL.apiBaseUrl}/api/v2/policies?buyer=${userWallet}
-
 Show the list of policies with their status, coverage, and expiration.
 
 STEP 6 — Download the SKILL file:
 curl -O https://www.lumina-org.com/LUMINA-SKILL.txt
-
 After downloading, tell me:
 
 "Setup complete! Here is what was configured:
+- Wallet: ${userWallet}
+- Agent: <my agent label>
 - API Key: created and active
 - USDC Approval: authorized via MetaMask (your key never left your wallet)
 - Test Policy: [show policy details]
