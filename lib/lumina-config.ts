@@ -177,7 +177,7 @@ export const PROTOCOL = {
   supportEmail: "support@lumina-org.com",
   salesEmail: "labs@lumina-org.com",
   website: "https://www.lumina-org.com",
-  github: "https://github.com/agustintiberio10/LUMINA-PROTOCOL",
+  github: "https://github.com/org-lumina/LUMINA-PROTOCOL",
 } as const
 
 // ════════════════════════════════════════════════════════════

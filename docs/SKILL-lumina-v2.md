@@ -379,7 +379,7 @@ TYPICAL AGENT LOOP:
 SUPPORT:
 Email: support@lumina-org.com
 Website: https://www.lumina-org.com
-GitHub: https://github.com/agustintiberio10/LUMINA-PROTOCOL
+GitHub: https://github.com/org-lumina/LUMINA-PROTOCOL
 
 ════════════════════════════════════════════════════════════
 13. API RESPONSE SCHEMAS

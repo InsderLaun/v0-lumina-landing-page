@@ -38,7 +38,7 @@ Debe resolver a IPs de Google: `216.239.32.21`, `216.239.34.21`, `216.239.36.21`
 ## Notas Importantes
 
 - **NO usar Vercel.** El dominio fue migrado de Vercel a Google Cloud Run el 2026-02-19.
-- El repo GitHub (`agustintiberio10/v0-lumina-landing-page`) YA NO auto-despliega en Vercel. Solo usar `gcloud run deploy`.
+- El repo GitHub (`org-lumina/v0-lumina-landing-page`) YA NO auto-despliega en Vercel. Solo usar `gcloud run deploy`.
 - El `git push` sigue siendo útil para versionar código, pero no dispara deploy automático.
 - El Dockerfile usa `pnpm` y `output: "standalone"` en `next.config.mjs`.
 - Min instances = 0 (free tier, se apaga cuando nadie visita).
