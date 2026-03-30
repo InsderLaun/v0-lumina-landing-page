@@ -124,7 +124,10 @@ export default function WhitepaperEN() {
       {/* Header */}
       <header className="border-b border-[#1F2937] py-4 px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-lg font-bold"><span className="text-[#00D4AA]">LUMINA</span> <span className="text-[#6B7280]">PROTOCOL</span></Link>
+          <div className="flex items-center gap-4">
+            <Link href="https://www.lumina-org.com" className="text-[#9CA3AF] hover:text-[#00D4AA] text-sm transition-colors">{"\u2190"} Back to Lumina</Link>
+            <Link href="/" className="text-lg font-bold"><span className="text-[#00D4AA]">LUMINA</span> <span className="text-[#6B7280]">PROTOCOL</span></Link>
+          </div>
           <Link href="/whitepaper/es" className="text-[#9CA3AF] hover:text-[#00D4AA] text-sm transition-colors">ES</Link>
         </div>
       </header>
@@ -226,21 +229,34 @@ export default function WhitepaperEN() {
 
       {/* Section 5: How Money Flows */}
       <FadeIn className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>How Money Flows</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all" style={{ borderLeftWidth: 4, borderLeftColor: "#00D4AA", boxShadow: "inset 4px 0 12px -4px rgba(0, 212, 170, 0.15)" }}>
-              <div className="text-[#00D4AA] font-bold text-lg mb-3">Premium In</div>
-              <div className="text-[#9CA3AF] text-sm leading-relaxed">97% {"\u2192"} Vault<br />3% {"\u2192"} Protocol Fee<br />+ 3% performance fee on vault yield at withdrawal</div>
+
+          {/* Flow A: Policy Purchase */}
+          <div className="mb-10">
+            <h3 className="text-lg font-semibold text-[#00D4AA] mb-4 text-center">Policy Purchase Flow</h3>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {["AI Agent", "Get Quote", "CoverRouter", "Shield", "Vault (Lock 1:1)", "Premium Split: 97% Vault / 3% Fee"].map((step, i, arr) => (
+                <div key={step} className="flex items-center gap-2">
+                  <div className="bg-[#1F2937] border border-[#00D4AA40] rounded-lg px-3 py-2 text-[#00D4AA] text-xs font-medium whitespace-nowrap">{step}</div>
+                  {i < arr.length - 1 && <span className="text-[#00D4AA] font-bold">{"\u2192"}</span>}
+                </div>
+              ))}
             </div>
-            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all" style={{ borderLeftWidth: 4, borderLeftColor: "#22d3ee", boxShadow: "inset 4px 0 12px -4px rgba(34, 211, 238, 0.15)" }}>
-              <div className="text-[#22d3ee] font-bold text-lg mb-3">Vault Capital</div>
-              <div className="text-[#9CA3AF] text-sm leading-relaxed">Idle {"\u2192"} Aave V3 yield<br />Locked {"\u2192"} Active policies</div>
+          </div>
+
+          {/* Flow B: Vault Investment */}
+          <div>
+            <h3 className="text-lg font-semibold text-[#22d3ee] mb-4 text-center">Vault Investment Flow (LP)</h3>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {["Deposit USDC", "Vault", "Aave V3 Yield", "Premiums In", "Request Withdrawal", "Cooldown (30-365d)", "Withdraw + Yield"].map((step, i, arr) => (
+                <div key={step} className="flex items-center gap-2">
+                  <div className="bg-[#1F2937] border border-[#22d3ee40] rounded-lg px-3 py-2 text-[#22d3ee] text-xs font-medium whitespace-nowrap">{step}</div>
+                  {i < arr.length - 1 && <span className="text-[#00D4AA] font-bold">{"\u2192"}</span>}
+                </div>
+              ))}
             </div>
-            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all" style={{ borderLeftWidth: 4, borderLeftColor: "#a78bfa", boxShadow: "inset 4px 0 12px -4px rgba(167, 139, 250, 0.15)" }}>
-              <div className="text-[#a78bfa] font-bold text-lg mb-3">Claim Out</div>
-              <div className="text-[#9CA3AF] text-sm leading-relaxed">Oracle verifies trigger<br />Payout {"\u2192"} Agent wallet</div>
-            </div>
+            <p className="text-[#9CA3AF] text-sm mt-4 text-center">Performance fee: 3% charged only on positive yield (profit above deposit cost)</p>
           </div>
         </div>
       </FadeIn>

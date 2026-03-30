@@ -122,7 +122,10 @@ export default function WhitepaperES() {
       {/* Header */}
       <header className="border-b border-[#1F2937] py-4 px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-lg font-bold"><span className="text-[#00D4AA]">LUMINA</span> <span className="text-[#6B7280]">PROTOCOL</span></Link>
+          <div className="flex items-center gap-4">
+            <Link href="https://www.lumina-org.com" className="text-[#9CA3AF] hover:text-[#00D4AA] text-sm transition-colors">{"\u2190"} Volver a Lumina</Link>
+            <Link href="/" className="text-lg font-bold"><span className="text-[#00D4AA]">LUMINA</span> <span className="text-[#6B7280]">PROTOCOL</span></Link>
+          </div>
           <Link href="/whitepaper/en" className="text-[#9CA3AF] hover:text-[#00D4AA] text-sm transition-colors">EN</Link>
         </div>
       </header>
@@ -216,30 +219,34 @@ export default function WhitepaperES() {
 
       {/* Section 5: Flujo de Fondos */}
       <FadeIn className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold mb-8 text-center">Flujo de Fondos</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div className="bg-[#111827] border border-[#2D3748] rounded-2xl p-8 border-l-4 border-l-[#00D4AA] shadow-lg shadow-[#00D4AA10]">
-              <div className="w-12 h-12 rounded-full bg-[#00D4AA20] flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#00D4AA] text-xl font-bold">1</span>
-              </div>
-              <div className="text-[#00D4AA] font-bold text-lg mb-3">Prima de Entrada</div>
-              <div className="text-[#9CA3AF] text-sm leading-relaxed" style={{ textAlign: "justify" }}>97% al Vault<br />3% Fee del Protocolo<br />+ 3% performance fee sobre rendimiento al retirar</div>
+
+          {/* Flow A: Compra de Poliza */}
+          <div className="mb-10">
+            <h3 className="text-lg font-semibold text-[#00D4AA] mb-4 text-center">Flujo de Compra de Poliza</h3>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {["Agente IA", "Cotizacion", "CoverRouter", "Shield", "Vault (Bloqueo 1:1)", "Prima: 97% Vault / 3% Fee"].map((step, i, arr) => (
+                <div key={step} className="flex items-center gap-2">
+                  <div className="bg-[#1F2937] border border-[#00D4AA40] rounded-lg px-3 py-2 text-[#00D4AA] text-xs font-medium whitespace-nowrap">{step}</div>
+                  {i < arr.length - 1 && <span className="text-[#00D4AA] font-bold">{"\u2192"}</span>}
+                </div>
+              ))}
             </div>
-            <div className="bg-[#111827] border border-[#2D3748] rounded-2xl p-8 border-l-4 border-l-[#22d3ee] shadow-lg shadow-[#22d3ee10]">
-              <div className="w-12 h-12 rounded-full bg-[#22d3ee20] flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#22d3ee] text-xl font-bold">2</span>
-              </div>
-              <div className="text-[#22d3ee] font-bold text-lg mb-3">Capital del Vault</div>
-              <div className="text-[#9CA3AF] text-sm leading-relaxed" style={{ textAlign: "justify" }}>Inactivo: rendimiento Aave V3<br />Bloqueado: polizas activas</div>
+          </div>
+
+          {/* Flow B: Inversion en Vault */}
+          <div>
+            <h3 className="text-lg font-semibold text-[#22d3ee] mb-4 text-center">Flujo de Inversion en Vault (LP)</h3>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {["Depositar USDC", "Vault", "Rendimiento Aave V3", "Primas Entrantes", "Solicitar Retiro", "Cooldown (30-365d)", "Retirar + Rendimiento"].map((step, i, arr) => (
+                <div key={step} className="flex items-center gap-2">
+                  <div className="bg-[#1F2937] border border-[#22d3ee40] rounded-lg px-3 py-2 text-[#22d3ee] text-xs font-medium whitespace-nowrap">{step}</div>
+                  {i < arr.length - 1 && <span className="text-[#00D4AA] font-bold">{"\u2192"}</span>}
+                </div>
+              ))}
             </div>
-            <div className="bg-[#111827] border border-[#2D3748] rounded-2xl p-8 border-l-4 border-l-[#a78bfa] shadow-lg shadow-[#a78bfa10]">
-              <div className="w-12 h-12 rounded-full bg-[#a78bfa20] flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#a78bfa] text-xl font-bold">3</span>
-              </div>
-              <div className="text-[#a78bfa] font-bold text-lg mb-3">Pago de Siniestro</div>
-              <div className="text-[#9CA3AF] text-sm leading-relaxed" style={{ textAlign: "justify" }}>Oracle verifica trigger<br />Payout al agente</div>
-            </div>
+            <p className="text-[#9CA3AF] text-sm mt-4 text-center">Performance fee: 3% solo sobre rendimiento positivo (ganancia sobre el costo de deposito)</p>
           </div>
         </div>
       </FadeIn>
