@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, AreaChart, Area, ReferenceLine } from "recharts"
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, AreaChart, Area, ReferenceLine, CartesianGrid, Legend, ReferenceArea } from "recharts"
 import Link from "next/link"
 
 const vaultData = [
@@ -57,27 +57,27 @@ const securityLayers = [
   { layer: "API", detail: "Rate limiting, restricciones CORS, Helmet headers, NonceManager, errores sanitizados" },
 ]
 
-const kinkPremiumData = [
-  { u: 0, m: 1.00 },
-  { u: 20, m: 1.13 },
-  { u: 40, m: 1.25 },
-  { u: 60, m: 1.38 },
-  { u: 80, m: 1.50 },
-  { u: 85, m: 1.88 },
-  { u: 90, m: 2.25 },
-  { u: 95, m: 2.63 },
-]
-
-const kinkApyData = [
-  { u: 0, apy: 4 },
-  { u: 20, apy: 7 },
-  { u: 40, apy: 10 },
-  { u: 60, apy: 14 },
-  { u: 80, apy: 18 },
-  { u: 85, apy: 22 },
-  { u: 90, apy: 25 },
-  { u: 95, apy: 27 },
-]
+// Kink Model data - dynamic pricing based on vault utilization
+const kinkModelData = (() => {
+  const kinkPoint = 80;
+  const maxUtil = 95;
+  const baseRate = 1.0;
+  const kinkRate = 1.5;
+  const jumpMultiplier = 15;
+  const data = [];
+  for (let u = 0; u <= 100; u += 2) {
+    let premium = null, lpYield = null;
+    if (u <= kinkPoint) {
+      premium = baseRate + (u / kinkPoint) * kinkRate;
+      lpYield = premium * (u / 100) * 0.97;
+    } else if (u <= maxUtil) {
+      premium = baseRate + kinkRate + ((u - kinkPoint) / (100 - kinkPoint)) * jumpMultiplier;
+      lpYield = premium * (u / 100) * 0.97;
+    }
+    data.push({ u, premium: premium ? Math.round(premium * 100) / 100 : null, lpYield: lpYield ? Math.round(lpYield * 100) / 100 : null });
+  }
+  return data;
+})();
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0)
@@ -286,116 +286,67 @@ export default function WhitepaperES() {
         </div>
       </FadeIn>
 
-      {/* Section 6: Modelo de Precios (Kink) */}
+      {/* Section: Modelo de Precios Dinamico (Kink) */}
       <FadeIn className="py-16 px-6 bg-[#0D1220]">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">Modelo de Precios (Kink)</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-              <h4 className="text-base font-semibold text-[#EF4444] mb-1 text-center">Costo de Prima</h4>
-              <p className="text-xs text-[#6B7280] mb-4 text-center">Lo que pagan los compradores</p>
-              <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={kinkPremiumData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
-                  <defs>
-                    <linearGradient id="redGradES" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis
-                    dataKey="u"
-                    domain={[0, 95]}
-                    tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
-                    axisLine={false}
-                    label={{ value: "Utilizacion %", position: "insideBottomRight", offset: -10, fill: "#9CA3AF", fontSize: 13 }}
-                  />
-                  <YAxis
-                    domain={[1.0, 3.0]}
-                    tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
-                    axisLine={false}
-                    width={45}
-                  />
-                  <Tooltip
-                    contentStyle={{ background: "#1F2937", border: "1px solid #EF444440", borderRadius: 8, color: "#fff" }}
-                    formatter={(v: number) => [`${v.toFixed(2)}x`, "Multiplicador"]}
-                    labelFormatter={(l: number) => `Utilizacion: ${l}%`}
-                  />
-                  <ReferenceLine
-                    x={80}
-                    stroke="#EF4444"
-                    strokeDasharray="6 4"
-                    strokeWidth={2}
-                    label={{ value: "Kink", position: "top", fill: "#EF4444", fontSize: 13, fontWeight: 600 }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="m"
-                    stroke="#EF4444"
-                    strokeWidth={2}
-                    fill="url(#redGradES)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+          <h2 className="text-2xl font-bold mb-2 text-center" style={{ textAlign: 'center' }}>Modelo de Precios Dinamico (Kink)</h2>
+          <p className="text-[#9CA3AF] text-sm text-center mb-10" style={{ textAlign: 'center' }}>El protocolo ajusta automaticamente el costo de las primas y el rendimiento de los LPs segun la disponibilidad de capital en los vaults.</p>
+
+          {/* Single large chart with dual Y axes */}
+          <div className="bg-[#111827] border border-[#1F2937] rounded-2xl p-6 mb-8">
+            <ResponsiveContainer width="100%" height={380}>
+              <AreaChart data={kinkModelData} margin={{ top: 20, right: 60, left: 20, bottom: 20 }}>
+                <defs>
+                  <linearGradient id="premiumGradES" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#F87171" stopOpacity={0.25}/>
+                    <stop offset="95%" stopColor="#F87171" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="yieldGradES" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#00D4AA" stopOpacity={0.25}/>
+                    <stop offset="95%" stopColor="#00D4AA" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+                <XAxis dataKey="u" tick={{ fontSize: 12, fill: "#9CA3AF" }} axisLine={{ stroke: "#1F2937" }} label={{ value: "Utilizacion del Vault (%)", position: "insideBottom", offset: -10, fill: "#9CA3AF", fontSize: 12 }} />
+                <YAxis yAxisId="left" tick={{ fontSize: 12, fill: "#F87171" }} axisLine={false} label={{ value: "Tasa de Prima", angle: -90, position: "insideLeft", fill: "#F87171", fontSize: 12 }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12, fill: "#00D4AA" }} axisLine={false} label={{ value: "Rendimiento LP %", angle: 90, position: "insideRight", fill: "#00D4AA", fontSize: 12 }} />
+                <Tooltip contentStyle={{ background: "#1F2937", border: "1px solid #374151", borderRadius: 12, color: "#fff" }} labelFormatter={(l) => `Utilizacion: ${l}%`} />
+                <ReferenceLine x={80} yAxisId="left" stroke="#F59E0B" strokeDasharray="6 4" strokeWidth={2} label={{ value: "Kink (80%)", position: "top", fill: "#F59E0B", fontSize: 12 }} />
+                <ReferenceArea x1={95} x2={100} yAxisId="left" fill="#EF4444" fillOpacity={0.12} label={{ value: "Sin nuevas polizas", position: "insideTop", fill: "#EF4444", fontSize: 10 }} />
+                <Area yAxisId="left" type="monotone" dataKey="premium" stroke="#F87171" strokeWidth={2.5} fill="url(#premiumGradES)" name="Tasa de Prima" connectNulls={false} />
+                <Area yAxisId="right" type="monotone" dataKey="lpYield" stroke="#00D4AA" strokeWidth={2.5} fill="url(#yieldGradES)" name="Rendimiento LP %" connectNulls={false} />
+                <Legend wrapperStyle={{ color: "#9CA3AF", fontSize: 12, paddingTop: 10 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Three zone cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="bg-[#1F2937] border-l-4 border-[#10B981] rounded-xl p-5">
+              <h4 className="text-[#10B981] font-semibold mb-2">Zona Baja (0-60%)</h4>
+              <p className="text-[#9CA3AF] text-sm" style={{ textAlign: 'justify' }}>Capital abundante. Primas bajas hacen la cobertura accesible para agentes. Rendimiento LP moderado. Condiciones ideales para comprar seguro.</p>
             </div>
-            <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-              <h4 className="text-base font-semibold text-[#22c55e] mb-1 text-center">Rendimiento LP</h4>
-              <p className="text-xs text-[#6B7280] mb-4 text-center">Lo que ganan los depositantes</p>
-              <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={kinkApyData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
-                  <defs>
-                    <linearGradient id="greenGradES" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis
-                    dataKey="u"
-                    domain={[0, 95]}
-                    tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
-                    axisLine={false}
-                    label={{ value: "Utilizacion %", position: "insideBottomRight", offset: -10, fill: "#9CA3AF", fontSize: 13 }}
-                  />
-                  <YAxis
-                    domain={[0, 30]}
-                    tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
-                    axisLine={false}
-                    width={45}
-                  />
-                  <Tooltip
-                    contentStyle={{ background: "#1F2937", border: "1px solid #22c55e40", borderRadius: 8, color: "#fff" }}
-                    formatter={(v: number) => [`${v}%`, "APY"]}
-                    labelFormatter={(l: number) => `Utilizacion: ${l}%`}
-                  />
-                  <ReferenceLine
-                    x={80}
-                    stroke="#22c55e"
-                    strokeDasharray="6 4"
-                    strokeWidth={2}
-                    label={{ value: "Kink", position: "top", fill: "#22c55e", fontSize: 13, fontWeight: 600 }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="apy"
-                    stroke="#22c55e"
-                    strokeWidth={2}
-                    fill="url(#greenGradES)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+            <div className="bg-[#1F2937] border-l-4 border-[#F59E0B] rounded-xl p-5">
+              <h4 className="text-[#F59E0B] font-semibold mb-2">Zona de Transicion (60-80%)</h4>
+              <p className="text-[#9CA3AF] text-sm" style={{ textAlign: 'justify' }}>Demanda creciente. Las primas comienzan a subir gradualmente. Equilibrio entre cobertura accesible y rendimientos LP crecientes.</p>
+            </div>
+            <div className="bg-[#1F2937] border-l-4 border-[#EF4444] rounded-xl p-5">
+              <h4 className="text-[#EF4444] font-semibold mb-2">Zona Alta (80-95%)</h4>
+              <p className="text-[#9CA3AF] text-sm" style={{ textAlign: 'justify' }}>Capital escaso. Las primas se disparan exponencialmente. Alto rendimiento LP atrae nuevos depositantes. Desincentiva nuevas polizas hasta que vuelva la liquidez.</p>
             </div>
           </div>
-          <div className="mt-6 bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-            <p className="text-[#9CA3AF] text-sm leading-relaxed" style={{ textAlign: "justify" }}>
-              <strong className="text-white">Como funciona el Modelo Kink:</strong>
-              <br /><br />
-              Utilizacion (U) = colateral bloqueado en polizas / activos totales del vault.
-              <br /><br />
-              - <strong className="text-white">Mas polizas compradas</strong> {"\u2192"} la utilizacion sube {"\u2192"} las primas aumentan {"\u2192"} el rendimiento LP sube
-              <br />
-              - <strong className="text-white">Mas depositos de LPs</strong> {"\u2192"} los activos totales crecen {"\u2192"} la utilizacion baja {"\u2192"} las primas bajan {"\u2192"} el rendimiento LP baja
-              <br /><br />
-              Esto crea un mercado autoequilibrado. Cuando la demanda de seguros es alta, las primas suben atrayendo mas LPs a depositar. Cuando la liquidez del vault es abundante, las primas bajan atrayendo mas compradores de polizas. El punto kink al 80% marca donde el crecimiento de primas se acelera drasticamente, protegiendo a los LPs de sobreexposicion. Por encima del 95% de utilizacion, no se aceptan nuevas polizas.
-            </p>
+
+          {/* Self-balancing mechanism explanation */}
+          <div className="bg-[#1F2937] border-l-4 border-[#00D4AA] rounded-xl p-6">
+            <h4 className="text-white font-semibold mb-3">Mecanismo de Autoequilibrio</h4>
+            <div className="text-[#9CA3AF] text-sm leading-relaxed space-y-3" style={{ textAlign: 'justify' }}>
+              <p>El Modelo Kink crea un mercado que se autoequilibra a traves de la escasez de capital:</p>
+              <p><strong className="text-white">Cuando la demanda de seguros es alta</strong> y los vaults tienen poca liquidez disponible:<br/>
+              Las primas suben, encareciendo la cobertura para los agentes. Los rendimientos LP aumentan, recompensandolos por el mayor riesgo. Nuevos LPs son atraidos por los altos retornos, inyectando mas capital. La utilizacion baja, las primas se normalizan — el ciclo se repite.</p>
+              <p><strong className="text-white">Cuando hay liquidez abundante</strong> y baja demanda:<br/>
+              Las primas son bajas, incentivando a los agentes a comprar cobertura. Los rendimientos LP son menores, lo que naturalmente limita el exceso de capital.</p>
+              <p>El punto kink al 80% marca donde comienza la aceleracion. Por encima del 95%, el protocolo deja de aceptar nuevas polizas para proteger la solvencia del vault.</p>
+            </div>
           </div>
         </div>
       </FadeIn>
