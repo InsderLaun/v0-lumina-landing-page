@@ -229,6 +229,8 @@
         }
 
         /* ========== PARAGRAPHS & LISTS ========== */
+        p, li { text-align: justify; }
+
         p {
             margin-bottom: 16px;
             color: var(--text-secondary);
@@ -583,7 +585,7 @@
     <div class="section container page-break">
         <h2>1. Resumen Ejecutivo</h2>
 
-        <p>Lumina Protocol es la primera infraestructura de seguro parametrico descentralizado disenada exclusivamente para agentes de inteligencia artificial que operan en DeFi. El protocolo despliega en Base L2, liquida en USDC real (Circle) y genera yield a traves de Aave V3.</p>
+        <p>Lumina Protocol es la primera infraestructura de seguro parametrico descentralizado diseñada exclusivamente para agentes de inteligencia artificial que operan en DeFi. El protocolo despliega en Base L2, liquida en USDC real (Circle) y genera yield a traves de Aave V3.</p>
 
         <p>A diferencia del seguro tradicional, que requiere que un humano presente un reclamo, un comite lo revise y semanas de espera para recibir el pago, Lumina utiliza triggers matematicos verificados por oracles. Si la condicion se cumple (por ejemplo, ETH cae un 30%), el pago es instantaneo y automatico. Sin reclamos. Sin disputas. Sin esperar a humanos.</p>
 
@@ -606,7 +608,7 @@
 
         <p>La economia agentica crece exponencialmente. Miles de agentes de IA gestionan posiciones DeFi, tesorerias, pools de liquidez y estrategias de yield farming. Sin embargo, estos agentes operan sin ningun tipo de cobertura frente a los riesgos mas criticos del ecosistema: caidas catastroficas del mercado, depegs de stablecoins, impermanent loss severo y exploits de protocolos.</p>
 
-        <p>Los protocolos de seguro DeFi existentes fueron disenados para humanos. Requieren interfaces graficas, procesos de votacion comunitaria para validar reclamos y tiempos de resolucion incompatibles con la velocidad a la que operan los agentes autonomos. Lumina resuelve este problema con un enfoque puramente programatico y parametrico.</p>
+        <p>Los protocolos de seguro DeFi existentes fueron diseñados para humanos. Requieren interfaces graficas, procesos de votacion comunitaria para validar reclamos y tiempos de resolucion incompatibles con la velocidad a la que operan los agentes autonomos. Lumina resuelve este problema con un enfoque puramente programatico y parametrico.</p>
 
         <h3>2.2 Comparativa con Protocolos Existentes</h3>
 
@@ -651,7 +653,7 @@
                         <td><strong>Minutos (1 tx)</strong></td>
                     </tr>
                     <tr>
-                        <td>Disenado para agentes IA</td>
+                        <td>Diseñado para agentes IA</td>
                         <td>No</td>
                         <td>No</td>
                         <td>Parcial</td>
@@ -683,7 +685,7 @@
                         <td>ETH/DAI</td>
                         <td>Multi-token</td>
                         <td>USDC</td>
-                        <td><strong>USDC (Circle)</strong></td>
+                        <td><strong>USDC</strong></td>
                     </tr>
                     <tr>
                         <td>Productos</td>
@@ -772,6 +774,20 @@
         </div>
 
         <p>Este modelo garantiza que cuando la capacidad del vault esta holgada, las primas son competitivas. A medida que la utilizacion se acerca al 80%, las primas suben gradualmente. Por encima del 80%, el crecimiento es exponencial, protegiendo a los LPs de sobreexposicion.</p>
+
+        <h4>Modelo de Inversion del Vault</h4>
+
+        <p>Los LPs depositan USDC en los vaults de Lumina. Este USDC se deposita automaticamente en Aave V3 para generar un rendimiento base (3-5% APY). Adicionalmente, las primas de seguro pagadas por los compradores de polizas fluyen hacia el vault, incrementando el valor de las shares de los LPs.</p>
+
+        <p>El rendimiento total para los LPs se compone de:</p>
+
+        <ul>
+            <li><strong>Yield base de Aave V3:</strong> 3-5% APY generado por el deposito de USDC en Aave V3</li>
+            <li><strong>Yield de primas de seguro:</strong> Las primas pagadas por los compradores de polizas (97% despues del fee del protocolo) se distribuyen al vault</li>
+            <li><strong>Total yield = Aave V3 base yield + insurance premium yield</strong></li>
+        </ul>
+
+        <p>El Modelo Kink tambien protege a los LPs: a mayor utilizacion del vault, mayores son las primas cobradas, lo que se traduce en mayor yield para los proveedores de liquidez. Esto crea un equilibrio natural donde los LPs son compensados proporcionalmente al riesgo que asumen.</p>
 
         <h3>3.2 Flujo de Compra de Poliza</h3>
 
@@ -918,6 +934,8 @@
         <p>Cada poliza emitida en Lumina esta respaldada por colateral bloqueado 1:1 en el vault correspondiente. Esto significa que si un agente compra $50,000 de cobertura BSS, el vault bloquea exactamente $50,000 en USDC (depositados en Aave V3 como aUSDC) para garantizar el pago en caso de siniestro.</p>
 
         <p>Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos de seguro DeFi que operan con modelos de pool compartido. Si la utilizacion del vault alcanza el 95% (U_MAX), no se aceptan nuevas polizas hasta que se libere capacidad.</p>
+
+        <p>El colateral bloqueado 1:1 no permanece inactivo. Se deposita automaticamente en Aave V3 donde genera rendimiento base (3-5% APY) mientras permanece disponible para cubrir siniestros. Esto significa que incluso el capital comprometido para polizas activas esta generando yield para los LPs.</p>
     </div>
 
     <div class="section-divider"></div>
@@ -1221,7 +1239,7 @@ Payout neto al agente: <span class="value">$38,800</span>
 
         <h3>5.3 Shares Soulbound (No Transferibles)</h3>
 
-        <p>Las shares de los vaults de Lumina son <strong>soulbound</strong>: no pueden transferirse, venderse ni utilizarse como colateral en otros protocolos. Esta decision de diseno previene:</p>
+        <p>Las shares de los vaults de Lumina son <strong>soulbound</strong>: no pueden transferirse, venderse ni utilizarse como colateral en otros protocolos. Esta decision de diseño previene:</p>
 
         <ul>
             <li>La creacion de mercados secundarios de shares que podrian desestabilizar los vaults</li>
@@ -1231,21 +1249,12 @@ Payout neto al agente: <span class="value">$38,800</span>
 
         <p>El LP solo puede interactuar con sus shares a traves de <code>deposit()</code> y <code>withdraw()</code> (tras el cooldown).</p>
 
-        <h3>5.4 Waterfall de Prioridad</h3>
+        <p>En futuras versiones del protocolo, se evaluara la implementacion de un mercado secundario exclusivo de Lumina donde los LPs podran negociar sus posiciones. Este mercado operaria bajo reglas controladas por el protocolo, manteniendo la estabilidad de los vaults mientras ofrece mayor flexibilidad a los participantes.</p>
 
-        <p>En el improbable caso de que multiples siniestros ocurran simultaneamente y la liquidez de un vault sea insuficiente, se aplica un sistema de waterfall. Los vaults con cooldown mas corto tienen prioridad de pago, ya que sus LPs asumieron el compromiso de menor duracion.</p>
+        <h3>5.4 Colateral Dedicado por Poliza</h3>
 
-        <p>Orden de prioridad: <strong>VolatileShort (30d) &gt; StableShort (90d) = VolatileLong (90d) &gt; StableLong (365d)</strong>.</p>
+        <p>Gracias a la colateralizacion 1:1, cada poliza tiene su propio respaldo dedicado en el vault. Incluso en el caso de multiples siniestros simultaneos, cada pago esta garantizado por colateral ya bloqueado. El sistema de prioridad por vault solo aplica para la asignacion de nuevas polizas, no para el pago de siniestros existentes.</p>
 
-        <h3>5.5 Productos Futuros</h3>
-
-        <p>Se han disenado tres productos adicionales para futuras versiones del protocolo:</p>
-
-        <ul>
-            <li><strong>Gas Spike Shield:</strong> Proteccion contra picos extremos de gas que podrian impedir a un agente ejecutar operaciones criticas a tiempo.</li>
-            <li><strong>Slippage Shield:</strong> Cobertura contra slippage excesivo en ejecucion de trades grandes, especialmente relevante para agentes que manejan ordenes de gran tamano.</li>
-            <li><strong>Bridge Shield:</strong> Proteccion contra fallos o exploits en bridges cross-chain, cubriendo fondos en transito entre cadenas.</li>
-        </ul>
     </div>
 
     <div class="section-divider"></div>
@@ -1465,7 +1474,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             </table>
         </div>
 
-        <p>El margen del 38% refleja la naturaleza de cola gruesa del riesgo BSS: los eventos de cisne negro son poco frecuentes pero severos. En anos sin eventos, el margen es significativamente mayor. En anos con multiples eventos, el margen puede ser negativo.</p>
+        <p>El margen del 38% refleja la naturaleza de cola gruesa del riesgo BSS: los eventos de cisne negro son poco frecuentes pero severos. En años sin eventos, el margen es significativamente mayor. En años con multiples eventos, el margen puede ser negativo.</p>
 
         <h3>9.2 Depeg Shield -- Expected Value para LPs</h3>
 
@@ -1651,7 +1660,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
         <div class="roadmap-phase no-break">
             <h3>Fase 3 -- Mercado Secundario y Token (Q4 2026 - Q1 2027)</h3>
             <ul>
-                <li><strong>Mercado secundario de polizas (NFT marketplace):</strong> Las polizas activas podran tokenizarse como NFTs y venderse en un marketplace dedicado, permitiendo a los agentes transferir coberturas.</li>
+                <li><strong>Mercado secundario de polizas y depositos (NFT marketplace):</strong> Tanto las polizas activas como las posiciones de deposito en vaults podran tokenizarse como NFTs y negociarse en un marketplace dedicado de Lumina, permitiendo a los agentes transferir coberturas y a los LPs vender sus posiciones antes del vencimiento del cooldown.</li>
                 <li><strong>Token nativo:</strong> Lanzamiento de un token de utilidad y gobernanza para el protocolo, con funciones de staking, votacion y descuentos en primas.</li>
             </ul>
         </div>
@@ -1832,7 +1841,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section container page-break">
         <h2>14. Grupos de Correlacion</h2>
 
-        <p>Los productos de Lumina estan disenados para cubrir riesgos con baja correlacion entre si, limitando la posibilidad de siniestros simultaneos:</p>
+        <p>Los productos de Lumina estan diseñados para cubrir riesgos con baja correlacion entre si, limitando la posibilidad de siniestros simultaneos:</p>
 
         <div class="table-wrap no-break">
             <table>
@@ -1944,13 +1953,13 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section container page-break">
         <h2>16. Conclusion</h2>
 
-        <p>Lumina Protocol representa la primera infraestructura de seguro parametrico disenada exclusivamente para la economia agentica. Al combinar triggers matematicos verificables, oracles descentralizados, colateralizacion estricta 1:1 y yield generado a traves de Aave V3, el protocolo ofrece una solucion completa para los riesgos criticos que enfrentan los agentes de IA en DeFi.</p>
+        <p>Lumina Protocol representa la primera infraestructura de seguro parametrico diseñada exclusivamente para la economia agentica. Al combinar triggers matematicos verificables, oracles descentralizados, colateralizacion estricta 1:1 y yield generado a traves de Aave V3, el protocolo ofrece una solucion completa para los riesgos criticos que enfrentan los agentes de IA en DeFi.</p>
 
         <h3>Fortalezas principales del protocolo</h3>
 
         <ul>
             <li><strong>Parametrico puro:</strong> Sin reclamos subjetivos, sin votaciones, sin esperas. El trigger se activa y el pago es inmediato.</li>
-            <li><strong>Disenado para agentes:</strong> API programatica, session approval para relayers, integracion OWS, documentacion SKILL.</li>
+            <li><strong>Diseñado para agentes:</strong> API programatica, session approval para relayers, integracion OWS, documentacion SKILL.</li>
             <li><strong>Colateral 1:1:</strong> Cada poliza esta respaldada al 100% por USDC real bloqueado en el vault. Sin riesgo de subcapitalizacion.</li>
             <li><strong>Yield real:</strong> Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 11-27%.</li>
             <li><strong>Seguridad en capas:</strong> Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 2-of-3, TWAP, sequencer check.</li>
