@@ -175,13 +175,13 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div id="vault-checkboxes" style="display:none;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:14px">
 <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:10px;font-weight:500">Select vaults to approve:</p>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0xe74d19551cbB809AaDcAb568c0E150B6BF0e3354" data-name="Volatile Short" checked style="accent-color:#22d3ee"> Volatile Short (30d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0xbd44547581b92805aAECc40EB2809352b9b2880d" data-name="Volatile Short" checked style="accent-color:#22d3ee"> Volatile Short (30d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0xc0016248E171b2A20Fb0C212AB917AB7fa07502a" data-name="Volatile Long" checked style="accent-color:#22d3ee"> Volatile Long (90d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" data-name="Volatile Long" checked style="accent-color:#22d3ee"> Volatile Long (90d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0xa682DC763e6A99607797989C5F44C8aA05a8511e" data-name="Stable Short" checked style="accent-color:#22d3ee"> Stable Short (90d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" data-name="Stable Short" checked style="accent-color:#22d3ee"> Stable Short (90d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0xE5e3F6898eeecEa4245558429CBFaE9CE255C05e" data-name="Stable Long" checked style="accent-color:#22d3ee"> Stable Long (365d)</label>
+<input type="checkbox" class="vault-cb" data-vault="0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" data-name="Stable Long" checked style="accent-color:#22d3ee"> Stable Long (365d)</label>
 </div>
 
 <button id="btn-approve" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:not-allowed;opacity:0.5" disabled>Approve with MetaMask</button>
@@ -233,9 +233,9 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <details style="margin-top:16px">
 <summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">For developers: alternative method (terminal) &#x25B8;</summary>
-<pre style="margin-top:8px">cast send 0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1 \
+<pre style="margin-top:8px">cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
   "approve(address,uint256)" \
-  0x5755af9cd293b9A0a798B7e2e816eAbE659750C0 \
+  0xd5f8678A0F2149B6342F9014CCe6d743234Ca025 \
   10000000000 \
   --rpc-url YOUR_RPC_URL --interactive</pre>
 <div class="info">
@@ -420,10 +420,10 @@ function finishSetup() {
 <div style="padding:14px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:8px;margin-bottom:14px">
 <p style="color:#ef4444;font-size:0.9rem;font-weight:600;margin-bottom:6px">Option 2 — Use Basescan</p>
 <ol style="color:rgba(255,255,255,0.6);font-size:0.85rem;line-height:1.8;margin:0;padding-left:20px">
-<li>Go to the <a href="https://basescan.org/address/0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1#writeContract" target="_blank" style="color:#22d3ee">USDC contract write page on Basescan</a></li>
+<li>Go to the <a href="https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913#writeContract" target="_blank" style="color:#22d3ee">USDC contract write page on Basescan</a></li>
 <li>Connect your wallet on Basescan</li>
 <li>Call <code>approve()</code> with:<br>
-<code>spender</code> = <code>0x5755af9cd293b9A0a798B7e2e816eAbE659750C0</code> (CoverRouter)<br>
+<code>spender</code> = <code>0xd5f8678A0F2149B6342F9014CCe6d743234Ca025</code> (CoverRouter)<br>
 <code>amount</code> = <code>0</code></li>
 </ol>
 </div>
@@ -498,16 +498,16 @@ function finishSetup() {
   'use strict';
 
   // --- Constants ---
-  const USDC_ADDRESS = '0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1';
-  const COVER_ROUTER = '0x5755af9cd293b9A0a798B7e2e816eAbE659750C0';
+  const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+  const COVER_ROUTER = '0xd5f8678A0F2149B6342F9014CCe6d743234Ca025';
   const BASE_CHAIN_ID = '0x2105';
   const UINT256_MAX = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
 
   const VAULTS = [
-    { address: '0xe74d19551cbB809AaDcAb568c0E150B6BF0e3354', name: 'Volatile Short' },
-    { address: '0xc0016248E171b2A20Fb0C212AB917AB7fa07502a', name: 'Volatile Long' },
-    { address: '0xa682DC763e6A99607797989C5F44C8aA05a8511e', name: 'Stable Short' },
-    { address: '0xE5e3F6898eeecEa4245558429CBFaE9CE255C05e', name: 'Stable Long' }
+    { address: '0xbd44547581b92805aAECc40EB2809352b9b2880d', name: 'Volatile Short' },
+    { address: '0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904', name: 'Volatile Long' },
+    { address: '0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC', name: 'Stable Short' },
+    { address: '0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c', name: 'Stable Long' }
   ];
 
   const TOOLTIP_INSURANCE = '\uD83D\uDCB3 Your limit, your control: This amount is the maximum \'allowance\' your AI Agent is permitted to use. If the Agent detects a risk and wants to buy $100 of insurance but you only approved $50, the purchase will be blocked. You own the money; the Agent is just the manager.';

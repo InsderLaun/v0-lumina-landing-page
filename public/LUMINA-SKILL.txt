@@ -1,6 +1,6 @@
 LUMINA PROTOCOL — SKILL FILE FOR AI AGENTS
-Version: 2.4 | Chain: Base Mainnet (8453) | March 2026
-Last updated: 2026-03-29
+Version: 2.5 | Chain: Base Mainnet (8453) | March 2026
+Last updated: 2026-03-30
 
 ════════════════════════════════════════════════════════════
 1. WHAT IS LUMINA?
@@ -185,10 +185,10 @@ Lumina has 4 vaults where you can deposit USDC to earn yield from insurance prem
 ┌─────────────────┬──────────┬─────────────────────────────────────────────────┐
 │ Vault           │ Lockup   │ Contract Address                                │
 ├─────────────────┼──────────┼─────────────────────────────────────────────────┤
-│ Volatile Short  │ 30 days  │ 0xe74d19551cbB809AaDcAb568c0E150B6BF0e3354     │
-│ Volatile Long   │ 90 days  │ 0xc0016248E171b2A20Fb0C212AB917AB7fa07502a     │
-│ Stable Short    │ 90 days  │ 0xa682DC763e6A99607797989C5F44C8aA05a8511e     │
-│ Stable Long     │ 365 days │ 0xE5e3F6898eeecEa4245558429CBFaE9CE255C05e     │
+│ Volatile Short  │ 30 days  │ 0xbd44547581b92805aAECc40EB2809352b9b2880d     │
+│ Volatile Long   │ 90 days  │ 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904     │
+│ Stable Short    │ 90 days  │ 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC     │
+│ Stable Long     │ 365 days │ 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c     │
 └─────────────────┴──────────┴─────────────────────────────────────────────────┘
 
 CHECK VAULT STATUS:
@@ -299,17 +299,17 @@ Protocol fee: 3% on premiums + 3% on payouts.
 TEST DEPLOYMENT — these addresses will change for production.
 Always verify addresses at https://www.lumina-org.com or via the API.
 
-MockUSDC (settlement token): 0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1
-CoverRouter (buy policies):  0x5755af9cd293b9A0a798B7e2e816eAbE659750C0
-PolicyManager:               0x5B337325b854a68Cd262aa2b6fE48EBe18073902
-Oracle:                      0x4916aC095c3B64443E87f3bc70A39146eC0B065d
+USDC (settlement token): 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+CoverRouter (buy policies):  0xd5f8678A0F2149B6342F9014CCe6d743234Ca025
+PolicyManager:               0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a
+Oracle:                      0xB52BB8B09Df13dB2D244746688C14A720ceE4C09
 Phala Verifier:              0xE44a263ccBc70DC761D955A590FDdA4F7a14Ccaf
 
 Shields:
-BSS Shield:      0x149e1d0474a7c212a5eAA78432863B01b98479d8
-Depeg Shield:    0xaD1EB669b4a9DC6C9432B904F65B360962E1d381
-IL Index Shield: 0xc2262311eD02E9c937cBC33F34426D5D9134F6CF
-Exploit Shield:  0x931427cED326eB49a3E5268b9b3e713Eb2EC5440
+BSS Shield:      0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e
+Depeg Shield:    0x71DBcE71AA36370f7357F6D8E0c8ba96343C8306
+IL Index Shield: 0x4196f2Cc92C5c4141a34f9a28f23236446E3C4E0
+Exploit Shield:  0xaE29Fc3e5f0DedC968cE2dA2A2F3ccB98397b38C
 
 ════════════════════════════════════════════════════════════
 11. ERROR HANDLING

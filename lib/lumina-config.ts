@@ -18,15 +18,15 @@ export const CHAIN = {
 
 export const TOKENS = {
   USDC: {
-    // TEST DEPLOYMENT - MockUSDC. Production will use real USDC: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-    address: "0x8a342233cFC95F4AeB11c2855BFF1f441241E8d1" as `0x${string}`,
+    // PRODUCTION - Real USDC on Base L2
+    address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as `0x${string}`,
     symbol: "USDC",
     name: "USD Coin",
     decimals: 6,
     issuer: "Circle",
   },
   aBasUSDC: {
-    address: "0x4e65fE4DbA92790696d040bc24Aa58D91F263a70" as `0x${string}`,
+    address: "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB" as `0x${string}`,
     symbol: "aBasUSDC",
     name: "Aave Base USDC",
     decimals: 6,
@@ -34,32 +34,32 @@ export const TOKENS = {
 } as const
 
 export const AAVE = {
-  pool: "0xA238Dd80C259a72e81d7e4674A5471b2f0730305" as `0x${string}`,
+  pool: "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5" as `0x${string}`,
   aToken: TOKENS.aBasUSDC.address,
 } as const
 
 export const ORACLES = {
-  ETH_USD: "0x71041ddDad3595F8cEd3DcbcBE31195759958911" as `0x${string}`,
-  BTC_USD: "0x45c32AEd995834F0A484FD092953258814774393" as `0x${string}`,
+  ETH_USD: "0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70" as `0x${string}`,
+  BTC_USD: "0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E" as `0x${string}`,
 } as const
 
-// CONTRACTS — TEST DEPLOYMENT on Base Mainnet (March 2026)
+// CONTRACTS — PRODUCTION on Base Mainnet (March 2026)
 export const CONTRACTS = {
-  CoverRouter: "0x5755af9cd293b9A0a798B7e2e816eAbE659750C0" as `0x${string}`,
-  PolicyManager: "0x5B337325b854a68Cd262aa2b6fE48EBe18073902" as `0x${string}`,
-  Oracle: "0x4916aC095c3B64443E87f3bc70A39146eC0B065d" as `0x${string}`,
-  Phala: "0xE44a263ccBc70DC761D955A590FDdA4F7a14Ccaf" as `0x${string}`,
+  CoverRouter: "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025" as `0x${string}`,
+  PolicyManager: "0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" as `0x${string}`,
+  Oracle: "0xB52BB8B09Df13dB2D244746688C14A720ceE4C09" as `0x${string}`,
+  Phala: "0x468b9D2E9043c80467B610bC290b698ae23adb9B" as `0x${string}`,
   vaults: {
-    VolatileShort: "0xe74d19551cbB809AaDcAb568c0E150B6BF0e3354" as `0x${string}`,
-    VolatileLong: "0xc0016248E171b2A20Fb0C212AB917AB7fa07502a" as `0x${string}`,
-    StableShort: "0xa682DC763e6A99607797989C5F44C8aA05a8511e" as `0x${string}`,
-    StableLong: "0xE5e3F6898eeecEa4245558429CBFaE9CE255C05e" as `0x${string}`,
+    VolatileShort: "0xbd44547581b92805aAECc40EB2809352b9b2880d" as `0x${string}`,
+    VolatileLong: "0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" as `0x${string}`,
+    StableShort: "0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" as `0x${string}`,
+    StableLong: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" as `0x${string}`,
   },
   shields: {
-    BSS: "0x149e1d0474a7c212a5eAA78432863B01b98479d8" as `0x${string}`,
-    Depeg: "0xaD1EB669b4a9DC6C9432B904F65B360962E1d381" as `0x${string}`,
-    ILIndex: "0xc2262311eD02E9c937cBC33F34426D5D9134F6CF" as `0x${string}`,
-    Exploit: "0x931427cED326eB49a3E5268b9b3e713Eb2EC5440" as `0x${string}`,
+    BSS: "0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e" as `0x${string}`,
+    Depeg: "0x71DBcE71AA36370f7357F6D8E0c8ba96343C8306" as `0x${string}`,
+    ILIndex: "0x4196f2Cc92C5c4141a34f9a28f23236446E3C4E0" as `0x${string}`,
+    Exploit: "0xaE29Fc3e5f0DedC968cE2dA2A2F3ccB98397b38C" as `0x${string}`,
   },
 } as const
 
