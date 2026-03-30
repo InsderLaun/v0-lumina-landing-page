@@ -45,6 +45,9 @@ function useAaveYield() {
 export default function Home() {
   const [perspective, setPerspective] = useState<Perspective>("protect")
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showWhitepaper, setShowWhitepaper] = useState(false)
+  const [wpStep, setWpStep] = useState<"lang" | "version">("lang")
+  const [wpLang, setWpLang] = useState<"en" | "es">("en")
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const aaveYield = useAaveYield()
 
@@ -160,6 +163,11 @@ export default function Home() {
               Learn How It Works
             </a>
           </motion.div>
+          <div className="text-center">
+            <button onClick={() => { setWpStep("lang"); setShowWhitepaper(true); }} className="text-[#9CA3AF] hover:text-[#00D4AA] text-sm font-medium transition-colors">
+              Read our Whitepaper
+            </button>
+          </div>
 
           {/* Agent vs Wallet explainer */}
           <div style={{ maxWidth: 700, margin: '40px auto 0', padding: '24px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -413,6 +421,68 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Whitepaper Modal */}
+      <AnimatePresence>
+        {showWhitepaper && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
+            style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}
+            onClick={() => setShowWhitepaper(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-[#111827] rounded-2xl max-w-lg w-full p-8 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button onClick={() => setShowWhitepaper(false)} className="absolute top-4 right-4 text-[#6B7280] hover:text-white text-xl">✕</button>
+
+              {wpStep === "lang" ? (
+                <>
+                  <h3 className="text-xl font-bold text-white text-center mb-2">Whitepaper</h3>
+                  <p className="text-[#9CA3AF] text-sm text-center mb-8">Choose your language / Elegi tu idioma</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button onClick={() => { setWpLang("en"); setWpStep("version"); }} className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 text-center transition-all">
+                      <div className="text-2xl mb-2">EN</div>
+                      <div className="text-white font-medium">English</div>
+                    </button>
+                    <button onClick={() => { setWpLang("es"); setWpStep("version"); }} className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 text-center transition-all">
+                      <div className="text-2xl mb-2">ES</div>
+                      <div className="text-white font-medium">Espanol</div>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => setWpStep("lang")} className="text-[#9CA3AF] hover:text-white text-sm mb-4 flex items-center gap-1">
+                    ← Back
+                  </button>
+                  <h3 className="text-xl font-bold text-white text-center mb-6">
+                    Whitepaper — {wpLang === "en" ? "English" : "Espanol"}
+                  </h3>
+                  <div className="space-y-4">
+                    <a href={`/LUMINA-WHITEPAPER-${wpLang.toUpperCase()}.pdf`} download className="block bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all">
+                      <div className="font-semibold text-white mb-1">Technical Whitepaper</div>
+                      <div className="text-[#9CA3AF] text-sm mb-3">Complete technical document — 16 sections, architecture, security, oracle flows, contract addresses</div>
+                      <span className="text-[#00D4AA] text-sm font-medium">Download PDF ↓</span>
+                    </a>
+                    <a href={`/whitepaper/${wpLang}`} className="block bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all">
+                      <div className="font-semibold text-white mb-1">Executive Summary</div>
+                      <div className="text-[#9CA3AF] text-sm mb-3">Quick visual overview — interactive charts, key metrics, 5 minute read</div>
+                      <span className="text-[#00D4AA] text-sm font-medium">View Interactive Summary →</span>
+                    </a>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Onboarding Modal */}
       <AnimatePresence>
