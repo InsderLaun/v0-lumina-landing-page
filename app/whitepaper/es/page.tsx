@@ -160,6 +160,21 @@ export default function WhitepaperES() {
         </div>
       </FadeIn>
 
+      {/* Section 1b: Como Invertir en Vaults */}
+      <FadeIn className="pb-16 px-6">
+        <div className="max-w-4xl mx-auto bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all">
+          <h2 className="text-2xl font-bold mb-6 text-center">Como Invertir en Vaults</h2>
+          <ul className="text-[#9CA3AF] space-y-3 list-disc list-inside">
+            <li>Depositar USDC en uno de los 4 vaults especializados</li>
+            <li>Tu USDC se deposita automaticamente en Aave V3, generando 3-5% APY base</li>
+            <li>Las primas de seguro de los compradores de polizas fluyen a tu vault, sumando rendimiento</li>
+            <li>APY total estimado: 11-27% segun el vault</li>
+            <li>Las shares son soulbound (no transferibles) para la estabilidad del vault</li>
+            <li>Para retirar: solicitar retiro → esperar periodo de cooldown → completar retiro</li>
+          </ul>
+        </div>
+      </FadeIn>
+
       {/* Section 2: Tipos de Cobertura */}
       <FadeIn className="py-16 px-6 bg-[#0D1220]">
         <div className="max-w-5xl mx-auto">
@@ -208,12 +223,26 @@ export default function WhitepaperES() {
             <BarChart data={vaultData} layout="vertical" margin={{ left: 20 }}>
               <XAxis type="number" domain={[0, 365]} tick={{ fill: "#6B7280", fontSize: 12 }} axisLine={false} />
               <YAxis dataKey="name" type="category" tick={{ fill: "#9CA3AF", fontSize: 12 }} width={120} axisLine={false} />
-              <Tooltip contentStyle={{ background: "#1F2937", border: "1px solid #00D4AA40", borderRadius: 8, color: "#fff" }} formatter={(v: number) => `${v} dias de cooldown`} />
+              <Tooltip contentStyle={{ background: "#1F2937", border: "1px solid #00D4AA40", borderRadius: 8, color: "#ffffff" }} labelStyle={{ color: "#ffffff" }} itemStyle={{ color: "#ffffff" }} formatter={(v: number) => `${v} dias de cooldown`} />
               <Bar dataKey="cooldown" radius={[0, 6, 6, 0]}>
                 {vaultData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+        </div>
+
+        {/* Cooldown Explanation */}
+        <div className="max-w-4xl mx-auto mt-6 bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all">
+          <h3 className="text-lg font-semibold text-[#22d3ee] mb-3">Que es el Cooldown?</h3>
+          <p className="text-[#9CA3AF] text-sm leading-relaxed mb-4">
+            El cooldown es un periodo de espera obligatorio entre solicitar un retiro y completarlo. Cuando solicitas un retiro, tus shares se bloquean durante el periodo de cooldown (30 a 365 dias segun el vault). Durante este tiempo, tu capital sigue generando rendimiento. Una vez que el cooldown expira, puedes completar el retiro y recibir tus USDC mas el rendimiento acumulado.
+          </p>
+          <h3 className="text-lg font-semibold text-[#22d3ee] mb-3">Como retirar:</h3>
+          <ol className="text-[#9CA3AF] text-sm space-y-2 list-decimal list-inside">
+            <li>Llamar <code className="text-[#00D4AA]">requestWithdrawal(shares)</code> — inicia el timer de cooldown</li>
+            <li>Esperar a que expire el periodo de cooldown</li>
+            <li>Llamar <code className="text-[#00D4AA]">completeWithdrawal()</code> — recibir USDC + rendimiento (menos 3% performance fee sobre ganancia)</li>
+          </ol>
         </div>
       </FadeIn>
 
