@@ -464,15 +464,15 @@ export default function Home() {
                     Whitepaper — {wpLang === "en" ? "English" : "Espanol"}
                   </h3>
                   <div className="space-y-4">
-                    <a href={`/LUMINA-WHITEPAPER-${wpLang.toUpperCase()}.pdf`} download className="block bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all">
-                      <div className="font-semibold text-white mb-1">Technical Whitepaper</div>
-                      <div className="text-[#9CA3AF] text-sm mb-3">Complete technical document — 16 sections, architecture, security, oracle flows, contract addresses</div>
-                      <span className="text-[#00D4AA] text-sm font-medium">Download PDF ↓</span>
+                    <a href={`/LUMINA-WHITEPAPER-${wpLang.toUpperCase()}-V3.html`} className="block bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all">
+                      <div className="font-semibold text-white mb-1">{wpLang === "en" ? "Full Whitepaper" : "Whitepaper Completo"}</div>
+                      <div className="text-[#9CA3AF] text-sm mb-3">{wpLang === "en" ? "Complete technical document — 16 sections, architecture, security, oracle flows, contract addresses" : "Documento tecnico completo — 16 secciones, arquitectura, seguridad, flujos de oracle, direcciones de contratos"}</div>
+                      <span className="text-[#00D4AA] text-sm font-medium">{wpLang === "en" ? "Read Full Whitepaper →" : "Leer Whitepaper Completo →"}</span>
                     </a>
                     <a href={`/whitepaper/${wpLang}`} className="block bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all">
-                      <div className="font-semibold text-white mb-1">Executive Summary</div>
-                      <div className="text-[#9CA3AF] text-sm mb-3">Quick visual overview — interactive charts, key metrics, 5 minute read</div>
-                      <span className="text-[#00D4AA] text-sm font-medium">View Interactive Summary →</span>
+                      <div className="font-semibold text-white mb-1">{wpLang === "en" ? "Executive Summary" : "Resumen Ejecutivo"}</div>
+                      <div className="text-[#9CA3AF] text-sm mb-3">{wpLang === "en" ? "Quick visual overview — interactive charts, key metrics, 5 minute read" : "Resumen visual rapido — graficos interactivos, metricas clave, 5 minutos de lectura"}</div>
+                      <span className="text-[#00D4AA] text-sm font-medium">{wpLang === "en" ? "View Interactive Summary →" : "Ver Resumen Interactivo →"}</span>
                     </a>
                   </div>
                 </>
