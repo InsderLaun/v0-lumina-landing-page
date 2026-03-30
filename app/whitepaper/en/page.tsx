@@ -1,7 +1,10 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+  AreaChart, Area, ReferenceLine, CartesianGrid
+} from "recharts"
 import Link from "next/link"
 
 const vaultData = [
@@ -16,6 +19,13 @@ const products = [
   { name: "Depeg Shield", trigger: "Stablecoin < $0.95", premium: "~0.2%", duration: "7-365 days", color: "#22d3ee" },
   { name: "IL Index Cover", trigger: "IL exceeds deductible", premium: "~0.4%", duration: "30-90 days", color: "#a78bfa" },
   { name: "Exploit Shield", trigger: "Protocol exploit + TEE proof", premium: "~0.5%", duration: "30-365 days", color: "#818cf8" },
+]
+
+const pools = [
+  { name: "Volatile Short", cooldown: "30 days", products: "BSS + IL Index", apy: "12-16%", color: "#00D4AA" },
+  { name: "Volatile Long", cooldown: "90 days", products: "IL Long + BSS overflow", apy: "15-19%", color: "#22d3ee" },
+  { name: "Stable Short", cooldown: "90 days", products: "Depeg Short", apy: "11-15%", color: "#a78bfa" },
+  { name: "Stable Long", cooldown: "365 days", products: "Depeg + Exploit", apy: "18-27%", color: "#818cf8" },
 ]
 
 const metrics = [
@@ -48,6 +58,21 @@ const securityLayers = [
   { layer: "Oracle", detail: "Multisig 2-of-3, Chainlink TWAP, L2 sequencer uptime check, 1h grace period" },
   { layer: "Governance", detail: "TimelockController (48h delay), Gnosis Safe (2-of-3 multisig)" },
   { layer: "API", detail: "Rate limiting, CORS restrictions, Helmet headers, NonceManager, sanitized errors" },
+]
+
+const kinkData = [
+  { u: 0, m: 1.00 },
+  { u: 10, m: 1.06 },
+  { u: 20, m: 1.13 },
+  { u: 30, m: 1.19 },
+  { u: 40, m: 1.25 },
+  { u: 50, m: 1.31 },
+  { u: 60, m: 1.38 },
+  { u: 70, m: 1.44 },
+  { u: 80, m: 1.50 },
+  { u: 85, m: 1.88 },
+  { u: 90, m: 2.25 },
+  { u: 95, m: 2.63 },
 ]
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -95,7 +120,7 @@ function FadeIn({ children, className = "" }: { children: React.ReactNode; class
 
 export default function WhitepaperEN() {
   return (
-    <div className="min-h-screen bg-[#0A0F1C] text-white font-sans">
+    <div className="min-h-screen bg-[#0A0F1C] text-white font-sans" style={{ textAlign: 'justify' }}>
       {/* Header */}
       <header className="border-b border-[#1F2937] py-4 px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
@@ -106,22 +131,24 @@ export default function WhitepaperEN() {
 
       {/* Hero */}
       <section className="py-20 px-6 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Executive Summary</h1>
-        <div className="w-20 h-1 bg-[#00D4AA] mx-auto mb-6" />
-        <p className="text-[#9CA3AF] max-w-xl mx-auto">Parametric insurance built exclusively for AI agents on Base L2. Real USDC. Real Aave V3 yield. No claims process.</p>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ textAlign: 'center' }}>Executive Summary</h1>
+        <div className="w-20 h-1 bg-[#00D4AA] mx-auto mb-8" />
+        <p className="text-[#9CA3AF] text-lg max-w-2xl mx-auto leading-relaxed font-medium" style={{ textAlign: 'center' }}>
+          Parametric insurance built exclusively for AI agents on Base L2. Real USDC. Real Aave V3 yield. No claims process.
+        </p>
       </section>
 
       {/* Section 1: What is Lumina */}
       <FadeIn className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-6 text-center">What is Lumina?</h2>
+        <div className="max-w-4xl mx-auto bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all">
+          <h2 className="text-2xl font-bold mb-6 text-center" style={{ textAlign: 'center' }}>What is Lumina?</h2>
           <div className="flex flex-col md:flex-row items-center gap-8">
             <p className="text-[#9CA3AF] flex-1">Lumina Protocol is parametric insurance for AI agents. Agents buy coverage via API, oracles verify triggers using Chainlink data, and payouts are instant. No human judges, no disputes, no waiting. Settlement in USDC on Base L2.</p>
             <div className="flex items-center gap-3 text-sm flex-1 justify-center">
               {["Agent", "API", "Contract", "Oracle", "Payout"].map((node, i) => (
                 <div key={node} className="flex items-center gap-2">
-                  <div className="bg-[#1F2937] border border-[#00D4AA40] rounded-lg px-3 py-2 text-[#00D4AA] text-xs font-medium">{node}</div>
-                  {i < 4 && <span className="text-[#00D4AA]">→</span>}
+                  <div className="bg-[#0A0F1C] border border-[#00D4AA40] rounded-lg px-3 py-2 text-[#00D4AA] text-xs font-medium">{node}</div>
+                  {i < 4 && <span className="text-[#00D4AA]">{"\u2192"}</span>}
                 </div>
               ))}
             </div>
@@ -129,10 +156,10 @@ export default function WhitepaperEN() {
         </div>
       </FadeIn>
 
-      {/* Section 2: Products */}
+      {/* Section 2: Coverage Types */}
       <FadeIn className="py-16 px-6 bg-[#0D1220]">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">Four Products</h2>
+          <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>Coverage Types</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {products.map((p) => (
               <div key={p.name} className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all group">
@@ -148,13 +175,45 @@ export default function WhitepaperEN() {
         </div>
       </FadeIn>
 
-      {/* Section 3: Vault Architecture */}
+      {/* Section 3: Liquidity Pools */}
       <FadeIn className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">Vault Architecture</h2>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>Liquidity Pools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {pools.map((pool) => (
+              <div
+                key={pool.name}
+                className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all"
+                style={{ borderLeftWidth: 4, borderLeftColor: pool.color }}
+              >
+                <h3 className="font-semibold text-lg mb-3" style={{ color: pool.color }}>{pool.name}</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-[#6B7280]">Cooldown</span>
+                    <span className="text-[#9CA3AF] font-medium">{pool.cooldown}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#6B7280]">Products</span>
+                    <span className="text-[#9CA3AF] font-medium">{pool.products}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#6B7280]">Est. APY</span>
+                    <span className="font-bold" style={{ color: pool.color }}>{pool.apy}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </FadeIn>
+
+      {/* Section 4: Vault Architecture */}
+      <FadeIn className="py-16 px-6 bg-[#0D1220]">
+        <div className="max-w-4xl mx-auto bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all">
+          <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>Vault Architecture</h2>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={vaultData} layout="vertical" margin={{ left: 20 }}>
-              <XAxis type="number" tick={{ fill: "#6B7280", fontSize: 12 }} axisLine={false} />
+              <XAxis type="number" domain={[0, 365]} tick={{ fill: "#6B7280", fontSize: 12 }} axisLine={false} />
               <YAxis dataKey="name" type="category" tick={{ fill: "#9CA3AF", fontSize: 12 }} width={120} axisLine={false} />
               <Tooltip contentStyle={{ background: "#1F2937", border: "1px solid #00D4AA40", borderRadius: 8, color: "#fff" }} formatter={(v: number) => `${v} days cooldown`} />
               <Bar dataKey="cooldown" radius={[0, 6, 6, 0]}>
@@ -165,34 +224,87 @@ export default function WhitepaperEN() {
         </div>
       </FadeIn>
 
-      {/* Section 4: How Money Flows */}
-      <FadeIn className="py-16 px-6 bg-[#0D1220]">
+      {/* Section 5: How Money Flows */}
+      <FadeIn className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">How Money Flows</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-            <div className="bg-[#1F2937] rounded-xl p-6 border-l-4 border-[#00D4AA]">
-              <div className="text-[#00D4AA] font-bold text-lg mb-2">Premium In</div>
-              <div className="text-[#9CA3AF] text-sm">97% → Vault<br />3% → Protocol Fee<br />+ 3% performance fee on vault yield at withdrawal</div>
+          <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>How Money Flows</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all" style={{ borderLeftWidth: 4, borderLeftColor: "#00D4AA", boxShadow: "inset 4px 0 12px -4px rgba(0, 212, 170, 0.15)" }}>
+              <div className="text-[#00D4AA] font-bold text-lg mb-3">Premium In</div>
+              <div className="text-[#9CA3AF] text-sm leading-relaxed">97% {"\u2192"} Vault<br />3% {"\u2192"} Protocol Fee<br />+ 3% performance fee on vault yield at withdrawal</div>
             </div>
-            <div className="bg-[#1F2937] rounded-xl p-6 border-l-4 border-[#22d3ee]">
-              <div className="text-[#22d3ee] font-bold text-lg mb-2">Vault Capital</div>
-              <div className="text-[#9CA3AF] text-sm">Idle → Aave V3 yield<br />Locked → Active policies</div>
+            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all" style={{ borderLeftWidth: 4, borderLeftColor: "#22d3ee", boxShadow: "inset 4px 0 12px -4px rgba(34, 211, 238, 0.15)" }}>
+              <div className="text-[#22d3ee] font-bold text-lg mb-3">Vault Capital</div>
+              <div className="text-[#9CA3AF] text-sm leading-relaxed">Idle {"\u2192"} Aave V3 yield<br />Locked {"\u2192"} Active policies</div>
             </div>
-            <div className="bg-[#1F2937] rounded-xl p-6 border-l-4 border-[#a78bfa]">
-              <div className="text-[#a78bfa] font-bold text-lg mb-2">Claim Out</div>
-              <div className="text-[#9CA3AF] text-sm">Oracle verifies trigger<br />Payout → Agent wallet</div>
+            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all" style={{ borderLeftWidth: 4, borderLeftColor: "#a78bfa", boxShadow: "inset 4px 0 12px -4px rgba(167, 139, 250, 0.15)" }}>
+              <div className="text-[#a78bfa] font-bold text-lg mb-3">Claim Out</div>
+              <div className="text-[#9CA3AF] text-sm leading-relaxed">Oracle verifies trigger<br />Payout {"\u2192"} Agent wallet</div>
             </div>
           </div>
         </div>
       </FadeIn>
 
-      {/* Section 5: Security Stack */}
+      {/* Section 6: Pricing Model (Kink) */}
+      <FadeIn className="py-16 px-6 bg-[#0D1220]">
+        <div className="max-w-4xl mx-auto bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all">
+          <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>Pricing Model (Kink)</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={kinkData} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
+              <defs>
+                <linearGradient id="kinkGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#1F293780" />
+              <XAxis
+                dataKey="u"
+                domain={[0, 95]}
+                tick={{ fill: "#6B7280", fontSize: 12 }}
+                axisLine={false}
+                label={{ value: "Utilization %", position: "insideBottomRight", offset: -5, fill: "#6B7280", fontSize: 12 }}
+              />
+              <YAxis
+                domain={[1.0, 3.0]}
+                tick={{ fill: "#6B7280", fontSize: 12 }}
+                axisLine={false}
+                label={{ value: "Premium Multiplier", angle: -90, position: "insideLeft", offset: 10, fill: "#6B7280", fontSize: 12 }}
+              />
+              <Tooltip
+                contentStyle={{ background: "#1F2937", border: "1px solid #00D4AA40", borderRadius: 8, color: "#fff" }}
+                formatter={(v: number) => [`${v.toFixed(2)}x`, "Multiplier"]}
+                labelFormatter={(l: number) => `Utilization: ${l}%`}
+              />
+              <ReferenceLine
+                x={80}
+                stroke="#00D4AA"
+                strokeDasharray="6 4"
+                strokeWidth={2}
+                label={{ value: "Kink (80%)", position: "top", fill: "#00D4AA", fontSize: 12 }}
+              />
+              <Area
+                type="monotone"
+                dataKey="m"
+                stroke="#22d3ee"
+                strokeWidth={2}
+                fill="url(#kinkGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+          <p className="text-[#9CA3AF] text-sm mt-6 max-w-2xl mx-auto leading-relaxed" style={{ textAlign: 'center' }}>
+            Below 80% utilization, premiums grow linearly. Above 80% (kink), premiums increase aggressively to protect LPs.
+          </p>
+        </div>
+      </FadeIn>
+
+      {/* Section 7: Security Stack */}
       <FadeIn className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">Security Stack</h2>
+          <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>Security Stack</h2>
           <div className="space-y-3">
             {securityLayers.map((s, i) => (
-              <div key={s.layer} className="bg-[#1F2937] rounded-xl p-5 border-l-4 border-[#00D4AA] flex items-start gap-4">
+              <div key={s.layer} className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-4 flex items-start gap-4 transition-all" style={{ borderLeftColor: "#00D4AA" }}>
                 <div className="text-[#00D4AA] font-bold text-sm min-w-[100px]">Layer {i + 1}</div>
                 <div>
                   <div className="font-semibold text-white text-sm">{s.layer}</div>
@@ -204,10 +316,10 @@ export default function WhitepaperEN() {
         </div>
       </FadeIn>
 
-      {/* Section 6: Metrics */}
+      {/* Section 8: Metrics */}
       <FadeIn className="py-16 px-6 bg-[#0D1220]">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold mb-10 text-center">Protocol Metrics</h2>
+        <div className="max-w-5xl mx-auto bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all">
+          <h2 className="text-2xl font-bold mb-10 text-center" style={{ textAlign: 'center' }}>Protocol Metrics</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
             {metrics.map((m) => (
               <div key={m.label}>
@@ -219,13 +331,13 @@ export default function WhitepaperEN() {
         </div>
       </FadeIn>
 
-      {/* Section 7: Contracts */}
+      {/* Section 9: Contracts */}
       <FadeIn className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">Contract Addresses</h2>
+        <div className="max-w-4xl mx-auto bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all">
+          <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>Contract Addresses</h2>
           <div className="space-y-2">
             {contracts.map((c) => (
-              <div key={c.addr} className="bg-[#1F2937] rounded-lg px-4 py-3 flex items-center justify-between gap-4">
+              <div key={c.addr} className="bg-[#0A0F1C] rounded-lg px-4 py-3 flex items-center justify-between gap-4">
                 <span className="text-sm text-[#9CA3AF] min-w-[140px]">{c.name}</span>
                 <a href={`https://basescan.org/address/${c.addr}`} target="_blank" rel="noopener noreferrer" className="text-xs text-[#00D4AA] hover:text-[#00FFD0] font-mono truncate transition-colors">
                   {c.addr.slice(0, 10)}...{c.addr.slice(-8)}
@@ -241,7 +353,7 @@ export default function WhitepaperEN() {
       <footer className="border-t border-[#1F2937] py-12 px-6 text-center">
         <div className="flex flex-col items-center gap-4">
           <a href="/LUMINA-WHITEPAPER-EN.pdf" download className="text-[#00D4AA] hover:text-[#00FFD0] font-medium transition-colors">
-            Read the full Technical Whitepaper (PDF) →
+            Read the full Technical Whitepaper (PDF) {"\u2192"}
           </a>
           <div className="flex gap-6 text-sm text-[#6B7280]">
             <a href="https://github.com/org-lumina/LUMINA-PROTOCOL" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
