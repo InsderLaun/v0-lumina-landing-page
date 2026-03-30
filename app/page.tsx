@@ -162,12 +162,10 @@ export default function Home() {
             <a href="#how-it-works" className="px-8 py-3 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all">
               Learn How It Works
             </a>
-          </motion.div>
-          <div className="text-center">
-            <button onClick={() => { setWpStep("lang"); setShowWhitepaper(true); }} className="text-[#9CA3AF] hover:text-[#00D4AA] text-sm font-medium transition-colors">
-              Read our Whitepaper
+            <button onClick={() => { setWpStep("lang"); setShowWhitepaper(true); }} className="px-8 py-3 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all">
+              Whitepaper
             </button>
-          </div>
+          </motion.div>
 
           {/* Agent vs Wallet explainer */}
           <div style={{ maxWidth: 700, margin: '40px auto 0', padding: '24px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
