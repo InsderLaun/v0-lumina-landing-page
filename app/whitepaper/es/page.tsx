@@ -292,7 +292,8 @@ export default function WhitepaperES() {
           <h2 className="text-2xl font-bold mb-8 text-center">Modelo de Precios (Kink)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-[#EF4444] mb-4 text-center">Multiplicador de Prima (Compradores)</h4>
+              <h4 className="text-lg font-semibold text-[#EF4444] mb-1 text-center">Multiplicador de Prima (Compradores)</h4>
+              <p className="text-xs text-[#6B7280] mb-4 text-center">Y: Multiplicador | X: Utilizacion del Vault %</p>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={kinkPremiumData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
                   <defs>
@@ -312,7 +313,7 @@ export default function WhitepaperES() {
                     domain={[1.0, 3.0]}
                     tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
                     axisLine={false}
-                    label={{ value: "Multiplicador de Prima", angle: -90, position: "insideLeft", offset: 5, fill: "#9CA3AF", fontSize: 13 }}
+                    width={45}
                   />
                   <Tooltip
                     contentStyle={{ background: "#1F2937", border: "1px solid #EF444440", borderRadius: 8, color: "#fff" }}
@@ -337,7 +338,8 @@ export default function WhitepaperES() {
               </ResponsiveContainer>
             </div>
             <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-[#22c55e] mb-4 text-center">APY Estimado del Vault (Rendimiento LP)</h4>
+              <h4 className="text-lg font-semibold text-[#22c55e] mb-1 text-center">APY Estimado del Vault (Rendimiento LP)</h4>
+              <p className="text-xs text-[#6B7280] mb-4 text-center">Y: APY % | X: Utilizacion del Vault %</p>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={kinkApyData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
                   <defs>
@@ -357,7 +359,7 @@ export default function WhitepaperES() {
                     domain={[0, 30]}
                     tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
                     axisLine={false}
-                    label={{ value: "APY Estimado %", angle: -90, position: "insideLeft", offset: 5, fill: "#9CA3AF", fontSize: 13 }}
+                    width={45}
                   />
                   <Tooltip
                     contentStyle={{ background: "#1F2937", border: "1px solid #22c55e40", borderRadius: 8, color: "#fff" }}
