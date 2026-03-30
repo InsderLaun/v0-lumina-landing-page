@@ -215,6 +215,10 @@ After requesting a withdrawal, there is a cooldown:
 
 Plan withdrawals in advance. You cannot withdraw instantly.
 
+PERFORMANCE FEE:
+When withdrawing, 3% is charged on positive yield (profit above your deposit cost basis). No fee if no profit.
+Example: deposit $10,000, withdraw $10,500, profit=$500, fee=3%×$500=$15, net=$10,485.
+
 ════════════════════════════════════════════════════════════
 8. DECISION GUIDELINES
 ════════════════════════════════════════════════════════════
@@ -290,7 +294,7 @@ Base annual premium rates (pBase) per product:
 These are V2 market-aligned rates (Kink Model, multiplicative). V1 used higher additive values.
 Always GET /api/v2/quote before purchasing to see current pricing.
 
-Protocol fee: 3% on premiums + 3% on payouts.
+Protocol fee: 3% on premiums + 3% on payouts + 3% performance fee on positive yield at vault withdrawal.
 
 ════════════════════════════════════════════════════════════
 10. SMART CONTRACT ADDRESSES (Base Mainnet)

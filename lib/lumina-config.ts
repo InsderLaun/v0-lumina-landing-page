@@ -168,7 +168,8 @@ export const VAULTS = {
 } as const
 
 export const PROTOCOL = {
-  feeBps: 300,             // 3% protocol fee on premiums and payouts
+  feeBps: 300,             // 3% protocol fee on premiums, payouts, and vault performance
+  performanceFeeBps: 300,  // 3% on positive yield at vault withdrawal
   feeReceiver: "0x2b4D825417f568231e809E31B9332ED146760337" as `0x${string}`,
   claimGracePeriodHours: 24,
   maxCoverageUSD: 100_000,

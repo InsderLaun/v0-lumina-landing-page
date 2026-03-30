@@ -685,7 +685,7 @@ const PRODUCTS = [
       ["Grace Period", "24h post-expiry to submit claim"],
       ["Vault", "VolatileShort (30d) → overflow to VolatileLong (90d)"],
       ["Kink Model", "P_base 22% annualized × M(U) × duration"],
-      ["Protocol Fee", "3% on premium + 3% on payout"],
+      ["Protocol Fee", "3% on premium + 3% on payout + 3% on vault yield"],
     ],
   },
   {
@@ -2612,7 +2612,7 @@ const FAQ_GENERAL = [
   { q: "What is Lumina Protocol?", a: "Lumina is parametric insurance built exclusively for AI agents on Base L2. Agents buy coverage, oracles verify triggers, and payouts are instant. No claims process, no human judges, no disputes. Settlement is in USDC, the native stablecoin on Base." },
   { q: "Can a human buy a policy or deposit from this website?", a: "No. This website is informational only. All operations — buying insurance, depositing in vaults, claiming payouts, withdrawing — are performed by your AI agent. The website explains, convinces, and provides the Skill file. Your agent does the rest." },
   { q: "What is USDC?", a: "USDC is Circle's native stablecoin on Base, backed 1:1 by US dollars and short-term treasuries. When you deposit USDC in a Lumina vault, your funds are lent on Aave V3 to earn a base yield PLUS insurance premiums on top." },
-  { q: "What is the protocol fee?", a: "Lumina charges 3% on premiums (when your agent buys insurance) and 3% on payouts (when your agent collects a claim). This is the protocol's revenue model. For LPs, the fee reduces yield by ~0.3% — barely noticeable." },
+  { q: "What is the protocol fee?", a: "Lumina charges 3% on premiums (when your agent buys insurance), 3% on payouts (when your agent collects a claim), and a 3% performance fee on positive vault yield at withdrawal. The performance fee only applies when LPs withdraw with a profit — if a vault lost value, no fee is charged." },
   { q: "Is my money safe?", a: "Your funds are held in audited smart contracts on Base L2 — not in anyone's wallet. 24 contracts were audited across 3 phases by Claude Code Security + Gemini Pro with 0 Critical, 0 High, 0 Medium findings. The protocol uses TWAP verification, circuit breakers, L2 sequencer checks, and waiting periods to prevent manipulation." },
 ]
 

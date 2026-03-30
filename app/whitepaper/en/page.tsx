@@ -172,7 +172,7 @@ export default function WhitepaperEN() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
             <div className="bg-[#1F2937] rounded-xl p-6 border-l-4 border-[#00D4AA]">
               <div className="text-[#00D4AA] font-bold text-lg mb-2">Premium In</div>
-              <div className="text-[#9CA3AF] text-sm">97% → Vault<br />3% → Protocol Fee</div>
+              <div className="text-[#9CA3AF] text-sm">97% → Vault<br />3% → Protocol Fee<br />+ 3% performance fee on vault yield at withdrawal</div>
             </div>
             <div className="bg-[#1F2937] rounded-xl p-6 border-l-4 border-[#22d3ee]">
               <div className="text-[#22d3ee] font-bold text-lg mb-2">Vault Capital</div>
