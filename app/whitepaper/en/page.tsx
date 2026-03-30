@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState } from "react"
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-  AreaChart, Area, ReferenceLine, CartesianGrid
+  AreaChart, Area, ReferenceLine
 } from "recharts"
 import Link from "next/link"
 
@@ -60,19 +60,26 @@ const securityLayers = [
   { layer: "API", detail: "Rate limiting, CORS restrictions, Helmet headers, NonceManager, sanitized errors" },
 ]
 
-const kinkData = [
+const kinkPremiumData = [
   { u: 0, m: 1.00 },
-  { u: 10, m: 1.06 },
   { u: 20, m: 1.13 },
-  { u: 30, m: 1.19 },
   { u: 40, m: 1.25 },
-  { u: 50, m: 1.31 },
   { u: 60, m: 1.38 },
-  { u: 70, m: 1.44 },
   { u: 80, m: 1.50 },
   { u: 85, m: 1.88 },
   { u: 90, m: 2.25 },
   { u: 95, m: 2.63 },
+]
+
+const kinkApyData = [
+  { u: 0, apy: 4 },
+  { u: 20, apy: 7 },
+  { u: 40, apy: 10 },
+  { u: 60, apy: 14 },
+  { u: 80, apy: 18 },
+  { u: 85, apy: 22 },
+  { u: 90, apy: 25 },
+  { u: 95, apy: 27 },
 ]
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -292,54 +299,105 @@ export default function WhitepaperEN() {
 
       {/* Section 6: Pricing Model (Kink) */}
       <FadeIn className="py-16 px-6 bg-[#0D1220]">
-        <div className="max-w-4xl mx-auto bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-8 transition-all">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>Pricing Model (Kink)</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={kinkData} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
-              <defs>
-                <linearGradient id="kinkGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1F293780" />
-              <XAxis
-                dataKey="u"
-                domain={[0, 95]}
-                tick={{ fill: "#6B7280", fontSize: 12 }}
-                axisLine={false}
-                label={{ value: "Utilization %", position: "insideBottomRight", offset: -5, fill: "#6B7280", fontSize: 12 }}
-              />
-              <YAxis
-                domain={[1.0, 3.0]}
-                tick={{ fill: "#6B7280", fontSize: 12 }}
-                axisLine={false}
-                label={{ value: "Premium Multiplier", angle: -90, position: "insideLeft", offset: 10, fill: "#6B7280", fontSize: 12 }}
-              />
-              <Tooltip
-                contentStyle={{ background: "#1F2937", border: "1px solid #00D4AA40", borderRadius: 8, color: "#fff" }}
-                formatter={(v: number) => [`${v.toFixed(2)}x`, "Multiplier"]}
-                labelFormatter={(l: number) => `Utilization: ${l}%`}
-              />
-              <ReferenceLine
-                x={80}
-                stroke="#00D4AA"
-                strokeDasharray="6 4"
-                strokeWidth={2}
-                label={{ value: "Kink (80%)", position: "top", fill: "#00D4AA", fontSize: 12 }}
-              />
-              <Area
-                type="monotone"
-                dataKey="m"
-                stroke="#22d3ee"
-                strokeWidth={2}
-                fill="url(#kinkGradient)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-          <p className="text-[#9CA3AF] text-sm mt-6 max-w-2xl mx-auto leading-relaxed" style={{ textAlign: 'center' }}>
-            Below 80% utilization, premiums grow linearly. Above 80% (kink), premiums increase aggressively to protect LPs.
-          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
+              <h4 className="text-lg font-semibold text-[#EF4444] mb-4 text-center">Premium Multiplier (Policy Buyers)</h4>
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={kinkPremiumData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
+                  <defs>
+                    <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="u"
+                    domain={[0, 95]}
+                    tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
+                    axisLine={false}
+                    label={{ value: "Vault Utilization %", position: "insideBottom", offset: -15, fill: "#9CA3AF", fontSize: 13 }}
+                  />
+                  <YAxis
+                    domain={[1.0, 3.0]}
+                    tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
+                    axisLine={false}
+                    label={{ value: "Premium Multiplier", angle: -90, position: "insideLeft", offset: 5, fill: "#9CA3AF", fontSize: 13 }}
+                  />
+                  <Tooltip
+                    contentStyle={{ background: "#1F2937", border: "1px solid #EF444440", borderRadius: 8, color: "#fff" }}
+                    formatter={(v: number) => [`${v.toFixed(2)}x`, "Multiplier"]}
+                    labelFormatter={(l: number) => `Utilization: ${l}%`}
+                  />
+                  <ReferenceLine
+                    x={80}
+                    stroke="#EF4444"
+                    strokeDasharray="6 4"
+                    strokeWidth={2}
+                    label={{ value: "Kink", position: "top", fill: "#EF4444", fontSize: 13, fontWeight: 600 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="m"
+                    stroke="#EF4444"
+                    strokeWidth={2}
+                    fill="url(#redGrad)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
+              <h4 className="text-lg font-semibold text-[#22c55e] mb-4 text-center">Estimated Vault APY (LP Yield)</h4>
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={kinkApyData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
+                  <defs>
+                    <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="u"
+                    domain={[0, 95]}
+                    tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
+                    axisLine={false}
+                    label={{ value: "Vault Utilization %", position: "insideBottom", offset: -15, fill: "#9CA3AF", fontSize: 13 }}
+                  />
+                  <YAxis
+                    domain={[0, 30]}
+                    tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
+                    axisLine={false}
+                    label={{ value: "Estimated APY %", angle: -90, position: "insideLeft", offset: 5, fill: "#9CA3AF", fontSize: 13 }}
+                  />
+                  <Tooltip
+                    contentStyle={{ background: "#1F2937", border: "1px solid #22c55e40", borderRadius: 8, color: "#fff" }}
+                    formatter={(v: number) => [`${v}%`, "APY"]}
+                    labelFormatter={(l: number) => `Utilization: ${l}%`}
+                  />
+                  <ReferenceLine
+                    x={80}
+                    stroke="#22c55e"
+                    strokeDasharray="6 4"
+                    strokeWidth={2}
+                    label={{ value: "Kink", position: "top", fill: "#22c55e", fontSize: 13, fontWeight: 600 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="apy"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    fill="url(#greenGrad)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="mt-6 bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
+            <p className="text-[#9CA3AF] text-sm leading-relaxed" style={{ textAlign: 'justify' }}>
+              The Kink Model creates a win-win: when vault utilization increases, policy premiums rise (protecting LPs from overexposure) while LP yields also increase (rewarding them for the higher risk). The kink point at 80% marks where this acceleration begins. Above 95%, no new policies are accepted.
+            </p>
+          </div>
         </div>
       </FadeIn>
 
