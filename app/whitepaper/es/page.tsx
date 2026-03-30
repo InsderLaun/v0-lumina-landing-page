@@ -292,8 +292,8 @@ export default function WhitepaperES() {
           <h2 className="text-2xl font-bold mb-8 text-center">Modelo de Precios (Kink)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-[#EF4444] mb-1 text-center">Multiplicador de Prima (Compradores)</h4>
-              <p className="text-xs text-[#6B7280] mb-4 text-center">Y: Multiplicador | X: Utilizacion del Vault %</p>
+              <h4 className="text-base font-semibold text-[#EF4444] mb-1 text-center">Costo de Prima</h4>
+              <p className="text-xs text-[#6B7280] mb-4 text-center">Lo que pagan los compradores</p>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={kinkPremiumData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
                   <defs>
@@ -307,7 +307,7 @@ export default function WhitepaperES() {
                     domain={[0, 95]}
                     tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
                     axisLine={false}
-                    label={{ value: "Utilizacion del Vault %", position: "insideBottom", offset: -15, fill: "#9CA3AF", fontSize: 13 }}
+                    label={{ value: "Utilizacion %", position: "insideBottomRight", offset: -10, fill: "#9CA3AF", fontSize: 13 }}
                   />
                   <YAxis
                     domain={[1.0, 3.0]}
@@ -338,8 +338,8 @@ export default function WhitepaperES() {
               </ResponsiveContainer>
             </div>
             <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-[#22c55e] mb-1 text-center">APY Estimado del Vault (Rendimiento LP)</h4>
-              <p className="text-xs text-[#6B7280] mb-4 text-center">Y: APY % | X: Utilizacion del Vault %</p>
+              <h4 className="text-base font-semibold text-[#22c55e] mb-1 text-center">Rendimiento LP</h4>
+              <p className="text-xs text-[#6B7280] mb-4 text-center">Lo que ganan los depositantes</p>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={kinkApyData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
                   <defs>
@@ -353,7 +353,7 @@ export default function WhitepaperES() {
                     domain={[0, 95]}
                     tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
                     axisLine={false}
-                    label={{ value: "Utilizacion del Vault %", position: "insideBottom", offset: -15, fill: "#9CA3AF", fontSize: 13 }}
+                    label={{ value: "Utilizacion %", position: "insideBottomRight", offset: -10, fill: "#9CA3AF", fontSize: 13 }}
                   />
                   <YAxis
                     domain={[0, 30]}
@@ -386,7 +386,15 @@ export default function WhitepaperES() {
           </div>
           <div className="mt-6 bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
             <p className="text-[#9CA3AF] text-sm leading-relaxed" style={{ textAlign: "justify" }}>
-              El Modelo Kink crea un beneficio mutuo: cuando la utilizacion del vault aumenta, las primas de las polizas suben (protegiendo a los LPs de sobreexposicion) mientras que los rendimientos de los LPs tambien aumentan (recompensandolos por el mayor riesgo). El punto kink al 80% marca donde comienza esta aceleracion. Por encima del 95%, no se aceptan nuevas polizas.
+              <strong className="text-white">Como funciona el Modelo Kink:</strong>
+              <br /><br />
+              Utilizacion (U) = colateral bloqueado en polizas / activos totales del vault.
+              <br /><br />
+              - <strong className="text-white">Mas polizas compradas</strong> {"\u2192"} la utilizacion sube {"\u2192"} las primas aumentan {"\u2192"} el rendimiento LP sube
+              <br />
+              - <strong className="text-white">Mas depositos de LPs</strong> {"\u2192"} los activos totales crecen {"\u2192"} la utilizacion baja {"\u2192"} las primas bajan {"\u2192"} el rendimiento LP baja
+              <br /><br />
+              Esto crea un mercado autoequilibrado. Cuando la demanda de seguros es alta, las primas suben atrayendo mas LPs a depositar. Cuando la liquidez del vault es abundante, las primas bajan atrayendo mas compradores de polizas. El punto kink al 80% marca donde el crecimiento de primas se acelera drasticamente, protegiendo a los LPs de sobreexposicion. Por encima del 95% de utilizacion, no se aceptan nuevas polizas.
             </p>
           </div>
         </div>

@@ -303,8 +303,8 @@ export default function WhitepaperEN() {
           <h2 className="text-2xl font-bold mb-8 text-center" style={{ textAlign: 'center' }}>Pricing Model (Kink)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-[#EF4444] mb-1 text-center">Premium Multiplier (Policy Buyers)</h4>
-              <p className="text-xs text-[#6B7280] mb-4 text-center">Y: Multiplier | X: Vault Utilization %</p>
+              <h4 className="text-base font-semibold text-[#EF4444] mb-1 text-center">Premium Cost</h4>
+              <p className="text-xs text-[#6B7280] mb-4 text-center">What policy buyers pay</p>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={kinkPremiumData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
                   <defs>
@@ -318,7 +318,7 @@ export default function WhitepaperEN() {
                     domain={[0, 95]}
                     tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
                     axisLine={false}
-                    label={{ value: "Vault Utilization %", position: "insideBottom", offset: -15, fill: "#9CA3AF", fontSize: 13 }}
+                    label={{ value: "Utilization %", position: "insideBottomRight", offset: -10, fill: "#9CA3AF", fontSize: 13 }}
                   />
                   <YAxis
                     domain={[1.0, 3.0]}
@@ -349,8 +349,8 @@ export default function WhitepaperEN() {
               </ResponsiveContainer>
             </div>
             <div className="bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
-              <h4 className="text-lg font-semibold text-[#22c55e] mb-1 text-center">Estimated Vault APY (LP Yield)</h4>
-              <p className="text-xs text-[#6B7280] mb-4 text-center">Y: APY % | X: Vault Utilization %</p>
+              <h4 className="text-base font-semibold text-[#22c55e] mb-1 text-center">LP Yield</h4>
+              <p className="text-xs text-[#6B7280] mb-4 text-center">What vault depositors earn</p>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={kinkApyData} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
                   <defs>
@@ -364,7 +364,7 @@ export default function WhitepaperEN() {
                     domain={[0, 95]}
                     tick={{ fontSize: 14, fill: "#ffffff", fontWeight: 500 }}
                     axisLine={false}
-                    label={{ value: "Vault Utilization %", position: "insideBottom", offset: -15, fill: "#9CA3AF", fontSize: 13 }}
+                    label={{ value: "Utilization %", position: "insideBottomRight", offset: -10, fill: "#9CA3AF", fontSize: 13 }}
                   />
                   <YAxis
                     domain={[0, 30]}
@@ -397,7 +397,15 @@ export default function WhitepaperEN() {
           </div>
           <div className="mt-6 bg-[#1F2937] border border-[#1F2937] rounded-xl p-6">
             <p className="text-[#9CA3AF] text-sm leading-relaxed" style={{ textAlign: 'justify' }}>
-              The Kink Model creates a win-win: when vault utilization increases, policy premiums rise (protecting LPs from overexposure) while LP yields also increase (rewarding them for the higher risk). The kink point at 80% marks where this acceleration begins. Above 95%, no new policies are accepted.
+              <strong className="text-white">How the Kink Model works:</strong>
+              <br /><br />
+              Utilization (U) = collateral locked in policies / total vault assets.
+              <br /><br />
+              - <strong className="text-white">More policies bought</strong> {"\u2192"} utilization rises {"\u2192"} premiums increase {"\u2192"} LP yield increases
+              <br />
+              - <strong className="text-white">More LP deposits</strong> {"\u2192"} total assets grow {"\u2192"} utilization drops {"\u2192"} premiums decrease {"\u2192"} LP yield decreases
+              <br /><br />
+              This creates a self-balancing market. When insurance demand is high, premiums rise attracting more LPs to deposit. When vault liquidity is abundant, premiums drop attracting more policy buyers. The kink point at 80% marks where premium growth accelerates sharply, protecting LPs from overexposure. Above 95% utilization, no new policies are accepted.
             </p>
           </div>
         </div>
