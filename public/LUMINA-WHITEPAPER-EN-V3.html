@@ -526,9 +526,57 @@
             h3 { font-size: 17px; }
             .container { padding: 0 16px; }
         }
+        /* ========== TOP NAV ========== */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 15, 28, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .top-nav a {
+            color: #00D4AA;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .top-nav a:hover {
+            color: #00FFD0;
+        }
+
+        /* ========== TOC LINKS ========== */
+        .toc-item a {
+            color: #9CA3AF;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .toc-item a:hover {
+            color: #00D4AA;
+        }
+        .toc-item a:hover .toc-label {
+            color: #00D4AA;
+        }
+        .toc-item a:hover .toc-number {
+            color: #00FFD0;
+        }
     </style>
 </head>
-<body>
+<body style="padding-top: 48px;">
+
+    <nav class="top-nav">
+        <a href="https://www.lumina-org.com">&larr; Back to Lumina</a>
+        <span style="color: #6B7280; font-size: 12px;">Whitepaper V3</span>
+    </nav>
 
     <!-- ============================================================ -->
     <!-- COVER PAGE -->
@@ -560,22 +608,22 @@
     <div class="toc-page container page-break">
         <h2 class="toc-title">Table of Contents</h2>
         <ul class="toc-list">
-            <li class="toc-item"><span class="toc-number">01</span><span class="toc-label">Executive Summary</span></li>
-            <li class="toc-item"><span class="toc-number">02</span><span class="toc-label">Introduction</span></li>
-            <li class="toc-item"><span class="toc-number">03</span><span class="toc-label">Protocol Architecture</span></li>
-            <li class="toc-item"><span class="toc-number">04</span><span class="toc-label">Insurance Products</span></li>
-            <li class="toc-item"><span class="toc-number">05</span><span class="toc-label">Vaults and Yield</span></li>
-            <li class="toc-item"><span class="toc-number">06</span><span class="toc-label">Oracle and Verification</span></li>
-            <li class="toc-item"><span class="toc-number">07</span><span class="toc-label">Business Model</span></li>
-            <li class="toc-item"><span class="toc-number">08</span><span class="toc-label">Security</span></li>
-            <li class="toc-item"><span class="toc-number">09</span><span class="toc-label">Actuarial Data</span></li>
-            <li class="toc-item"><span class="toc-number">10</span><span class="toc-label">Risks</span></li>
-            <li class="toc-item"><span class="toc-number">11</span><span class="toc-label">Roadmap</span></li>
-            <li class="toc-item"><span class="toc-number">12</span><span class="toc-label">Legal Framework</span></li>
-            <li class="toc-item"><span class="toc-number">13</span><span class="toc-label">Production Addresses</span></li>
-            <li class="toc-item"><span class="toc-number">14</span><span class="toc-label">Correlation Groups</span></li>
-            <li class="toc-item"><span class="toc-number">15</span><span class="toc-label">API and Agents</span></li>
-            <li class="toc-item"><span class="toc-number">16</span><span class="toc-label">Conclusion</span></li>
+            <li class="toc-item"><a href="#sec-1"><span class="toc-number">01</span><span class="toc-label">Executive Summary</span></a></li>
+            <li class="toc-item"><a href="#sec-2"><span class="toc-number">02</span><span class="toc-label">Introduction</span></a></li>
+            <li class="toc-item"><a href="#sec-3"><span class="toc-number">03</span><span class="toc-label">Protocol Architecture</span></a></li>
+            <li class="toc-item"><a href="#sec-4"><span class="toc-number">04</span><span class="toc-label">Insurance Products</span></a></li>
+            <li class="toc-item"><a href="#sec-5"><span class="toc-number">05</span><span class="toc-label">Vaults and Yield</span></a></li>
+            <li class="toc-item"><a href="#sec-6"><span class="toc-number">06</span><span class="toc-label">Oracle and Verification</span></a></li>
+            <li class="toc-item"><a href="#sec-7"><span class="toc-number">07</span><span class="toc-label">Business Model</span></a></li>
+            <li class="toc-item"><a href="#sec-8"><span class="toc-number">08</span><span class="toc-label">Security</span></a></li>
+            <li class="toc-item"><a href="#sec-9"><span class="toc-number">09</span><span class="toc-label">Actuarial Data</span></a></li>
+            <li class="toc-item"><a href="#sec-10"><span class="toc-number">10</span><span class="toc-label">Risks</span></a></li>
+            <li class="toc-item"><a href="#sec-11"><span class="toc-number">11</span><span class="toc-label">Roadmap</span></a></li>
+            <li class="toc-item"><a href="#sec-12"><span class="toc-number">12</span><span class="toc-label">Legal Framework</span></a></li>
+            <li class="toc-item"><a href="#sec-13"><span class="toc-number">13</span><span class="toc-label">Production Addresses</span></a></li>
+            <li class="toc-item"><a href="#sec-14"><span class="toc-number">14</span><span class="toc-label">Correlation Groups</span></a></li>
+            <li class="toc-item"><a href="#sec-15"><span class="toc-number">15</span><span class="toc-label">API and Agents</span></a></li>
+            <li class="toc-item"><a href="#sec-16"><span class="toc-number">16</span><span class="toc-label">Conclusion</span></a></li>
         </ul>
     </div>
 
@@ -583,7 +631,7 @@
     <!-- SECTION 1: EXECUTIVE SUMMARY -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>1. Executive Summary</h2>
+        <h2 id="sec-1">1. Executive Summary</h2>
 
         <p>Lumina Protocol is the first decentralized parametric insurance infrastructure designed exclusively for artificial intelligence agents operating in DeFi. The protocol deploys on Base L2, settles in real USDC (Circle), and generates yield through Aave V3.</p>
 
@@ -602,7 +650,7 @@
     <!-- SECTION 2: INTRODUCTION -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>2. Introduction</h2>
+        <h2 id="sec-2">2. Introduction</h2>
 
         <h3>2.1 The Problem: DeFi Without Protection for Autonomous Agents</h3>
 
@@ -715,7 +763,7 @@
     <!-- SECTION 3: PROTOCOL ARCHITECTURE -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>3. Protocol Architecture</h2>
+        <h2 id="sec-3">3. Protocol Architecture</h2>
 
         <h3>3.1 Kink Utilization Model</h3>
 
@@ -944,7 +992,7 @@
     <!-- SECTION 4: INSURANCE PRODUCTS -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>4. Insurance Products</h2>
+        <h2 id="sec-4">4. Insurance Products</h2>
 
         <!-- BSS -->
         <div class="product-card bss no-break">
@@ -1182,7 +1230,7 @@ Net payout to agent: <span class="value">$38,800</span>
     <!-- SECTION 5: VAULTS AND YIELD -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>5. Vaults and Yield</h2>
+        <h2 id="sec-5">5. Vaults and Yield</h2>
 
         <h3>5.1 The Four Vaults</h3>
 
@@ -1263,7 +1311,7 @@ Net payout to agent: <span class="value">$38,800</span>
     <!-- SECTION 6: ORACLE AND VERIFICATION -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>6. Oracle and Verification</h2>
+        <h2 id="sec-6">6. Oracle and Verification</h2>
 
         <h3>6.1 LuminaOracle</h3>
 
@@ -1339,7 +1387,7 @@ Signatures = signature_signer1 ++ signature_signer2 ++ ... ++ signature_signerN
     <!-- SECTION 7: BUSINESS MODEL -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>7. Business Model</h2>
+        <h2 id="sec-7">7. Business Model</h2>
 
         <h3>7.1 Monetization</h3>
 
@@ -1396,7 +1444,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 8: SECURITY -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>8. Security</h2>
+        <h2 id="sec-8">8. Security</h2>
 
         <h3>8.1 Smart Contracts</h3>
 
@@ -1456,7 +1504,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 9: ACTUARIAL DATA -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>9. Actuarial Data</h2>
+        <h2 id="sec-9">9. Actuarial Data</h2>
 
         <h3>9.1 Black Swan Shield -- Expected Value for LPs</h3>
 
@@ -1552,7 +1600,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 10: RISKS -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>10. Risks</h2>
+        <h2 id="sec-10">10. Risks</h2>
 
         <div class="table-wrap no-break">
             <table>
@@ -1631,7 +1679,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 11: ROADMAP -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>11. Roadmap</h2>
+        <h2 id="sec-11">11. Roadmap</h2>
 
         <div class="roadmap-phase no-break">
             <h3>Phase 1 -- Launch (Current, Q1 2026)</h3>
@@ -1681,7 +1729,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 12: LEGAL FRAMEWORK -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>12. Legal Framework</h2>
+        <h2 id="sec-12">12. Legal Framework</h2>
 
         <h3>12.1 Protocol Structure</h3>
 
@@ -1718,7 +1766,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 13: PRODUCTION ADDRESSES -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>13. Production Addresses</h2>
+        <h2 id="sec-13">13. Production Addresses</h2>
 
         <p><strong>Network:</strong> Base L2 (Chain 8453) &nbsp;|&nbsp; <strong>Deployment date:</strong> March 29, 2026</p>
 
@@ -1839,7 +1887,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 14: CORRELATION GROUPS -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>14. Correlation Groups</h2>
+        <h2 id="sec-14">14. Correlation Groups</h2>
 
         <p>Lumina's products are designed to cover risks with low correlation between them, limiting the possibility of simultaneous claims:</p>
 
@@ -1893,7 +1941,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 15: API AND AGENTS -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>15. API and Agents</h2>
+        <h2 id="sec-15">15. API and Agents</h2>
 
         <h3>15.1 General Description</h3>
 
@@ -1951,7 +1999,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <!-- SECTION 16: CONCLUSION -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2>16. Conclusion</h2>
+        <h2 id="sec-16">16. Conclusion</h2>
 
         <p>Lumina Protocol represents the first parametric insurance infrastructure designed exclusively for the agentic economy. By combining verifiable mathematical triggers, decentralized oracles, strict 1:1 collateralization, and yield generated through Aave V3, the protocol offers a complete solution for the critical risks that AI agents face in DeFi.</p>
 
