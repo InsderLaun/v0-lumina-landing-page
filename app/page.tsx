@@ -2769,23 +2769,12 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
   return (
     <nav className="sticky top-0 z-50 bg-[#0A0A0F]/80 backdrop-blur-md border-b border-white/5">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo + Whitepaper — grupo izquierda */}
-        <div className="flex items-center gap-3">
-          <a href="#" className="text-xl font-bold whitespace-nowrap">
-            <span className="text-cyan-400">LUMINA</span>
-            <span className="text-white/20"> · </span>
-            <span className="text-purple-400">M2M</span>
-          </a>
-          <button
-            onClick={() => {
-              const event = new CustomEvent('open-whitepaper-modal');
-              window.dispatchEvent(event);
-            }}
-            className="hidden md:inline-flex items-center px-3 py-1 rounded-md text-xs font-medium border border-[#00D4AA] text-[#00D4AA] bg-transparent hover:bg-[#00D4AA15] hover:border-[#00FFD0] transition-all duration-150 whitespace-nowrap"
-          >
-            Whitepaper
-          </button>
-        </div>
+        {/* Logo */}
+        <a href="#" className="text-xl font-bold">
+          <span className="text-cyan-400">LUMINA</span>
+          <span className="text-white/20"> · </span>
+          <span className="text-purple-400">M2M</span>
+        </a>
 
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-8">
@@ -2800,6 +2789,15 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
               </button>
             )
           ))}
+          <button
+            onClick={() => {
+              const event = new CustomEvent('open-whitepaper-modal');
+              window.dispatchEvent(event);
+            }}
+            className={`text-base text-[#00D4AA] ${hoverColor} transition-colors`}
+          >
+            Whitepaper
+          </button>
         </div>
 
         {/* Connect Agent + Connect Wallet */}
