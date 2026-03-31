@@ -2777,14 +2777,14 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
         </a>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-5">
           {navLinks.map((link) => (
             link.external ? (
-              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={`text-base text-white ${hoverColor} transition-colors`}>
+              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={`text-sm text-white/70 ${hoverColor} transition-colors whitespace-nowrap`}>
                 {link.label}
               </a>
             ) : (
-              <button key={link.label} onClick={() => handleClick(link.href)} className={`text-base text-white ${hoverColor} transition-colors`}>
+              <button key={link.label} onClick={() => handleClick(link.href)} className={`text-sm text-white/70 ${hoverColor} transition-colors whitespace-nowrap`}>
                 {link.label}
               </button>
             )
@@ -2794,7 +2794,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
               const event = new CustomEvent('open-whitepaper-modal');
               window.dispatchEvent(event);
             }}
-            className={`text-base text-[#00D4AA] ${hoverColor} transition-colors`}
+            className="text-sm text-[#00D4AA] hover:text-[#00FFD0] transition-colors whitespace-nowrap"
           >
             Whitepaper
           </button>
@@ -2825,13 +2825,13 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
             <>
               <button
                 onClick={onConnectAgent}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all"
               >
                 Getting Started
               </button>
               <a
                 href="/connect"
-                className={`px-6 py-2.5 rounded-full text-base font-medium transition-all ${
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                   accent === "cyan"
                     ? "text-cyan-400 border border-cyan-500/50 hover:bg-cyan-500/10"
                     : "text-purple-400 border border-purple-500/50 hover:bg-purple-500/10"
