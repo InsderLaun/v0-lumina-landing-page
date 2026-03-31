@@ -66,6 +66,17 @@ export function Navbar({ onRegisterAgent, onDepositLP }: NavbarProps) {
                         </span>
                     </button>
 
+                    {/* Whitepaper button - next to logo */}
+                    <button
+                        onClick={() => {
+                            const event = new CustomEvent('open-whitepaper-modal');
+                            window.dispatchEvent(event);
+                        }}
+                        className="hidden md:inline-flex items-center px-3 py-1 rounded-md text-[13px] font-medium border border-[#00D4AA] text-[#00D4AA] bg-transparent hover:bg-[#00D4AA15] hover:border-[#00FFD0] transition-all duration-150"
+                    >
+                        Whitepaper
+                    </button>
+
                     {/* Desktop links */}
                     <ul className="hidden md:flex items-center gap-8">
                         {NAV_ITEMS.map((item) => (

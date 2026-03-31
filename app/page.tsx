@@ -57,6 +57,13 @@ export default function Home() {
     if (stored && isDisclaimerAccepted()) setWalletAddress(stored)
   }, [])
 
+  // Listen for whitepaper modal open from navbar
+  useEffect(() => {
+    const handler = () => { setWpStep("lang"); setShowWhitepaper(true); }
+    window.addEventListener("open-whitepaper-modal", handler)
+    return () => window.removeEventListener("open-whitepaper-modal", handler)
+  }, [])
+
   return (
     <main className="min-h-screen bg-[#0A0A0F] text-white">
       {/* NAVBAR */}
@@ -110,7 +117,7 @@ export default function Home() {
               Your agent buys coverage, oracles verify triggers, payouts arrive in seconds.
             </p>
             <p className="text-sm sm:text-base text-white/70 mt-3 tracking-wide font-medium">
-              No claims process <span className="text-white/30 mx-2">·</span> No human judges <span className="text-white/30 mx-2">·</span> No disputes <span className="text-white/30 mx-2">·</span> Just math.
+              <span style={{color: '#00D4AA'}}>No claims process</span><span style={{color: '#6B7280'}}> · </span><span style={{color: '#3B82F6'}}>No human judges</span><span style={{color: '#6B7280'}}> · </span><span style={{color: '#8B5CF6'}}>No disputes</span><span style={{color: '#6B7280'}}> · </span><span style={{color: '#F59E0B'}}>Just math.</span>
             </p>
           </motion.div>
 
