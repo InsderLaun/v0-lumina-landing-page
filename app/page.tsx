@@ -348,6 +348,35 @@ export default function Home() {
       {/* SECURITY & AUDITS (shared) */}
       <SecuritySection perspective={perspective} />
 
+      {/* ROADMAP */}
+      <section className="py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Roadmap</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-[3px] border-l-[#10B981] transition-all">
+              <p className="text-white font-bold text-lg mb-1">Q2 2026</p>
+              <p className="text-[#00D4AA] font-semibold text-sm uppercase tracking-wider mb-3">Lanzamiento</p>
+              <p className="text-[#9CA3AF] text-sm leading-relaxed">Lumina Protocol sale a produccion. La primera infraestructura de seguros parametricos disenada exclusivamente para agentes de IA en DeFi. Contratos verificados en Base L2, liquidacion en USDC real, rendimiento automatico para proveedores de liquidez. Todo operativo: API, dashboard, documentacion y whitepaper.</p>
+            </div>
+            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-[3px] border-l-[#00D4AA] transition-all">
+              <p className="text-white font-bold text-lg mb-1">Q3 2026</p>
+              <p className="text-[#00D4AA] font-semibold text-sm uppercase tracking-wider mb-3">Crecimiento</p>
+              <p className="text-[#9CA3AF] text-sm leading-relaxed">Integracion con los principales frameworks de agentes de IA. Nuevos productos de cobertura ampliando la proteccion del ecosistema. Automatizacion avanzada de los procesos de resolucion. Auditoria de seguridad por firma independiente de primer nivel. Expansion de canales de distribucion para alcanzar mas agentes y mas protocolos.</p>
+            </div>
+            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-[3px] border-l-[#3B82F6] transition-all">
+              <p className="text-white font-bold text-lg mb-1">Q4 2026</p>
+              <p className="text-[#00D4AA] font-semibold text-sm uppercase tracking-wider mb-3">Escala</p>
+              <p className="text-[#9CA3AF] text-sm leading-relaxed">Infraestructura de alta disponibilidad preparada para volumen institucional. Presencia en multiples redes. Partnerships estrategicos con protocolos DeFi para ofrecer cobertura nativa integrada. Monitoreo en tiempo real y operaciones 24/7.</p>
+            </div>
+            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-[3px] border-l-[#8B5CF6] transition-all">
+              <p className="text-white font-bold text-lg mb-1">Q1 2027</p>
+              <p className="text-[#00D4AA] font-semibold text-sm uppercase tracking-wider mb-3">Nueva Economia</p>
+              <p className="text-[#9CA3AF] text-sm leading-relaxed">Lanzamiento del mercado secundario de polizas y posiciones de vault tokenizadas como NFTs. Token nativo con rendimiento real vinculado a los ingresos del protocolo. Transicion hacia gobernanza descentralizada — la comunidad decide el futuro de Lumina.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ + CONTACT (shared) */}
       <FAQSection perspective={perspective} />
 
