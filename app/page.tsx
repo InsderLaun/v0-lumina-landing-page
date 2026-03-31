@@ -169,9 +169,6 @@ export default function Home() {
             <a href="#how-it-works" className="px-8 py-3 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all">
               Learn How It Works
             </a>
-            <button onClick={() => { setWpStep("lang"); setShowWhitepaper(true); }} className="px-8 py-3 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 transition-all">
-              Whitepaper
-            </button>
           </motion.div>
 
           {/* Agent vs Wallet explainer */}

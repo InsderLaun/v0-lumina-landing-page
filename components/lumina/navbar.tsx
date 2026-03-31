@@ -55,27 +55,22 @@ export function Navbar({ onRegisterAgent, onDepositLP }: NavbarProps) {
                     }`}
             >
                 <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16 lg:h-[72px]">
-                    {/* Logo */}
-                    <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-2 group">
-                        <div className="relative w-8 h-8 flex items-center justify-center">
-                            <Shield className="w-6 h-6 text-lumina-cyan group-hover:drop-shadow-[0_0_8px_rgba(0,212,255,0.6)] transition-all" />
-                        </div>
-                        <span className="text-lg font-bold tracking-tight text-lumina-text">
-                            Lumina
-                            <span className="text-lumina-cyan"> Protocol</span>
-                        </span>
-                    </button>
-
-                    {/* Whitepaper button - next to logo */}
-                    <button
-                        onClick={() => {
-                            const event = new CustomEvent('open-whitepaper-modal');
-                            window.dispatchEvent(event);
-                        }}
-                        className="hidden md:inline-flex items-center px-3 py-1 rounded-md text-[13px] font-medium border border-[#00D4AA] text-[#00D4AA] bg-transparent hover:bg-[#00D4AA15] hover:border-[#00FFD0] transition-all duration-150"
-                    >
-                        Whitepaper
-                    </button>
+                    {/* Logo + Whitepaper — grupo izquierda */}
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex items-center gap-1 group whitespace-nowrap">
+                            <span className="text-lg font-bold text-white">LUMINA</span>
+                            <span className="text-lg font-bold text-[#00D4AA]">· M2M</span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                const event = new CustomEvent('open-whitepaper-modal');
+                                window.dispatchEvent(event);
+                            }}
+                            className="hidden md:inline-flex items-center px-3 py-1 rounded-md text-xs font-medium border border-[#00D4AA] text-[#00D4AA] bg-transparent hover:bg-[#00D4AA15] hover:border-[#00FFD0] transition-all duration-150 whitespace-nowrap"
+                        >
+                            Whitepaper
+                        </button>
+                    </div>
 
                     {/* Desktop links */}
                     <ul className="hidden md:flex items-center gap-8">
