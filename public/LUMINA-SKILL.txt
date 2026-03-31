@@ -1,6 +1,5 @@
 LUMINA PROTOCOL — SKILL FILE FOR AI AGENTS
-Version: 2.5 | Chain: Base Mainnet (8453) | March 2026
-Last updated: 2026-03-30
+Version: 3.0 | Chain: Base Mainnet (8453) | Settlement: USDC | March 2026
 
 ════════════════════════════════════════════════════════════
 1. WHAT IS LUMINA?
@@ -8,561 +7,405 @@ Last updated: 2026-03-30
 
 Lumina Protocol is parametric insurance built exclusively for AI agents on Base L2.
 You buy insurance policies to protect portfolios against market crashes, stablecoin depegs, impermanent loss, and smart contract exploits.
-You can also deposit USDC into vaults to earn yield from insurance premiums.
-All operations happen via HTTP API calls. No blockchain knowledge needed.
+You can also deposit USDC into vaults to earn yield from insurance premiums + Aave V3 lending.
+All operations happen via HTTP API calls. No blockchain knowledge needed for insurance operations.
 
-Settlement asset: USDC (Circle stablecoin, 6 decimals)
+Settlement asset: USDC (Circle, 6 decimals) — 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
 Chain: Base Mainnet (Chain ID: 8453)
 
 ════════════════════════════════════════════════════════════
-2. AUTHENTICATION
+2. QUICK START (5 minutes)
 ════════════════════════════════════════════════════════════
 
-All write operations require an API Key in the header:
-X-API-Key: YOUR_API_KEY_HERE
+Step 1 — Check API is online:
+  curl https://lumina-protocol-production.up.railway.app/api/v2/health
+  Expected: {"status":"ok","chain":8453,"version":"2.0.0"}
 
-To create an API Key:
-POST /api/v2/keys/create
-Body: {"wallet":"0xYOUR_WALLET","label":"my-agent"}
-Response: {"apiKey":"lum_xxxxx","agentId":"..."}
+Step 2 — Create your API key:
+  curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/keys/create \
+    -H "Content-Type: application/json" \
+    -d '{"wallet":"0xYOUR_WALLET","label":"my-agent"}'
+  Response: {"apiKey":"lum_xxxxx","wallet":"0x...","label":"my-agent","warning":"Save this key securely. It cannot be retrieved again."}
+  IMPORTANT: The API key is shown ONLY ONCE. Save it immediately.
+  Maximum 3 keys per wallet.
 
-IMPORTANT: The API Key is shown ONLY ONCE. Save it immediately.
-Your human owner should have given you this key. If you don't have one, ask them to create it from https://www.lumina-org.com/tutorial.html
+Step 3 — Get a price quote:
+  curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote \
+    -H "Content-Type: application/json" \
+    -d '{"productId":"BSS","coverageAmount":1000000000,"durationSeconds":1209600,"buyer":"0xYOUR_WALLET"}'
+  Note: Quotes expire in 5 minutes (300 seconds).
+
+Step 4 — Buy a policy:
+  curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
+    -H "Content-Type: application/json" \
+    -H "X-API-Key: lum_YOUR_KEY" \
+    -d '{"productId":"BSS","coverageAmount":1000000000,"durationSeconds":1209600}'
+  Requires: USDC balance + USDC approved to CoverRouter (0xd5f8678A0F2149B6342F9014CCe6d743234Ca025)
+
+Step 5 — Check your policies:
+  curl https://lumina-protocol-production.up.railway.app/api/v2/policies?buyer=0xYOUR_WALLET
 
 ════════════════════════════════════════════════════════════
-3. API BASE URL
+3. API REFERENCE
 ════════════════════════════════════════════════════════════
 
-https://lumina-protocol-production.up.railway.app
+Base URL: https://lumina-protocol-production.up.railway.app
 
-Always check health first:
-GET /api/v2/health
-Expected: {"status":"ok","chain":"base","chainId":8453}
+All write operations require X-API-Key header.
+
+--- GET /api/v2/health ---
+No auth required.
+Response: { "status": "ok", "chain": 8453, "version": "2.0.0" }
+Status codes: 200
+
+--- GET /api/v2/products ---
+No auth required.
+Response: { "products": [{ "name", "id", "productId", "shield", "riskType", "vaults", "pBase", "minDuration", "maxDuration", "deductible", "assets", "stablecoins" }] }
+Status codes: 200, 500
+
+--- GET /api/v2/vaults ---
+No auth required.
+Response: { "vaults": [{ "name", "address", "riskType", "totalAssets", "allocatedAssets", "freeAssets", "utilizationBps", "totalShares", "cooldownDuration", "estimatedAPY" }] }
+Status codes: 200, 500
+
+--- GET /api/v2/vaults/:address ---
+No auth required.
+Response: Same as single vault from above.
+Status codes: 200, 404, 500
+
+--- POST /api/v2/quote ---
+No auth required.
+Body: { "productId": "BSS", "coverageAmount": 1000000000, "durationSeconds": 1209600, "buyer": "0x..." }
+Optional body fields: "asset" (for BSS: "ETH" or "BTC"), "stablecoin" (for DEPEG: "USDT" or "DAI"), "protocol" (for EXPLOIT: protocol address)
+Response: { "quote": { "productId", "productName", "coverageAmount", "premiumAmount", "durationSeconds", "asset", "stablecoin", "protocol", "buyer", "deadline", "nonce", "utilizationAtQuote" }, "signature": "0x...", "signedQuote": {...} }
+Quotes expire in 300 seconds (5 minutes). Get a fresh quote before each purchase.
+Status codes: 200, 400, 500
+
+--- POST /api/v2/purchase ---
+Requires: X-API-Key header
+Body: { "productId": "BSS", "coverageAmount": 1000000000, "durationSeconds": 1209600 }
+  productId: "BSS" | "DEPEG" | "IL" | "EXPLOIT"
+  coverageAmount: 6 decimals. Min $100 (100000000), Max $100,000 (100000000000)
+  durationSeconds: Min 604800 (7 days), Max 31536000 (365 days) — varies by product
+Response: { "success": true, "txHash": "0x...", "product": "Black Swan Shield", "productId": "BSS", "coverage": "1000000000", "premium": "...", "premiumUSD": "...", "durationDays": 14, "wallet": "0x...", "explorer": "https://basescan.org/tx/0x...", "message": "Policy purchased successfully." }
+Status codes: 201, 400, 401, 409, 429, 500
+
+--- GET /api/v2/policies ---
+No auth required.
+Query: ?buyer=0xWALLET_ADDRESS&page=1&limit=50
+Response: { "buyer": "0x...", "policies": [{ "policyId", "productId", "productName", "shield", "coverageAmount", "premiumPaid", "maxPayout", "startTimestamp", "waitingEndsAt", "expiresAt", "status" }], "count", "total", "page", "limit", "hasMore" }
+Status values: "NONEXISTENT", "WAITING", "ACTIVE", "EXPIRED", "SETTLEMENT", "PAID_OUT", "CANCELLED"
+Pagination: page (default 1), limit (default 50, max 100)
+Status codes: 200, 400, 500
+
+--- POST /api/v2/renew ---
+Requires: X-API-Key header
+Body: { "productId": "BSS", "durationSeconds": 1209600 }
+Response: { "message": "Use POST /purchase with these parameters to renew:", "suggestedParams": { "productId", "coverageAmount", "durationSeconds" }, "note": "Premium will be recalculated based on current vault utilization.", "previousPolicy": {...} }
+This is a convenience endpoint. It finds your last policy for the product and suggests params for /purchase. It does NOT execute the purchase.
+Status codes: 200, 400, 401, 404, 500
+
+--- POST /api/v2/keys/create ---
+No auth required.
+Body: { "wallet": "0x...", "label": "my-agent" }
+Response: { "apiKey": "lum_...", "wallet": "0x...", "label": "...", "warning": "Save this key securely. It cannot be retrieved again." }
+Max 3 keys per wallet. The API key is shown ONLY ONCE.
+Status codes: 201, 400, 500
+
+--- GET /api/v2/keys/list ---
+No auth required.
+Query: ?wallet=0x...
+Response: { "wallet": "0x...", "keys": [{ "label", "createdAt" }] }
+Does NOT return the actual key values (they are hashed).
+Status codes: 200, 400
+
+--- DELETE /api/v2/keys/revoke ---
+Body: { "apiKey": "lum_..." }
+Response: { "revoked": true, "wallet": "0x..." }
+Status codes: 200, 404
+
+--- GET /api/v2/dashboard ---
+No auth required. Returns cached data (refreshed every 60 seconds).
+Query: ?wallet=0x... (optional, for user-specific data)
+Response: { "vaults": [...], "policies": [...], "lastUpdated", "cacheAge" }
+Status codes: 200, 500
+
+RATE LIMITS:
+  General: 100 requests per 15 minutes per IP
+  Key creation: 5 per hour per IP
+  Purchase: 30 per minute per API key
+  Per-wallet: max 5 purchases per minute
+  Concurrent: 1 purchase per wallet at a time (nonce lock)
 
 ════════════════════════════════════════════════════════════
 4. INSURANCE PRODUCTS
 ════════════════════════════════════════════════════════════
 
-┌──────────┬──────────────────────────┬────────────┬────────────┬──────────────┐
-│ Product  │ What it covers           │ Duration   │ Deductible │ Trigger      │
-├──────────┼──────────────────────────┼────────────┼────────────┼──────────────┤
-│ BSS      │ ETH crash ≥30%           │ 7-30 days  │ 20%        │ ETH price    │
-│ DEPEG    │ USDT or DAI loses peg    │ 14-365 days│ USDT:15%   │ Peg deviation│
-│          │ (USDC excluded)          │            │ DAI:12%    │              │
-│ IL       │ Impermanent loss         │ 14-90 days │ 2%         │ IL index     │
-│ EXPLOIT  │ Smart contract hack      │ 90-365 days│ 10%        │ Oracle+TEE   │
-│          │ (Aave V3 excluded)       │            │            │              │
-└──────────┴──────────────────────────┴────────────┴────────────┴──────────────┘
+--- BLACK SWAN SHIELD (BSS) ---
+What it covers: ETH or BTC price crashes exceeding 30%
+Product ID: "BSS"
+Trigger: Price drops >30% from purchase price (TRIGGER_DROP_BPS = 3000)
+Verification: Oracle-signed TWAP 15 min or 3 consecutive Chainlink rounds
+Deductible: 20% — Payout: 80% of coverage (binary, all-or-nothing)
+Duration: 7 to 30 days
+Waiting period: None (coverage starts immediately)
+Base rate: 6.5% annualized (650 bps)
+Assets: ETH, BTC
+Max proof age: 30 minutes
+Fee: 3% on premium (purchase) + 3% on payout (claim)
 
-GET /api/v2/products — returns full product details with current pricing
+Example: Buy $10,000 BSS coverage for 14 days
+  Premium ≈ $10,000 × 0.065 × M(U) × (14/365) = ~$25-40 depending on utilization
+  If trigger activates: payout = $10,000 × 80% = $8,000 gross, $7,760 net (after 3% fee)
 
-════════════════════════════════════════════════════════════
-5. HOW TO BUY A POLICY (step by step)
-════════════════════════════════════════════════════════════
+--- DEPEG SHIELD ---
+What it covers: Stablecoin losing its peg (dropping below $0.95)
+Product ID: "DEPEG"
+Trigger: Stablecoin TWAP 30 min < $0.95 (TRIGGER_PRICE = 95,000,000 in Chainlink 8-decimal format)
+Verification: TWAP 30 min or 5 consecutive Chainlink rounds
+Deductibles per stablecoin:
+  DAI:  12% deductible → 88% payout
+  USDT: 15% deductible → 85% payout
+  USDC: EXCLUDED (circular — Lumina settles in USDC)
+Duration: 14 to 365 days
+Waiting period: 24 hours
+Base rate: 2.5% annualized (250 bps)
+Stablecoins: USDT, DAI (specify in quote with "stablecoin" field)
+Fee: 3% on premium + 3% on payout
 
-STEP 1 — Check your USDC balance is sufficient:
-Your owner must have USDC on Base in their wallet and must have approved the CoverRouter to spend it.
+--- IL INDEX COVER ---
+What it covers: Impermanent loss exceeding 2% at policy expiry
+Product ID: "IL"
+Trigger: IL% > 2% at expiry (European-style — can ONLY claim within 48h after expiry)
+Formula: IL = 1 - (2 × sqrt(r)) / (1 + r), where r = priceAtExpiry / priceAtPurchase
+Payout: Proportional — Coverage × max(0, IL% - 2%) × 90%
+Payout cap: 11.7% of coverage (max IL 13% × 90% factor)
+Duration: 14 to 90 days
+Waiting period: None
+Settlement window: 48 HOURS after expiry. If you miss this window, the claim is lost.
+Base rate: 8.5% annualized (850 bps)
+Asset: ETH
+Fee: 3% on premium + 3% on payout
 
-STEP 2 — Get a quote (optional but recommended):
-GET /api/v2/quote?productId=BSS&coverageAmount=1000000000&durationSeconds=604800
-Response: {"premium":1635000,"premiumUSD":1.64,"product":"BSS","coverage":1000000000}
+CRITICAL: IL Index uses European-style resolution. You can ONLY claim during the 48-hour window after policy expiry. Set a reminder.
 
-Premium varies based on vault utilization. This example assumes ~50% utilization.
+--- EXPLOIT SHIELD ---
+What it covers: Smart contract exploits/hacks on covered DeFi protocols
+Product ID: "EXPLOIT"
+Trigger: DUAL — BOTH conditions must be met:
+  1. Governance token drops >25% in 24h (GOV_DROP_THRESHOLD_BPS = 2500)
+  2. Receipt token drops >30% for 4+ hours OR protocol contract is paused
+  Condition 1 verified by Chainlink oracle. Condition 2 verified by Phala TEE.
+Deductible: 10% — Payout: 90% of coverage (binary)
+Duration: 90 to 365 days
+Waiting period: 14 days
+Max coverage: $50,000 per wallet
+Base rate: 4.0% annualized (400 bps)
+Covered protocols: Compound III, Uniswap V3, MakerDAO (Tier 1), Curve, Morpho (Tier 2)
+Excluded: Aave V3 (circular — Lumina deposits in Aave)
+Fee: 3% on premium + 3% on payout
 
-This tells you the cost BEFORE buying. Always quote first to avoid surprises.
-
-STEP 3 — Purchase:
-POST /api/v2/purchase
-Headers: Content-Type: application/json, X-API-Key: YOUR_KEY
-Body:
-{
-  "productId": "BSS",
-  "coverageAmount": 1000000000,
-  "durationSeconds": 604800
-}
-
-coverageAmount uses 6 decimals:
-  $100 = 100000000
-  $500 = 500000000
-  $1,000 = 1000000000
-  $5,000 = 5000000000
-  $10,000 = 10000000000
+COVERAGE AMOUNT REFERENCE (6 decimals):
+  $100     = 100000000
+  $500     = 500000000
+  $1,000   = 1000000000
+  $5,000   = 5000000000
+  $10,000  = 10000000000
+  $50,000  = 50000000000
   $100,000 = 100000000000
 
-durationSeconds reference:
-  7 days = 604800
-  14 days = 1209600
-  30 days = 2592000
-  90 days = 7776000
+DURATION REFERENCE (in seconds):
+  7 days   = 604800
+  14 days  = 1209600
+  30 days  = 2592000
+  90 days  = 7776000
+  180 days = 15552000
   365 days = 31536000
 
-Min coverage: $100 | Max coverage: $100,000
-
-Response on success:
-{"success":true,"policyId":"...","premium":1635000,"txHash":"0x..."}
-
-STEP 4 — Verify your policy:
-GET /api/v2/policies?buyer=0xYOUR_WALLET
-Returns array of active policies with status, expiry, coverage details.
-
 ════════════════════════════════════════════════════════════
-6. HOW TO MONITOR & CLAIM
+5. VAULTS (for liquidity providers)
 ════════════════════════════════════════════════════════════
 
-MONITORING:
-Check your policies regularly:
-GET /api/v2/policies?buyer=0xYOUR_WALLET
+Four vaults, each with a different risk profile and cooldown period:
 
-Each policy has:
-- status: "active", "expired", "claimed", "claimable"
-- expiresAt: Unix timestamp — set alerts before this
-- triggerMet: true/false — if true and status is "claimable", you should claim
-
-CLAIMING A PAYOUT:
-When a trigger is met (e.g., ETH drops 30%+ for BSS):
-POST /api/v2/claim
-Headers: Content-Type: application/json, X-API-Key: YOUR_KEY
-Body: {"policyId":"YOUR_POLICY_ID"}
-
-Response: {"success":true,"payout":800000000,"txHash":"0x..."}
-
-Gross Payout = coverageAmount × (1 - deductibleBps/10000)
-Protocol Fee = Gross Payout × 3%
-Net Payout = Gross Payout - Protocol Fee
-
-Example: $1000 BSS with 20% deductible:
-  Gross Payout = $1000 × 0.80 = $800
-  Protocol Fee = $800 × 0.03 = $24
-  Net Payout (you receive) = $776
-
-PENDING PAYOUTS (if Aave has low liquidity):
-If the vault cannot withdraw USDC from Aave at the time of your claim (rare, only during extreme Aave utilization), your payout is queued automatically. You will NOT lose your payout.
-
-To claim a pending payout:
-POST /api/v2/claim-pending
-Headers: X-API-Key: YOUR_KEY
-Body: {"policyId":"YOUR_POLICY_ID"}
-
-Or on-chain: call claimPendingPayout() on the vault contract.
-
-The payout will execute as soon as Aave has sufficient liquidity. Check periodically (every hour) until you receive it.
-
-LARGE PAYOUT DELAY:
-Payouts above the large payout threshold may be delayed by up to 6 hours as a security measure. This is automatic and the payout executes after the delay. The protocol owner can cancel suspicious payouts during this window.
-
-IMPORTANT TIMING:
-- You have a 24-HOUR GRACE PERIOD after policy expiry to claim
-- If you miss the grace period, the payout is lost
-- Set up monitoring to check every hour for claimable policies
-- For DEPEG: there is a 24-hour waiting period after purchase before coverage starts
-- For EXPLOIT: there is a 14-day waiting period after purchase before coverage starts
-
-AUTO-REPURCHASE STRATEGY:
-To maintain continuous coverage without gaps:
-
-┌─────────┬────────────────┬────────────────────────────────────────────────────┐
-│ Product │ Waiting Period │ Repurchase Window                                  │
-├─────────┼────────────────┼────────────────────────────────────────────────────┤
-│ BSS     │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
-│ DEPEG   │ 86400s (24h)   │ Repurchase when expiresAt - now < 90000 (25 hours) │
-│ IL      │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
-│ EXPLOIT │ 1209600s (14d) │ Repurchase when expiresAt - now < 1296000 (15 days)│
-└─────────┴────────────────┴────────────────────────────────────────────────────┘
-
-Logic for your agent loop:
-  currentTime = Math.floor(Date.now() / 1000)
-  timeLeft = policy.expiresAt - currentTime
-  if (timeLeft < repurchaseWindowSeconds) → GET /quote → POST /purchase
-
-This ensures zero coverage gaps. The extra buffer (1h for BSS/IL, 25h for DEPEG, 15d for EXPLOIT) accounts for the waiting period of the new policy.
-
-════════════════════════════════════════════════════════════
-7. YIELD VAULTS (for earning, not insurance)
-════════════════════════════════════════════════════════════
-
-Lumina has 4 vaults where you can deposit USDC to earn yield from insurance premiums:
-
-┌─────────────────┬──────────┬─────────────────────────────────────────────────┐
-│ Vault           │ Lockup   │ Contract Address                                │
-├─────────────────┼──────────┼─────────────────────────────────────────────────┤
-│ Volatile Short  │ 30 days  │ 0xbd44547581b92805aAECc40EB2809352b9b2880d     │
-│ Volatile Long   │ 90 days  │ 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904     │
-│ Stable Short    │ 90 days  │ 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC     │
-│ Stable Long     │ 365 days │ 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c     │
-└─────────────────┴──────────┴─────────────────────────────────────────────────┘
-
-CHECK VAULT STATUS:
-GET /api/v2/vaults
-Returns: TVL, utilization, estimated APY for each vault
+| Vault          | Cooldown | Products            | Est. APY  | Address                                    |
+|----------------|----------|---------------------|-----------|--------------------------------------------|
+| VolatileShort  | 30 days  | BSS + IL            | 12-16%    | 0xbd44547581b92805aAECc40EB2809352b9b2880d |
+| VolatileLong   | 90 days  | IL long + BSS spill | 15-19%    | 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904 |
+| StableShort    | 90 days  | Depeg short         | 11-15%    | 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC |
+| StableLong     | 365 days | Depeg + Exploit     | 18-27%    | 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c |
 
 YIELD SOURCES:
-- Base yield: USDC is deposited into Aave V3 on Base, earning lending APY (~3-5%, variable)
-- Premium yield: additional yield from insurance premiums paid by AI agents
-- Total yield = Aave V3 yield + premium yield
-- Your USDC is supplied to Aave V3. The vault holds aUSDC (Aave's receipt token) which grows in value automatically as interest accrues.
+  Layer 1: Aave V3 base yield (~3-5% APY) — USDC deposited automatically
+  Layer 2: Insurance premium income — premiums from policy buyers flow to vaults
 
-DEPOSITING:
-Your owner must approve each vault contract to spend their USDC (done in tutorial Step 2).
-Deposits and withdrawals are on-chain transactions — your owner's wallet interacts directly with the vault contracts.
-Your USDC is supplied to Aave V3. The vault holds aUSDC (Aave's receipt token) which grows in value as interest accrues.
+HOW TO DEPOSIT: On-chain transaction directly to the vault contract.
+  Call deposit(amount, receiverAddress) on the vault. Min deposit: $100 USDC.
+  The API provides read-only vault data (GET /api/v2/vaults). Deposits require on-chain interaction.
 
-COOLDOWN PERIODS:
-After requesting a withdrawal, there is a cooldown:
-- Volatile Short: 30 days
-- Volatile Long: 90 days
-- Stable Short: 90 days
-- Stable Long: 365 days
+HOW TO WITHDRAW:
+  1. Call requestWithdrawal(shares) on the vault — starts cooldown timer
+  2. Wait for cooldown period (30 to 365 days depending on vault)
+  3. Call completeWithdrawal(receiverAddress) — receive USDC + accumulated yield
+  Partial withdrawals allowed (any number of shares). Up to 10 concurrent withdrawal requests.
 
-Plan withdrawals in advance. You cannot withdraw instantly.
+PERFORMANCE FEE: 3% charged ONLY on positive yield (profit above your deposit cost).
+  Example: Deposit $10,000 → Withdraw $10,500 → Profit $500 → Fee $15 → Net $10,485
+  If no profit, no fee is charged.
 
-PERFORMANCE FEE:
-When withdrawing, 3% is charged on positive yield (profit above your deposit cost basis). No fee if no profit.
-Example: deposit $10,000, withdraw $10,500, profit=$500, fee=3%×$500=$15, net=$10,485.
+SHARES ARE SOULBOUND: Vault shares cannot be transferred or sold. This prevents market manipulation. You can only deposit and withdraw through the vault contract.
 
-VAULT DEPOSITS FOR LIQUIDITY PROVIDERS:
-
-Deposits are indefinite — they do not expire. Your USDC earns yield automatically.
-You can deposit more USDC into the same vault at any time (shares accumulate).
-
-WITHDRAWAL PROCESS:
-1. Request withdrawal: specify number of shares to withdraw
-2. Wait for cooldown period (30-365 days depending on vault)
-3. Complete withdrawal: receive USDC + accumulated yield
-4. Performance fee: 3% charged only on positive yield (profit above deposit cost)
-5. If no profit, no fee is charged
-
-PARTIAL WITHDRAWALS: You can withdraw any portion of your shares (not all-or-nothing).
-MULTIPLE REQUESTS: Up to 10 concurrent withdrawal requests allowed (V2 queue).
-NEW DEPOSITS: Depositing more USDC does NOT reset or affect existing withdrawal cooldowns.
-
-IMPORTANT: New deposits while a withdrawal is pending do not cancel the withdrawal request.
+NEW DEPOSITS: You can deposit more USDC at any time. Shares accumulate. New deposits do NOT affect existing withdrawal requests or cooldowns.
 
 ════════════════════════════════════════════════════════════
-8. DECISION GUIDELINES
+6. PRICING MODEL (Kink)
 ════════════════════════════════════════════════════════════
 
-WHEN TO BUY EACH PRODUCT:
+Premium = Coverage × P_base × RiskMult × DurationDiscount × M(U) × (Duration / 365 days)
 
-BSS (Black Swan Shield):
-- Buy when: ETH volatility is high, your portfolio has significant ETH exposure, market sentiment is fearful, VIX-crypto equivalent is elevated
-- Don't buy when: Market is calm, ETH is in a steady uptrend, your exposure is minimal
-- Recommended coverage: 50-80% of ETH exposure value
+Where M(U) is the utilization multiplier (from PremiumMath.sol):
 
-DEPEG (Depeg Shield):
-- Buy when: You hold large stablecoin positions, there are concerns about stablecoin issuers, regulatory uncertainty is high
-- Don't buy when: You hold small stablecoin amounts, the stablecoin has strong reserves
-- Recommended coverage: 70-100% of stablecoin holdings
-- Remember: 24-hour waiting period — buy BEFORE you think you'll need it
-- Note: USDC cannot be insured. Lumina settles in USDC, so insuring it would be circular. Use this for USDT or DAI holdings.
-- Deductible varies by stablecoin: USDT = 15% (higher risk, opaque reserves), DAI = 12% (crypto-collateralized, cascade risk). This means for $10,000 USDT coverage, max payout is $8,500. For DAI, max payout is $8,800.
+  If U <= 80%:  M(U) = 1 + (U / 0.80) × 0.5
+  If U > 80%:   M(U) = 1 + 0.5 + ((U - 0.80) / 0.20) × 3.0
+  If U > 95%:   REJECTED — no new policies accepted
 
-IL (IL Index Cover):
-- Buy when: You provide liquidity in volatile pairs, the pair's price ratio is diverging, you want to hedge IL risk
-- Don't buy when: You're in stable/stable pairs, IL risk is minimal
-- Recommended coverage: match your LP position value
+Multiplier table:
+  0% = 1.00x | 20% = 1.13x | 40% = 1.25x | 60% = 1.38x
+  80% = 1.50x (kink) | 85% = 1.88x | 90% = 2.25x | 95% = REJECTED
 
-EXPLOIT (Exploit Shield):
-- Buy when: You have funds in DeFi protocols, the protocol is unaudited or newly launched, there have been recent hacks in similar protocols
-- Don't buy when: Protocol is battle-tested, your exposure is small
-- Remember: 14-day waiting period — buy well in advance
-- Recommended coverage: 80-100% of funds in the protocol
-- Note: Aave V3 cannot be insured. Lumina vaults deposit into Aave, so insuring it would be circular. Use this for other DeFi protocols.
+The model self-balances: high demand → scarce capital → premiums rise → LP yield rises → attracts LPs → more capital → premiums normalize.
 
-YIELD VAULTS — when to deposit:
-- Deposit when: You have idle USDC, you want passive income, you're comfortable with the lockup period
-- Choose Volatile vaults: higher yield but higher risk (covers BSS and IL claims)
-- Choose Stable vaults: lower yield but lower risk (covers DEPEG and EXPLOIT claims)
-- Choose Short lockups: if you may need liquidity soon
-- Choose Long lockups: for higher yield if you can lock funds longer
-
-MARKET DATA SOURCES (for autonomous decision-making):
-
-Your agent needs external data to make buy/sell decisions. Recommended free sources:
-
-- ETH price: GET https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
-- ETH volatility: Fetch ETH price hourly, compute stddev over 24 points. If stddev > 5% of price → high volatility → consider BSS
-- Stablecoin peg: GET https://api.coingecko.com/api/v3/simple/price?ids=tether,dai&vs_currencies=usd — if price < 0.98 → consider DEPEG
-- Vault utilization: GET /api/v2/vaults → use utilizationPct. If > 80% → premiums expensive. If < 40% → premiums cheap
-- DeFi exploits: Monitor https://rekt.news for hack reports
-- USDC balance: Not available via API. If purchase fails with "Insufficient USDC balance", alert owner immediately
-
-OWNER ALERT STRATEGY:
-- ChatGPT/Claude: tell the user in the chat
-- ElizaOS/custom: log to stderr or send webhook
-- Via API: return error, owner monitors logs
-There is no built-in notification endpoint in Lumina. Alerting is your responsibility.
+Always GET /api/v2/quote before purchasing to see the current premium.
 
 ════════════════════════════════════════════════════════════
-9. PRICING MODEL
+7. CLAIM RESOLUTION
 ════════════════════════════════════════════════════════════
 
-Premiums are dynamic based on vault utilization (Kink Model):
-- Low utilization (<60%) → cheap premiums
-- Medium utilization (60-80%) → moderate premiums
-- High utilization (>80%) → expensive premiums (kink kicks in)
+Claims are AUTOMATIC. The oracle monitors conditions and triggers payouts when met. You do NOT need to submit a claim manually.
 
-Premium formula: premium = coverageAmount × pBase × M(U) × (durationSeconds / 31,536,000)
+BSS:     Oracle detects >30% drop → verifies TWAP → triggers payout → 80% of coverage sent to your wallet
+DEPEG:   Oracle detects stablecoin <$0.95 → verifies TWAP → triggers payout → 85-88% sent
+IL:      At expiry, oracle calculates IL → if >2%, proportional payout → sent within 48h settlement window
+EXPLOIT: Oracle detects gov token -25% AND TEE verifies receipt token → 90% of coverage sent
 
-Base annual premium rates (pBase) per product:
-- BSS:     6.5%  (650 bps)  — Black Swan Shield
-- DEPEG:   2.5%  (250 bps)  — Stablecoin Depeg Shield
-- IL:      8.5%  (850 bps)  — IL Index Cover
-- EXPLOIT: 4.0%  (400 bps)  — Exploit Shield (Tier 1 base)
+Payout = (Coverage × (100% - Deductible%)) × 97% (after 3% protocol fee)
 
-These are V2 market-aligned rates (Kink Model, multiplicative). V1 used higher additive values.
-Always GET /api/v2/quote before purchasing to see current pricing.
+Claim grace period: 24 hours after policy expiry for BSS, Depeg, Exploit.
+IL settlement: ONLY within 48 hours after expiry (European-style). Do not miss this window.
 
-Protocol fee: 3% on premiums + 3% on payouts + 3% performance fee on positive yield at vault withdrawal.
+Large payouts may be delayed (configurable by protocol governance) for security review.
 
 ════════════════════════════════════════════════════════════
-10. SMART CONTRACT ADDRESSES (Base Mainnet)
+8. RENEWAL STRATEGY
 ════════════════════════════════════════════════════════════
 
-TEST DEPLOYMENT — these addresses will change for production.
-Always verify addresses at https://www.lumina-org.com or via the API.
+There is NO auto-renewal on-chain. Your agent must monitor expiresAt and buy a new policy before the current one expires.
 
-USDC (settlement token): 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-CoverRouter (buy policies):  0xd5f8678A0F2149B6342F9014CCe6d743234Ca025
-PolicyManager:               0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a
-Oracle:                      0xB52BB8B09Df13dB2D244746688C14A720ceE4C09
-Phala Verifier:              0xE44a263ccBc70DC761D955A590FDdA4F7a14Ccaf
+Recommended repurchase windows (buy new policy this many seconds before expiry):
+  BSS:     3,600 (1 hour before)
+  DEPEG:   90,000 (25 hours before — accounts for 24h waiting period)
+  IL:      3,600 (1 hour before)
+  EXPLOIT: 1,296,000 (15 days before — accounts for 14d waiting period)
+
+Agent loop pseudocode:
+  1. GET /api/v2/policies?buyer=myWallet
+  2. For each active policy: timeLeft = expiresAt - now
+  3. If timeLeft < repurchaseWindow → GET /api/v2/quote → if acceptable → POST /api/v2/purchase
+  4. Sleep 3600 seconds → repeat
+
+You CAN have multiple policies of the same product active simultaneously.
+Premium is RECALCULATED on each purchase based on current vault utilization (Kink Model).
+
+Convenience: POST /api/v2/renew returns suggested params based on your last policy. Still requires POST /api/v2/purchase to execute.
+
+════════════════════════════════════════════════════════════
+9. ERROR HANDLING
+════════════════════════════════════════════════════════════
+
+HTTP STATUS CODES:
+  200 — Success
+  201 — Created (key created, policy purchased)
+  400 — Bad request (invalid params, insufficient balance/allowance)
+  401 — Unauthorized (missing or invalid API key)
+  404 — Not found
+  409 — Conflict (concurrent purchase in progress for this wallet)
+  429 — Rate limit exceeded
+  500 — Internal server error
+
+COMMON ERRORS AND REMEDIES:
+  "Invalid API key" → Create a new key with POST /api/v2/keys/create
+  "Insufficient USDC balance" → Fund your wallet with USDC on Base L2
+  "Insufficient USDC allowance" → Approve CoverRouter to spend your USDC
+  "Rate limit exceeded" → Wait 60 seconds, retry
+  "Concurrent purchase lock" → Wait for previous purchase to complete
+  "Duration between 7 and 365 days" → Check product min/max duration
+  "Coverage between $100 and $100,000" → Adjust coverageAmount
+  "Daily payout limit reached" → Wait until next day
+  "Product frozen" → Product temporarily halted due to extreme volatility
+  Network error → Wait 10 seconds, retry up to 3 times
+  Any other error → Log it, continue your loop (never crash)
+
+════════════════════════════════════════════════════════════
+10. SECURITY
+════════════════════════════════════════════════════════════
+
+Smart Contracts: 79 tests passing. Solidity 0.8.20. CEI pattern. SafeERC20. ReentrancyGuard.
+Governance: TimelockController (48h delay) + Gnosis Safe (2-of-3 multisig). No instant admin changes.
+Oracle: Multisig-capable (N-of-M). Chainlink TWAP verification. L2 sequencer uptime check (1h grace).
+API: Rate limiting, CORS restrictions, Helmet headers, NonceManager, sanitized errors.
+
+Collateral: Strict 1:1. Every $1 of coverage = $1 USDC locked in vault. Max utilization 95%.
+Session approval: Buyers must authorize relayers before purchases can be made on their behalf.
+
+NEVER share your private key with anyone — not even Lumina. The API only needs your wallet address and API key.
+
+════════════════════════════════════════════════════════════
+11. CONTRACT ADDRESSES (Production — Base L2, Chain 8453)
+════════════════════════════════════════════════════════════
+
+Core:
+  CoverRouter:       0xd5f8678A0F2149B6342F9014CCe6d743234Ca025
+  PolicyManager:     0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a
+  LuminaOracle:      0xB52BB8B09Df13dB2D244746688C14A720ceE4C09
+  PhalaVerifier:     0x468b9D2E9043c80467B610bC290b698ae23adb9B
+
+Vaults:
+  VolatileShort:     0xbd44547581b92805aAECc40EB2809352b9b2880d
+  VolatileLong:      0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904
+  StableShort:       0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC
+  StableLong:        0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c
 
 Shields:
-BSS Shield:      0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e
-Depeg Shield:    0x71DBcE71AA36370f7357F6D8E0c8ba96343C8306
-IL Index Shield: 0x4196f2Cc92C5c4141a34f9a28f23236446E3C4E0
-Exploit Shield:  0xaE29Fc3e5f0DedC968cE2dA2A2F3ccB98397b38C
+  BSS:               0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e
+  Depeg:             0x71DBcE71AA36370f7357F6D8E0c8ba96343C8306
+  ILIndex:           0x4196f2Cc92C5c4141a34f9a28f23236446E3C4E0
+  Exploit:           0xaE29Fc3e5f0DedC968cE2dA2A2F3ccB98397b38C
+
+Governance:
+  TimelockController: 0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a
+  Gnosis Safe (2/3):  0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD
+
+External:
+  USDC (Circle):     0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+  Aave V3 Pool:      0xA238Dd80C259a72e81d7e4664a9801593F98d1c5
+
+All contracts verified on BaseScan. Verify at https://basescan.org/address/[ADDRESS]
 
 ════════════════════════════════════════════════════════════
-11. ERROR HANDLING
+12. CONTACT & SUPPORT
 ════════════════════════════════════════════════════════════
 
-Common errors and how to handle them:
-
-"Insufficient USDC balance"
-→ Your owner needs more USDC. Alert them.
-
-"CoverRouter not approved" / "Insufficient allowance"
-→ Your owner needs to approve CoverRouter to spend USDC. Direct them to the tutorial.
-
-"Policy expired"
-→ You missed the claim window. Cannot recover. Set up better monitoring.
-
-"Rate limit exceeded"
-→ Max 5 requests/minute. Wait 60 seconds and retry.
-
-"Invalid API Key"
-→ The key is wrong or was never created. Ask your owner for the correct key.
-
-"Product frozen"
-→ This product is temporarily disabled. Try a different product or wait.
-
-"Coverage amount too low/high"
-→ Min $100, Max $100,000. Adjust your amount.
-
-"Duration out of range"
-→ Check the min/max duration for each product in the products table.
-
-"Cannot insure settlement token"
-→ You tried to buy Depeg Shield for USDC. USDC is excluded. Choose USDT or DAI.
-
-"Cannot insure vault infrastructure"
-→ You tried to buy Exploit Shield for Aave V3. Aave is excluded. Choose another protocol.
-
-RETRY STRATEGY:
-- On rate limit: wait 60s, retry once
-- On network error: wait 10s, retry up to 3 times
-- On insufficient balance: alert owner, do not retry
-- On invalid key: alert owner, do not retry
-
-════════════════════════════════════════════════════════════
-12. QUICK REFERENCE
-════════════════════════════════════════════════════════════
-
-ENDPOINTS SUMMARY:
-GET  /api/v2/health                        → API status
-GET  /api/v2/products                      → Product list
-GET  /api/v2/vaults                        → Vault status + APY
-GET  /api/v2/quote?productId=X&coverageAmount=Y&durationSeconds=Z → Price quote
-POST /api/v2/purchase                      → Buy policy (requires API Key)
-POST /api/v2/claim                         → Claim payout (requires API Key)
-GET  /api/v2/policies?buyer=0x...          → Your policies
-POST /api/v2/keys/create                   → Create API Key
-
-TYPICAL AGENT LOOP:
-1. Check /health → confirm API is up
-2. Check /policies → review active policies, check for claimable ones
-3. If any claimable → POST /claim immediately
-4. If any expiring soon → GET /quote for renewal → POST /purchase
-5. Assess market conditions → decide if new coverage needed
-6. GET /quote → check pricing → POST /purchase if favorable
-7. Sleep 1 hour → repeat from step 1
-
-SUPPORT:
-Email: support@lumina-org.com
 Website: https://www.lumina-org.com
+Dashboard: https://www.lumina-org.com/dashboard
+Tutorial: https://www.lumina-org.com/tutorial.html
 GitHub: https://github.com/org-lumina/LUMINA-PROTOCOL
+Support: support@lumina-org.com
+Sales: labs@lumina-org.com
 
 ════════════════════════════════════════════════════════════
-13. API RESPONSE SCHEMAS
+VERIFICATION
 ════════════════════════════════════════════════════════════
 
-Every endpoint's exact response format. Parse these to make decisions.
-
-GET /api/v2/health
-{"status":"ok","chain":"base","chainId":8453}
-
-GET /api/v2/products
-[{"id":"BSS","name":"Black Swan Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":0,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
-
-GET /api/v2/vaults
-[{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":30,"products":["BSS","IL"],"riskProfile":"higher"}]
-
-Key fields for decision-making:
-- currentUtilizationPct: if > 80 → post-kink, premiums expensive
-- estimatedAPY: total yield for LPs (Aave + premiums)
-- allocatedAssets: how much is locked for active policies
-
-GET /api/v2/quote?productId=BSS&coverageAmount=1000000000&durationSeconds=604800
-{"premium":1635000,"premiumUSD":1.64,"product":"BSS","coverage":1000000000,"utilizationPct":20.6}
-
-POST /api/v2/purchase (requires X-API-Key header)
-Success: {"success":true,"policyId":"1","premium":1635000,"txHash":"0x..."}
-Error: {"error":"Insufficient USDC balance","required":"1635000","balance":"0"}
-
-GET /api/v2/policies?buyer=0x...
-[{"policyId":1,"productId":"0xbc5e...","productName":"Black Swan Shield","shield":"0x54CDc21...","coverageAmount":"100000000","premiumPaid":"299058","maxPayout":"80000000","startTimestamp":1711756800,"waitingEndsAt":1711756800,"expiresAt":1712361600,"status":"ACTIVE"}]
-
-Key fields for your agent loop:
-- status: "ACTIVE" | "EXPIRED" | "CLAIMED" | "CLAIMABLE"
-- expiresAt: Unix timestamp — use with getRepurchaseWindow() for auto-renewal
-- waitingEndsAt: coverage only active AFTER this timestamp (relevant for DEPEG and EXPLOIT)
-- productName: human-readable product name (e.g. "Black Swan Shield")
-- shield: address of the shield contract for this policy
-- coverageAmount, premiumPaid, maxPayout: raw USDC amounts (6 decimals)
-
-POST /api/v2/claim (requires X-API-Key header)
-Success: {"success":true,"payout":776000000,"txHash":"0x..."}
-Error: {"error":"Policy not claimable"}
-
-════════════════════════════════════════════════════════════
-14. AUTONOMOUS AGENT BLUEPRINT
-════════════════════════════════════════════════════════════
-
-Complete pseudocode for a fully autonomous Lumina agent:
-
-INITIALIZATION:
-  API_KEY = "lum_your_key"
-  BASE_URL = "https://lumina-protocol-production.up.railway.app"
-  WALLET = "0xYOUR_WALLET"
-  HEADERS = {"Content-Type": "application/json", "X-API-Key": API_KEY}
-
-MAIN LOOP (runs every 3600 seconds / 1 hour):
-
-  1. HEALTH CHECK
-     response = GET {BASE_URL}/api/v2/health
-     if response.status != "ok" → log error, sleep 300, retry
-
-  2. CHECK CLAIMABLE POLICIES (highest priority)
-     policies = GET {BASE_URL}/api/v2/policies?buyer={WALLET}
-     for each policy where claimable == true:
-       result = POST {BASE_URL}/api/v2/claim with {"policyId": policy.policyId}
-       log "CLAIMED: policy {policyId}, net payout {netPayoutUSD}"
-
-  3. CHECK EXPIRING POLICIES (auto-repurchase)
-     currentTime = now()
-     for each policy where status == "active":
-       timeLeft = policy.expiresAt - currentTime
-       window = getRepurchaseWindow(policy.product)
-       if timeLeft < window:
-         quote = GET {BASE_URL}/api/v2/quote (same product/coverage/duration)
-         if quote.premiumUSD is acceptable (kinkMultiplier < 2.0):
-           POST {BASE_URL}/api/v2/purchase
-           log "RENEWED: {product} for ${premiumUSD}"
-
-  4. ASSESS MARKET CONDITIONS (decide new purchases)
-     ethPrice = GET https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
-     stablePrices = GET https://api.coingecko.com/api/v3/simple/price?ids=tether,dai&vs_currencies=usd
-     vaults = GET {BASE_URL}/api/v2/vaults
-
-     Decision rules:
-     - ETH stddev(24h) > 5% of price → consider buying BSS
-     - USDT or DAI price < 0.98 → consider buying DEPEG
-     - Providing liquidity in volatile AMM → consider buying IL
-     - Funds in unaudited protocol → consider buying EXPLOIT
-
-     For each consideration:
-       quote = GET /api/v2/quote
-       if quote.kinkMultiplier < 2.0 → POST /api/v2/purchase
-
-  5. LOG VAULT STATUS (optional: inform owner)
-     for each vault in vaults:
-       log "{vault.name}: APY {estimatedAPY}%, util {currentUtilizationPct}%"
-
-  6. SLEEP 3600 seconds → go to step 1
-
-ERROR HANDLING:
-  "Insufficient USDC balance" → alert owner, skip, continue loop
-  "Rate limit exceeded" → sleep 60, retry once
-  "Invalid API Key" → alert owner, STOP loop entirely
-  "Policy expired" → log warning, do not retry
-  Network error → sleep 10, retry up to 3 times
-  Any other error → log, continue loop (never crash)
-
-getRepurchaseWindow(product):
-  BSS     → 3600     (1 hour before expiry)
-  DEPEG   → 90000    (25 hours before expiry)
-  IL      → 3600     (1 hour before expiry)
-  EXPLOIT → 1296000  (15 days before expiry)
-
-════════════════════════════════════════════════════════════
-15. MULTISIG ORACLE
-════════════════════════════════════════════════════════════
-
-HOW IT WORKS:
-  The LuminaOracle now supports N-of-M multisig verification for claim resolution.
-  Default configuration: 3-of-5 independent cryptographic signatures required.
-  Oracle reports are signed by multiple independent signers. Their ECDSA signatures
-  are concatenated (packed) into a single bytes payload (65 bytes per signature).
-  Signatures MUST be ordered by signer address (ascending) to prevent duplicates.
-
-  When requiredSignatures == 1: single-signer mode (backwards compatible).
-  When requiredSignatures > 1: packed multisig mode via verifyPackedMultisig().
-  The verifySignature() function automatically detects and routes to the correct mode.
-
-KEY FUNCTIONS (LuminaOracle.sol):
-  verifyPackedMultisig(bytes32 dataHash, bytes packedSignatures) → bool
-    Verifies N packed ECDSA signatures. Each signature = 65 bytes (r, s, v).
-    Requires signatures ordered by signer address ascending. Reverts on duplicates.
-
-  verifySignature(bytes32 digest, bytes signature) → address
-    IOracle interface. In multisig mode, verifies packed signatures and returns
-    oracleKey address for BaseShield compatibility. In single mode, works as before.
-
-  addSigner(address signer) → onlyOwner
-    Register a new authorized signer. Cannot add duplicates or zero address.
-
-  removeSigner(address signer) → onlyOwner
-    Remove a signer. Reverts if removal would break the required quorum.
-
-  setRequiredSignatures(uint256 required) → onlyOwner
-    Change the quorum threshold. Must be > 0 and <= totalSigners.
-
-  getSignerInfo() → (uint256 required, uint256 total)
-    Query current quorum configuration.
-
-  isSigner(address addr) → bool
-    Check if an address is an authorized signer.
-
-SECURITY PROPERTIES:
-  - No single point of failure: compromising 1 key cannot forge oracle reports
-  - Quorum protection: removeSigner reverts if it would break quorum
-  - Duplicate prevention: signatures must be ordered by address (ascending)
-  - Unauthorized signer detection: every recovered address checked against mapping
-  - Owner-only management: addSigner, removeSigner, setRequiredSignatures
-  - Backwards compatible: existing shields work without modification
-
-AGENT INTEGRATION:
-  No changes needed in agent integration. The API handles signature aggregation
-  server-side. Agents continue using the same /claim endpoint as before.
-  The multisig verification happens transparently at the smart contract level.
+Every data point in this SKILL was extracted from the source code on March 31, 2026.
+Sources: api/src/index.js, src/libraries/PremiumMath.sol, src/core/CoverRouter.sol,
+src/vaults/BaseVault.sol, src/products/*.sol, docs/PRODUCTION-ADDRESSES.md, lib/lumina-config.ts
