@@ -619,18 +619,19 @@
             <li class="toc-item"><a href="#sec-2"><span class="toc-number">02</span><span class="toc-label">Introduccion</span></a></li>
             <li class="toc-item"><a href="#sec-3"><span class="toc-number">03</span><span class="toc-label">Arquitectura del Protocolo</span></a></li>
             <li class="toc-item"><a href="#sec-4"><span class="toc-number">04</span><span class="toc-label">Productos de Seguro</span></a></li>
-            <li class="toc-item"><a href="#sec-5"><span class="toc-number">05</span><span class="toc-label">Vaults y Yield</span></a></li>
-            <li class="toc-item"><a href="#sec-6"><span class="toc-number">06</span><span class="toc-label">Oracle y Verificacion</span></a></li>
-            <li class="toc-item"><a href="#sec-7"><span class="toc-number">07</span><span class="toc-label">Modelo de Negocio</span></a></li>
-            <li class="toc-item"><a href="#sec-8"><span class="toc-number">08</span><span class="toc-label">Seguridad</span></a></li>
-            <li class="toc-item"><a href="#sec-9"><span class="toc-number">09</span><span class="toc-label">Datos Actuariales</span></a></li>
-            <li class="toc-item"><a href="#sec-10"><span class="toc-number">10</span><span class="toc-label">Riesgos</span></a></li>
-            <li class="toc-item"><a href="#sec-11"><span class="toc-number">11</span><span class="toc-label">Roadmap</span></a></li>
-            <li class="toc-item"><a href="#sec-12"><span class="toc-number">12</span><span class="toc-label">Marco Legal</span></a></li>
-            <li class="toc-item"><a href="#sec-13"><span class="toc-number">13</span><span class="toc-label">Direcciones de Produccion</span></a></li>
-            <li class="toc-item"><a href="#sec-14"><span class="toc-number">14</span><span class="toc-label">Grupos de Correlacion</span></a></li>
-            <li class="toc-item"><a href="#sec-15"><span class="toc-number">15</span><span class="toc-label">API y Agentes</span></a></li>
-            <li class="toc-item"><a href="#sec-16"><span class="toc-number">16</span><span class="toc-label">Conclusion</span></a></li>
+            <li class="toc-item"><a href="#sec-5"><span class="toc-number">05</span><span class="toc-label">Modelo de Precios Dinamico (Kink Model)</span></a></li>
+            <li class="toc-item"><a href="#sec-6"><span class="toc-number">06</span><span class="toc-label">Vaults y Yield</span></a></li>
+            <li class="toc-item"><a href="#sec-7"><span class="toc-number">07</span><span class="toc-label">Oracle y Verificacion</span></a></li>
+            <li class="toc-item"><a href="#sec-8"><span class="toc-number">08</span><span class="toc-label">Modelo de Negocio</span></a></li>
+            <li class="toc-item"><a href="#sec-9"><span class="toc-number">09</span><span class="toc-label">Seguridad</span></a></li>
+            <li class="toc-item"><a href="#sec-10"><span class="toc-number">10</span><span class="toc-label">Datos Actuariales</span></a></li>
+            <li class="toc-item"><a href="#sec-11"><span class="toc-number">11</span><span class="toc-label">Riesgos</span></a></li>
+            <li class="toc-item"><a href="#sec-12"><span class="toc-number">12</span><span class="toc-label">Roadmap</span></a></li>
+            <li class="toc-item"><a href="#sec-13"><span class="toc-number">13</span><span class="toc-label">Marco Legal</span></a></li>
+            <li class="toc-item"><a href="#sec-14"><span class="toc-number">14</span><span class="toc-label">Direcciones de Produccion</span></a></li>
+            <li class="toc-item"><a href="#sec-15"><span class="toc-number">15</span><span class="toc-label">Grupos de Correlacion</span></a></li>
+            <li class="toc-item"><a href="#sec-16"><span class="toc-number">16</span><span class="toc-label">API y Agentes</span></a></li>
+            <li class="toc-item"><a href="#sec-17"><span class="toc-number">17</span><span class="toc-label">Conclusion</span></a></li>
         </ul>
     </div>
 
@@ -1234,12 +1235,211 @@ Payout neto al agente: <span class="value">$38,800</span>
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 5: VAULTS Y YIELD -->
+    <!-- SECTION 5: MODELO DE PRECIOS DINAMICO (KINK MODEL) -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-5">5. Vaults y Yield</h2>
+        <h2 id="sec-5">5. Modelo de Precios Dinamico (Kink Model)</h2>
 
-        <h3>5.1 Los Cuatro Vaults</h3>
+        <h3>5.1 Fundamentos</h3>
+
+        <p>El Modelo Kink es un sistema de pricing dinamico inspirado en los modelos de tasa de interes de Aave y Compound, adaptado para seguros parametricos. Su objetivo es doble: garantizar la solvencia permanente de los vaults y crear un mercado autoequilibrado donde la oferta (liquidez de los LPs) y la demanda (compra de polizas por agentes) encuentren su equilibrio naturalmente.</p>
+
+        <p>A diferencia de un precio fijo, el Modelo Kink ajusta el costo de las primas en tiempo real segun la disponibilidad de capital en cada vault. Cuando hay abundante liquidez, las primas son accesibles. Cuando el capital escasea, las primas se encarecen dramaticamente, protegiendo a los LPs y atrayendo nuevo capital.</p>
+
+        <h3>5.2 Formula de Calculo</h3>
+
+        <p>La formula completa, extraida del contrato PremiumMath.sol:</p>
+
+        <div class="code-block">
+Premium = Coverage x P_base x RiskMult x DurationDiscount x M(U) x (Duration / 365)
+        </div>
+
+        <p>Donde M(U) es el multiplicador de utilizacion:</p>
+
+        <div class="code-block">
+Si U &lt;= U_kink (80%):
+    M(U) = 1 + (U / U_kink) x R_slope1
+    M(U) = 1 + (U / 0.80) x 0.5
+
+Si U &gt; U_kink (80%):
+    M(U) = 1 + R_slope1 + ((U - U_kink) / (1 - U_kink)) x R_slope2
+    M(U) = 1 + 0.5 + ((U - 0.80) / 0.20) x 3.0
+
+Si U &gt; 95%: Se rechaza la poliza
+        </div>
+
+        <p>Parametros on-chain (PremiumMath.sol):</p>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Parametro</th><th>Valor</th><th>Variable Solidity</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Punto Kink</td><td>80%</td><td><code>U_KINK = 8000 bps</code></td></tr>
+                    <tr><td>Pendiente pre-kink</td><td>0.5</td><td><code>R_SLOPE1_WAD = 5e17</code></td></tr>
+                    <tr><td>Pendiente post-kink</td><td>3.0</td><td><code>R_SLOPE2_WAD = 3e18</code></td></tr>
+                    <tr><td>Utilizacion maxima</td><td>95%</td><td><code>U_MAX = 9500 bps</code></td></tr>
+                    <tr><td>Precision interna</td><td>1e18</td><td><code>WAD</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Tabla de multiplicadores:</p>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Utilizacion</th><th>M(U)</th><th>Efecto</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>0%</td><td>1.00x</td><td>Prima base</td></tr>
+                    <tr><td>20%</td><td>1.13x</td><td>+13%</td></tr>
+                    <tr><td>40%</td><td>1.25x</td><td>+25%</td></tr>
+                    <tr><td>60%</td><td>1.38x</td><td>+38%</td></tr>
+                    <tr><td>80%</td><td>1.50x</td><td>+50% (punto kink)</td></tr>
+                    <tr><td>85%</td><td>1.88x</td><td>+88% (zona agresiva)</td></tr>
+                    <tr><td>90%</td><td>2.25x</td><td>+125%</td></tr>
+                    <tr><td>95%</td><td>2.63x</td><td>RECHAZADO</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p><strong>Ejemplo numerico:</strong> Un agente compra Black Swan Shield por $50,000 de cobertura, 14 dias, con U=50%:</p>
+        <ul>
+            <li>P_base = 650 bps (6.5% anualizado)</li>
+            <li>RiskMult = 1.0x (ETH base)</li>
+            <li>DurationDiscount = 1.0x</li>
+            <li>M(U) = 1 + (0.50/0.80) x 0.5 = 1.3125x</li>
+            <li>Premium = 50,000 x 0.065 x 1.0 x 1.0 x 1.3125 x (14/365) = <strong>$163.70</strong></li>
+        </ul>
+
+        <p>Mismo escenario con U=85%:</p>
+        <ul>
+            <li>M(U) = 1 + 0.5 + ((0.85-0.80)/0.20) x 3.0 = 2.25x</li>
+            <li>Premium = 50,000 x 0.065 x 1.0 x 1.0 x 2.25 x (14/365) = <strong>$280.82</strong></li>
+        </ul>
+
+        <h3>5.3 Utilizacion del Vault</h3>
+
+        <p>La utilizacion (U) se define como:</p>
+
+        <div class="code-block">
+U = Capital bloqueado en polizas activas / Activos totales del vault
+        </div>
+
+        <ul>
+            <li><strong>"Capital bloqueado"</strong> = USDC reservado 1:1 para cubrir polizas vigentes (<code>allocatedAssets</code> en BaseVault.sol)</li>
+            <li><strong>"Activos totales"</strong> = aToken balance en Aave V3 + USDC libre en el vault (<code>totalAssets()</code> en BaseVault.sol)</li>
+        </ul>
+
+        <p>Cuando un agente compra una poliza, el capital correspondiente se bloquea. Cuando la poliza expira o se ejecuta, el capital se libera.</p>
+
+        <h3>5.4 Mecanismo de Autoequilibrio</h3>
+
+        <p>El Modelo Kink crea un mercado que se autoequilibra mediante la escasez de capital:</p>
+
+        <p><strong>Cuando la demanda de seguros es alta</strong> y los vaults tienen poca liquidez disponible:</p>
+        <ul>
+            <li>Las primas suben, haciendo mas caro asegurar para los agentes</li>
+            <li>Los rendimientos de los LPs aumentan, recompensandolos por el mayor riesgo</li>
+            <li>Nuevos LPs son atraidos por los rendimientos altos, inyectando mas capital</li>
+            <li>La utilizacion baja, las primas se normalizan — el ciclo se repite</li>
+        </ul>
+
+        <p><strong>Cuando hay mucha liquidez y poca demanda:</strong></p>
+        <ul>
+            <li>Las primas son bajas, incentivando a los agentes a comprar cobertura</li>
+            <li>Los rendimientos LP son menores, lo que naturalmente limita el exceso de capital</li>
+        </ul>
+
+        <h3>5.5 Las Tres Zonas de Operacion</h3>
+
+        <p><strong>Zona Verde (0% a 60%):</strong> Capital abundante. Primas accesibles para agentes. Rendimiento LP moderado (Aave base + primas bajas). Condiciones ideales para comprar seguro.</p>
+
+        <p><strong>Zona Amarilla (60% a 80%):</strong> Demanda creciente. Las primas comienzan a subir gradualmente. Equilibrio entre cobertura accesible y rendimientos LP crecientes. El mercado se acerca al punto de inflexion.</p>
+
+        <p><strong>Zona Roja (80% a 95%):</strong> Capital escaso. Las primas se disparan exponencialmente. Alto rendimiento LP atrae nuevos depositantes. Desincentiva nuevas polizas hasta que vuelva la liquidez. El protocolo se protege activamente.</p>
+
+        <p><strong>Zona Bloqueada (&gt;95%):</strong> No se aceptan nuevas polizas. El vault se protege de insolvencia. Solo se pueden ejecutar polizas existentes y depositar nuevo capital.</p>
+
+        <h3>5.6 Garantia de Solvencia Matematica</h3>
+
+        <p>El modelo garantiza solvencia mediante tres mecanismos:</p>
+        <ol>
+            <li><strong>Colateralizacion 1:1:</strong> Cada poliza tiene su respaldo dedicado en USDC</li>
+            <li><strong>Curva exponencial:</strong> Las primas se vuelven prohibitivas antes de alcanzar el limite, desincentivando naturalmente la sobreemision</li>
+            <li><strong>Tope absoluto (95%):</strong> Rechazo automatico de nuevas polizas — es imposible que el vault acepte mas de lo que puede cubrir</li>
+        </ol>
+
+        <h3>5.7 Impacto en Cada Producto</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Producto</th><th>P_base</th><th>Vault</th><th>Duracion</th><th>Trigger</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Black Swan Shield</td><td>650 bps (6.5%)</td><td>Volatile Short/Long</td><td>7-30 dias</td><td>Caida &gt;30%</td></tr>
+                    <tr><td>Depeg Shield</td><td>250 bps (2.5%)</td><td>Stable Short/Long</td><td>14-365 dias</td><td>Stablecoin &lt;$0.95</td></tr>
+                    <tr><td>IL Index Cover</td><td>850 bps (8.5%)</td><td>Volatile Short/Long</td><td>14-90 dias</td><td>IL &gt;2% al vencimiento</td></tr>
+                    <tr><td>Exploit Shield</td><td>400 bps (4.0%)</td><td>Stable Long</td><td>90-365 dias</td><td>Dual trigger (oracle+TEE)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Todos los productos comparten el mismo Modelo Kink (misma curva M(U)), pero difieren en su P_base y factores de riesgo. Esto significa que un producto con P_base alto (como IL Index Cover al 8.5%) sera proporcionalmente mas caro que uno con P_base bajo (como Depeg al 2.5%), pero ambos se encarecen en la misma proporcion cuando la utilizacion sube.</p>
+
+        <h3>5.8 Estructura de Fees del Protocolo</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Evento</th><th>Fee</th><th>Calculo</th><th>Receptor</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Compra de poliza</td><td>3%</td><td>3% de la prima</td><td>Protocolo (97% al vault)</td></tr>
+                    <tr><td>Ejecucion de poliza</td><td>3%</td><td>3% del payout</td><td>Protocolo (97% al agente)</td></tr>
+                    <tr><td>Retiro de vault con ganancia</td><td>3%</td><td>3% de la ganancia</td><td>Protocolo</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p><strong>Ejemplo completo:</strong></p>
+        <ol>
+            <li><strong>Agente compra BSS $50,000, prima = $280.82</strong>
+                <ul>
+                    <li>Fee protocolo: $280.82 x 3% = $8.42</li>
+                    <li>Vault recibe: $280.82 - $8.42 = $272.40</li>
+                </ul>
+            </li>
+            <li><strong>Siniestro se ejecuta, payout = $40,000 (80% coverage)</strong>
+                <ul>
+                    <li>Fee protocolo: $40,000 x 3% = $1,200</li>
+                    <li>Agente recibe: $40,000 - $1,200 = $38,800</li>
+                </ul>
+            </li>
+            <li><strong>LP deposito $10,000, retira $10,500 (ganancia $500)</strong>
+                <ul>
+                    <li>Performance fee: $500 x 3% = $15</li>
+                    <li>LP recibe: $10,500 - $15 = $10,485</li>
+                    <li>Si LP retira $9,800 (perdida): fee = $0</li>
+                </ul>
+            </li>
+        </ol>
+
+        <p>Fee receiver: <code>0x2b4D825417f568231e809E31B9332ED146760337</code></p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 6: VAULTS Y YIELD -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-6">6. Vaults y Yield</h2>
+
+        <h3>6.1 Los Cuatro Vaults</h3>
 
         <p>Lumina opera con cuatro vaults especializados, cada uno con un periodo de cooldown diferente y productos de seguro asignados:</p>
 
@@ -1283,7 +1483,7 @@ Payout neto al agente: <span class="value">$38,800</span>
 
         <p>Los vaults con cooldowns mas largos ofrecen mayor APY estimado porque asumen mayor riesgo (polizas de mayor duracion, eventos menos frecuentes pero de mayor impacto).</p>
 
-        <h3>5.2 Composicion del Yield</h3>
+        <h3>6.2 Composicion del Yield</h3>
 
         <p>El yield que reciben los LPs proviene de dos fuentes:</p>
 
@@ -1292,7 +1492,7 @@ Payout neto al agente: <span class="value">$38,800</span>
             <li><strong>Primas de seguro:</strong> Cuando un agente compra una poliza, el 97% de la prima (despues del 3% de fee del protocolo) se distribuye al vault correspondiente, incrementando el valor de las shares de los LPs.</li>
         </ol>
 
-        <h3>5.3 Shares Soulbound (No Transferibles)</h3>
+        <h3>6.3 Shares Soulbound (No Transferibles)</h3>
 
         <p>Las shares de los vaults de Lumina son <strong>soulbound</strong>: no pueden transferirse, venderse ni utilizarse como colateral en otros protocolos. Esta decision de diseño previene:</p>
 
@@ -1306,7 +1506,7 @@ Payout neto al agente: <span class="value">$38,800</span>
 
         <p>En futuras versiones del protocolo, se evaluara la implementacion de un mercado secundario exclusivo de Lumina donde los LPs podran negociar sus posiciones. Este mercado operaria bajo reglas controladas por el protocolo, manteniendo la estabilidad de los vaults mientras ofrece mayor flexibilidad a los participantes.</p>
 
-        <h3>5.4 Colateral Dedicado por Poliza</h3>
+        <h3>6.4 Colateral Dedicado por Poliza</h3>
 
         <p>Gracias a la colateralizacion 1:1, cada poliza tiene su propio respaldo dedicado en el vault. Incluso en el caso de multiples siniestros simultaneos, cada pago esta garantizado por colateral ya bloqueado. El sistema de prioridad por vault solo aplica para la asignacion de nuevas polizas, no para el pago de siniestros existentes.</p>
 
@@ -1315,18 +1515,18 @@ Payout neto al agente: <span class="value">$38,800</span>
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 6: ORACLE Y VERIFICACION -->
+    <!-- SECTION 7: ORACLE Y VERIFICACION -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-6">6. Oracle y Verificacion</h2>
+        <h2 id="sec-7">7. Oracle y Verificacion</h2>
 
-        <h3>6.1 LuminaOracle</h3>
+        <h3>7.1 LuminaOracle</h3>
 
         <p>El contrato LuminaOracle (<code class="address">0xB52BB8B09Df13dB2D244746688C14A720ceE4C09</code>) es el componente central de verificacion de datos del protocolo. Opera con un esquema multisig N-of-M que puede expandirse segun las necesidades de descentralizacion.</p>
 
         <p>Actualmente opera en modo 1-of-1 (expandible a N-of-M). El oracle verifica los feeds de Chainlink, implementa un chequeo de sequencer de 1 hora para Base L2, y valida la frescura de los datos antes de aceptarlos como input para triggers.</p>
 
-        <h3>6.2 Tabla de Feeds de Chainlink</h3>
+        <h3>7.2 Tabla de Feeds de Chainlink</h3>
 
         <div class="table-wrap no-break">
             <table>
@@ -1370,7 +1570,7 @@ Payout neto al agente: <span class="value">$38,800</span>
 
         <p>Los feeds de assets volatiles (ETH, BTC) tienen un staleness de 20 minutos, mientras que los feeds de stablecoins tienen un staleness de 24 horas, reflejando la menor volatilidad esperada.</p>
 
-        <h3>6.3 Verificacion Multisig: verifyPackedMultisig</h3>
+        <h3>7.3 Verificacion Multisig: verifyPackedMultisig</h3>
 
         <p>El sistema de verificacion de firmas utiliza un esquema de firmas concatenadas ordenadas por address. Cada firmante autorizado produce una firma ECDSA sobre los datos del oracle, y las firmas se concatenan en orden ascendente de address del firmante.</p>
 
@@ -1381,7 +1581,7 @@ Firmas = firma_signer1 ++ firma_signer2 ++ ... ++ firma_signerN
 
         <p>La funcion <code>verifyPackedMultisig</code> deserializa las firmas, verifica que cada una proviene de un firmante autorizado, que estan en orden correcto (para prevenir duplicados), y que se alcanza el umbral N-of-M requerido.</p>
 
-        <h3>6.4 Phala TEE para Exploit Shield</h3>
+        <h3>7.4 Phala TEE para Exploit Shield</h3>
 
         <p>El contrato LuminaPhalaVerifier (<code class="address">0x468b9D2E9043c80467B610bC290b698ae23adb9B</code>) utiliza Phala Network como Trusted Execution Environment para verificar el trigger secundario de Exploit Shield. El TEE ejecuta logica de verificacion en un entorno aislado y tamper-proof, proporcionando una capa de seguridad independiente del oracle principal.</p>
 
@@ -1391,12 +1591,12 @@ Firmas = firma_signer1 ++ firma_signer2 ++ ... ++ firma_signerN
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 7: MODELO DE NEGOCIO -->
+    <!-- SECTION 8: MODELO DE NEGOCIO -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-7">7. Modelo de Negocio</h2>
+        <h2 id="sec-8">8. Modelo de Negocio</h2>
 
-        <h3>7.1 Monetizacion</h3>
+        <h3>8.1 Monetizacion</h3>
 
         <p>Lumina Protocol genera ingresos a traves de un modelo de comision dual, simple y transparente:</p>
 
@@ -1413,7 +1613,7 @@ Firmas = firma_signer1 ++ firma_signer2 ++ ... ++ firma_signerN
             </table>
         </div>
 
-        <h3>7.2 Fee Receiver</h3>
+        <h3>8.2 Fee Receiver</h3>
 
         <p>Todos los fees del protocolo se envian a la direccion:</p>
 
@@ -1423,7 +1623,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
 
         <p>Esta direccion es controlada por el TimelockController con un delay de 48 horas, lo que asegura transparencia y capacidad de auditoria.</p>
 
-        <h3>7.3 Performance Fee en Retiros de Vault</h3>
+        <h3>8.3 Performance Fee en Retiros de Vault</h3>
 
         <p>Se cobra un 3% de performance fee unicamente sobre el rendimiento positivo (ganancia) al retirar fondos de los vaults. El fee se calcula sobre la diferencia entre el monto retirado y el cost basis (deposito original). Si no hay ganancia, no se cobra fee alguno.</p>
 
@@ -1431,7 +1631,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
 
         <p>Esta estructura alinea los incentivos del protocolo con los de los LPs: Lumina solo cobra cuando el LP efectivamente gana dinero.</p>
 
-        <h3>7.4 Escalabilidad del Modelo</h3>
+        <h3>8.4 Escalabilidad del Modelo</h3>
 
         <p>El modelo de negocio de Lumina es inherentemente escalable:</p>
 
@@ -1448,12 +1648,12 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 8: SEGURIDAD -->
+    <!-- SECTION 9: SEGURIDAD -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-8">8. Seguridad</h2>
+        <h2 id="sec-9">9. Seguridad</h2>
 
-        <h3>8.1 Smart Contracts</h3>
+        <h3>9.1 Smart Contracts</h3>
 
         <p>Los 13 contratos del protocolo han sido desarrollados con las mejores practicas de seguridad de Solidity:</p>
 
@@ -1466,7 +1666,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             <li><strong>79 tests:</strong> Suite completa de tests unitarios y de integracion</li>
         </ul>
 
-        <h3>8.2 Governance</h3>
+        <h3>9.2 Governance</h3>
 
         <p>La gobernanza del protocolo implementa un modelo de seguridad en capas:</p>
 
@@ -1475,7 +1675,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             <li><strong>Gnosis Safe 2-of-3</strong> (<code class="address">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</code>): Las transacciones administrativas requieren la firma de al menos 2 de 3 signatarios autorizados.</li>
         </ul>
 
-        <h3>8.3 API y Backend</h3>
+        <h3>9.3 API y Backend</h3>
 
         <p>La API que conecta a los agentes de IA con los contratos implementa:</p>
 
@@ -1486,7 +1686,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             <li><strong>NonceManager:</strong> Gestion de nonces para prevenir replay attacks y garantizar la secuencialidad de transacciones</li>
         </ul>
 
-        <h3>8.4 Oracle</h3>
+        <h3>9.4 Oracle</h3>
 
         <p>La seguridad del oracle se basa en tres capas:</p>
 
@@ -1496,11 +1696,11 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             <li><strong>Sequencer check:</strong> Verificacion de que el sequencer de Base L2 ha estado activo durante al menos 1 hora antes de aceptar datos de oracle</li>
         </ul>
 
-        <h3>8.5 Session Approval</h3>
+        <h3>9.5 Session Approval</h3>
 
         <p>Para compras realizadas a traves de relayers, el protocolo requiere <strong>session approval</strong>: el comprador (buyer) debe firmar un consentimiento explicito que autoriza al relayer a ejecutar la compra en su nombre. Esto previene que un relayer compre polizas no autorizadas con fondos del usuario.</p>
 
-        <h3>8.6 Integracion OWS</h3>
+        <h3>9.6 Integracion OWS</h3>
 
         <p>Lumina integra el estandar OWS (Open Wallet Standard) para facilitar la interaccion segura entre agentes de IA y wallets. Esta integracion permite que los agentes operen con permisos granulares y revocables, sin necesidad de exponer claves privadas.</p>
     </div>
@@ -1508,12 +1708,12 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 9: DATOS ACTUARIALES -->
+    <!-- SECTION 10: DATOS ACTUARIALES -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-9">9. Datos Actuariales</h2>
+        <h2 id="sec-10">10. Datos Actuariales</h2>
 
-        <h3>9.1 Black Swan Shield -- Expected Value para LPs</h3>
+        <h3>10.1 Black Swan Shield -- Expected Value para LPs</h3>
 
         <div class="table-wrap no-break">
             <table>
@@ -1531,7 +1731,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
 
         <p>El margen del 38% refleja la naturaleza de cola gruesa del riesgo BSS: los eventos de cisne negro son poco frecuentes pero severos. En años sin eventos, el margen es significativamente mayor. En años con multiples eventos, el margen puede ser negativo.</p>
 
-        <h3>9.2 Depeg Shield -- Expected Value para LPs</h3>
+        <h3>10.2 Depeg Shield -- Expected Value para LPs</h3>
 
         <div class="table-wrap no-break">
             <table>
@@ -1549,7 +1749,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
 
         <p>Depeg Shield presenta el mayor volumen de primas y un margen saludable del 62%. Los eventos de depeg son raros (1-2 veces por decada para stablecoins mayores) pero cuando ocurren son sistemicos.</p>
 
-        <h3>9.3 IL Index Cover -- Expected Value para LPs</h3>
+        <h3>10.3 IL Index Cover -- Expected Value para LPs</h3>
 
         <div class="table-wrap no-break">
             <table>
@@ -1566,7 +1766,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
 
         <p>El modelo de payout proporcional de IL Index Cover y el deducible del 2% crean un margen favorable. La mayoria de las polizas expiran con IL inferior al 2%, generando primas sin siniestro.</p>
 
-        <h3>9.4 Exploit Shield -- Expected Value para LPs</h3>
+        <h3>10.4 Exploit Shield -- Expected Value para LPs</h3>
 
         <div class="table-wrap no-break">
             <table>
@@ -1583,7 +1783,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
 
         <p>Exploit Shield tiene el menor volumen absoluto pero el mayor margen porcentual. El dual trigger, el waiting period de 14 dias y el cap de $50,000 por wallet limitan significativamente la exposicion.</p>
 
-        <h3>9.5 Peor Escenario Sistemico</h3>
+        <h3>10.5 Peor Escenario Sistemico</h3>
 
         <div class="table-wrap no-break">
             <table>
@@ -1604,10 +1804,10 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 10: RIESGOS -->
+    <!-- SECTION 11: RIESGOS -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-10">10. Riesgos</h2>
+        <h2 id="sec-11">11. Riesgos</h2>
 
         <div class="table-wrap no-break">
             <table>
@@ -1683,10 +1883,10 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 11: ROADMAP -->
+    <!-- SECTION 12: ROADMAP -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-11">11. Roadmap</h2>
+        <h2 id="sec-12">12. Roadmap</h2>
 
         <div class="roadmap-phase no-break">
             <h3>Fase 1 -- Lanzamiento (Actual, Q1 2026)</h3>
@@ -1733,30 +1933,30 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 12: MARCO LEGAL -->
+    <!-- SECTION 13: MARCO LEGAL -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-12">12. Marco Legal</h2>
+        <h2 id="sec-13">13. Marco Legal</h2>
 
-        <h3>12.1 Estructura del Protocolo</h3>
+        <h3>13.1 Estructura del Protocolo</h3>
 
         <p>Lumina Protocol opera como un protocolo descentralizado desplegado en Base L2 (Chain 8453). Los contratos inteligentes son inmutables en su logica core, con capacidad de upgrade a traves de proxies UUPS controlados por un TimelockController con delay de 48 horas y una Gnosis Safe 2-of-3.</p>
 
         <p>El protocolo no custodia fondos de usuarios. Los depositos de LPs se mantienen en Aave V3, y los pagos de siniestros se ejecutan directamente desde los vaults a las wallets de los agentes. El protocolo solo cobra fees como intermediario.</p>
 
-        <h3>12.2 Naturaleza del Producto</h3>
+        <h3>13.2 Naturaleza del Producto</h3>
 
         <p>Lumina ofrece productos de proteccion parametrica basados en triggers matematicos verificables on-chain. Los productos de Lumina no constituyen seguros en el sentido regulatorio tradicional: no requieren licencia de aseguradora, no involucran evaluacion subjetiva de reclamos y no dependen de procesos judiciales para la resolucion de disputas.</p>
 
         <p>Los pagos son automaticos, deterministas y verificables por cualquier tercero que inspeccione la blockchain.</p>
 
-        <h3>12.3 Riesgos Regulatorios</h3>
+        <h3>13.3 Riesgos Regulatorios</h3>
 
         <p>El panorama regulatorio de DeFi continua evolucionando. Existen riesgos de que jurisdicciones futuras clasifiquen los productos parametricos on-chain como productos de seguros regulados, lo que podria requerir licencias, cumplimiento normativo adicional o restricciones geograficas.</p>
 
         <p>El equipo monitorea activamente los desarrollos regulatorios en las principales jurisdicciones (EE.UU., UE, Reino Unido, Singapur) y esta preparado para adaptar la estructura del protocolo segun sea necesario.</p>
 
-        <h3>12.4 Disclaimer</h3>
+        <h3>13.4 Disclaimer</h3>
 
         <div class="callout callout-warning">
             <p><strong>ESTE DOCUMENTO ES EXCLUSIVAMENTE INFORMATIVO Y NO CONSTITUYE ASESORAMIENTO FINANCIERO, LEGAL NI DE INVERSION.</strong> La participacion en Lumina Protocol, ya sea como comprador de cobertura o como proveedor de liquidez, implica riesgos significativos incluyendo pero no limitados a: perdida total del capital depositado, riesgos de smart contract, riesgos de oracle, riesgo regulatorio y riesgo de mercado.</p>
@@ -1770,10 +1970,10 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 13: DIRECCIONES DE PRODUCCION -->
+    <!-- SECTION 14: DIRECCIONES DE PRODUCCION -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-13">13. Direcciones de Produccion</h2>
+        <h2 id="sec-14">14. Direcciones de Produccion</h2>
 
         <p><strong>Red:</strong> Base L2 (Chain 8453) &nbsp;|&nbsp; <strong>Fecha de despliegue:</strong> 29 de marzo de 2026</p>
 
@@ -1891,10 +2091,10 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 14: GRUPOS DE CORRELACION -->
+    <!-- SECTION 15: GRUPOS DE CORRELACION -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-14">14. Grupos de Correlacion</h2>
+        <h2 id="sec-15">15. Grupos de Correlacion</h2>
 
         <p>Los productos de Lumina estan diseñados para cubrir riesgos con baja correlacion entre si, limitando la posibilidad de siniestros simultaneos:</p>
 
@@ -1945,12 +2145,12 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 15: API Y AGENTES -->
+    <!-- SECTION 16: API Y AGENTES -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-15">15. API y Agentes</h2>
+        <h2 id="sec-16">16. API y Agentes</h2>
 
-        <h3>15.1 Descripcion General</h3>
+        <h3>16.1 Descripcion General</h3>
 
         <p>El humano, a traves de su agente de IA, interactua con Lumina Protocol a traves de una API REST que expone las funcionalidades core del protocolo. La API permite cotizar, comprar polizas, consultar estado y verificar triggers sin necesidad de interactuar directamente con los contratos.</p>
 
@@ -1973,7 +2173,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             </table>
         </div>
 
-        <h3>15.2 Referencia SKILL</h3>
+        <h3>16.2 Referencia SKILL</h3>
 
         <p>La documentacion completa de la API y las instrucciones para configurar agentes se encuentran en el archivo SKILL del protocolo: <code>docs/SKILL-lumina-v2.md</code> (Version 2.3, Marzo 2026).</p>
 
@@ -1987,7 +2187,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             <li>Informacion de fees y como planificar coberturas considerando el fee del 3%</li>
         </ul>
 
-        <h3>15.3 Flujo de Setup de un Agente</h3>
+        <h3>16.3 Flujo de Setup de un Agente</h3>
 
         <ol>
             <li>El humano configura su agente con la URL de la API de Lumina y las credenciales de su wallet</li>
@@ -2003,10 +2203,10 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section-divider"></div>
 
     <!-- ============================================================ -->
-    <!-- SECTION 16: CONCLUSION -->
+    <!-- SECTION 17: CONCLUSION -->
     <!-- ============================================================ -->
     <div class="section container page-break">
-        <h2 id="sec-16">16. Conclusion</h2>
+        <h2 id="sec-17">17. Conclusion</h2>
 
         <p>Lumina Protocol representa la primera infraestructura de seguro parametrico diseñada exclusivamente para la economia agentica. Al combinar triggers matematicos verificables, oracles descentralizados, colateralizacion estricta 1:1 y yield generado a traves de Aave V3, el protocolo ofrece una solucion completa para los riesgos criticos que enfrentan los agentes de IA en DeFi.</p>
 
