@@ -219,6 +219,24 @@ PERFORMANCE FEE:
 When withdrawing, 3% is charged on positive yield (profit above your deposit cost basis). No fee if no profit.
 Example: deposit $10,000, withdraw $10,500, profit=$500, fee=3%×$500=$15, net=$10,485.
 
+VAULT DEPOSITS FOR LIQUIDITY PROVIDERS:
+
+Deposits are indefinite — they do not expire. Your USDC earns yield automatically.
+You can deposit more USDC into the same vault at any time (shares accumulate).
+
+WITHDRAWAL PROCESS:
+1. Request withdrawal: specify number of shares to withdraw
+2. Wait for cooldown period (30-365 days depending on vault)
+3. Complete withdrawal: receive USDC + accumulated yield
+4. Performance fee: 3% charged only on positive yield (profit above deposit cost)
+5. If no profit, no fee is charged
+
+PARTIAL WITHDRAWALS: You can withdraw any portion of your shares (not all-or-nothing).
+MULTIPLE REQUESTS: Up to 10 concurrent withdrawal requests allowed (V2 queue).
+NEW DEPOSITS: Depositing more USDC does NOT reset or affect existing withdrawal cooldowns.
+
+IMPORTANT: New deposits while a withdrawal is pending do not cancel the withdrawal request.
+
 ════════════════════════════════════════════════════════════
 8. DECISION GUIDELINES
 ════════════════════════════════════════════════════════════
@@ -413,14 +431,15 @@ Success: {"success":true,"policyId":"1","premium":1635000,"txHash":"0x..."}
 Error: {"error":"Insufficient USDC balance","required":"1635000","balance":"0"}
 
 GET /api/v2/policies?buyer=0x...
-[{"policyId":1,"product":"BSS","coverageAmount":1000000000,"coverageUSD":1000.00,"premiumPaid":1635000,"premiumUSD":1.64,"maxPayout":800000000,"maxPayoutUSD":800.00,"deductibleBps":2000,"status":"active","startedAt":1774027483,"expiresAt":1775237483,"waitingEndsAt":1774027483,"triggerMet":false,"claimable":false,"vault":"volatile_short"}]
+[{"policyId":1,"productId":"0xbc5e...","productName":"Black Swan Shield","shield":"0x54CDc21...","coverageAmount":"100000000","premiumPaid":"299058","maxPayout":"80000000","startTimestamp":1711756800,"waitingEndsAt":1711756800,"expiresAt":1712361600,"status":"ACTIVE"}]
 
 Key fields for your agent loop:
-- status: "active" | "expired" | "claimed" | "claimable"
-- triggerMet: true = the insured event happened (e.g. ETH dropped 30%)
-- claimable: true = you MUST call POST /claim immediately (highest priority)
+- status: "ACTIVE" | "EXPIRED" | "CLAIMED" | "CLAIMABLE"
 - expiresAt: Unix timestamp — use with getRepurchaseWindow() for auto-renewal
 - waitingEndsAt: coverage only active AFTER this timestamp (relevant for DEPEG and EXPLOIT)
+- productName: human-readable product name (e.g. "Black Swan Shield")
+- shield: address of the shield contract for this policy
+- coverageAmount, premiumPaid, maxPayout: raw USDC amounts (6 decimals)
 
 POST /api/v2/claim (requires X-API-Key header)
 Success: {"success":true,"payout":776000000,"txHash":"0x..."}
