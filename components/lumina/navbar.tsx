@@ -202,6 +202,19 @@ export function Navbar({ onRegisterAgent, onDepositLP }: NavbarProps) {
                             <motion.button
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: NAV_ITEMS.length * 0.1 }}
+                                onClick={() => {
+                                    setMobileOpen(false);
+                                    const event = new CustomEvent('open-whitepaper-modal');
+                                    window.dispatchEvent(event);
+                                }}
+                                className="text-lg font-medium text-[#00D4AA] hover:text-[#00FFD0] transition-colors border border-[#00D4AA] rounded-lg px-6 py-2"
+                            >
+                                Whitepaper
+                            </motion.button>
+                            <motion.button
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4 }}
                                 onClick={() => {
                                     setMobileOpen(false)

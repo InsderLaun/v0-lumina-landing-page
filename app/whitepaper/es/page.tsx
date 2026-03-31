@@ -295,7 +295,7 @@ export default function WhitepaperES() {
           {/* Single large chart with dual Y axes */}
           <div className="bg-[#111827] border border-[#1F2937] rounded-2xl p-6 mb-8">
             <ResponsiveContainer width="100%" height={380}>
-              <AreaChart data={kinkModelData} margin={{ top: 20, right: 60, left: 20, bottom: 20 }}>
+              <AreaChart data={kinkModelData} margin={{ top: 10, right: 40, left: 10, bottom: 20 }}>
                 <defs>
                   <linearGradient id="premiumGradES" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#F87171" stopOpacity={0.25}/>
@@ -307,9 +307,9 @@ export default function WhitepaperES() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
-                <XAxis dataKey="u" tick={{ fontSize: 12, fill: "#9CA3AF" }} axisLine={{ stroke: "#1F2937" }} label={{ value: "Utilizacion del Vault (%)", position: "insideBottom", offset: -10, fill: "#9CA3AF", fontSize: 12 }} />
-                <YAxis yAxisId="left" tick={{ fontSize: 12, fill: "#F87171" }} axisLine={false} label={{ value: "Tasa de Prima", angle: -90, position: "insideLeft", fill: "#F87171", fontSize: 12 }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12, fill: "#00D4AA" }} axisLine={false} label={{ value: "Rendimiento LP %", angle: 90, position: "insideRight", fill: "#00D4AA", fontSize: 12 }} />
+                <XAxis dataKey="u" tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={{ stroke: "#1F2937" }} label={{ value: "Utilizacion del Vault (%)", position: "insideBottom", offset: -10, fill: "#9CA3AF", fontSize: 11 }} />
+                <YAxis yAxisId="left" tick={{ fontSize: 11, fill: "#F87171" }} axisLine={false} label={{ value: "Tasa de Prima", angle: -90, position: "insideLeft", fill: "#F87171", fontSize: 11 }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: "#00D4AA" }} axisLine={false} label={{ value: "Rendimiento LP %", angle: 90, position: "insideRight", fill: "#00D4AA", fontSize: 11 }} />
                 <Tooltip contentStyle={{ background: "#1F2937", border: "1px solid #374151", borderRadius: 12, color: "#fff" }} labelFormatter={(l) => `Utilizacion: ${l}%`} />
                 <ReferenceLine x={80} yAxisId="left" stroke="#F59E0B" strokeDasharray="6 4" strokeWidth={2} label={{ value: "Kink (80%)", position: "top", fill: "#F59E0B", fontSize: 12 }} />
                 <ReferenceArea x1={95} x2={100} yAxisId="left" fill="#EF4444" fillOpacity={0.12} label={{ value: "Sin nuevas polizas", position: "insideTop", fill: "#EF4444", fontSize: 10 }} />
@@ -388,9 +388,9 @@ export default function WhitepaperES() {
       <FadeIn className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold mb-8 text-center">Direcciones de Contratos</h2>
-          <div className="space-y-2">
+          <div className="overflow-x-auto space-y-2">
             {contracts.map((c) => (
-              <div key={c.addr} className="bg-[#111827] border border-[#2D3748] rounded-lg px-4 py-3 flex items-center justify-between gap-4">
+              <div key={c.addr} className="bg-[#111827] border border-[#2D3748] rounded-lg px-4 py-3 flex items-center justify-between gap-4 min-w-[480px]">
                 <span className="text-sm text-[#9CA3AF] min-w-[140px]">{c.name}</span>
                 <a href={`https://basescan.org/address/${c.addr}`} target="_blank" rel="noopener noreferrer" className="text-xs text-[#00D4AA] hover:text-[#00FFD0] font-mono truncate transition-colors">
                   {c.addr.slice(0, 10)}...{c.addr.slice(-8)}
