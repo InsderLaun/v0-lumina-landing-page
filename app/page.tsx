@@ -349,30 +349,49 @@ export default function Home() {
       <SecuritySection perspective={perspective} />
 
       {/* ROADMAP */}
-      <section className="py-24 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Roadmap</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-[3px] border-l-[#10B981] transition-all">
-              <p className="text-white font-bold text-lg mb-1">Q2 2026</p>
-              <p className="text-[#00D4AA] font-semibold text-sm uppercase tracking-wider mb-3">Lanzamiento</p>
-              <p className="text-[#9CA3AF] text-sm leading-relaxed">Lumina Protocol sale a produccion. La primera infraestructura de seguros parametricos disenada exclusivamente para agentes de IA en DeFi. Contratos verificados en Base L2, liquidacion en USDC real, rendimiento automatico para proveedores de liquidez. Todo operativo: API, dashboard, documentacion y whitepaper.</p>
+      <section className="py-20 px-4">
+        <h2 className="text-3xl font-bold text-white text-center mb-16">Roadmap</h2>
+
+        {/* Timeline line - desktop only */}
+        <div className="hidden md:block relative w-full max-w-5xl mx-auto mb-12">
+          <div className="absolute top-1/2 left-[12.5%] right-[12.5%] h-[2px] -translate-y-1/2" style={{background: 'linear-gradient(to right, #10B981, #00D4AA, #3B82F6, #8B5CF6)'}} />
+          <div className="relative flex justify-around">
+            <div className="flex flex-col items-center">
+              <div className="w-5 h-5 rounded-full bg-[#10B981] border-4 border-[#0A0A0F] shadow-[0_0_12px_rgba(16,185,129,0.5)] z-10" />
             </div>
-            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-[3px] border-l-[#00D4AA] transition-all">
-              <p className="text-white font-bold text-lg mb-1">Q3 2026</p>
-              <p className="text-[#00D4AA] font-semibold text-sm uppercase tracking-wider mb-3">Crecimiento</p>
-              <p className="text-[#9CA3AF] text-sm leading-relaxed">Integracion con los principales frameworks de agentes de IA. Nuevos productos de cobertura ampliando la proteccion del ecosistema. Automatizacion avanzada de los procesos de resolucion. Auditoria de seguridad por firma independiente de primer nivel. Expansion de canales de distribucion para alcanzar mas agentes y mas protocolos.</p>
+            <div className="flex flex-col items-center">
+              <div className="w-5 h-5 rounded-full bg-[#00D4AA] border-4 border-[#0A0A0F] shadow-[0_0_12px_rgba(0,212,170,0.5)] z-10" />
             </div>
-            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-[3px] border-l-[#3B82F6] transition-all">
-              <p className="text-white font-bold text-lg mb-1">Q4 2026</p>
-              <p className="text-[#00D4AA] font-semibold text-sm uppercase tracking-wider mb-3">Escala</p>
-              <p className="text-[#9CA3AF] text-sm leading-relaxed">Infraestructura de alta disponibilidad preparada para volumen institucional. Presencia en multiples redes. Partnerships estrategicos con protocolos DeFi para ofrecer cobertura nativa integrada. Monitoreo en tiempo real y operaciones 24/7.</p>
+            <div className="flex flex-col items-center">
+              <div className="w-5 h-5 rounded-full bg-[#3B82F6] border-4 border-[#0A0A0F] shadow-[0_0_12px_rgba(59,130,246,0.5)] z-10" />
             </div>
-            <div className="bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 border-l-[3px] border-l-[#8B5CF6] transition-all">
-              <p className="text-white font-bold text-lg mb-1">Q1 2027</p>
-              <p className="text-[#00D4AA] font-semibold text-sm uppercase tracking-wider mb-3">Nueva Economia</p>
-              <p className="text-[#9CA3AF] text-sm leading-relaxed">Lanzamiento del mercado secundario de polizas y posiciones de vault tokenizadas como NFTs. Token nativo con rendimiento real vinculado a los ingresos del protocolo. Transicion hacia gobernanza descentralizada — la comunidad decide el futuro de Lumina.</p>
+            <div className="flex flex-col items-center">
+              <div className="w-5 h-5 rounded-full bg-[#8B5CF6] border-4 border-[#0A0A0F] shadow-[0_0_12px_rgba(139,92,246,0.5)] z-10" />
             </div>
+          </div>
+        </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto px-4">
+          <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#10B981] rounded-xl p-5 hover:border-[#10B98140] transition-all">
+            <p className="text-white font-bold text-lg">Q2 2026</p>
+            <p className="text-[#10B981] text-xs font-semibold uppercase tracking-widest mb-3">Launch</p>
+            <p className="text-[#9CA3AF] text-sm leading-relaxed">Protocol live on Base L2. Real USDC settlement. Four insurance products. Aave V3 yield. Multisig oracle. API-first for AI agents.</p>
+          </div>
+          <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#00D4AA] rounded-xl p-5 hover:border-[#00D4AA40] transition-all">
+            <p className="text-white font-bold text-lg">Q3 2026</p>
+            <p className="text-[#00D4AA] text-xs font-semibold uppercase tracking-widest mb-3">Growth</p>
+            <p className="text-[#9CA3AF] text-sm leading-relaxed">Agent framework integrations. New coverage products. Automated claim resolution. Tier 1 security audit. Expanded distribution channels.</p>
+          </div>
+          <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#3B82F6] rounded-xl p-5 hover:border-[#3B82F640] transition-all">
+            <p className="text-white font-bold text-lg">Q4 2026</p>
+            <p className="text-[#3B82F6] text-xs font-semibold uppercase tracking-widest mb-3">Scale</p>
+            <p className="text-[#9CA3AF] text-sm leading-relaxed">Institutional-grade infrastructure. Multi-chain deployment. Strategic DeFi partnerships. 24/7 monitoring and operations.</p>
+          </div>
+          <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#8B5CF6] rounded-xl p-5 hover:border-[#8B5CF640] transition-all">
+            <p className="text-white font-bold text-lg">Q1 2027</p>
+            <p className="text-[#8B5CF6] text-xs font-semibold uppercase tracking-widest mb-3">New Economy</p>
+            <p className="text-[#9CA3AF] text-sm leading-relaxed">Policy and vault position NFT marketplace. Native token with real protocol yield. Transition to community-driven DAO governance.</p>
           </div>
         </div>
       </section>
