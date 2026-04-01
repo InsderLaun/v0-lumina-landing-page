@@ -19,10 +19,10 @@ const products = [
 ]
 
 const pools = [
-  { name: "Volatile Short", cooldown: "30 days", products: "BSS + IL Index", apy: "12-16%", color: "#00D4AA" },
-  { name: "Volatile Long", cooldown: "90 days", products: "IL Long + BSS overflow", apy: "15-19%", color: "#22d3ee" },
-  { name: "Stable Short", cooldown: "90 days", products: "Depeg Short", apy: "11-15%", color: "#a78bfa" },
-  { name: "Stable Long", cooldown: "365 days", products: "Depeg + Exploit", apy: "18-27%", color: "#818cf8" },
+  { name: "Volatile Short", cooldown: "30 days", products: "BSS + IL Index", apy: "2-29%", color: "#00D4AA" },
+  { name: "Volatile Long", cooldown: "90 days", products: "IL Long + BSS overflow", apy: "2-29%", color: "#22d3ee" },
+  { name: "Stable Short", cooldown: "90 days", products: "Depeg Short", apy: "2-16%", color: "#a78bfa" },
+  { name: "Stable Long", cooldown: "365 days", products: "Depeg + Exploit", apy: "2-16%", color: "#818cf8" },
 ]
 
 const metrics = [
