@@ -615,7 +615,22 @@ export default function Home() {
                     <button
                       onClick={() => {
                         const userWallet = walletAddress || '[PASTE YOUR WALLET ADDRESS HERE]'
-                        const prompt = `I need to connect my AI agent to Lumina Protocol for DeFi insurance on Base L2.
+                        const prompt = `BEFORE WE START — ONE MANUAL STEP REQUIRED
+
+This setup is 95% automatic, but there is ONE step you will need to do manually in your browser: approving USDC spending in MetaMask.
+
+When I tell you, you will need to:
+1. Open lumina-org.com/tutorial.html in your browser
+2. Connect your wallet (MetaMask, on Base network)
+3. Approve USDC spending for the Lumina CoverRouter contract
+
+This is a security feature — your private key NEVER leaves MetaMask. I cannot and should not access your private key. The approval is like setting a spending limit on a debit card.
+
+I will tell you exactly when to do this. Everything else I handle automatically.
+
+---
+
+I need to connect my AI agent to Lumina Protocol for DeFi insurance on Base L2.
 
 BEFORE STARTING — I need to provide my information:
 - Wallet address: ${userWallet}
