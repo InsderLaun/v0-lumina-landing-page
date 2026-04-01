@@ -301,7 +301,7 @@ export default function Home() {
           {/* CTA */}
           <div className="text-center mt-8">
             <a
-              href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+              href="/LUMINA-SKILL.txt"
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
@@ -429,7 +429,7 @@ export default function Home() {
             <div>
               <h5 className="text-sm font-semibold text-white/60 uppercase mb-3">Resources</h5>
               <div className="space-y-2">
-                <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Skill File</a>
+                <a href="/LUMINA-SKILL.txt" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Skill File</a>
                 <a href="https://github.com/org-lumina/LUMINA-PROTOCOL" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Smart Contracts</a>
                 <a href="https://github.com/org-lumina/LUMINA-PROTOCOL" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Documentation</a>
                 <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="block text-sm text-white/40 hover:text-white transition-colors">Base L2</a>
@@ -466,7 +466,7 @@ export default function Home() {
           </div>
           <div className="border-t border-white/5 pt-8">
             <p className="text-xs text-white/20 text-center">
-              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 72 Tests Passing · 0C/0H/0M · Yield by Aave V3
+              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 79 Tests Passing · 0C/0H/0M · Yield by Aave V3
             </p>
           </div>
         </div>
@@ -917,7 +917,7 @@ function ProductsSection() {
             {/* CTA */}
             <div className="text-center pt-2">
               <a
-                href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+                href="/LUMINA-SKILL.txt"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition-all"
@@ -1301,7 +1301,7 @@ function PremiumCalculatorSection() {
               {/* CTA */}
               <div className="text-center pt-2">
                 <a
-                  href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+                  href="/LUMINA-SKILL.txt"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition-all"
@@ -1562,7 +1562,7 @@ function VaultsSection() {
         {/* CTA */}
         <div className="text-center">
           <a
-            href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+            href="/LUMINA-SKILL.txt"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 transition-all"
@@ -1812,7 +1812,7 @@ function YieldCalculatorSection() {
               {/* CTA */}
               <div className="text-center pt-2">
                 <a
-                  href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+                  href="/LUMINA-SKILL.txt"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 transition-all"
@@ -2100,7 +2100,7 @@ function AgentSkillsSection({ perspective, onStartSetup }: { perspective: Perspe
   const checkColor = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
 
   const skillUrl = "lumina-org.com/skill-v2.md"
-  const githubUrl = "github.com/org-lumina/LUMINA-PROTOCOL/docs/SKILL-lumina-v2.md"
+  const githubUrl = "lumina-org.com/LUMINA-SKILL.txt"
 
   const hl = (text: string) => {
     const cls = accent === "cyan"
@@ -2189,7 +2189,7 @@ function AgentSkillsSection({ perspective, onStartSetup }: { perspective: Perspe
               Getting Started →
             </button>
             <a
-              href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md"
+              href="/LUMINA-SKILL.txt"
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
@@ -2617,7 +2617,7 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
           </div>
           <div className="flex gap-4">
             <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/src/oracles/LuminaOracle.sol" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">LuminaOracle.sol →</a>
-            <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/test/MultisigOracle.t.sol" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">72 Tests Passing →</a>
+            <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/test/MultisigOracle.t.sol" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">79 Tests Passing →</a>
           </div>
         </div>
 
@@ -2805,7 +2805,7 @@ function Navbar({ perspective, onConnectAgent, walletAddress, setWalletAddress }
     ...(perspective === "earn" ? [{ label: "Vaults", href: "#vaults" }] : []),
     { label: "Pricing", href: "#kink-model" },
     { label: "Calculator", href: perspective === "earn" ? "#yield-calculator" : "#calculator" },
-    { label: "Skill", href: "https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/SKILL-lumina-v2.md", external: true },
+    { label: "Skill", href: "/LUMINA-SKILL.txt", external: true },
     { label: "Security", href: "#security" },
     { label: "FAQ", href: "#faq" },
     { label: "Docs", href: "https://github.com/org-lumina/LUMINA-PROTOCOL", external: true },
