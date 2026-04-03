@@ -239,6 +239,15 @@ Only a REAL exploit triggers BOTH conditions simultaneously.
 | Annual cost (Tier 1) | ~3% | ~2.6% |
 | Advantage | Speed, automation | Covers more scenarios |
 
+## Correlation Group Capacity Limits
+
+BSS and IL Protection share a combined allocation cap of 70% per vault.
+This means if BSS is using 50% of the vault, IL can only use up to 20%.
+If the combined cap is reached, new purchases for either product will be rejected.
+This protects LPs from correlated losses during market crashes (an ETH crash triggers both BSS and IL simultaneously).
+
+Depeg and Exploit are NOT correlated with BSS/IL and have independent capacity limits.
+
 ---
 
 # SECTION 3: YIELD — HOW LPs EARN MONEY

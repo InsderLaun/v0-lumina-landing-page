@@ -30,6 +30,12 @@ const TRUST_CARDS = [
         description: "Agent signs keccak256 hash. Immutable. Verifiable forever.",
         link: `${BASESCAN_URL}/${CONTRACTS.MutualLumina}`,
     },
+    {
+        icon: Shield,
+        title: "Correlation Groups",
+        description: "BSS+IL capped at 70% per vault. Limits correlated loss exposure.",
+        link: `${BASESCAN_URL}/${CONTRACTS.MutualLumina}`,
+    },
 ]
 
 export function SecuritySection() {
