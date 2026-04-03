@@ -56,7 +56,7 @@ Exploit: $40,000 / (0.90 × 0.97) = $45,830 coverage
 | Duration | 7 to 30 days (you choose, priced by the second) |
 | Waiting Period | None — coverage starts immediately |
 | Minimum Coverage | $100 |
-| Base Rate | 22% annualized |
+| Base Rate | 6.5% annualized (650 bps) |
 | Protocol Fee | 3% on premium + 3% on payout. Net payout = 77.6% of coverage |
 
 **Example:**
@@ -65,11 +65,11 @@ You buy: $50,000 coverage on ETH for 14 days
 ETH price at purchase: $2,000
 Trigger price: $2,000 × 0.70 = $1,400
 
-Premium: $50,000 × 0.22 × 1.25 (utilization multiplier) × (14/365) = $527
+Premium: $50,000 × 0.065 × 1.25 (utilization multiplier) × (14/365) = $156
 
-Scenario A: ETH stays above $1,400 → policy expires, you lose $527
+Scenario A: ETH stays above $1,400 → policy expires, you lose $156
 Scenario B: ETH crashes to $1,350 → you receive $40,000 (80% of $50K)
-Return on premium: $40,000 / $527 = 75x
+Return on premium: $40,000 / $156 = 256x
 ```
 
 **Pricing table ($50,000 coverage, utilization 40%):**
@@ -96,7 +96,7 @@ Return on premium: $40,000 / $527 = 75x
 | Payout | Depends on stablecoin (see below) |
 | Duration | 14 to 365 days |
 | Waiting Period | 24 hours (protection starts after 24h) |
-| Base Rate | 24% annualized |
+| Base Rate | 2.5% annualized (250 bps) |
 | Protocol Fee (USDT) | 3% on premium + 3% on payout. Net payout USDT = 82.45% of coverage |
 | Protocol Fee (DAI) | 3% on premium + 3% on payout. Net payout DAI = 85.36% of coverage |
 
@@ -122,7 +122,7 @@ Note: USDC is excluded — Lumina settles in USDC, so insuring it would be circu
 **Example:**
 ```
 You buy: $100,000 USDT coverage for 90 days
-Premium: $100,000 × 0.24 × 1.4 × 1.0 × 1.25 (util) × (90/365) = $5,178
+Premium: $100,000 × 0.025 × 1.4 × 1.0 × 1.25 (util) × (90/365) = $1,078
 
 If USDT depegs to $0.93 (TWAP 30 min confirms):
 → Gross Payout = $100,000 × 0.85 = $85,000 (15% deductible)
@@ -150,7 +150,7 @@ If USDT depegs to $0.93 (TWAP 30 min confirms):
 | Resolution | European-style: ONLY within 48h window after expiry |
 | Duration | 14 to 90 days |
 | Waiting Period | None (trigger is relative to purchase price) |
-| Base Rate | 20% annualized |
+| Base Rate | 8.5% annualized (850 bps) |
 | Asset | ETH/USD |
 | Protocol Fee | 3% on premium + 3% on payout. Net payout = IL_net × 87.3% of coverage |
 
@@ -187,7 +187,7 @@ Example:
   LP position: $100,000 in ETH/USDC pool
   Pool APY: 3% monthly = $3,000/month in fees
   Max premium budget: $1,500 (50% of fees)
-  Optimal coverage: $1,500 / (0.20 × 1.25 × 30/365) = ~$73,000
+  Optimal coverage: $1,500 / (0.085 × 1.25 × 30/365) = ~$171,000
   You cover 73% of your position for $1,500/month
 ```
 
@@ -207,7 +207,7 @@ Example:
 | Duration | 90 to 365 days |
 | Waiting Period | 14 days (longest — anti-insider) |
 | Max Coverage | $50,000 per wallet |
-| Base Rate | 3% annualized (Tier 1) |
+| Base Rate | 4% annualized (400 bps, Tier 1) |
 | Protocol Fee | 3% on premium + 3% on payout. Net payout = 87.3% of coverage |
 
 **Why dual trigger?**
@@ -283,12 +283,12 @@ The Kink Model (dynamic pricing) creates a self-balancing market:
 ```
 Vault TVL: $200K, Allocated: $120K → Utilization: 60%
 Kink multiplier at 60%: 1.38x
-Premium for a $50K BSS policy (14d): $50K × 0.22 × 1.38 × (14/365) = $582
+Premium for a $50K BSS policy (14d): $50K × 0.065 × 1.38 × (14/365) = $172
 
 Now an agent buys another $50K policy:
 New utilization: ($120K + $50K) / $200K = 85%
 Kink multiplier at 85%: 1.88x
-Next premium for same policy: $50K × 0.22 × 1.88 × (14/365) = $793
+Next premium for same policy: $50K × 0.065 × 1.88 × (14/365) = $234
 
 The premium increased 36% because utilization went up.
 LPs in this vault are earning MORE per dollar deployed.
@@ -1263,25 +1263,26 @@ Settlement token: USDC (Circle) on Base.
 | Contract | Address | Notes |
 |----------|---------|-------|
 | USDC Token | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` | Circle USDC on Base (6 decimals) |
-| CoverRouter | `0x8407afBa100812bFb5f9f188b44379E4268eff94` | Main entry point for all operations |
-| PolicyManager | `0x615e9c32c70350192fCa9BAC06Ba8ebA9dC4fEF4` | Vault selection + allocation |
-| LuminaOracle | `0x2f9d3DA66FCB84f47851636d9e0921373ede2176` | Chainlink price feeds + signature verification |
-| LuminaPhalaVerifier | `0xa2d461f4A7eC7089A7e414986d9d9b43514a82EC` | Phala TEE attestation (Exploit Shield only) |
-| VolatileShortVault | `0x2D7D735f71638730cbe9A143227A00Fa64E94E88` | 37-day cooldown |
-| VolatileLongVault | `0xDf30548d46e77015A4dDA82D3c263e81a60B075c` | 97-day cooldown |
-| StableShortVault | `0x8F6e6a4Ee6aeD70757c16382eA7156AD4b33c078` | 97-day cooldown |
-| StableLongVault | `0x3e8dF8746c42Aa4B0CDb089174aBbBaf2C3aD46c` | 372-day cooldown |
-| BlackSwanShield | `0xC01ED8eF52506B29545f08BBf9aAe5Fe59b15CF7` | BSS product |
-| DepegShield | `0xCdA417909d43F252f63034346db9121441BfE70F` | Depeg product |
-| ILIndexCover | `0x73fB5CB9Aa0BeBAf74a3a4b6Cfb09d3Fd66C9FB6` | IL product |
-| ExploitShield | `0x05170F9Ca56026001064F5242c6F9F7f181c6baA` | Exploit product |
+| CoverRouter | `0xd5f8678A0F2149B6342F9014CCe6d743234Ca025` | Main entry point for all operations |
+| PolicyManager | `0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a` | Vault selection + allocation |
+| LuminaOracle | `0xB52BB8B09Df13dB2D244746688C14A720ceE4C09` | Chainlink price feeds + signature verification |
+| TimelockController | `0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a` | Governance timelock |
+| Gnosis Safe | `0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD` | 2-of-3 multisig |
+| VolatileShortVault | `0xbd44547581b92805aAECc40EB2809352b9b2880d` | 37-day cooldown |
+| VolatileLongVault | `0xFee5d6DAdA0A41407e9EA83D4F357DA6214Ff904` | 97-day cooldown |
+| StableShortVault | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC` | 97-day cooldown |
+| StableLongVault | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c` | 372-day cooldown |
+| BlackSwanShield | `0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e` | BSS product |
+| DepegShield | `0x71DBcE71AA36370f7357F6D8E0c8ba96343C8306` | Depeg product |
+| ILIndexCover | `0x4196f2Cc92C5c4141a34f9a28f23236446E3C4E0` | IL product |
+| ExploitShield | `0xaE29Fc3e5f0DedC968cE2dA2A2F3ccB98397b38C` | Exploit product |
 
 **Chainlink Price Feeds (Base L2):**
 
 | Asset | Feed Address |
 |-------|-------------|
 | ETH/USD | `0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70` |
-| BTC/USD | `0x64c911996D3c6aC71f9b455B1E8E7266BcbD848F` |
+| BTC/USD | `0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E` |
 | USDC/USD | `0x7e860098F58bBFC8648a4311b374B1D669a2bc6B` |
 | USDT/USD | `0xf19d560eB8d2ADf07BD6D13ed03e1D11215721F9` |
 | DAI/USD | `0x591e79239a7d679378eC8c847e5038150364C78F` |
