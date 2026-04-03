@@ -5,10 +5,10 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, AreaCh
 import Link from "next/link"
 
 const vaultData = [
-  { name: "Volatile Short", cooldown: 30, color: "#00D4AA" },
-  { name: "Volatile Long", cooldown: 90, color: "#22d3ee" },
-  { name: "Stable Short", cooldown: 90, color: "#a78bfa" },
-  { name: "Stable Long", cooldown: 365, color: "#818cf8" },
+  { name: "Volatile Short", cooldown: 37, color: "#00D4AA" },
+  { name: "Volatile Long", cooldown: 97, color: "#22d3ee" },
+  { name: "Stable Short", cooldown: 97, color: "#a78bfa" },
+  { name: "Stable Long", cooldown: 372, color: "#818cf8" },
 ]
 
 const products = [
@@ -19,10 +19,10 @@ const products = [
 ]
 
 const pools = [
-  { name: "Volatile Short", cooldown: "30 days", products: "BSS + IL Index", apy: "2-29%", color: "#00D4AA" },
-  { name: "Volatile Long", cooldown: "90 days", products: "IL Long + BSS overflow", apy: "2-29%", color: "#22d3ee" },
-  { name: "Stable Short", cooldown: "90 days", products: "Depeg Short", apy: "2-16%", color: "#a78bfa" },
-  { name: "Stable Long", cooldown: "365 days", products: "Depeg + Exploit", apy: "2-16%", color: "#818cf8" },
+  { name: "Volatile Short", cooldown: "37 days", products: "BSS + IL Index", apy: "2-29%", color: "#00D4AA" },
+  { name: "Volatile Long", cooldown: "97 days", products: "IL Long + BSS overflow", apy: "2-29%", color: "#22d3ee" },
+  { name: "Stable Short", cooldown: "97 days", products: "Depeg Short", apy: "2-16%", color: "#a78bfa" },
+  { name: "Stable Long", cooldown: "372 days", products: "Depeg + Exploit", apy: "2-16%", color: "#818cf8" },
 ]
 
 const metrics = [
@@ -249,7 +249,7 @@ export default function WhitepaperEN() {
         <div className="max-w-4xl mx-auto mt-6 bg-[#1F2937] border border-[#1F2937] hover:border-[#00D4AA40] rounded-xl p-6 transition-all">
           <h3 className="text-lg font-semibold text-[#22d3ee] mb-3">What is the Cooldown?</h3>
           <p className="text-[#9CA3AF] text-sm leading-relaxed mb-4">
-            The cooldown is a mandatory waiting period between requesting a withdrawal and completing it. When you request a withdrawal, your shares are locked for the cooldown duration (30 to 365 days depending on the vault). During this time, your capital continues earning yield. Once the cooldown expires, you can complete the withdrawal and receive your USDC plus accumulated yield.
+            The cooldown is a mandatory waiting period between requesting a withdrawal and completing it. When you request a withdrawal, your shares are locked for the cooldown duration (37 to 372 days depending on the vault). During this time, your capital continues earning yield. Once the cooldown expires, you can complete the withdrawal and receive your USDC plus accumulated yield.
           </p>
           <h3 className="text-lg font-semibold text-[#22d3ee] mb-3">How to withdraw:</h3>
           <ol className="text-[#9CA3AF] text-sm space-y-2 list-decimal list-inside">
@@ -282,7 +282,7 @@ export default function WhitepaperEN() {
           <div>
             <h3 className="text-lg font-semibold text-[#22d3ee] mb-4 text-center">Vault Investment Flow (LP)</h3>
             <div className="flex flex-wrap items-center justify-center gap-2">
-              {["Deposit USDC", "Vault", "Aave V3 Yield", "Premiums In", "Request Withdrawal", "Cooldown (30-365d)", "Withdraw + Yield"].map((step, i, arr) => (
+              {["Deposit USDC", "Vault", "Aave V3 Yield", "Premiums In", "Request Withdrawal", "Cooldown (37-372d)", "Withdraw + Yield"].map((step, i, arr) => (
                 <div key={step} className="flex items-center gap-2">
                   <div className="bg-[#1F2937] border border-[#22d3ee40] rounded-lg px-3 py-2 text-[#22d3ee] text-xs font-medium whitespace-nowrap">{step}</div>
                   {i < arr.length - 1 && <span className="text-[#00D4AA] font-bold">{"\u2192"}</span>}

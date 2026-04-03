@@ -1340,7 +1340,7 @@ const VAULTS = [
   {
     name: "Volatile Short",
     symbol: "lvsUSDC",
-    cooldown: "30 days",
+    cooldown: "37 days",
     apy: "2-29%",
     base: "Aave V3",
     premiums: "2-29%",
@@ -1351,11 +1351,11 @@ const VAULTS = [
     technicalDetails: [
       ["Contract", "VolatileShortVault.sol"],
       ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
-      ["Cooldown", "30 days exit notice (NOT a lock)"],
+      ["Cooldown", "37 days exit notice (NOT a lock)"],
       ["Max Allocation", "20% of vault TVL per product"],
       ["Waterfall", "First choice for BSS 7-30d and IL 14-30d"],
       ["During Cooldown", "Capital still earns from existing policies, no new policies assigned"],
-      ["Withdrawal", "requestWithdrawal() → wait 30d → completeWithdrawal()"],
+      ["Withdrawal", "requestWithdrawal() → wait 37d → completeWithdrawal()"],
       ["Cancel", "cancelWithdrawal() returns to full availability"],
       ["USDC Yield", "Dynamic rate from Aave V3 lending on Base, independent of Lumina"],
       ["Premium Yield", "Dynamic, depends on # of policies and Kink multiplier"],
@@ -1365,7 +1365,7 @@ const VAULTS = [
   {
     name: "Volatile Long",
     symbol: "lvlUSDC",
-    cooldown: "90 days",
+    cooldown: "97 days",
     apy: "2-29%",
     base: "Aave V3",
     premiums: "2-29%",
@@ -1376,18 +1376,18 @@ const VAULTS = [
     technicalDetails: [
       ["Contract", "VolatileLongVault.sol"],
       ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
-      ["Cooldown", "90 days exit notice"],
+      ["Cooldown", "97 days exit notice"],
       ["Waterfall", "Receives overflow when VolatileShort is full (>95% utilized)"],
       ["Backs", "IL 60-90d policies and BSS when Short vault is >95% utilized"],
       ["Higher Yield", "Longer commitment = longer policies = more premium per dollar"],
-      ["Withdrawal", "requestWithdrawal() → wait 90d → completeWithdrawal()"],
+      ["Withdrawal", "requestWithdrawal() → wait 97d → completeWithdrawal()"],
       ["Worst Case", "Same risk type as VolatileShort but longer lock = higher yield compensation"],
     ],
   },
   {
     name: "Stable Short",
     symbol: "lssUSDC",
-    cooldown: "90 days",
+    cooldown: "97 days",
     apy: "2-16%",
     base: "Aave V3",
     premiums: "2-16%",
@@ -1398,18 +1398,18 @@ const VAULTS = [
     technicalDetails: [
       ["Contract", "StableShortVault.sol"],
       ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
-      ["Cooldown", "90 days exit notice"],
-      ["Restriction", "Cannot back Exploit Shield (90d policy + 14d waiting = 104d > 90d cooldown)"],
+      ["Cooldown", "97 days exit notice"],
+      ["Restriction", "Cannot back Exploit Shield (90d policy + 14d waiting = 104d > 97d cooldown)"],
       ["Only Backs", "Depeg Shield 14-90d"],
       ["Claim Risk", "Lower — stablecoin depegs are rare (2-3 per decade)"],
-      ["Withdrawal", "requestWithdrawal() → wait 90d → completeWithdrawal()"],
+      ["Withdrawal", "requestWithdrawal() → wait 97d → completeWithdrawal()"],
       ["Worst Case", "Major depeg like USDC March 2023 (went to $0.87) = ~20% TVL loss"],
     ],
   },
   {
     name: "Stable Long",
     symbol: "lslUSDC",
-    cooldown: "365 days",
+    cooldown: "372 days",
     apy: "2-16%",
     base: "Aave V3",
     premiums: "2-16%",
@@ -1420,12 +1420,12 @@ const VAULTS = [
     technicalDetails: [
       ["Contract", "StableLongVault.sol"],
       ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
-      ["Cooldown", "365 days exit notice — longest commitment, highest yield"],
+      ["Cooldown", "372 days exit notice — longest commitment, highest yield"],
       ["Monopoly", "ONLY vault that can back annual Depeg policies and Exploit Shield"],
       ["Advantage", "Monopoly on long-term premiums → highest APY"],
       ["Target", "Institutional LPs, DAO treasuries, family offices"],
       ["Exploit Risk", "Extremely rare: dual trigger + 14d waiting + $50K cap"],
-      ["Withdrawal", "requestWithdrawal() → wait 365d → completeWithdrawal()"],
+      ["Withdrawal", "requestWithdrawal() → wait 372d → completeWithdrawal()"],
       ["Worst Case", "Simultaneous depeg + exploit = ~25% TVL loss (once per decade)"],
     ],
   },
@@ -1563,7 +1563,7 @@ function VaultsSection() {
               Cooldown is <span className="text-white font-medium">NOT a lock period</span>. It&apos;s an <span className="text-white font-medium">EXIT NOTICE</span>.
             </p>
             <p>
-              Think of it like renting an apartment: you move in (deposit) and live there as long as you want (earn yield). One day you decide to move out (request withdrawal). You give 30 days notice (cooldown). After 30 days, you leave with your deposit + everything you earned.
+              Think of it like renting an apartment: you move in (deposit) and live there as long as you want (earn yield). One day you decide to move out (request withdrawal). You give 37 days notice (cooldown). After 37 days, you leave with your deposit + everything you earned.
             </p>
             <p>
               Why? Because your money backs insurance policies. If everyone could withdraw instantly during a crash, the policies would have no collateral.
@@ -1605,10 +1605,10 @@ const YIELD_VAULTS: Record<YieldVaultKey, {
   risk: string
   worstCase: number
 }> = {
-  "volatile-short": { label: "Volatile Short", cooldown: 30, productId: "LIQSHIELD-001", products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
-  "volatile-long": { label: "Volatile Long", cooldown: 90, productId: "ILPROT-001", products: "IL Index + BSS overflow", risk: "Higher", worstCase: 0.28 },
-  "stable-short": { label: "Stable Short", cooldown: 90, productId: "DEPEG-USDC-001", products: "Depeg + Exploit Shield", risk: "Low", worstCase: 0.20 },
-  "stable-long": { label: "Stable Long", cooldown: 365, productId: "DEPEG-USDT-001", products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
+  "volatile-short": { label: "Volatile Short", cooldown: 37, productId: "LIQSHIELD-001", products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
+  "volatile-long": { label: "Volatile Long", cooldown: 97, productId: "ILPROT-001", products: "IL Index + BSS overflow", risk: "Higher", worstCase: 0.28 },
+  "stable-short": { label: "Stable Short", cooldown: 97, productId: "DEPEG-USDC-001", products: "Depeg + Exploit Shield", risk: "Low", worstCase: 0.20 },
+  "stable-long": { label: "Stable Long", cooldown: 372, productId: "DEPEG-USDT-001", products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
 }
 
 function YieldCalculatorSection() {
@@ -2696,11 +2696,11 @@ const FAQ_PROTECT = [
 ]
 
 const FAQ_EARN = [
-  { q: "How do I deposit in a vault?", a: "Vault deposits are on-chain transactions (not through the API). You need USDC on Base L2, then approve and call the deposit function on the vault contract. Minimum deposit is $100. You'll receive non-transferable (soulbound) shares. Four vaults available: VolatileShort (30-day cooldown, highest risk/reward), VolatileLong (90-day), StableShort (90-day), and StableLong (365-day, most conservative)." },
+  { q: "How do I deposit in a vault?", a: "Vault deposits are on-chain transactions (not through the API). You need USDC on Base L2, then approve and call the deposit function on the vault contract. Minimum deposit is $100. You'll receive non-transferable (soulbound) shares. Four vaults available: VolatileShort (37-day cooldown, highest risk/reward), VolatileLong (97-day), StableShort (97-day), and StableLong (372-day, most conservative)." },
   { q: "How much can I earn as an LP?", a: "Returns come from insurance premiums plus Aave V3 lending yield. In normal conditions (40% utilization, no claims): expect 5-8% APY. In high demand (70%+): 10-20% APY. However, if many policies trigger simultaneously, returns go negative. In extreme scenarios, LPs can lose 30-50% of their deposit. A 3% performance fee is charged only on positive returns when you withdraw." },
   { q: "What's the worst that can happen as an LP?", a: "In extreme events (market crash triggering multiple policies simultaneously), a vault could lose 30-50% of TVL from insurance payouts. If Aave V3 were exploited, additional losses are possible since vault idle capital is deposited there. The protocol guarantees it can always pay claims, but LP capital absorbs the losses. VolatileShort has the highest risk. Only deposit what you can afford to lose." },
   { q: "Is the APY guaranteed?", a: "No. The base yield comes from Aave V3 lending on Base and fluctuates with market demand. The premium yield depends on insurance policy volume and vault utilization. Both fluctuate. The numbers shown are estimates based on current conditions." },
-  { q: "What is a cooldown? Is my money locked?", a: "No lock. Cooldown is an EXIT NOTICE. You deposit indefinitely and earn yield. When you want to leave, you give notice (30-365 days depending on vault). During cooldown, you KEEP earning. After cooldown, you withdraw everything." },
+  { q: "What is a cooldown? Is my money locked?", a: "No lock. Cooldown is an EXIT NOTICE. You deposit indefinitely and earn yield. When you want to leave, you give notice (37-372 days depending on vault). During cooldown, you KEEP earning. After cooldown, you withdraw everything." },
   { q: "Why are shares soulbound?", a: "To prevent cooldown bypass. If you could sell shares on a DEX, someone could buy 'mature' shares about to finish cooldown, defeating the purpose of locking capital to back policies." },
   { q: "Who controls the protocol?", a: "No single person. The protocol is governed by a Gnosis Safe multisig requiring 2 of 3 signatures, plus a TimelockController with a 48-hour mandatory delay on all changes. Deployer, oracle signer, and relayer use separate keys. In the future, governance will transition to a community-driven DAO." },
   { q: "What happens if the Lumina team disappears?", a: "The smart contracts continue operating on Base L2 regardless. Active policies still trigger and pay out automatically. LPs can always withdraw after cooldown. All code is open-source and verified on BaseScan. The protocol is designed to be self-sustaining." },

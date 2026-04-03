@@ -30,7 +30,7 @@ const VAULT_CONFIG = [
   {
     name: "Volatile Short",
     address: CONTRACTS.vaults.VolatileShort,
-    cooldown: "30 days",
+    cooldown: "37 days",
     riskType: "VOLATILE" as const,
     products: "BSS + IL Index",
     color: "purple",
@@ -40,7 +40,7 @@ const VAULT_CONFIG = [
   {
     name: "Volatile Long",
     address: CONTRACTS.vaults.VolatileLong,
-    cooldown: "90 days",
+    cooldown: "97 days",
     riskType: "VOLATILE" as const,
     products: "BSS + IL Index",
     color: "purple",
@@ -50,7 +50,7 @@ const VAULT_CONFIG = [
   {
     name: "Stable Short",
     address: CONTRACTS.vaults.StableShort,
-    cooldown: "90 days",
+    cooldown: "97 days",
     riskType: "STABLE" as const,
     products: "Depeg + Exploit",
     color: "cyan",
@@ -60,7 +60,7 @@ const VAULT_CONFIG = [
   {
     name: "Stable Long",
     address: CONTRACTS.vaults.StableLong,
-    cooldown: "365 days",
+    cooldown: "372 days",
     riskType: "STABLE" as const,
     products: "Depeg + Exploit",
     color: "cyan",
