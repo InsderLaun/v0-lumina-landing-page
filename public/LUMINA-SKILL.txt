@@ -1276,6 +1276,7 @@ Settlement token: USDC (Circle) on Base.
 | DepegShield | `0x71DBcE71AA36370f7357F6D8E0c8ba96343C8306` | Depeg product |
 | ILIndexCover | `0x4196f2Cc92C5c4141a34f9a28f23236446E3C4E0` | IL product |
 | ExploitShield | `0xaE29Fc3e5f0DedC968cE2dA2A2F3ccB98397b38C` | Exploit product |
+| EmergencyPause | `0x0b977e492650cc03dfaef7d3dbfb3ee87dceade5` | Global circuit breaker |
 
 **Chainlink Price Feeds (Base L2):**
 

@@ -61,6 +61,9 @@ export const CONTRACTS = {
     ILIndex: "0x4196f2Cc92C5c4141a34f9a28f23236446E3C4E0" as `0x${string}`,
     Exploit: "0xaE29Fc3e5f0DedC968cE2dA2A2F3ccB98397b38C" as `0x${string}`,
   },
+  EmergencyPause: "0x0b977e492650cc03dfaef7d3dbfb3ee87dceade5" as `0x${string}`,
+  TimelockController: "0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a" as `0x${string}`,
+  GnosisSafe: "0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD" as `0x${string}`,
 } as const
 
 // KINK MODEL — mirror of PremiumMath.sol

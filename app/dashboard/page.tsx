@@ -1617,6 +1617,11 @@ export default function DashboardPage() {
         { alias: "Oracle", addr: CONTRACTS.Oracle },
         { alias: "Phala Verifier", addr: CONTRACTS.Phala },
       ]},
+      { category: "GOVERNANCE", items: [
+        { alias: "Emergency Pause", addr: CONTRACTS.EmergencyPause },
+        { alias: "Timelock Controller", addr: CONTRACTS.TimelockController },
+        { alias: "Gnosis Safe", addr: CONTRACTS.GnosisSafe },
+      ]},
     ]
 
     return (

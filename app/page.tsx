@@ -137,7 +137,7 @@ export default function Home() {
               }`}
             >
               🛡️ PROTECT
-              <span className="hidden sm:inline text-xs font-normal opacity-70">Buy Insurance</span>
+              <span className="hidden sm:inline text-xs font-normal opacity-70">AI Agent Insurance</span>
             </button>
             <button
               onClick={() => setPerspective("earn")}
