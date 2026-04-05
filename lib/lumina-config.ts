@@ -87,7 +87,7 @@ export const PRODUCTS = {
     trigger: "ETH price drops ≥30%",
     vaults: ["VolatileShort", "VolatileLong"] as const,
     excludedAssets: [] as string[],
-    waitingPeriodDays: 0,
+    waitingPeriodDays: 0, // Effective: 1 hour (3600s) anti-front-running — enforced on-chain, not in days
   },
   DEPEG: {
     id: "DEPEG",
@@ -134,7 +134,7 @@ export const PRODUCTS = {
 export const VAULTS = {
   VolatileShort: {
     name: "Volatile Short",
-    cooldownDays: 30,
+    cooldownDays: 37,
     riskType: "VOLATILE" as const,
     riskLevel: "Higher",
     products: ["BSS", "IL"],
@@ -143,7 +143,7 @@ export const VAULTS = {
   },
   VolatileLong: {
     name: "Volatile Long",
-    cooldownDays: 90,
+    cooldownDays: 97,
     riskType: "VOLATILE" as const,
     riskLevel: "Higher",
     products: ["BSS", "IL"],
@@ -152,7 +152,7 @@ export const VAULTS = {
   },
   StableShort: {
     name: "Stable Short",
-    cooldownDays: 90,
+    cooldownDays: 97,
     riskType: "STABLE" as const,
     riskLevel: "Low",
     products: ["DEPEG", "EXPLOIT"],
@@ -161,7 +161,7 @@ export const VAULTS = {
   },
   StableLong: {
     name: "Stable Long",
-    cooldownDays: 365,
+    cooldownDays: 372,
     riskType: "STABLE" as const,
     riskLevel: "Very Low",
     products: ["DEPEG", "EXPLOIT"],

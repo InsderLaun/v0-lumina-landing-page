@@ -42,6 +42,8 @@ Exploit: $40,000 / (0.90 × 0.97) = $45,830 coverage
 
 # SECTION 2: THE 4 INSURANCE PRODUCTS
 
+**Note on Product IDs:** The API accepts both short IDs (BSS, DEPEG, IL, EXPLOIT) and full IDs (BLACKSWAN-002, DEPEG-STABLE-002, ILPROT-002, EXPLOIT-002). Use whichever format your integration prefers.
+
 ## Product 1: Black Swan Shield (BSS)
 
 **What it covers:** Catastrophic crash of ETH or BTC (>30% drop from your purchase price).
@@ -54,7 +56,7 @@ Exploit: $40,000 / (0.90 × 0.97) = $45,830 coverage
 | Trigger | Price drops >30% from the exact price at the moment you buy the policy |
 | Payout | 80% of coverage (20% deductible) |
 | Duration | 7 to 30 days (you choose, priced by the second) |
-| Waiting Period | None — coverage starts immediately |
+| Waiting Period | 1 hour (anti-front-running) — coverage starts 1 hour after purchase |
 | Minimum Coverage | $100 |
 | Base Rate | 6.5% annualized (650 bps) |
 | Protocol Fee | 3% on premium + 3% on payout. Net payout = 77.6% of coverage |
@@ -207,6 +209,7 @@ Example:
 | Duration | 90 to 365 days |
 | Waiting Period | 14 days (longest — anti-insider) |
 | Max Coverage | $50,000 per wallet |
+| Lifetime Cap | $150,000 total per wallet (across all policies, active + expired) |
 | Base Rate | 4% annualized (400 bps, Tier 1) |
 | Protocol Fee | 3% on premium + 3% on payout. Net payout = 87.3% of coverage |
 
@@ -287,10 +290,10 @@ Premium for a $50K BSS policy (14d): $50K × 0.065 × 1.38 × (14/365) = $172
 
 Now an agent buys another $50K policy:
 New utilization: ($120K + $50K) / $200K = 85%
-Kink multiplier at 85%: 1.88x
-Next premium for same policy: $50K × 0.065 × 1.88 × (14/365) = $234
+Kink multiplier at 85%: 2.25x
+Next premium for same policy: $50K × 0.065 × 2.25 × (14/365) = $280
 
-The premium increased 36% because utilization went up.
+The premium increased 63% because utilization went up.
 LPs in this vault are earning MORE per dollar deployed.
 This higher yield attracts new LPs → they deposit → utilization drops → premiums normalize.
 ```
@@ -313,8 +316,8 @@ Natural equilibrium: the market finds its balance.
 - This is a dynamic market, not a savings account.
 
 **Think of it like this:**
-- Short vaults (30d) = checking account: low yield, quick access, high turnover
-- Long vaults (365d) = certificate of deposit: high yield, locked for a year, stable income
+- Short vaults (37d) = checking account: low yield, quick access, high turnover
+- Long vaults (372d) = certificate of deposit: high yield, locked for a year, stable income
 
 ### Claims Risk (What Can Go Wrong for LPs)
 
@@ -340,7 +343,7 @@ Lumina uses multiple layers to prevent gaming:
 | Mechanism | Purpose | Products |
 |-----------|---------|----------|
 | TWAP verification | Prevents flash crash exploitation | All |
-| Waiting periods | Prevents buying when you see the event coming | Depeg (24h), Exploit (14d) |
+| Waiting periods | Prevents buying when you see the event coming | BSS (1h), Depeg (24h), Exploit (14d) |
 | Circuit breakers | Pauses or increases price during volatile moments | All |
 | European-style resolution | Prevents scanning for optimal claim point | IL Index |
 | $50K cap per wallet | Makes insider attacks unprofitable | Exploit |
@@ -418,6 +421,10 @@ CoverRouter.triggerPayout(productId, policyId, oracleProof);
 
 **⚠️ PROTOCOL FEE ON CLAIMS:** Your payout will be 97% of the calculated amount. The 3% protocol fee is deducted automatically by the CoverRouter. This is NOT a bug — it is the protocol's revenue model.
 
+**6-HOUR ANYONE-CAN-TRIGGER:** If your agent is offline, anyone can trigger the payout after 6 hours to protect your coverage. This ensures you do not lose a valid claim due to agent downtime.
+
+**SEQUENCER DOWNTIME EXTENSION:** If the Base L2 sequencer goes down, your claim grace period is automatically extended by the downtime duration (minimum 2 hours). You will not lose your claim window due to L2 outages.
+
 Example:
 ```
 Gross Payout = coverageAmount × (1 - deductibleBps/10000)
@@ -460,7 +467,7 @@ To maintain continuous coverage without gaps:
 ┌─────────┬────────────────┬────────────────────────────────────────────────────┐
 │ Product │ Waiting Period │ Repurchase Window                                  │
 ├─────────┼────────────────┼────────────────────────────────────────────────────┤
-│ BSS     │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
+│ BSS     │ 3600s (1h)     │ Repurchase when expiresAt - now < 7200 (2 hours)   │
 │ DEPEG   │ 86400s (24h)   │ Repurchase when expiresAt - now < 90000 (25 hours) │
 │ IL      │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
 │ EXPLOIT │ 1209600s (14d) │ Repurchase when expiresAt - now < 1296000 (15 days)│
@@ -471,7 +478,7 @@ Logic for your agent loop:
   timeLeft = policy.expiresAt - currentTime
   if (timeLeft < repurchaseWindowSeconds) → GET /quote → POST /purchase
 
-This ensures zero coverage gaps. The extra buffer (1h for BSS/IL, 25h for DEPEG, 15d for EXPLOIT) accounts for the waiting period of the new policy.
+This ensures zero coverage gaps. The extra buffer (2h for BSS, 1h for IL, 25h for DEPEG, 15d for EXPLOIT) accounts for the waiting period of the new policy.
 
 ## Error Handling
 
@@ -579,8 +586,8 @@ GET /api/v2/vaults
 **Decision guide:**
 ```
 Want maximum yield and OK with 1-year exit notice?    → StableLong (18-26%)
-Want moderate yield with 90-day exit notice?           → VolatileLong or StableShort (11-18%)
-Want quick exit (30-day notice) and accept BSS risk?   → VolatileShort (12-15%)
+Want moderate yield with 97-day exit notice?           → VolatileLong or StableShort (11-18%)
+Want quick exit (37-day notice) and accept BSS risk?   → VolatileShort (12-15%)
 Unsure? Start with VolatileShort (shortest commitment) → move to longer vaults later
 ```
 
@@ -624,7 +631,7 @@ IVault(VAULT_ADDRESS).requestWithdrawal(sharesToWithdraw);
 
 // Step 4b: WAIT for cooldown to complete
 // Nothing to do. Just wait.
-// VolatileShort: 37 days, VolatileLong: 97 days
+// VolatileShort: 37 days, VolatileLong: 97 days,
 // StableShort: 97 days, StableLong: 372 days
 
 // Step 4c: COMPLETE withdrawal (after cooldown ends)
@@ -640,7 +647,7 @@ IVault(VAULT_ADDRESS).cancelWithdrawal();
 
 If you want to switch from VolatileShort to StableLong (better APY):
 ```
-1. requestWithdrawal() from VolatileShort → wait 37 days
+1. requestWithdrawal() from VolatileShort → wait 37 days cooldown
 2. completeWithdrawal() → USDC back in your wallet
 3. deposit() into StableLong → done
 ```
@@ -673,13 +680,13 @@ IF the premium (including 3% protocol fee) exceeds 5% of your projected returns:
 ## Should I deposit as LP? (For LP agents)
 
 ```
-IF you want maximum yield and can lock for 372 days:
+IF you want maximum yield and can commit to 372-day exit notice:
   → StableLong (18-25% APY combined)
 
-IF you want moderate yield with 97-day flexibility:
+IF you want moderate yield with 97-day exit notice:
   → VolatileLong or StableShort (12-17% APY)
 
-IF you want quick access (37 days) and tolerate BSS/IL claim risk:
+IF you want quick access (37-day exit notice) and tolerate BSS/IL claim risk:
   → VolatileShort (12-14% APY)
 
 IF a vault's utilization is > 80%:
@@ -739,9 +746,9 @@ If U > 95%:  REJECTED — policy cannot be issued
 | 40% | 1.25x | Normal operating range |
 | 60% | 1.38x | Getting busy |
 | 80% | 1.50x | Kink point — premiums start rising fast |
-| 85% | 1.88x | Stress zone |
-| 90% | 2.25x | Very expensive |
-| 95% | 2.63x | Maximum before rejection |
+| 85% | 2.25x | Stress zone |
+| 90% | 3.00x | Very expensive |
+| 95% | REJECT | Policy cannot be issued |
 | >95% | REJECTED | No more policies sold |
 
 ## Why This Matters For You:
@@ -1267,7 +1274,7 @@ Settlement token: USDC (Circle) on Base.
 | PolicyManager | `0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a` | Vault selection + allocation |
 | LuminaOracle | `0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87` | Chainlink price feeds + signature verification |
 | TimelockController | `0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a` | Governance timelock |
-| Gnosis Safe | `0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD` | 2-of-3 multisig |
+| Gnosis Safe | `0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD` | 1-of-1 (planned upgrade to 2-of-3 multisig) |
 | VolatileShortVault | `0xbd44547581b92805aAECc40EB2809352b9b2880d` | 37-day cooldown |
 | VolatileLongVault | `0xFee5d6DAdA0A41407e9EA83D4F357DA6214Ff904` | 97-day cooldown |
 | StableShortVault | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC` | 97-day cooldown |
@@ -1332,7 +1339,7 @@ GET /api/v2/health
 {"status":"ok","chain":"base","chainId":8453}
 
 GET /api/v2/products
-[{"id":"BSS","name":"Black Swan Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":0,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
+[{"id":"BSS","name":"Black Swan Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":3600,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
 
 GET /api/v2/vaults
 [{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":37,"products":["BSS","IL"],"riskProfile":"higher"}]
@@ -1428,7 +1435,7 @@ ERROR HANDLING:
   Any other error → log, continue loop (never crash)
 
 getRepurchaseWindow(product):
-  BSS     → 3600     (1 hour before expiry)
+  BSS     → 7200     (2 hours before expiry — includes 1h waiting period)
   DEPEG   → 90000    (25 hours before expiry)
   IL      → 3600     (1 hour before expiry)
   EXPLOIT → 1296000  (15 days before expiry)
