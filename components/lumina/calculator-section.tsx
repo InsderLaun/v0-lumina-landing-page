@@ -57,7 +57,7 @@ export function CalculatorSection() {
 }
 
 function AgentCalculator() {
-    const [productId, setProductId] = useState("LIQSHIELD-001")
+    const [productId, setProductId] = useState("BLACKSWAN-002")
     const [coverage, setCoverage] = useState(10000)
     const [duration, setDuration] = useState(30)
     const [thresholdBps, setThresholdBps] = useState(2000)
@@ -191,7 +191,7 @@ function AgentCalculator() {
 
 /* ── Per-product historical risk data ── */
 const RISK_DATA: Record<string, { level: string; color: "green" | "amber" | "red"; emoji: string; description: string }> = {
-    "LIQSHIELD-001": {
+    "BLACKSWAN-002": {
         level: "Medium",
         color: "amber",
         emoji: "🟡",
@@ -221,30 +221,12 @@ const RISK_DATA: Record<string, { level: string; color: "green" | "amber" | "red
         emoji: "🔴",
         description: "Severe impermanent loss occurs in pools with high price volatility",
     },
-    "GASSPIKE-001": {
-        level: "Low",
-        color: "green",
-        emoji: "🟢",
-        description: "Extreme gas spikes on Base L2 are infrequent",
-    },
-    "SLIPPAGE-001": {
-        level: "Medium",
-        color: "amber",
-        emoji: "🟡",
-        description: "Excessive slippage occurs regularly in low liquidity markets",
-    },
-    "BRIDGE-001": {
-        level: "Low",
-        color: "green",
-        emoji: "🟢",
-        description: "Base bridge failures are rare, historically <2 major incidents",
-    },
 }
 
-const DEFAULT_RISK = RISK_DATA["LIQSHIELD-001"]
+const DEFAULT_RISK = RISK_DATA["BLACKSWAN-002"]
 
 function LPCalculator() {
-    const [productId, setProductId] = useState("LIQSHIELD-001")
+    const [productId, setProductId] = useState("BLACKSWAN-002")
     const [deposit, setDeposit] = useState(10000)
     const [utilization, setUtilization] = useState(30)
     const [realUtilization, setRealUtilization] = useState<number | null>(null)

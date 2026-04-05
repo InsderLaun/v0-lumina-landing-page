@@ -27,11 +27,11 @@ const pools = [
 
 const metrics = [
   { label: "Verified Contracts", value: 13 },
-  { label: "Tests Passing", value: 79 },
+  { label: "Tests Passing", value: 119 },
   { label: "Insurance Products", value: 4 },
   { label: "Isolated Vaults", value: 4 },
   { label: "Timelock Delay", value: 48, suffix: "h" },
-  { label: "Multisig", value: 2, suffix: "-of-3" },
+  { label: "Multisig", value: 1, suffix: "-of-1" },
 ]
 
 const contracts = [
@@ -52,9 +52,9 @@ const contracts = [
 ]
 
 const securityLayers = [
-  { layer: "Smart Contracts", detail: "79 tests, CEI pattern, SafeERC20, ReentrancyGuard, Solidity 0.8.20" },
-  { layer: "Oracle", detail: "Multisig 2-of-3, Chainlink TWAP, L2 sequencer uptime check, 1h grace period" },
-  { layer: "Governance", detail: "TimelockController (48h delay), Gnosis Safe (2-of-3 multisig)" },
+  { layer: "Smart Contracts", detail: "119 tests, CEI pattern, SafeERC20, ReentrancyGuard, Solidity 0.8.20" },
+  { layer: "Oracle", detail: "1-of-1 (planned 2-of-3), Chainlink TWAP, L2 sequencer uptime check, 1h grace period" },
+  { layer: "Governance", detail: "TimelockController (48h delay), Gnosis Safe 1-of-1 (planned 2-of-3 multisig)" },
   { layer: "API", detail: "Rate limiting, CORS restrictions, Helmet headers, NonceManager, sanitized errors" },
 ]
 

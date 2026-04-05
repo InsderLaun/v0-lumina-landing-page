@@ -466,7 +466,7 @@ export default function Home() {
           </div>
           <div className="border-t border-white/5 pt-8">
             <p className="text-xs text-white/20 text-center">
-              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 79 Tests Passing · 0C/0H/0M · Yield by Aave V3
+              © 2026 Lumina Protocol. All rights reserved. · Protocol Fee: 3% · 119 Tests Passing · 0C/0H/0M · Yield by Aave V3
             </p>
           </div>
         </div>
@@ -737,7 +737,7 @@ const PRODUCTS = [
       ["Trigger", "ETH or BTC drops >30% from your purchase price"],
       ["Payout", "80% of coverage (net 77.6% after 3% fee)"],
       ["Duration", "7–30 days"],
-      ["Waiting Period", "None — instant coverage"],
+      ["Waiting Period", "1 hour — anti-front-running"],
       ["Price", "From 0.53% for 7 days"],
     ],
     example: "$50K coverage, 14 days → Premium $527 → If triggered: receive $38,800 → Return: 73x",
@@ -794,7 +794,7 @@ const PRODUCTS = [
       ["Trigger", "IL > 2% at policy expiry (European-style, 48h claim window)"],
       ["Payout", "Proportional: Coverage × (IL% − 2%) × 90% × 97%. Cap at 11.7%"],
       ["Duration", "14–90 days"],
-      ["Waiting Period", "None"],
+      ["Waiting Period", "None — instant coverage"],
       ["Key Difference", "ONLY product with proportional payout. Can ONLY claim during 48h window after expiry."],
     ],
     example: "ETH moves ±50% → IL 5.7% → Net payout $1,665 on $50K coverage",
@@ -1605,7 +1605,7 @@ const YIELD_VAULTS: Record<YieldVaultKey, {
   risk: string
   worstCase: number
 }> = {
-  "volatile-short": { label: "Volatile Short", cooldown: 37, productId: "LIQSHIELD-001", products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
+  "volatile-short": { label: "Volatile Short", cooldown: 37, productId: "BLACKSWAN-002", products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
   "volatile-long": { label: "Volatile Long", cooldown: 97, productId: "ILPROT-001", products: "IL Index + BSS overflow", risk: "Higher", worstCase: 0.28 },
   "stable-short": { label: "Stable Short", cooldown: 97, productId: "DEPEG-USDC-001", products: "Depeg + Exploit Shield", risk: "Low", worstCase: 0.20 },
   "stable-long": { label: "Stable Long", cooldown: 372, productId: "DEPEG-USDT-001", products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
@@ -1942,7 +1942,7 @@ const KINK_TABLE = [
   { range: "40–60%", mult: "1.25–1.38x", meaning: "Healthy demand. Good LP yields." },
   { range: "60–80%", mult: "1.38–1.50x", meaning: "High demand. LPs earning well." },
   { range: "80–90%", mult: "1.50–2.25x", meaning: "Stress zone. Premiums spike. Attracts new LPs." },
-  { range: "90–95%", mult: "2.25–2.63x", meaning: "Near capacity. Very expensive premiums." },
+  { range: "90–95%", mult: "2.25–3.75x", meaning: "Near capacity. Very expensive premiums." },
   { range: ">95%", mult: "REJECTED", meaning: "No new policies. Safety mechanism to protect LP capital." },
 ]
 
@@ -2632,7 +2632,7 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
           </div>
           <div className="flex gap-4">
             <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/src/oracles/LuminaOracle.sol" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">LuminaOracle.sol →</a>
-            <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/test/MultisigOracle.t.sol" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">79 Tests Passing →</a>
+            <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/test/MultisigOracle.t.sol" target="_blank" rel="noopener noreferrer" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">119 Tests Passing →</a>
           </div>
         </div>
 
@@ -2683,7 +2683,7 @@ const FAQ_GENERAL = [
   { q: "How much does a policy cost?", a: "Pricing is dynamic based on vault utilization. When utilization is low, premiums are cheaper. Above 80% utilization, premiums accelerate sharply (Kink model). Above 95%, no new policies accepted. Example: $10,000 BSS coverage for 14 days costs approximately $28 at low utilization, $75 at high utilization. A 3% protocol fee is applied to every premium." },
   { q: "What happens when my policy triggers?", a: "The oracle detects the trigger condition, generates a signed proof, and submits it to the smart contract. The contract verifies signatures, calculates payout (coverage minus deductible), deducts 3% protocol fee, and transfers USDC to your wallet. Example: $10,000 BSS with 20% deductible = $8,000 payout, minus 3% fee = $7,760 net. The process is automatic — no forms, no waiting." },
   { q: "What is the protocol fee?", a: "Lumina charges 3% on premiums (when your agent buys insurance), 3% on payouts (when your agent collects a claim), and a 3% performance fee on positive vault yield at withdrawal. The performance fee only applies when LPs withdraw with a profit — if a vault lost value, no fee is charged." },
-  { q: "Is my money safe?", a: "Lumina implements multiple security layers: a 48-hour TimelockController on all admin changes, a 2-of-3 Gnosis Safe multisig, separated keys for different roles, 79 automated tests, and all contracts verified on BaseScan. The protocol has undergone internal security review using dual-auditor methodology. However, a formal external audit by a Tier 1 firm is planned but not yet completed. As with any DeFi protocol, risks exist: smart contract bugs, oracle failures, or extreme market events could result in loss of funds. Only deposit what you can afford to lose." },
+  { q: "Is my money safe?", a: "Lumina implements multiple security layers: a 48-hour TimelockController on all admin changes, a Gnosis Safe 1-of-1 (planned upgrade to 2-of-3 multisig), separated keys for different roles, 119 automated tests, and all contracts verified on BaseScan. The protocol has undergone internal security review using dual-auditor methodology. However, a formal external audit by a Tier 1 firm is planned but not yet completed. As with any DeFi protocol, risks exist: smart contract bugs, oracle failures, or extreme market events could result in loss of funds. Only deposit what you can afford to lose." },
 ]
 
 const FAQ_PROTECT = [

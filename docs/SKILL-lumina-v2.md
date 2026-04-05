@@ -163,7 +163,7 @@ To maintain continuous coverage without gaps:
 ┌─────────┬────────────────┬────────────────────────────────────────────────────┐
 │ Product │ Waiting Period │ Repurchase Window                                  │
 ├─────────┼────────────────┼────────────────────────────────────────────────────┤
-│ BSS     │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
+│ BSS     │ 3600s (1h)     │ Repurchase when expiresAt - now < 7200 (2 hours)   │
 │ DEPEG   │ 86400s (24h)   │ Repurchase when expiresAt - now < 90000 (25 hours) │
 │ IL      │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
 │ EXPLOIT │ 1209600s (14d) │ Repurchase when expiresAt - now < 1296000 (15 days)│
@@ -185,10 +185,10 @@ Lumina has 4 vaults where you can deposit USDC to earn yield from insurance prem
 ┌─────────────────┬──────────┬─────────────────────────────────────────────────┐
 │ Vault           │ Lockup   │ Contract Address                                │
 ├─────────────────┼──────────┼─────────────────────────────────────────────────┤
-│ Volatile Short  │ 30 days  │ 0xbd44547581b92805aAECc40EB2809352b9b2880d     │
-│ Volatile Long   │ 90 days  │ 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904     │
-│ Stable Short    │ 90 days  │ 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC     │
-│ Stable Long     │ 365 days │ 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c     │
+│ Volatile Short  │ 37 days  │ 0xbd44547581b92805aAECc40EB2809352b9b2880d     │
+│ Volatile Long   │ 97 days  │ 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904     │
+│ Stable Short    │ 97 days  │ 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC     │
+│ Stable Long     │ 372 days │ 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c     │
 └─────────────────┴──────────┴─────────────────────────────────────────────────┘
 
 CHECK VAULT STATUS:
@@ -208,10 +208,10 @@ Your USDC is supplied to Aave V3. The vault holds aUSDC (Aave's receipt token) w
 
 COOLDOWN PERIODS:
 After requesting a withdrawal, there is a cooldown:
-- Volatile Short: 30 days
-- Volatile Long: 90 days
-- Stable Short: 90 days
-- Stable Long: 365 days
+- Volatile Short: 37 days
+- Volatile Long: 97 days
+- Stable Short: 97 days
+- Stable Long: 372 days
 
 Plan withdrawals in advance. You cannot withdraw instantly.
 
@@ -391,10 +391,10 @@ GET /api/v2/health
 {"status":"ok","chain":"base","chainId":8453}
 
 GET /api/v2/products
-[{"id":"BSS","name":"Black Swan Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":0,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
+[{"id":"BSS","name":"Black Swan Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":3600,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
 
 GET /api/v2/vaults
-[{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":30,"products":["BSS","IL"],"riskProfile":"higher"}]
+[{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":37,"products":["BSS","IL"],"riskProfile":"higher"}]
 
 Key fields for decision-making:
 - currentUtilizationPct: if > 80 → post-kink, premiums expensive

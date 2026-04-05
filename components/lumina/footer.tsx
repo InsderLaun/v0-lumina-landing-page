@@ -26,7 +26,6 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
         title: "Community",
         links: [
             { label: "Twitter / X", href: "https://twitter.com/LuminaProtocol", external: true },
-            { label: "MoltX", href: "#", external: true },
         ],
     },
     {

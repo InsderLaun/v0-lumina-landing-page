@@ -35,9 +35,9 @@ export interface Product {
 
 export const PRODUCTS: Product[] = [
     {
-        id: 'LIQSHIELD-001',
-        name: 'Liquidation Shield',
-        shortName: 'Liq Shield',
+        id: 'BLACKSWAN-002',
+        name: 'Black Swan Shield',
+        shortName: 'BSS',
         icon: 'ShieldAlert',
         description: 'Protects leveraged positions against sudden price crashes',
         agentView: {
@@ -165,93 +165,11 @@ export const PRODUCTS: Product[] = [
         thresholdOptions: ['15%', '20%', '30%', '50%'],
         expandedDetail: 'Trigger: price divergence between pool assets exceeds threshold (15-50%) for 2 continuous hours. 8% deductible because some IL is normal — this covers the catastrophic tail.',
     },
-    {
-        id: 'GASSPIKE-001',
-        name: 'Gas Spike Shield',
-        shortName: 'Gas Shield',
-        icon: 'Flame',
-        description: 'Compensates when Base L2 gas costs spike unexpectedly',
-        agentView: {
-            tagline: 'Protection against unexpected gas cost spikes on Base',
-            details: 'Reads gas price directly from Base L2 blockchain. Triggers when gas stays above threshold for 15+ continuous minutes.',
-        },
-        lpView: {
-            tagline: "You're betting Base L2 gas won't spike above X gwei",
-            riskDescription: 'Low risk — Base L2 gas spikes are relatively rare',
-            riskLevel: 'Low',
-            historicalProbability: 'Low',
-        },
-        triggerType: 'GAS_ABOVE',
-        triggerDescription: 'Gas stays above threshold for 15 continuous minutes (tx.gasprice)',
-        oracleFeeds: ['Base L2 tx.gasprice'],
-        premiumRange: [1.7, 5.5],
-        deductiblePct: 10,
-        durationRange: [7, 30],
-        sustainedPeriod: '15 min',
-        thresholdOptions: ['50 gwei', '100 gwei', '200 gwei', '500 gwei'],
-        expandedDetail: 'Reads gas price directly from Base L2 blockchain. Trigger: gas stays above threshold (50/100/200/500 gwei) for 15 continuous minutes. Only covers Base L2, not Ethereum L1.',
-    },
-    {
-        id: 'SLIPPAGE-001',
-        name: 'Slippage Protection',
-        shortName: 'Slippage',
-        icon: 'TrendingDown',
-        description: 'Covers excessive price movement during trade execution',
-        agentView: {
-            tagline: 'Protect against price movement during trade execution',
-            details: 'Zero sustained period — if the price moves beyond threshold during execution, it triggers immediately.',
-        },
-        lpView: {
-            tagline: "You're betting trades won't slip beyond X%",
-            riskDescription: 'Medium risk — large trades in illiquid markets can experience significant slippage',
-            riskLevel: 'Medium',
-            historicalProbability: 'Medium',
-        },
-        triggerType: 'PRICE_DROP_PCT / PRICE_RISE_PCT',
-        triggerDescription: 'Price moves >X% immediately during execution (Chainlink)',
-        oracleFeeds: ['ETH/USD', 'BTC/USD'],
-        premiumRange: [1.3, 7],
-        deductiblePct: 3,
-        durationRange: [1, 7],
-        sustainedPeriod: 'Immediate',
-        thresholdOptions: ['2%', '3%', '5%', '10%'],
-        expandedDetail: 'Trigger: price moves >X% between when the agent decides and when the trade executes. Zero sustained period — if it happens, it triggers immediately. 30-minute cooling-off period (vs 2h for other products).',
-    },
-    {
-        id: 'BRIDGE-001',
-        name: 'Bridge Failure Cover',
-        shortName: 'Bridge Cover',
-        icon: 'Unlink',
-        description: 'Protects against funds lost or stuck in cross-chain bridges',
-        agentView: {
-            tagline: 'Protection for cross-chain bridge transfers',
-            details: 'AutoResolver checks Transfer events on-chain. If USDC never arrives at destination wallet within 365 days, payout is automatic.',
-        },
-        lpView: {
-            tagline: "You're betting bridge transfers will complete successfully",
-            riskDescription: 'Low risk — major bridge failures are rare but catastrophic when they happen',
-            riskLevel: 'Low',
-            historicalProbability: 'Low',
-        },
-        triggerType: 'NO_TRANSFER',
-        triggerDescription: 'No Transfer event of USDC to destination wallet within 365 days',
-        oracleFeeds: ['On-chain Transfer events'],
-        premiumRange: [3, 3],
-        deductiblePct: 5,
-        durationRange: [365, 365],
-        sustainedPeriod: 'N/A',
-        thresholdOptions: ['N/A'],
-        expandedDetail: 'AutoResolver checks Transfer events on-chain to verify if USDC arrived at destination wallet. No manual confirmation. If funds don\'t arrive in 365 days, payout is automatic.',
-        badges: ['Base Bridge', 'Across', 'Stargate', 'Hop'],
-    },
 ]
 
 // Grouped products for the product grid display (3 depeg covers grouped)
 export const PRODUCT_GRID_DISPLAY = [
-    PRODUCTS[0], // Liquidation Shield
+    PRODUCTS[0], // Black Swan Shield
     { ...PRODUCTS[1], name: 'Stablecoin Depeg Cover', description: 'Covers USDC, USDT and DAI if they lose their dollar peg', isGroup: true },
     PRODUCTS[4], // IL Protection
-    PRODUCTS[5], // Gas Spike Shield
-    PRODUCTS[6], // Slippage Protection
-    PRODUCTS[7], // Bridge Failure Cover
 ] as const

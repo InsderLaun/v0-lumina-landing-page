@@ -70,7 +70,7 @@ curl GET /api/v1/products
 # 2. Get a quote
 curl -X POST /api/v1/quote \\
   -H "Authorization: Bearer lum_YOUR_KEY" \\
-  -d '{"productId":"LIQSHIELD-001","coverageAmount":10000}'
+  -d '{"productId":"BLACKSWAN-002","coverageAmount":10000}'
 
 # 3. Approve USDC on-chain (ERC-20 approve)
 # 4. Create pool on-chain (MutualLumina.createPool)

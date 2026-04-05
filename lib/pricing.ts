@@ -14,17 +14,13 @@ import {
 // ─── Per-product config (pBase in bps) — from lumina-config.ts ─────────────
 // Maps legacy product IDs to the canonical config
 const PRODUCT_PBASE: Record<string, { pBaseBps: number; deductibleBps: number; triggerDesc: string }> = {
-    'LIQSHIELD-001':   { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: PRODUCTS.BSS.deductibleBps, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
-    'BLACKSWAN-001':   { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: PRODUCTS.BSS.deductibleBps, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
+    'BLACKSWAN-002':   { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: PRODUCTS.BSS.deductibleBps, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
     'DEPEG-USDC-001':  { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'USDC/USD stays below $0.95 for 4h (Chainlink)' },
     'DEPEG-USDT-001':  { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'USDT/USD stays below $0.95 for 4h (Chainlink)' },
     'DEPEG-DAI-001':   { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'DAI/USD stays below $0.95 for 4h (Chainlink)' },
     'DEPEG-STABLE-001':{ pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'Stablecoin/USD stays below $0.95 for 4h (Chainlink)' },
     'ILPROT-001':      { pBaseBps: PRODUCTS.IL.pBaseBps, deductibleBps: PRODUCTS.IL.deductibleBps,  triggerDesc: 'IL% > 2% at expiry (European-style, Chainlink)' },
     'EXPLOIT-001':     { pBaseBps: PRODUCTS.EXPLOIT.pBaseBps,  deductibleBps: PRODUCTS.EXPLOIT.deductibleBps,    triggerDesc: 'Protocol exploit verified by Phala TEE oracle' },
-    'GASSPIKE-001':    { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: 1000, triggerDesc: 'Base L2 gas >100 gwei for 15 min' },
-    'SLIPPAGE-001':    { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: 300,  triggerDesc: 'Price moves >5% during execution (immediate)' },
-    'BRIDGE-001':      { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: 500,  triggerDesc: 'Funds don\'t arrive at destination within 365 days' },
 }
 
 // ═══════════════════════════════════════════════════════════════

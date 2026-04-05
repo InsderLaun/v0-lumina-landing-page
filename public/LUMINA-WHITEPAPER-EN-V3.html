@@ -822,9 +822,9 @@
                     <tr><td>40%</td><td>1.25x</td><td>+25% over base premium</td></tr>
                     <tr><td>60%</td><td>1.38x</td><td>+38% over base premium</td></tr>
                     <tr><td>80%</td><td>1.50x</td><td>+50% (kink point)</td></tr>
-                    <tr><td>85%</td><td>1.88x</td><td>+88% (aggressive zone)</td></tr>
+                    <tr><td>85%</td><td>2.25x</td><td>+125% (aggressive zone)</td></tr>
                     <tr><td>90%</td><td>2.25x</td><td>+125% (aggressive zone)</td></tr>
-                    <tr><td>95%</td><td>2.63x</td><td>REJECTED (U_MAX reached)</td></tr>
+                    <tr><td>95%</td><td>3.75x</td><td>REJECTED (U_MAX reached)</td></tr>
                 </tbody>
             </table>
         </div>
@@ -871,7 +871,7 @@
             <li><strong>Vault</strong> receives the USDC and deposits it into <strong>Aave V3</strong> (<code class="address">0xA238Dd80C259a72e81d7e4664a9801593F98d1c5</code>)</li>
             <li>The LP receives <strong>soulbound shares</strong> (non-transferable) proportional to their deposit</li>
             <li>The shares accumulate yield from two sources: Aave V3 base rate (3-5% APY) + insurance premiums</li>
-            <li>To withdraw, the LP initiates a <strong>cooldown</strong> period (30 to 365 days depending on the vault)</li>
+            <li>To withdraw, the LP initiates a <strong>cooldown</strong> period (37 to 372 days depending on the vault)</li>
             <li>After the cooldown, the LP can execute <code>withdraw()</code> and receive their USDC + accumulated yield</li>
             <li><strong>A 3% performance fee is charged on the positive yield (profit) upon withdrawal</strong></li>
         </ol>
@@ -1022,7 +1022,7 @@
                         <tr><td>Deductible</td><td>20%</td></tr>
                         <tr><td>Payout</td><td>Binary: 80% of coverage</td></tr>
                         <tr><td>Duration</td><td>7 to 30 days</td></tr>
-                        <tr><td>Waiting period</td><td>None -- immediate coverage</td></tr>
+                        <tr><td>Waiting period</td><td>1 hour (anti-front-running)</td></tr>
                         <tr><td>Covered assets</td><td>ETH, BTC</td></tr>
                         <tr><td>MAX_PROOF_AGE</td><td>30 minutes</td></tr>
                         <tr><td>Base rate</td><td>22% annualized</td></tr>
@@ -1298,9 +1298,9 @@ Net payout to agent: <span class="value">$38,800</span>
                     <tr><td>40%</td><td>1.25x</td><td>+25%</td></tr>
                     <tr><td>60%</td><td>1.38x</td><td>+38%</td></tr>
                     <tr><td>80%</td><td>1.50x</td><td>+50% (kink point)</td></tr>
-                    <tr><td>85%</td><td>1.88x</td><td>+88% (aggressive zone)</td></tr>
+                    <tr><td>85%</td><td>2.25x</td><td>+125% (aggressive zone)</td></tr>
                     <tr><td>90%</td><td>2.25x</td><td>+125%</td></tr>
-                    <tr><td>95%</td><td>2.63x</td><td>REJECTED</td></tr>
+                    <tr><td>95%</td><td>3.75x</td><td>REJECTED</td></tr>
                 </tbody>
             </table>
         </div>
@@ -1448,28 +1448,28 @@ DurationDiscount = 1.0x
                 <tbody>
                     <tr>
                         <td><strong>VolatileShort</strong></td>
-                        <td>30 days</td>
+                        <td>37 days</td>
                         <td>BSS + IL Index Cover</td>
                         <td>2 - 29%</td>
                         <td><code>0xbd44...880d</code></td>
                     </tr>
                     <tr>
                         <td><strong>VolatileLong</strong></td>
-                        <td>90 days</td>
+                        <td>97 days</td>
                         <td>Long IL + BSS overflow</td>
                         <td>2 - 29%</td>
                         <td><code>0xFee5...f904</code></td>
                     </tr>
                     <tr>
                         <td><strong>StableShort</strong></td>
-                        <td>90 days</td>
+                        <td>97 days</td>
                         <td>Short depeg</td>
                         <td>2 - 16%</td>
                         <td><code>0x429b...54fC</code></td>
                     </tr>
                     <tr>
                         <td><strong>StableLong</strong></td>
-                        <td>365 days</td>
+                        <td>372 days</td>
                         <td>Long depeg + Exploit Shield</td>
                         <td>2 - 16%</td>
                         <td><code>0x1778...321c</code></td>
@@ -1660,7 +1660,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             <li><strong>SafeERC20:</strong> All USDC transfers use OpenZeppelin's SafeERC20 library</li>
             <li><strong>ReentrancyGuard:</strong> Protection against reentrancy attacks on all functions that handle funds</li>
             <li><strong>UUPS Proxies:</strong> Upgradeable contracts with OpenZeppelin's UUPS pattern, controlled by TimelockController</li>
-            <li><strong>79 tests:</strong> Complete suite of unit and integration tests</li>
+            <li><strong>119 tests:</strong> Complete suite of unit and integration tests</li>
         </ul>
 
         <h3>9.2 Governance</h3>
@@ -1669,7 +1669,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
 
         <ul>
             <li><strong>TimelockController</strong> (<code class="address">0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a</code>): 48-hour delay for all administrative operations. Any change to critical parameters requires a waiting period that allows LPs to react.</li>
-            <li><strong>Gnosis Safe 2-of-3</strong> (<code class="address">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</code>): Administrative transactions require the signature of at least 2 of 3 authorized signers.</li>
+            <li><strong>Gnosis Safe 1-of-1 (planned 2-of-3)</strong> (<code class="address">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</code>): Currently 1-of-1 signer. Planned upgrade to require at least 2 of 3 authorized signers.</li>
         </ul>
 
         <h3>9.3 API and Backend</h3>
@@ -1816,7 +1816,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                         <td>Smart contract bug</td>
                         <td><span class="risk-low">Low</span></td>
                         <td><span class="risk-critical">Critical</span></td>
-                        <td>79 tests, CEI, ReentrancyGuard, Solidity 0.8.20, UUPS proxies for upgrades</td>
+                        <td>119 tests, CEI, ReentrancyGuard, Solidity 0.8.20, UUPS proxies for upgrades</td>
                     </tr>
                     <tr>
                         <td>Oracle manipulation</td>
@@ -1870,7 +1870,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                         <td>Governance attack</td>
                         <td><span class="risk-low">Very Low</span></td>
                         <td><span class="risk-critical">Critical</span></td>
-                        <td>TimelockController 48h + Gnosis Safe 2-of-3, delay allows community reaction</td>
+                        <td>TimelockController 48h + Gnosis Safe 1-of-1 (planned 2-of-3), delay allows community reaction</td>
                     </tr>
                 </tbody>
             </table>
@@ -1937,7 +1937,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
 
         <h3>13.1 Protocol Structure</h3>
 
-        <p>Lumina Protocol operates as a decentralized protocol deployed on Base L2 (Chain 8453). The smart contracts are immutable in their core logic, with upgrade capability through UUPS proxies controlled by a TimelockController with a 48-hour delay and a 2-of-3 Gnosis Safe.</p>
+        <p>Lumina Protocol operates as a decentralized protocol deployed on Base L2 (Chain 8453). The smart contracts are immutable in their core logic, with upgrade capability through UUPS proxies controlled by a TimelockController with a 48-hour delay and a Gnosis Safe 1-of-1 (planned 2-of-3).</p>
 
         <p>The protocol does not custody user funds. LP deposits are maintained in Aave V3, and claim payouts are executed directly from the vaults to the agents' wallets. The protocol only charges fees as an intermediary.</p>
 
@@ -1983,7 +1983,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                 </thead>
                 <tbody>
                     <tr><td>TimelockController</td><td><a class="address-link" href="https://basescan.org/address/0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a" target="_blank">0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a</a></td></tr>
-                    <tr><td>Gnosis Safe (2-of-3)</td><td><a class="address-link" href="https://basescan.org/address/0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD" target="_blank">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</a></td></tr>
+                    <tr><td>Gnosis Safe 1-of-1 (planned 2-of-3)</td><td><a class="address-link" href="https://basescan.org/address/0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD" target="_blank">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</a></td></tr>
                 </tbody>
             </table>
         </div>
@@ -2012,10 +2012,10 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                     <tr><th>Vault</th><th>Cooldown</th><th>Address</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>VolatileShort</td><td>30 days</td><td><a class="address-link" href="https://basescan.org/address/0xbd44547581b92805aAECc40EB2809352b9b2880d" target="_blank">0xbd44547581b92805aAECc40EB2809352b9b2880d</a></td></tr>
-                    <tr><td>VolatileLong</td><td>90 days</td><td><a class="address-link" href="https://basescan.org/address/0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" target="_blank">0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904</a></td></tr>
-                    <tr><td>StableShort</td><td>90 days</td><td><a class="address-link" href="https://basescan.org/address/0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" target="_blank">0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC</a></td></tr>
-                    <tr><td>StableLong</td><td>365 days</td><td><a class="address-link" href="https://basescan.org/address/0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" target="_blank">0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c</a></td></tr>
+                    <tr><td>VolatileShort</td><td>37 days</td><td><a class="address-link" href="https://basescan.org/address/0xbd44547581b92805aAECc40EB2809352b9b2880d" target="_blank">0xbd44547581b92805aAECc40EB2809352b9b2880d</a></td></tr>
+                    <tr><td>VolatileLong</td><td>97 days</td><td><a class="address-link" href="https://basescan.org/address/0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" target="_blank">0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904</a></td></tr>
+                    <tr><td>StableShort</td><td>97 days</td><td><a class="address-link" href="https://basescan.org/address/0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" target="_blank">0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC</a></td></tr>
+                    <tr><td>StableLong</td><td>372 days</td><td><a class="address-link" href="https://basescan.org/address/0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" target="_blank">0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c</a></td></tr>
                 </tbody>
             </table>
         </div>
@@ -2214,7 +2214,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             <li><strong>Designed for agents:</strong> Programmatic API, session approval for relayers, OWS integration, SKILL documentation.</li>
             <li><strong>1:1 collateral:</strong> Each policy is backed 100% by real USDC locked in the vault. No undercapitalization risk.</li>
             <li><strong>Real yield:</strong> LPs earn compound yield from Aave V3 + insurance premiums, with estimated APYs of 2-29%.</li>
-            <li><strong>Layered security:</strong> Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 2-of-3, TWAP, sequencer check.</li>
+            <li><strong>Layered security:</strong> Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), TWAP, sequencer check.</li>
             <li><strong>Transparent business model:</strong> 3% premium + 3% payout. No hidden fees. 3% performance fee on positive yield from vault withdrawals.</li>
         </ul>
 

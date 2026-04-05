@@ -124,9 +124,9 @@ U_MAX = 95% → se rechaza la poliza (no se puede comprar cobertura)
 | 40%              | 1.25x               | +25% sobre la prima base      |
 | 60%              | 1.38x               | +38% sobre la prima base      |
 | 80%              | 1.50x               | +50% (punto kink)             |
-| 85%              | 1.88x               | +88% (zona agresiva)          |
+| 85%              | 2.25x               | +125% (zona agresiva)          |
 | 90%              | 2.25x               | +125% (zona agresiva)         |
-| 95%              | 2.63x               | RECHAZADO (U_MAX alcanzado)   |
+| 95%              | 3.75x               | RECHAZADO (U_MAX alcanzado)   |
 
 Este modelo garantiza que cuando la capacidad del vault esta holgada, las primas son competitivas. A medida que la utilizacion se acerca al 80%, las primas suben gradualmente. Por encima del 80%, el crecimiento es exponencial, protegiendo a los LPs de sobreexposicion.
 
@@ -153,7 +153,7 @@ El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vault
 3. **Vault** recibe el USDC y lo deposita en **Aave V3** (`0xA238Dd80C259a72e81d7e4664a9801593F98d1c5`)
 4. El LP recibe **shares soulbound** (no transferibles) proporcionales a su deposito
 5. Las shares acumulan yield de dos fuentes: tasa base de Aave V3 (3-5% APY) + primas de seguro
-6. Para retirar, el LP inicia un periodo de **cooldown** (30 a 365 dias segun el vault)
+6. Para retirar, el LP inicia un periodo de **cooldown** (37 a 372 dias segun el vault)
 7. Tras el cooldown, el LP puede ejecutar `withdraw()` y recibir sus USDC + yield acumulado
 8. **No se cobra ninguna comision al retirar fondos del vault**
 
@@ -201,7 +201,7 @@ Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos
 | Deducible                | 20%                                                       |
 | Payout                   | Binario: 80% del coverage                                 |
 | Duracion                 | 7 a 30 dias                                               |
-| Waiting period           | Ninguno -- cobertura inmediata                            |
+| Waiting period           | 1 hora (anti-front-running)                               |
 | Assets cubiertos         | ETH, BTC                                                  |
 | MAX_PROOF_AGE            | 30 minutos                                                |
 | Tasa base                | 22% anualizado                                            |
@@ -369,10 +369,10 @@ Lumina opera con cuatro vaults especializados, cada uno con un periodo de cooldo
 
 | Vault                | Cooldown | Productos Asignados             | APY Estimado | Direccion                                          |
 |----------------------|----------|---------------------------------|--------------|-----------------------------------------------------|
-| **VolatileShort**    | 30 dias  | BSS + IL Index Cover            | 12 - 16%     | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
-| **VolatileLong**     | 90 dias  | IL largo + BSS overflow         | 15 - 19%     | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
-| **StableShort**      | 90 dias  | Depeg corto                     | 11 - 15%     | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
-| **StableLong**       | 365 dias | Depeg largo + Exploit Shield    | 18 - 27%     | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
+| **VolatileShort**    | 37 dias  | BSS + IL Index Cover            | 12 - 16%     | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
+| **VolatileLong**     | 97 dias  | IL largo + BSS overflow         | 15 - 19%     | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
+| **StableShort**      | 97 dias  | Depeg corto                     | 11 - 15%     | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
+| **StableLong**       | 372 dias | Depeg largo + Exploit Shield    | 18 - 27%     | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
 
 Los vaults con cooldowns mas largos ofrecen mayor APY estimado porque asumen mayor riesgo (polizas de mayor duracion, eventos menos frecuentes pero de mayor impacto).
 
@@ -498,14 +498,14 @@ Los 13 contratos del protocolo han sido desarrollados con las mejores practicas 
 - **Patron CEI (Checks-Effects-Interactions):** Todas las funciones criticas siguen este patron
 - **SafeERC20:** Todas las transferencias de USDC utilizan la libreria SafeERC20 de OpenZeppelin
 - **ReentrancyGuard:** Proteccion contra ataques de reentrancia en todas las funciones que mueven fondos
-- **79 tests:** Suite completa de tests unitarios y de integracion
+- **119 tests:** Suite completa de tests unitarios y de integracion
 
 ### 8.2 Governance
 
 La gobernanza del protocolo implementa un modelo de seguridad en capas:
 
 - **TimelockController** (`0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a`): Delay de 48 horas para todas las operaciones administrativas. Cualquier cambio en parametros criticos requiere un periodo de espera que permite a los LPs reaccionar.
-- **Gnosis Safe 2-of-3** (`0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD`): Las transacciones administrativas requieren la firma de al menos 2 de 3 signatarios autorizados.
+- **Gnosis Safe 1-of-1 (planned 2-of-3)** (`0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD`): Actualmente 1-of-1 signatario. Upgrade planificado para requerir al menos 2 de 3 signatarios autorizados.
 
 ### 8.3 API y Backend
 
@@ -594,7 +594,7 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 
 | Riesgo                         | Probabilidad | Impacto  | Mitigacion                                                                          |
 |--------------------------------|--------------|----------|--------------------------------------------------------------------------------------|
-| Bug en smart contract          | Baja         | Critico  | 79 tests, CEI, ReentrancyGuard, Solidity 0.8.20, proxies UUPS para upgrades         |
+| Bug en smart contract          | Baja         | Critico  | 119 tests, CEI, ReentrancyGuard, Solidity 0.8.20, proxies UUPS para upgrades         |
 | Manipulacion de oracle         | Baja         | Alto     | TWAP (no precio spot), multisig, sequencer check 1h, MAX_PROOF_AGE 30min            |
 | Flash loan attack              | Baja         | Alto     | TWAP multiples rounds, colateral 1:1, no dependencia de precios spot                |
 | Sequencer de Base L2 offline   | Media        | Medio    | Sequencer check de 1 hora, polizas no expiran durante downtime                      |
@@ -603,7 +603,7 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 | Exploit de Aave V3             | Muy Baja     | Critico  | Riesgo aceptado; Aave V3 es el protocolo DeFi mas auditado; no se cubre (circular)  |
 | Depeg de USDC                  | Muy Baja     | Critico  | Riesgo de denominacion aceptado; no se cubre USDC (circular)                        |
 | Caida simultanea multiple      | Muy Baja     | Alto     | Vaults segregados por tipo de riesgo, waterfall de prioridad, grupos de correlacion  |
-| Ataque de gobernanza           | Muy Baja     | Critico  | TimelockController 48h + Gnosis Safe 2-of-3, delay permite reaccion de la comunidad |
+| Ataque de gobernanza           | Muy Baja     | Critico  | TimelockController 48h + Gnosis Safe 1-of-1 (planned 2-of-3), delay permite reaccion de la comunidad |
 
 ---
 
@@ -644,7 +644,7 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 
 ### 12.1 Estructura del Protocolo
 
-Lumina Protocol opera como un protocolo descentralizado desplegado en Base L2 (Chain 8453). Los contratos inteligentes son inmutables en su logica core, con capacidad de upgrade a traves de proxies UUPS controlados por un TimelockController con delay de 48 horas y una Gnosis Safe 2-of-3.
+Lumina Protocol opera como un protocolo descentralizado desplegado en Base L2 (Chain 8453). Los contratos inteligentes son inmutables en su logica core, con capacidad de upgrade a traves de proxies UUPS controlados por un TimelockController con delay de 48 horas y una Gnosis Safe 1-of-1 (planned 2-of-3).
 
 El protocolo no custodia fondos de usuarios. Los depositos de LPs se mantienen en Aave V3, y los pagos de siniestros se ejecutan directamente desde los vaults a las wallets de los agentes. El protocolo solo cobra fees como intermediario.
 
@@ -679,7 +679,7 @@ Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, 
 | Contrato               | Direccion                                          |
 |------------------------|-----------------------------------------------------|
 | TimelockController     | `0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a`       |
-| Gnosis Safe (2-of-3)   | `0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD`       |
+| Gnosis Safe 1-of-1 (planned 2-of-3)   | `0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD`       |
 
 ### Core
 
@@ -694,10 +694,10 @@ Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, 
 
 | Vault                  | Cooldown  | Direccion                                          |
 |------------------------|-----------|-----------------------------------------------------|
-| VolatileShort          | 30 dias   | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
-| VolatileLong           | 90 dias   | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
-| StableShort            | 90 dias   | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
-| StableLong             | 365 dias  | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
+| VolatileShort          | 37 dias   | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
+| VolatileLong           | 97 dias   | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
+| StableShort            | 97 dias   | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
+| StableLong             | 372 dias  | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
 
 ### Shields (Productos)
 
@@ -812,7 +812,7 @@ Lumina Protocol representa la primera infraestructura de seguro parametrico dise
 - **Disenado para agentes:** API programatica, session approval para relayers, integracion OWS, documentacion SKILL.
 - **Colateral 1:1:** Cada poliza esta respaldada al 100% por USDC real bloqueado en el vault. Sin riesgo de subcapitalizacion.
 - **Yield real:** Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 11-27%.
-- **Seguridad en capas:** Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 2-of-3, TWAP, sequencer check.
+- **Seguridad en capas:** Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), TWAP, sequencer check.
 - **Modelo de negocio transparente:** 3% premium + 3% payout. Sin fees ocultos. Sin fee en retiros de vault.
 
 **Vision:**
