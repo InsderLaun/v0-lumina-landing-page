@@ -369,10 +369,10 @@ Lumina opera con cuatro vaults especializados, cada uno con un periodo de cooldo
 
 | Vault                | Cooldown | Productos Asignados             | APY Estimado | Direccion                                          |
 |----------------------|----------|---------------------------------|--------------|-----------------------------------------------------|
-| **VolatileShort**    | 37 dias  | BSS + IL Index Cover            | 12 - 16%     | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
-| **VolatileLong**     | 97 dias  | IL largo + BSS overflow         | 15 - 19%     | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
-| **StableShort**      | 97 dias  | Depeg corto                     | 11 - 15%     | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
-| **StableLong**       | 372 dias | Depeg largo + Exploit Shield    | 18 - 27%     | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
+| **VolatileShort**    | 37 dias  | BSS + IL Index Cover            | 3.3 - 22.2%  | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
+| **VolatileLong**     | 97 dias  | IL largo + BSS overflow         | 3.3 - 24.7%  | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
+| **StableShort**      | 97 dias  | Depeg corto                     | 2.7 - 9.0%   | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
+| **StableLong**       | 372 dias | Depeg largo + Exploit Shield    | 2.8 - 10.3%  | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
 
 Los vaults con cooldowns mas largos ofrecen mayor APY estimado porque asumen mayor riesgo (polizas de mayor duracion, eventos menos frecuentes pero de mayor impacto).
 
@@ -811,7 +811,7 @@ Lumina Protocol representa la primera infraestructura de seguro parametrico dise
 - **Parametrico puro:** Sin reclamos subjetivos, sin votaciones, sin esperas. El trigger se activa y el pago es inmediato.
 - **Disenado para agentes:** API programatica, session approval para relayers, integracion OWS, documentacion SKILL.
 - **Colateral 1:1:** Cada poliza esta respaldada al 100% por USDC real bloqueado en el vault. Sin riesgo de subcapitalizacion.
-- **Yield real:** Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 11-27%.
+- **Yield real:** Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 3-25%.
 - **Seguridad en capas:** Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), TWAP, sequencer check.
 - **Modelo de negocio transparente:** 3% premium + 3% payout. Sin fees ocultos. Sin fee en retiros de vault.
 

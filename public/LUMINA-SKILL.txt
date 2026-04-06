@@ -271,10 +271,10 @@ Total yield = Aave V3 yield + premium yield
 
 | Vault | Cooldown | Aave V3 Base | Premiums | TOTAL APY |
 |-------|----------|-----------|----------|-----------|
-| VolatileShort | 37 days | 3-5% | 9-11% | **12-16%** |
-| VolatileLong | 97 days | 3-5% | 12-14% | **15-19%** |
-| StableShort | 97 days | 3-5% | 8-10% | **11-15%** |
-| StableLong | 372 days | 3-5% | 15-22% | **18-27%** |
+| VolatileShort | 37 days | 3-5% | 0.8-19.7% | **3.3-22.2%** |
+| VolatileLong | 97 days | 3-5% | 0.8-22.2% | **3.3-24.7%** |
+| StableShort | 97 days | 3-5% | 0.2-6.5% | **2.7-9.0%** |
+| StableLong | 372 days | 3-5% | 0.3-7.8% | **2.8-10.3%** |
 
 Note: Premium APYs shown are AFTER the 3% protocol fee. The vault receives 97% of each premium. These APYs already reflect that.
 
@@ -543,7 +543,7 @@ ABIs are published at: `https://github.com/org-lumina/LUMINA-PROTOCOL/tree/main/
 | Products backed | BSS + IL short | IL long + BSS overflow | Depeg short | Depeg long + Exploit |
 | Risk type | VOLATILE | VOLATILE | STABLE | STABLE |
 | Claim frequency | Higher | Higher | Low | Very low |
-| APY (Aave V3 + premiums) | 12-16% | 15-19% | 11-15% | 18-27% |
+| APY (Aave V3 + premiums) | 3.3-22.2% | 3.3-24.7% | 2.7-9.0% | 2.8-10.3% |
 
 **What is a cooldown? It is NOT a lock period. It is an EXIT NOTICE.**
 

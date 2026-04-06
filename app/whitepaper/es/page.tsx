@@ -19,10 +19,10 @@ const products = [
 ]
 
 const pools = [
-  { name: "Volatile Short", duration: "37 dias", covers: "BSS + IL Index", apy: "2-29% APY", color: "#00D4AA" },
-  { name: "Volatile Long", duration: "97 dias", covers: "IL largo + BSS overflow", apy: "2-29% APY", color: "#22d3ee" },
-  { name: "Stable Short", duration: "97 dias", covers: "Depeg corto", apy: "2-16% APY", color: "#a78bfa" },
-  { name: "Stable Long", duration: "372 dias", covers: "Depeg + Exploit", apy: "2-16% APY", color: "#818cf8" },
+  { name: "Volatile Short", duration: "37 dias", covers: "BSS + IL Index", apy: "3-22% APY", color: "#00D4AA" },
+  { name: "Volatile Long", duration: "97 dias", covers: "IL largo + BSS overflow", apy: "3-25% APY", color: "#22d3ee" },
+  { name: "Stable Short", duration: "97 dias", covers: "Depeg corto", apy: "3-9% APY", color: "#a78bfa" },
+  { name: "Stable Long", duration: "372 dias", covers: "Depeg + Exploit", apy: "3-10% APY", color: "#818cf8" },
 ]
 
 const metrics = [
@@ -175,7 +175,7 @@ export default function WhitepaperES() {
             <li>Depositar USDC en uno de los 4 vaults especializados</li>
             <li>Tu USDC se deposita automaticamente en Aave V3, generando 3-5% APY base</li>
             <li>Las primas de seguro de los compradores de polizas fluyen a tu vault, sumando rendimiento</li>
-            <li>APY total estimado: 11-27% segun el vault</li>
+            <li>APY total estimado: 3-25% segun el vault</li>
             <li>Las shares son soulbound (no transferibles) para la estabilidad del vault</li>
             <li>Para retirar: solicitar retiro → esperar periodo de cooldown → completar retiro</li>
           </ul>

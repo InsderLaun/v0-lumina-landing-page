@@ -231,10 +231,10 @@ Four vaults, each with a different risk profile and cooldown period:
 
 | Vault          | Cooldown | Products            | Est. APY  | Address                                    |
 |----------------|----------|---------------------|-----------|--------------------------------------------|
-| VolatileShort  | 30 days  | BSS + IL            | 12-16%    | 0xbd44547581b92805aAECc40EB2809352b9b2880d |
-| VolatileLong   | 90 days  | IL long + BSS spill | 15-19%    | 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904 |
-| StableShort    | 90 days  | Depeg short         | 11-15%    | 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC |
-| StableLong     | 365 days | Depeg + Exploit     | 18-27%    | 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c |
+| VolatileShort  | 30 days  | BSS + IL            | 3.3-22.2% | 0xbd44547581b92805aAECc40EB2809352b9b2880d |
+| VolatileLong   | 90 days  | IL long + BSS spill | 3.3-24.7% | 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904 |
+| StableShort    | 90 days  | Depeg short         | 2.7-9.0%  | 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC |
+| StableLong     | 365 days | Depeg + Exploit     | 2.8-10.3% | 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c |
 
 YIELD SOURCES:
   Layer 1: Aave V3 base yield (~3-5% APY) — USDC deposited automatically
