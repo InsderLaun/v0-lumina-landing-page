@@ -46,7 +46,7 @@ export function DepositLPModal({ open, onClose }: DepositLPModalProps) {
     const hasEnoughAllowance = allowance ? Number(formatUnits(allowance, 6)) >= depositAmount : false
 
     const yieldResult = calculateYield({
-        productId: "BLACKSWAN-002",
+        productId: "BCS-001",
         depositAmount,
         utilizationPct: 50,
     })

@@ -332,7 +332,7 @@ export function RegisterAgentModal({ open, onClose }: RegisterAgentModalProps) {
                                 <pre className="text-[11px] font-mono text-lumina-text/70 whitespace-pre-wrap">
                                     {`curl -X POST ${API_BASE_URL}/api/v1/quote \\
   -H "Authorization: Bearer ${result.apiKey}" \\
-  -d '{"productId":"BLACKSWAN-002","coverageAmount":10000}'`}
+  -d '{"productId":"BCS-001","coverageAmount":10000}'`}
                                 </pre>
                             </div>
 

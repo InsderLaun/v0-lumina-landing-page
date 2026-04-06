@@ -37,7 +37,7 @@ Lumina Protocol es la primera infraestructura de seguro parametrico descentraliz
 
 A diferencia del seguro tradicional, que requiere que un humano presente un reclamo, un comite lo revise y semanas de espera para recibir el pago, Lumina utiliza triggers matematicos verificados por oracles. Si la condicion se cumple (por ejemplo, ETH cae un 30%), el pago es instantaneo y automatico. Sin reclamos. Sin disputas. Sin esperar a humanos.
 
-El protocolo ofrece **4 productos de seguro** (Black Swan Shield, Depeg Shield, IL Index Cover, Exploit Shield), **4 vaults de liquidez** (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de **13 contratos inteligentes** desplegados en produccion con proxies UUPS upgradeables.
+El protocolo ofrece **5 productos de seguro** (BTC Catastrophe Shield, ETH Apocalypse Shield, Depeg Shield, IL Index Cover, Exploit Shield), **4 vaults de liquidez** (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de **13 contratos inteligentes** desplegados en produccion con proxies UUPS upgradeables.
 
 Cada flujo de interaccion comienza de la misma forma: **el humano, a traves de su agente de IA**, instruye la operacion deseada. El agente ejecuta la transaccion on-chain de forma autonoma, interactuando con la API de Lumina y los contratos del protocolo sin intervencion manual.
 
@@ -95,7 +95,7 @@ Premium = Coverage x P_base x RiskMult x DurationDiscount x M(U) x (Duration / 3
 Donde:
 
 - **Coverage**: monto asegurado en USDC
-- **P_base**: tasa base anualizada del producto (ej: 22% para BSS, 24% para Depeg)
+- **P_base**: tasa base anualizada del producto (ej: 6.5% para BCS/EAS, 2.5% para Depeg)
 - **RiskMult**: multiplicador de riesgo por activo
 - **DurationDiscount**: descuento por duracion larga
 - **M(U)**: multiplicador de utilizacion (modelo kink)
@@ -139,7 +139,7 @@ El humano, a traves de su agente de IA, inicia la compra de cobertura. El flujo 
 3. **API** calcula la prima usando el modelo kink y devuelve los parametros
 4. **Agente** aprueba USDC al CoverRouter y ejecuta `purchaseCover()`
 5. **CoverRouter** (`0xd5f8678A0F2149B6342F9014CCe6d743234Ca025`) valida parametros y rutea al Shield correcto
-6. **Shield** (BSS/Depeg/IL/Exploit) valida reglas especificas del producto
+6. **Shield** (BCS/EAS/Depeg/IL/Exploit) valida reglas especificas del producto
 7. **PolicyManager** (`0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a`) registra la poliza on-chain
 8. **Vault** bloquea colateral 1:1 para respaldar la cobertura
 9. **USDC** se transfiere del agente al vault (prima) y se cobra el 3% de fee
@@ -169,7 +169,8 @@ El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vault
 | VolatileLong Vault      | Vault          | UUPS   | Aave V3, USDC                        | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
 | StableShort Vault       | Vault          | UUPS   | Aave V3, USDC                        | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
 | StableLong Vault        | Vault          | UUPS   | Aave V3, USDC                        | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
-| BlackSwanShield         | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f`       |
+| BTC Catastrophe Shield  | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f`       |
+| ETH Apocalypse Shield   | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f`       |
 | DepegShield             | Producto       | UUPS   | Oracle, PolicyManager, StableShort   | `0x7578816a803d293bbb4dbea0efbed872842679d0`       |
 | ILIndexCover            | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x2ac0d2a9889a8a4143727a0240de3fed4650dd93`       |
 | ExploitShield           | Producto       | UUPS   | Oracle, Phala TEE, PolicyManager     | `0x9870830c615d1b9c53dfee4136c4792de395b7a1`       |
@@ -177,7 +178,7 @@ El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vault
 
 ### 3.5 Colateralizacion Estricta 1:1
 
-Cada poliza emitida en Lumina esta respaldada por colateral bloqueado 1:1 en el vault correspondiente. Esto significa que si un agente compra $50,000 de cobertura BSS, el vault bloquea exactamente $50,000 en USDC (depositados en Aave V3 como aUSDC) para garantizar el pago en caso de siniestro.
+Cada poliza emitida en Lumina esta respaldada por colateral bloqueado 1:1 en el vault correspondiente. Esto significa que si un agente compra $50,000 de cobertura BCS, el vault bloquea exactamente $50,000 en USDC (depositados en Aave V3 como aUSDC) para garantizar el pago en caso de siniestro.
 
 Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos de seguro DeFi que operan con modelos de pool compartido. Si la utilizacion del vault alcanza el 95% (U_MAX), no se aceptan nuevas polizas hasta que se libere capacidad.
 
@@ -185,15 +186,19 @@ Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos
 
 ## 4. PRODUCTOS DE SEGURO
 
-### 4.1 Black Swan Shield (BSS)
+### 4.1 BTC Catastrophe Shield (BCS)
 
-**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en ETH o BTC contra caidas catastroficas del mercado. Black Swan Shield cubre escenarios de cisne negro: crasheos superiores al 30% como los vividos durante COVID (marzo 2020), el colapso de LUNA (mayo 2022) o la caida de FTX (noviembre 2022).
+**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en BTC contra caidas catastroficas del mercado. BTC Catastrophe Shield cubre escenarios extremos: crasheos superiores al 50% como los vividos durante COVID (marzo 2020), el colapso de LUNA (mayo 2022) o la caida de FTX (noviembre 2022).
+
+### 4.1b ETH Apocalypse Shield (EAS)
+
+**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en ETH contra caidas apocalipticas del mercado. ETH Apocalypse Shield cubre los escenarios mas extremos: crasheos superiores al 60%.
 
 **Parametros del contrato:**
 
 | Parametro                | Valor                                                     |
 |--------------------------|-----------------------------------------------------------|
-| Producto ID              | `BLACKSWAN-001`                                           |
+| Producto ID              | `BCS-001`                                           |
 | Contrato                 | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f`              |
 | Trigger                  | Caida > 30% desde el precio al momento de compra          |
 | TRIGGER_DROP_BPS         | `3000` (30% en puntos base)                               |
@@ -369,8 +374,8 @@ Lumina opera con cuatro vaults especializados, cada uno con un periodo de cooldo
 
 | Vault                | Cooldown | Productos Asignados             | APY Estimado | Direccion                                          |
 |----------------------|----------|---------------------------------|--------------|-----------------------------------------------------|
-| **VolatileShort**    | 37 dias  | BSS + IL Index Cover            | 3.3 - 22.2%  | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
-| **VolatileLong**     | 97 dias  | IL largo + BSS overflow         | 3.3 - 24.7%  | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
+| **VolatileShort**    | 37 dias  | BCS + EAS + IL Index Cover      | 4 - 17%       | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
+| **VolatileLong**     | 97 dias  | IL largo + BCS/EAS overflow     | 4 - 21%       | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
 | **StableShort**      | 97 dias  | Depeg corto                     | 2.7 - 9.0%   | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
 | **StableLong**       | 372 dias | Depeg largo + Exploit Shield    | 2.8 - 10.3%  | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
 
@@ -422,8 +427,8 @@ Actualmente opera en modo 1-of-1 (expandible a N-of-M). El oracle verifica los f
 
 | Feed           | Direccion                                          | Staleness    | Productos que lo usan          |
 |----------------|-----------------------------------------------------|--------------|--------------------------------|
-| ETH/USD        | `0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70`       | 1,200s (20m) | BSS, IL Index Cover            |
-| BTC/USD        | `0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E`       | 1,200s (20m) | BSS                            |
+| ETH/USD        | `0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70`       | 1,200s (20m) | EAS, IL Index Cover            |
+| BTC/USD        | `0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E`       | 1,200s (20m) | BCS                            |
 | USDC/USD       | `0x7e860098F58bBFC8648a4311b374B1D669a2bc6B`       | 86,400s (24h)| Referencia interna             |
 | USDT/USD       | `0xf19d560eB8d2ADf07BD6D13ed03e1D11215721F9`       | 86,400s (24h)| Depeg Shield                   |
 | DAI/USD        | `0x591e79239a7d679378eC8c847e5038150364C78F`       | 86,400s (24h)| Depeg Shield                   |
@@ -536,7 +541,7 @@ Lumina integra el estandar OWS (Open Wallet Standard) para facilitar la interacc
 
 ## 9. DATOS ACTUARIALES
 
-### 9.1 Black Swan Shield -- Expected Value para LPs
+### 9.1 BTC Catastrophe Shield / ETH Apocalypse Shield -- Expected Value para LPs
 
 | Metrica                      | Valor                  |
 |------------------------------|------------------------|
@@ -545,7 +550,7 @@ Lumina integra el estandar OWS (Open Wallet Standard) para facilitar la interacc
 | Ganancia neta anual          | +$20,000               |
 | Margen                       | 38%                    |
 
-El margen del 38% refleja la naturaleza de cola gruesa del riesgo BSS: los eventos de cisne negro son poco frecuentes pero severos. En anos sin eventos, el margen es significativamente mayor. En anos con multiples eventos, el margen puede ser negativo.
+El margen del 38% refleja la naturaleza de cola gruesa del riesgo BCS/EAS: los eventos catastroficos son poco frecuentes pero severos. En anos sin eventos, el margen es significativamente mayor. En anos con multiples eventos, el margen puede ser negativo.
 
 ### 9.2 Depeg Shield -- Expected Value para LPs
 
@@ -611,7 +616,7 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 
 ### Fase 1 -- Lanzamiento (Actual, Q1 2026)
 
-- 4 productos de seguro operativos: BSS, Depeg, IL Index, Exploit
+- 5 productos de seguro operativos: BCS, EAS, Depeg, IL Index, Exploit
 - 4 vaults de liquidez con yield Aave V3
 - Despliegue en Base L2 (Chain 8453)
 - 13 contratos en produccion con proxies UUPS
@@ -703,7 +708,7 @@ Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, 
 
 | Shield                 | Direccion                                          |
 |------------------------|-----------------------------------------------------|
-| BlackSwanShield (BSS)  | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f`       |
+| BTC Catastrophe Shield (BCS) / ETH Apocalypse Shield (EAS) | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f` |
 | DepegShield            | `0x7578816a803d293bbb4dbea0efbed872842679d0`       |
 | ILIndexCover           | `0x2ac0d2a9889a8a4143727a0240de3fed4650dd93`       |
 | ExploitShield          | `0x9870830c615d1b9c53dfee4136c4792de395b7a1`       |
@@ -743,14 +748,14 @@ Los productos de Lumina estan disenados para cubrir riesgos con baja correlacion
 
 | Grupo de Correlacion     | Productos Afectados              | Trigger                                       | Probabilidad Conjunta |
 |--------------------------|----------------------------------|------------------------------------------------|------------------------|
-| **Crash de ETH/BTC**     | BSS, IL Index Cover              | Caida >30% en activos volatiles                | Media                  |
+| **Crash de ETH/BTC**     | BCS, EAS, IL Index Cover         | Caida >50% BTC / >60% ETH                     | Media                  |
 | **Crisis de stablecoin** | Depeg Shield                     | Depeg de DAI o USDT por debajo de $0.95        | Baja                   |
 | **Exploit de protocolo** | Exploit Shield                   | Hack o vulnerabilidad en protocolo cubierto    | Baja                   |
-| **Evento sistemico**     | BSS + Depeg + IL + Exploit       | Colapso del ecosistema DeFi completo           | Muy Baja               |
+| **Evento sistemico**     | BCS + EAS + Depeg + IL + Exploit | Colapso del ecosistema DeFi completo           | Muy Baja               |
 
 **Analisis de correlacion:**
 
-- **BSS e IL Index Cover** tienen correlacion alta: un crash de mercado activa BSS y simultaneamente genera IL significativo. Por esta razon, ambos comparten el vault VolatileShort.
+- **BCS, EAS e IL Index Cover** tienen correlacion alta: un crash de mercado activa BCS/EAS y simultaneamente genera IL significativo. Por esta razon, comparten el vault VolatileShort.
 
 - **Depeg Shield** tiene correlacion baja con los productos de volatilidad. Un depeg de stablecoin puede ocurrir independientemente de la direccion del mercado (ej: crisis bancaria, riesgo regulatorio de Tether).
 
@@ -811,7 +816,7 @@ Lumina Protocol representa la primera infraestructura de seguro parametrico dise
 - **Parametrico puro:** Sin reclamos subjetivos, sin votaciones, sin esperas. El trigger se activa y el pago es inmediato.
 - **Disenado para agentes:** API programatica, session approval para relayers, integracion OWS, documentacion SKILL.
 - **Colateral 1:1:** Cada poliza esta respaldada al 100% por USDC real bloqueado en el vault. Sin riesgo de subcapitalizacion.
-- **Yield real:** Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 3-25%.
+- **Yield real:** Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 3-21%.
 - **Seguridad en capas:** Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), TWAP, sequencer check.
 - **Modelo de negocio transparente:** 3% premium + 3% payout. Sin fees ocultos. Sin fee en retiros de vault.
 

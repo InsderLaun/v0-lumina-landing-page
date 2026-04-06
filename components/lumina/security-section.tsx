@@ -33,7 +33,7 @@ const TRUST_CARDS = [
     {
         icon: Shield,
         title: "Correlation Groups",
-        description: "BSS+IL capped at 70% per vault. Limits correlated loss exposure.",
+        description: "BCS+EAS+IL capped at 70% per vault. Limits correlated loss exposure.",
         link: `${BASESCAN_URL}/${CONTRACTS.MutualLumina}`,
     },
 ]

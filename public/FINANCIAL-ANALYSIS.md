@@ -32,7 +32,7 @@
 
 ## KINK MODEL M(U) CURVE
 
-| U% | M(U) | Premium at BSS 6.5% | Zone |
+| U% | M(U) | Premium at BCS/EAS 6.5% | Zone |
 |----|------|---------------------|------|
 | 0% | 1.000 | 6.50% | Safe |
 | 20% | 1.125 | 7.31% | Safe |
@@ -53,10 +53,10 @@
 
 | Scenario | Trigger | Vault Loss | Recovery |
 |----------|---------|-----------|----------|
-| ETH -50% (Black Thursday) | All BSS | -16.8% TVL | 27 months |
+| ETH -50% (Black Thursday) | All BCS/EAS | -16.8% TVL | 27 months |
 | USDT depeg to $0.90 | Depeg Shield | -22.1% TVL | 52 months |
 | Aave V3 exploit (-20%) | Direct capital loss | -20% TVL | N/A (unrecoverable) |
-| ETH crash + USDT depeg | Correlated BSS+Depeg | -22% volatile + -22% stable | 40+ months |
+| ETH crash + USDT depeg | Correlated BCS/EAS+Depeg | -22% volatile + -22% stable | 40+ months |
 | Bank run (all LPs withdraw) | Liquidity crunch | 0% (cooldown prevents) | N/A |
 
 ---
@@ -92,14 +92,14 @@
 2. **Oracle 1-of-1** — single key compromise drains non-Exploit vaults
 3. **Extreme illiquidity** — 37-372d irrevocable cooldowns, soulbound shares
 4. **Long recovery times** — 27-60 months post-catastrophe
-5. **BSS actuarially negative at small scale** — needs product blending + Aave subsidy
+5. **BCS/EAS actuarially negative at small scale** — needs product blending + Aave subsidy
 
 ---
 
 ## RECOMMENDATIONS
 
 - **Kink Model parameters:** Current settings are well-calibrated. No changes needed.
-- **Base rates:** BSS 6.5% and IL 8.5% are appropriate for the risk. DEPEG 2.5% is barely competitive vs Nexus Mutual (2.6%). EXPLOIT 4.0% is 54% more expensive but justified by automation speed.
+- **Base rates:** BCS/EAS 6.5% and IL 8.5% are appropriate for the risk. DEPEG 2.5% is barely competitive vs Nexus Mutual (2.6%). EXPLOIT 4.0% is 54% more expensive but justified by automation speed.
 - **Cooldowns:** VolatileShort 37d is acceptable. StableLong 372d is extremely long — consider reducing to 180d.
 - **Reaseguro:** Not implemented. At scale ($10M+ TVL), consider buying coverage on Nexus Mutual for tail risk.
 - **Key metrics to track:** loss ratio per product, utilization by vault, premium income vs claim payouts, time-to-recovery after events.
@@ -112,6 +112,6 @@
 
 **For DeFi-native capital?** Yes — one of the more interesting real-yield opportunities on Base. Position sizing: 5-15% of portfolio until audit completed.
 
-**Is the model sustainable?** Yes at scale ($5M+ TVL). At small scale, BSS alone is actuarially negative — protocol viability depends on product diversification and Aave yield subsidy.
+**Is the model sustainable?** Yes at scale ($5M+ TVL). At small scale, BCS/EAS alone is actuarially negative — protocol viability depends on product diversification and Aave yield subsidy.
 
 **Best vault for LPs:** VolatileShort (highest Sharpe 0.82, shortest cooldown 37d, manageable drawdown).

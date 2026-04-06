@@ -14,8 +14,8 @@ const TABS = [
         response: `{
   "products": [
     {
-      "id": "BLACKSWAN-002",
-      "name": "Black Swan Shield",
+      "id": "BCS-001",
+      "name": "BTC Catastrophe Shield",
       "triggerType": "PRICE_DROP_PCT",
       "thresholdOptions": [1000, 1500, 2000, 2500, 3000],
       "sustainedPeriod": 1800,
@@ -37,7 +37,7 @@ const TABS = [
         command: `curl -X POST .../api/v1/quote \\
   -H "Authorization: Bearer lum_YOUR_API_KEY" \\
   -d '{
-    "productId": "BLACKSWAN-002",
+    "productId": "BCS-001",
     "coverageAmount": 10000,
     "durationDays": 30,
     "threshold": 2000,

@@ -373,7 +373,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <div style="margin-top:16px;margin-bottom:12px;padding:14px;background:rgba(34,211,238,0.05);border:1px solid rgba(34,211,238,0.15);border-radius:8px">
 <p style="color:#22d3ee;font-size:0.85rem;font-weight:600;margin-bottom:6px">💬 Using ChatGPT or Claude?</p>
-<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Tell your agent: <em>"Buy a Black Swan Shield for $100, 7 days duration."</em> Your agent will call the Lumina API and respond with a confirmation including the policy ID.</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Tell your agent: <em>"Buy a BTC Catastrophe Shield for $100, 7 days duration."</em> Your agent will call the Lumina API and respond with a confirmation including the policy ID.</p>
 </div>
 
 <div style="margin-bottom:12px;padding:14px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:8px">
@@ -386,8 +386,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <pre style="margin-top:8px">curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
   -H "Content-Type: application/json" \
   -H "X-API-Key: lum_your_key_here" \
-  -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'</pre>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This buys $100 Black Swan Shield for 7 days.</p>
+  -d '{"productId":"BCS","coverageAmount":100000000,"durationSeconds":604800}'</pre>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This buys $100 BTC Catastrophe Shield for 7 days.</p>
 </details>
 
 <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the Dashboard to see your active policy.</p>
@@ -447,7 +447,8 @@ function finishSetup() {
 <div style="overflow-x:auto">
 <table class="table-insurance" style="width:100%">
 <tr><th>Product</th><th>ID</th><th>Protects Against</th><th>Duration</th><th>Deductible</th></tr>
-<tr><td>Black Swan Shield</td><td><code>BSS</code></td><td>ETH or BTC crash &#x2265;30%</td><td>7-30d</td><td>20%</td></tr>
+<tr><td>BTC Catastrophe Shield</td><td><code>BCS</code></td><td>BTC crash &#x2265;50%</td><td>7-30d</td><td>20%</td></tr>
+<tr><td>ETH Apocalypse Shield</td><td><code>EAS</code></td><td>ETH crash &#x2265;60%</td><td>7-30d</td><td>20%</td></tr>
 <tr><td>Depeg Shield</td><td><code>DEPEG</code></td><td>USDT or DAI loses peg</td><td>14-365d</td><td>USDT:15% / DAI:12%</td></tr>
 <tr><td>IL Index Cover</td><td><code>IL</code></td><td>Impermanent loss</td><td>14-90d</td><td>2%</td></tr>
 <tr><td>Exploit Shield</td><td><code>EXPLOIT</code></td><td>External protocol hacks (excl. Aave)</td><td>90-365d</td><td>10%</td></tr>
@@ -465,8 +466,8 @@ function finishSetup() {
 <div style="overflow-x:auto">
 <table class="table-vaults" style="width:100%">
 <tr><th>Vault</th><th>Lockup</th><th>Risk Profile</th><th>What it covers</th></tr>
-<tr><td><strong>Volatile Short</strong></td><td>37 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>BSS + IL claims</td></tr>
-<tr><td><strong>Volatile Long</strong></td><td>97 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>BSS + IL claims</td></tr>
+<tr><td><strong>Volatile Short</strong></td><td>37 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>BCS + EAS + IL claims</td></tr>
+<tr><td><strong>Volatile Long</strong></td><td>97 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>BCS + EAS + IL claims</td></tr>
 <tr><td><strong>Stable Short</strong></td><td>97 days</td><td><span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px">Lower risk/yield</span></td><td>DEPEG + EXPLOIT claims</td></tr>
 <tr><td><strong>Stable Long</strong></td><td>372 days</td><td><span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px">Lower risk/yield</span></td><td>DEPEG + EXPLOIT claims</td></tr>
 </table>

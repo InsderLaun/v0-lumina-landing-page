@@ -19,10 +19,10 @@
 |---|-------|---------------|---------------|
 | 6 | "79 tests" instead of "119" | 15+ locations (page.tsx, whitepapers, CLI, SKILL) | 119 |
 | 7 | Cooldowns 30/90/365 instead of 37/97/372 | ~20 locations (SKILL-v2, CLI, whitepapers, DeployUUPS.s.sol) | 37/97/97/372 |
-| 8 | BSS waiting "None" instead of "1 hour" | 7+ locations (SKILL-v2, page.tsx, CLI, whitepapers) | 1 hour |
+| 8 | BCS/EAS waiting "None" instead of "1 hour" | 7+ locations (SKILL-v2, page.tsx, CLI, whitepapers) | 1 hour |
 | 9 | M(U) values 1.88/2.63 (wrong post-kink) | 10+ locations (whitepapers HTML, CLI, page.tsx) | 2.25/3.0/3.75 |
 | 10 | Oracle "2-of-3" without "planned" qualifier | 4 locations (whitepaper pages, CLI) | 1-of-1 (planned 2-of-3) |
-| 11 | Old product names LIQSHIELD/GASSPIKE/SLIPPAGE/BRIDGE | 15+ locations in landing page components | BSS/DEPEG/IL/EXPLOIT |
+| 11 | Old product names LIQSHIELD/GASSPIKE/SLIPPAGE/BRIDGE | 15+ locations in landing page components | BCS/EAS/DEPEG/IL/EXPLOIT |
 | 12 | "MoltX" in landing page footer | components/lumina/footer.tsx | Remove or rename |
 | 13 | EP V1 address in subgraph not marked deactivated | subgraph/subgraph.yaml, README.md | Update to new EP |
 
@@ -52,4 +52,4 @@
 - Chainlink feed addresses correct
 - 3 roles (AI Agent, Agent Owner, LP) consistent
 - Fee structure (3% premium + 3% payout + 3% perf) consistent
-- Product parameters match code (except BSS waiting noted above)
+- Product parameters match code (except BCS/EAS waiting noted above)

@@ -26,13 +26,13 @@ Lumina charges a 3% protocol fee on two events:
 - **When you buy:** 3% of your premium goes to the protocol. The vault receives 97%.
 - **When you claim:** 3% of your payout goes to the protocol. You receive 97%.
 
-This means your NET payout = calculated payout × 0.97. If a BSS policy calculates $40,000 payout (80% of $50K coverage), you receive $38,800. Plan your coverage accordingly.
+This means your NET payout = calculated payout × 0.97. If a BCS policy calculates $40,000 payout (80% of $50K coverage), you receive $38,800. Plan your coverage accordingly.
 
 **Coverage planning with fee:**
 If you need to receive EXACTLY $40,000 net after a claim:
 ```
 Required coverage = target_net / (maxPayout% × 0.97)
-BSS: $40,000 / (0.80 × 0.97) = $51,546 coverage
+BCS/EAS: $40,000 / (0.80 × 0.97) = $51,546 coverage
 Depeg USDT: $40,000 / (0.85 × 0.97) = $48,530 coverage
 Depeg DAI: $40,000 / (0.88 × 0.97) = $46,860 coverage
 Exploit: $40,000 / (0.90 × 0.97) = $45,830 coverage
@@ -42,18 +42,59 @@ Exploit: $40,000 / (0.90 × 0.97) = $45,830 coverage
 
 # SECTION 2: THE 4 INSURANCE PRODUCTS
 
-**Note on Product IDs:** The API accepts both short IDs (BSS, DEPEG, IL, EXPLOIT) and full IDs (BLACKSWAN-002, DEPEG-STABLE-002, ILPROT-002, EXPLOIT-002). Use whichever format your integration prefers.
+**Note on Product IDs:** The API accepts both short IDs (BCS, EAS, DEPEG, IL, EXPLOIT) and full IDs (BCS-001, EAS-001, DEPEG-STABLE-002, ILPROT-002, EXPLOIT-002). Use whichever format your integration prefers.
 
-## Product 1: Black Swan Shield (BSS)
+## Product 1: BTC Catastrophe Shield (BCS)
 
-**What it covers:** Catastrophic crash of ETH or BTC (>30% drop from your purchase price).
+**What it covers:** Catastrophic crash of BTC (>50% drop from your purchase price).
 
-**When you need it:** You hold ETH/BTC exposure and want protection against sudden market collapse. Not for normal 10-15% swings — this is for "the world is ending" scenarios like COVID March 2020, LUNA collapse 2022, or FTX crash 2022.
+**When you need it:** You hold BTC exposure and want protection against sudden market collapse. Not for normal 10-15% swings — this is for "the world is ending" scenarios like COVID March 2020, LUNA collapse 2022, or FTX crash 2022.
 
 | Parameter | Value |
 |-----------|-------|
-| Product ID | `BLACKSWAN-001` |
-| Trigger | Price drops >30% from the exact price at the moment you buy the policy |
+| Product ID | `BCS-001` |
+| Trigger | BTC price drops >50% from the exact price at the moment you buy the policy |
+| Payout | 80% of coverage (20% deductible) |
+| Duration | 7 to 30 days (you choose, priced by the second) |
+| Waiting Period | 1 hour (anti-front-running) — coverage starts 1 hour after purchase |
+| Minimum Coverage | $100 |
+| Base Rate | 6.5% annualized (650 bps) |
+| Protocol Fee | 3% on premium + 3% on payout. Net payout = 77.6% of coverage |
+
+**Example:**
+```
+You buy: $50,000 coverage on BTC for 14 days
+BTC price at purchase: $60,000
+Trigger price: $60,000 × 0.50 = $30,000
+
+Premium: $50,000 × 0.065 × 1.25 (utilization multiplier) × (14/365) = $156
+
+Scenario A: BTC stays above $30,000 → policy expires, you lose $156
+Scenario B: BTC crashes to $28,000 → you receive $40,000 (80% of $50K)
+Return on premium: $40,000 / $156 = 256x
+```
+
+**Pricing table ($50,000 coverage, utilization 40%):**
+
+| Duration | Premium | % of Coverage |
+|----------|---------|---------------|
+| 7 days | $264 | 0.53% |
+| 14 days | $527 | 1.05% |
+| 21 days | $791 | 1.58% |
+| 30 days | $1,130 | 2.26% |
+
+---
+
+## Product 1b: ETH Apocalypse Shield (EAS)
+
+**What it covers:** Apocalyptic crash of ETH (>60% drop from your purchase price).
+
+**When you need it:** You hold ETH exposure and want protection against the most extreme market scenarios. This covers deeper crashes than BCS — true apocalyptic events.
+
+| Parameter | Value |
+|-----------|-------|
+| Product ID | `EAS-001` |
+| Trigger | ETH price drops >60% from the exact price at the moment you buy the policy |
 | Payout | 80% of coverage (20% deductible) |
 | Duration | 7 to 30 days (you choose, priced by the second) |
 | Waiting Period | 1 hour (anti-front-running) — coverage starts 1 hour after purchase |
@@ -65,12 +106,12 @@ Exploit: $40,000 / (0.90 × 0.97) = $45,830 coverage
 ```
 You buy: $50,000 coverage on ETH for 14 days
 ETH price at purchase: $2,000
-Trigger price: $2,000 × 0.70 = $1,400
+Trigger price: $2,000 × 0.40 = $800
 
 Premium: $50,000 × 0.065 × 1.25 (utilization multiplier) × (14/365) = $156
 
-Scenario A: ETH stays above $1,400 → policy expires, you lose $156
-Scenario B: ETH crashes to $1,350 → you receive $40,000 (80% of $50K)
+Scenario A: ETH stays above $800 → policy expires, you lose $156
+Scenario B: ETH crashes to $750 → you receive $40,000 (80% of $50K)
 Return on premium: $40,000 / $156 = 256x
 ```
 
@@ -244,12 +285,12 @@ Only a REAL exploit triggers BOTH conditions simultaneously.
 
 ## Correlation Group Capacity Limits
 
-BSS and IL Protection share a combined allocation cap of 70% per vault.
-This means if BSS is using 50% of the vault, IL can only use up to 20%.
+BCS, EAS, and IL Protection share a combined allocation cap of 70% per vault.
+This means if BCS+EAS is using 50% of the vault, IL can only use up to 20%.
 If the combined cap is reached, new purchases for either product will be rejected.
-This protects LPs from correlated losses during market crashes (an ETH crash triggers both BSS and IL simultaneously).
+This protects LPs from correlated losses during market crashes (a crash triggers both BCS/EAS and IL simultaneously).
 
-Depeg and Exploit are NOT correlated with BSS/IL and have independent capacity limits.
+Depeg and Exploit are NOT correlated with BCS/EAS/IL and have independent capacity limits.
 
 ---
 
@@ -271,8 +312,8 @@ Total yield = Aave V3 yield + premium yield
 
 | Vault | Cooldown | Aave V3 Base | Premiums | TOTAL APY |
 |-------|----------|-----------|----------|-----------|
-| VolatileShort | 37 days | 3-5% | 0.8-19.7% | **3.3-22.2%** |
-| VolatileLong | 97 days | 3-5% | 0.8-22.2% | **3.3-24.7%** |
+| VolatileShort | 37 days | 3-5% | 1-14% | **4-17%** |
+| VolatileLong | 97 days | 3-5% | 1-18% | **4-21%** |
 | StableShort | 97 days | 3-5% | 0.2-6.5% | **2.7-9.0%** |
 | StableLong | 372 days | 3-5% | 0.3-7.8% | **2.8-10.3%** |
 
@@ -286,7 +327,7 @@ The Kink Model (dynamic pricing) creates a self-balancing market:
 ```
 Vault TVL: $200K, Allocated: $120K → Utilization: 60%
 Kink multiplier at 60%: 1.38x
-Premium for a $50K BSS policy (14d): $50K × 0.065 × 1.38 × (14/365) = $172
+Premium for a $50K BCS policy (14d): $50K × 0.065 × 1.38 × (14/365) = $172
 
 Now an agent buys another $50K policy:
 New utilization: ($120K + $50K) / $200K = 85%
@@ -325,11 +366,11 @@ LPs earn premiums but also absorb claims. Here's the risk profile:
 
 | Vault | Products | Claim Frequency | Max Loss per Event | Expected Monthly |
 |-------|----------|----------------|-------------------|-----------------|
-| VolatileShort | BSS + IL | BSS: rare but large. IL: frequent but small | 20% of vault (BSS) | Premiums >> claims |
+| VolatileShort | BCS + EAS + IL | BCS/EAS: rare but large. IL: frequent but small | 20% of vault (BCS/EAS) | Premiums >> claims |
 | StableLong | Depeg + Exploit | Very rare (both) | 22% of vault (Depeg) | Very stable income |
 
 **Worst case (once every 5-10 years):**
-A black swan event triggers BSS AND Depeg simultaneously (e.g., market crash + bank failure like SVB). Combined loss: ~38% of vault TVL. Severe but not terminal. The protocol survives and rebuilds via ongoing premiums.
+A catastrophic event triggers BCS/EAS AND Depeg simultaneously (e.g., market crash + bank failure like SVB). Combined loss: ~38% of vault TVL. Severe but not terminal. The protocol survives and rebuilds via ongoing premiums.
 
 **Expected case (normal year):**
 Premiums far exceed claims. The Kink Model ensures premiums are always priced above expected loss. LP is profitable in expectation.
@@ -343,7 +384,7 @@ Lumina uses multiple layers to prevent gaming:
 | Mechanism | Purpose | Products |
 |-----------|---------|----------|
 | TWAP verification | Prevents flash crash exploitation | All |
-| Waiting periods | Prevents buying when you see the event coming | BSS (1h), Depeg (24h), Exploit (14d) |
+| Waiting periods | Prevents buying when you see the event coming | BCS/EAS (1h), Depeg (24h), Exploit (14d) |
 | Circuit breakers | Pauses or increases price during volatile moments | All |
 | European-style resolution | Prevents scanning for optimal claim point | IL Index |
 | $50K cap per wallet | Makes insider attacks unprofitable | Exploit |
@@ -353,7 +394,7 @@ Lumina uses multiple layers to prevent gaming:
 
 **Circuit breaker rules:**
 
-| Condition | BSS | Depeg | IL | Exploit |
+| Condition | BCS/EAS | Depeg | IL | Exploit |
 |-----------|-----|-------|----|---------|
 | Moderate volatility | Premium ×1.5 | Premium ×2.0 | Premium ×1.5 | Premium ×3.0 |
 | Extreme volatility | HALT new policies | HALT new policies | HALT new policies | HALT new policies |
@@ -367,10 +408,10 @@ Lumina uses multiple layers to prevent gaming:
 ```
 GET /api/v2/quote
 {
-  "productId": "BLACKSWAN-001",
+  "productId": "BCS-001",
   "coverageAmount": 50000000000,    // $50,000 in 6 decimals (USDC)
   "durationSeconds": 1209600,       // 14 days
-  "asset": "ETH",                   // For BSS and IL
+  "asset": "ETH",                   // For BCS/EAS and IL
   "stablecoin": "",                 // For Depeg: "DAI", "USDT" (USDC excluded)
   "protocol": "",                   // For Exploit: protocol address
   "buyer": "0xYourAgentWallet"
@@ -431,12 +472,12 @@ Gross Payout = coverageAmount × (1 - deductibleBps/10000)
 Protocol Fee = Gross Payout × 3%
 Net Payout = Gross Payout - Protocol Fee
 
-Example: $1000 BSS with 20% deductible:
+Example: $1000 BCS with 20% deductible:
   Gross Payout = $1000 × 0.80 = $800
   Protocol Fee = $800 × 0.03 = $24
   Net Payout (you receive) = $776
 
-For larger amounts ($50,000 BSS coverage):
+For larger amounts ($50,000 BCS coverage):
   Gross Payout = $50,000 × 0.80 = $40,000
   Protocol Fee = $40,000 × 0.03 = $1,200
   Net Payout (you receive) = $38,800
@@ -467,7 +508,7 @@ To maintain continuous coverage without gaps:
 ┌─────────┬────────────────┬────────────────────────────────────────────────────┐
 │ Product │ Waiting Period │ Repurchase Window                                  │
 ├─────────┼────────────────┼────────────────────────────────────────────────────┤
-│ BSS     │ 3600s (1h)     │ Repurchase when expiresAt - now < 7200 (2 hours)   │
+│ BCS/EAS │ 3600s (1h)     │ Repurchase when expiresAt - now < 7200 (2 hours)   │
 │ DEPEG   │ 86400s (24h)   │ Repurchase when expiresAt - now < 90000 (25 hours) │
 │ IL      │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
 │ EXPLOIT │ 1209600s (14d) │ Repurchase when expiresAt - now < 1296000 (15 days)│
@@ -478,7 +519,7 @@ Logic for your agent loop:
   timeLeft = policy.expiresAt - currentTime
   if (timeLeft < repurchaseWindowSeconds) → GET /quote → POST /purchase
 
-This ensures zero coverage gaps. The extra buffer (2h for BSS, 1h for IL, 25h for DEPEG, 15d for EXPLOIT) accounts for the waiting period of the new policy.
+This ensures zero coverage gaps. The extra buffer (2h for BCS/EAS, 1h for IL, 25h for DEPEG, 15d for EXPLOIT) accounts for the waiting period of the new policy.
 
 ## Error Handling
 
@@ -494,7 +535,7 @@ On-chain transactions can revert. Here is how to handle each error:
 | `NoVaultCapacity` | All vaults for this risk type are full (>95% utilization) | Wait 24 hours for utilization to drop, or reduce coverage amount |
 | `CorrelationGroupCapExceeded` | Correlated products hit their combined cap | Same as above — wait or reduce |
 | `NonceAlreadyUsed` | You resubmitted a quote that was already used | Request a fresh quote with a new nonce |
-| `DurationOutOfRange` | Duration outside product limits | Check product's durationRange (e.g., BSS: 7-30 days) |
+| `DurationOutOfRange` | Duration outside product limits | Check product's durationRange (e.g., BCS: 7-30 days) |
 | `CoverageOutOfRange` | Coverage below $100 minimum | Increase coverage to at least $100 |
 | `MaxCoveragePerWalletExceeded` | Exploit Shield: exceeded $50K per wallet | You already have $50K in Exploit coverage — cannot buy more from this wallet |
 | `TriggerNotMet` | Tried to claim but the trigger condition wasn't met | Verify the event actually occurred. Check oracle proof freshness. |
@@ -540,10 +581,10 @@ ABIs are published at: `https://github.com/org-lumina/LUMINA-PROTOCOL/tree/main/
 | What changes | VolatileShort | VolatileLong | StableShort | StableLong |
 |-------------|---------------|--------------|-------------|------------|
 | Cooldown (exit notice) | 37 days | 97 days | 97 days | 372 days |
-| Products backed | BSS + IL short | IL long + BSS overflow | Depeg short | Depeg long + Exploit |
+| Products backed | BCS + EAS + IL short | IL long + BCS/EAS overflow | Depeg short | Depeg long + Exploit |
 | Risk type | VOLATILE | VOLATILE | STABLE | STABLE |
 | Claim frequency | Higher | Higher | Low | Very low |
-| APY (Aave V3 + premiums) | 3.3-22.2% | 3.3-24.7% | 2.7-9.0% | 2.8-10.3% |
+| APY (Aave V3 + premiums) | 4-17% | 4-21% | 2.7-9.0% | 2.8-10.3% |
 
 **What is a cooldown? It is NOT a lock period. It is an EXIT NOTICE.**
 
@@ -587,7 +628,7 @@ GET /api/v2/vaults
 ```
 Want maximum yield and OK with 1-year exit notice?    → StableLong (18-26%)
 Want moderate yield with 97-day exit notice?           → VolatileLong or StableShort (11-18%)
-Want quick exit (37-day notice) and accept BSS risk?   → VolatileShort (12-15%)
+Want quick exit (37-day notice) and accept BCS/EAS risk? → VolatileShort (12-15%)
 Unsure? Start with VolatileShort (shortest commitment) → move to longer vaults later
 ```
 
@@ -660,8 +701,11 @@ There is no direct transfer between vaults. You must withdraw and re-deposit.
 ## Should I buy insurance? (For buyer agents)
 
 ```
-IF you hold ETH/BTC exposure > $10,000:
-  → Consider BSS for crash protection
+IF you hold BTC exposure > $10,000:
+  → Consider BCS for crash protection
+
+IF you hold ETH exposure > $10,000:
+  → Consider EAS for crash protection
 
 IF you hold stablecoins > $50,000 for > 14 days:
   → Consider Depeg Shield
@@ -686,7 +730,7 @@ IF you want maximum yield and can commit to 372-day exit notice:
 IF you want moderate yield with 97-day exit notice:
   → VolatileLong or StableShort (12-17% APY)
 
-IF you want quick access (37-day exit notice) and tolerate BSS/IL claim risk:
+IF you want quick access (37-day exit notice) and tolerate BCS/EAS/IL claim risk:
   → VolatileShort (12-14% APY)
 
 IF a vault's utilization is > 80%:
@@ -705,7 +749,8 @@ MARKET DATA SOURCES (for autonomous decision-making):
 Your agent needs external data to make buy/sell decisions. Recommended free sources:
 
 - ETH price: GET https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
-- ETH volatility: Fetch ETH price hourly, compute stddev over 24 points. If stddev > 5% of price → high volatility → consider BSS
+- ETH volatility: Fetch ETH price hourly, compute stddev over 24 points. If stddev > 5% of price → high volatility → consider EAS
+- BTC volatility: Same approach for BTC → consider BCS
 - Stablecoin peg: GET https://api.coingecko.com/api/v3/simple/price?ids=tether,dai&vs_currencies=usd — if price < 0.98 → consider DEPEG
 - Vault utilization: GET /api/v2/vaults → use utilizationPct. If > 80% → premiums expensive. If < 40% → premiums cheap
 - DeFi exploits: Monitor https://rekt.news for hack reports
@@ -825,13 +870,14 @@ Current on-chain parameters (verified against live API):
 ```
 Product     │ pBase (annual) │ riskMult │ Used by vaults
 ────────────┼────────────────┼──────────┼──────────────────────
-BSS         │ 6.50%  (650bp) │ 1.0x     │ VolatileShort, VolatileLong
+BCS         │ 6.50%  (650bp) │ 1.0x     │ VolatileShort, VolatileLong
+EAS         │ 6.50%  (650bp) │ 1.0x     │ VolatileShort, VolatileLong
 IL Index    │ 8.50%  (850bp) │ 1.0x     │ VolatileShort, VolatileLong
 Depeg       │ 2.50%  (250bp) │ 1.0x     │ StableShort, StableLong
 Exploit     │ 4.00%  (400bp) │ 1.0x     │ StableShort, StableLong
 ```
 
-### TABLE 1 — BSS Premium ($10,000 coverage, 14 days)
+### TABLE 1 — BCS/EAS Premium ($10,000 coverage, 14 days)
 
 Formula: Premium = $10,000 × 0.065 × M(U) × (14/365)
 
@@ -954,7 +1000,7 @@ STEP 2: Use this matrix:
 
 KEY INSIGHT: When premiums are cheap (low U), few agents are buying protection. This is often BEFORE a crash, when protection is most valuable. When premiums are expensive (high U), many agents are already protected — the market is pricing in danger.
 
-STRATEGY: The smartest time to buy BSS is when U is LOW and the market feels safe. That's when protection is cheapest and most likely to pay off.
+STRATEGY: The smartest time to buy BCS/EAS is when U is LOW and the market feels safe. That's when protection is cheapest and most likely to pay off.
 
 ## AS A VAULT DEPOSITOR (LP) — Real-Time Yield Tables
 
@@ -962,7 +1008,7 @@ LP yield = Aave V3 base yield + Premium yield from insurance policies
 
 Premium yield = U × blended_pBase × M(U) × 0.97 (after 3% protocol fee)
 
-### TABLE 5 — VolatileShort LP Yield (BSS + IL blend, pBase_avg ≈ 7.3%)
+### TABLE 5 — VolatileShort LP Yield (BCS + EAS + IL blend, pBase_avg ≈ 7.2%)
 
 Assuming Aave V3 base yield = 3.5% (variable — check current rate)
 
@@ -983,7 +1029,7 @@ U%   │ M(U)  │ Premium yield │ + Aave 3.5% │ TOTAL APY │ Beats?
 94%  │ 3.600 │    23.96%     │    3.50%    │  27.46%   │ exceptional
 ```
 
-### TABLE 6 — VolatileLong LP Yield (BSS overflow + IL, pBase_avg ≈ 8.0%)
+### TABLE 6 — VolatileLong LP Yield (BCS/EAS overflow + IL, pBase_avg ≈ 7.5%)
 
 ```
 U%   │ Premium yield │ + Aave 3.5% │ TOTAL APY
@@ -1144,7 +1190,7 @@ THIS IS NOT A BUG — IT IS THE CORE FEATURE. The protocol naturally oscillates 
 
 In a bear market (ETH declining):
 ```
-→ Every agent wants BSS protection (crash insurance)
+→ Every agent wants BCS/EAS protection (crash insurance)
 → Demand explodes → U skyrockets toward 80-95%
 → Premiums become very expensive (2-3.6x baseline)
 → LP yields become EXCEPTIONAL (15-28% for Volatile vaults)
@@ -1160,7 +1206,7 @@ This is counter-cyclical by design. When traditional DeFi yields collapse to 0-2
 
 In a bull market (ETH rising):
 ```
-→ Few agents need BSS protection
+→ Few agents need BCS/EAS protection
 → U drops toward 10-20%
 → Premiums are cheap
 → LP yields are low (4-5%, mostly Aave)
@@ -1200,10 +1246,10 @@ As an autonomous agent, monitor for these opportunities:
 Signal: Vault utilization drops below 20%
 Action: Buy protection — it's at its cheapest
 Why: Low U = M(U) ≈ 1.13 = premiums near minimum
-Example: BSS $10K/14d costs only $28 at U=20% vs $75 at U=90%
+Example: BCS $10K/14d costs only $28 at U=20% vs $75 at U=90%
 
 Signal: ETH volatility rising BUT utilization still low
-Action: Buy BSS immediately — cheap protection before the crowd arrives
+Action: Buy BCS/EAS immediately — cheap protection before the crowd arrives
 Why: Demand will push U up → your renewal will be more expensive
 ```
 
@@ -1279,7 +1325,8 @@ Settlement token: USDC (Circle) on Base.
 | VolatileLongVault | `0xFee5d6DAdA0A41407e9EA83D4F357DA6214Ff904` | 97-day cooldown |
 | StableShortVault | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC` | 97-day cooldown |
 | StableLongVault | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c` | 372-day cooldown |
-| BlackSwanShield | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f` | BSS product |
+| BTC Catastrophe Shield | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f` | BCS product |
+| ETH Apocalypse Shield | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f` | EAS product |
 | DepegShield | `0x7578816a803d293bbb4dbea0efbed872842679d0` | Depeg product |
 | ILIndexCover | `0x2ac0d2a9889a8a4143727a0240de3fed4650dd93` | IL product |
 | ExploitShield | `0x9870830c615d1b9c53dfee4136c4792de395b7a1` | Exploit product |
@@ -1303,7 +1350,7 @@ Settlement token: USDC (Circle) on Base.
 A: No. The website is informational only. All operations (buying, depositing, claiming) are done by AI agents via API or on-chain calls.
 
 **Q: What happens if I don't claim within the grace period?**
-A: The policy expires and funds are returned to the vault. For BSS/Depeg/Exploit, you have until cleanupAt (expiresAt + 24h). For IL Index, you have a 48h settlement window after expiry.
+A: The policy expires and funds are returned to the vault. For BCS/EAS/Depeg/Exploit, you have until cleanupAt (expiresAt + 24h). For IL Index, you have a 48h settlement window after expiry.
 
 **Q: Can I cancel a policy mid-term?**
 A: No. Policies are non-cancellable. The premium is paid upfront and non-refundable.
@@ -1315,7 +1362,7 @@ A: The oracle blocks stale prices until 1 hour after sequencer recovery. You hav
 A: The Aave V3 lending yield (variable, ~3-5% APY) is not guaranteed by Lumina — it depends on Aave V3 lending market conditions on Base. The premium yield on top depends on Lumina policy volume.
 
 **Q: What's the maximum I can lose as an LP?**
-A: In the absolute worst case (simultaneous BSS crash + stablecoin depeg), a vault could lose ~38% of TVL. This is extremely rare (~2-3% annual probability). In normal years, premiums far exceed claims.
+A: In the absolute worst case (simultaneous BCS/EAS crash + stablecoin depeg), a vault could lose ~38% of TVL. This is extremely rare (~2-3% annual probability). In normal years, premiums far exceed claims.
 
 **Q: Why are shares soulbound?**
 A: To prevent cooldown bypass. If you could sell your shares on a DEX, someone could buy "mature" shares that are about to finish cooldown, defeating the purpose of locking capital.
@@ -1339,25 +1386,25 @@ GET /api/v2/health
 {"status":"ok","chain":"base","chainId":8453}
 
 GET /api/v2/products
-[{"id":"BSS","name":"Black Swan Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":3600,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
+[{"id":"BCS","name":"BTC Catastrophe Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":3600,"riskType":"VOLATILE","excludedAssets":[]},{"id":"EAS","name":"ETH Apocalypse Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":3600,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
 
 GET /api/v2/vaults
-[{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":37,"products":["BSS","IL"],"riskProfile":"higher"}]
+[{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":37,"products":["BCS","EAS","IL"],"riskProfile":"higher"}]
 
 Key fields for decision-making:
 - currentUtilizationPct: if > 80 → post-kink, premiums expensive
 - estimatedAPY: total yield for LPs (Aave + premiums)
 - allocatedAssets: how much is locked for active policies
 
-GET /api/v2/quote?productId=BSS&coverageAmount=1000000000&durationSeconds=604800
-{"premium":1635000,"premiumUSD":1.64,"product":"BSS","coverage":1000000000,"utilizationPct":20.6}
+GET /api/v2/quote?productId=BCS&coverageAmount=1000000000&durationSeconds=604800
+{"premium":1635000,"premiumUSD":1.64,"product":"BCS","coverage":1000000000,"utilizationPct":20.6}
 
 POST /api/v2/purchase (requires X-API-Key header)
 Success: {"success":true,"policyId":"1","premium":1635000,"txHash":"0x..."}
 Error: {"error":"Insufficient USDC balance","required":"1635000","balance":"0"}
 
 GET /api/v2/policies?buyer=0x...
-[{"policyId":1,"product":"BSS","coverageAmount":1000000000,"coverageUSD":1000.00,"premiumPaid":1635000,"premiumUSD":1.64,"maxPayout":800000000,"maxPayoutUSD":800.00,"deductibleBps":2000,"status":"active","startedAt":1774027483,"expiresAt":1775237483,"waitingEndsAt":1774027483,"triggerMet":false,"claimable":false,"vault":"volatile_short"}]
+[{"policyId":1,"product":"BCS","coverageAmount":1000000000,"coverageUSD":1000.00,"premiumPaid":1635000,"premiumUSD":1.64,"maxPayout":800000000,"maxPayoutUSD":800.00,"deductibleBps":2000,"status":"active","startedAt":1774027483,"expiresAt":1775237483,"waitingEndsAt":1774027483,"triggerMet":false,"claimable":false,"vault":"volatile_short"}]
 
 Key fields for your agent loop:
 - status: "active" | "expired" | "claimed" | "claimable"
@@ -1411,7 +1458,8 @@ MAIN LOOP (runs every 3600 seconds / 1 hour):
      vaults = GET {BASE_URL}/api/v2/vaults
 
      Decision rules:
-     - ETH stddev(24h) > 5% of price → consider buying BSS
+     - ETH stddev(24h) > 5% of price → consider buying EAS
+     - BTC stddev(24h) > 5% of price → consider buying BCS
      - USDT or DAI price < 0.98 → consider buying DEPEG
      - Providing liquidity in volatile AMM → consider buying IL
      - Funds in unaudited protocol → consider buying EXPLOIT
@@ -1435,7 +1483,8 @@ ERROR HANDLING:
   Any other error → log, continue loop (never crash)
 
 getRepurchaseWindow(product):
-  BSS     → 7200     (2 hours before expiry — includes 1h waiting period)
+  BCS     → 7200     (2 hours before expiry — includes 1h waiting period)
+  EAS     → 7200     (2 hours before expiry — includes 1h waiting period)
   DEPEG   → 90000    (25 hours before expiry)
   IL      → 3600     (1 hour before expiry)
   EXPLOIT → 1296000  (15 days before expiry)

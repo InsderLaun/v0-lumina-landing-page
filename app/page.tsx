@@ -418,7 +418,8 @@ export default function Home() {
             <div>
               <h5 className="text-sm font-semibold text-white/60 uppercase mb-3">Products</h5>
               <div className="space-y-2">
-                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Black Swan Shield</a>
+                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">BTC Catastrophe Shield</a>
+                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">ETH Apocalypse Shield</a>
                 <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Depeg Shield</a>
                 <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">IL Index Cover</a>
                 <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Exploit Shield</a>
@@ -669,8 +670,8 @@ This is a one-time setup. Once approved, your agent can operate automatically wi
 
 Wait for the user to confirm they completed the approval before continuing.
 
-STEP 4 — Buy a test policy (Black Swan Shield, $100 coverage, 7 days):
-curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/purchase -H "Content-Type: application/json" -H "X-API-Key: <API key from Step 2>" -d '{"productId":"BSS","coverageAmount":100000000,"durationSeconds":604800}'
+STEP 4 — Buy a test policy (BTC Catastrophe Shield, $100 coverage, 7 days):
+curl -X POST ${PROTOCOL.apiBaseUrl}/api/v2/purchase -H "Content-Type: application/json" -H "X-API-Key: <API key from Step 2>" -d '{"productId":"BCS","coverageAmount":100000000,"durationSeconds":604800}'
 If successful, show the policy ID and tell me: "Your first policy is active! Your agent is now connected to Lumina."
 If it fails with "Insufficient allowance", tell me I need to go back to Step 3 and complete the approve.
 
@@ -728,13 +729,13 @@ Show me results after each step.`;
 
 const PRODUCTS = [
   {
-    key: "bss",
+    key: "bcs",
     emoji: "🌊",
-    label: "Black Swan Shield",
-    tagline: "Insurance against catastrophic crashes",
-    analogy: "Like hurricane insurance — covers the worst-case scenario",
+    label: "BTC Catastrophe Shield",
+    tagline: "Insurance against catastrophic BTC crashes",
+    analogy: "Like hurricane insurance — covers the worst-case BTC scenario",
     rows: [
-      ["Trigger", "ETH or BTC drops >30% from your purchase price"],
+      ["Trigger", "BTC drops >50% from your purchase price"],
       ["Payout", "80% of coverage (net 77.6% after 3% fee)"],
       ["Duration", "7–30 days"],
       ["Waiting Period", "1 hour — anti-front-running"],
@@ -742,11 +743,39 @@ const PRODUCTS = [
     ],
     example: "$50K coverage, 14 days → Premium $527 → If triggered: receive $38,800 → Return: 73x",
     technicalDetails: [
-      ["Product ID", "BLACKSWAN-001"],
+      ["Product ID", "BCS-001"],
       ["Risk Type", "VOLATILE"],
       ["Oracle", "Chainlink TWAP 15 min or 3 consecutive roundIds"],
       ["Strike Price", "Captured at moment of purchase"],
-      ["Trigger Price", "strikePrice × 0.70"],
+      ["Trigger Price", "strikePrice × 0.50"],
+      ["Deductible", "20%"],
+      ["Max Allocation", "20% of vault"],
+      ["Grace Period", "24h post-expiry to submit claim"],
+      ["Vault", "VolatileShort (30d) → overflow to VolatileLong (90d)"],
+      ["Kink Model", "P_base 22% annualized × M(U) × duration"],
+      ["Protocol Fee", "3% on premium + 3% on payout + 3% on vault yield"],
+    ],
+  },
+  {
+    key: "eas",
+    emoji: "⚡",
+    label: "ETH Apocalypse Shield",
+    tagline: "Insurance against apocalyptic ETH crashes",
+    analogy: "Like earthquake insurance — covers the most extreme ETH scenario",
+    rows: [
+      ["Trigger", "ETH drops >60% from your purchase price"],
+      ["Payout", "80% of coverage (net 77.6% after 3% fee)"],
+      ["Duration", "7–30 days"],
+      ["Waiting Period", "1 hour — anti-front-running"],
+      ["Price", "From 0.53% for 7 days"],
+    ],
+    example: "$50K coverage, 14 days → Premium $527 → If triggered: receive $38,800 → Return: 73x",
+    technicalDetails: [
+      ["Product ID", "EAS-001"],
+      ["Risk Type", "VOLATILE"],
+      ["Oracle", "Chainlink TWAP 15 min or 3 consecutive roundIds"],
+      ["Strike Price", "Captured at moment of purchase"],
+      ["Trigger Price", "strikePrice × 0.40"],
       ["Deductible", "20%"],
       ["Max Allocation", "20% of vault"],
       ["Grace Period", "24h post-expiry to submit claim"],
@@ -991,10 +1020,11 @@ function ProductsSection() {
 /*  PREMIUM CALCULATOR                                       */
 /* ═══════════════════════════════════════════════════════════ */
 
-type CalcProduct = "bss" | "depeg" | "il" | "exploit"
+type CalcProduct = "bcs" | "eas" | "depeg" | "il" | "exploit"
 
 const CALC_DURATION_RANGES: Record<CalcProduct, [number, number, number]> = {
-  bss: [7, 30, 14],
+  bcs: [7, 30, 14],
+  eas: [7, 30, 14],
   depeg: [30, 365, 90],
   il: [30, 90, 30],
   exploit: [30, 365, 180],
@@ -1007,7 +1037,8 @@ const CALC_DURATION_RANGES: Record<CalcProduct, [number, number, number]> = {
 
 // Map lowercase CalcProduct keys to config keys
 const CALC_PRODUCT_CONFIG: Record<CalcProduct, { pBaseBps: number; riskType: "VOLATILE" | "STABLE" }> = {
-  bss:     { pBaseBps: PRODUCTS_CONFIG.BSS.pBaseBps, riskType: PRODUCTS_CONFIG.BSS.riskType },
+  bcs:     { pBaseBps: PRODUCTS_CONFIG.BCS.pBaseBps, riskType: PRODUCTS_CONFIG.BCS.riskType },
+  eas:     { pBaseBps: PRODUCTS_CONFIG.EAS.pBaseBps, riskType: PRODUCTS_CONFIG.EAS.riskType },
   depeg:   { pBaseBps: PRODUCTS_CONFIG.DEPEG.pBaseBps, riskType: PRODUCTS_CONFIG.DEPEG.riskType },
   il:      { pBaseBps: PRODUCTS_CONFIG.IL.pBaseBps, riskType: PRODUCTS_CONFIG.IL.riskType },
   exploit: { pBaseBps: PRODUCTS_CONFIG.EXPLOIT.pBaseBps, riskType: PRODUCTS_CONFIG.EXPLOIT.riskType },
@@ -1019,7 +1050,8 @@ const calcKinkMultiplier = calcKinkMultiplierFromConfig
 // Deductibles per product (unchanged)
 function getCalcDeductible(product: CalcProduct, stablecoin: string, protocol: string) {
   switch (product) {
-    case "bss": return 0.20
+    case "bcs": return 0.20
+    case "eas": return 0.20
     case "depeg":
       if (stablecoin === "DAI") return 0.12
       if (stablecoin === "USDT") return 0.15
@@ -1086,7 +1118,7 @@ function CustomDropdown({ value, onChange, options, label }: {
 }
 
 function PremiumCalculatorSection() {
-  const [product, setProduct] = useState<CalcProduct>("bss")
+  const [product, setProduct] = useState<CalcProduct>("bcs")
   const [coverage, setCoverage] = useState(10000)
   const [duration, setDuration] = useState(14)
   const [asset, setAsset] = useState("ETH")
@@ -1179,7 +1211,8 @@ function PremiumCalculatorSection() {
                 value={product}
                 onChange={(v) => handleProductChange(v as CalcProduct)}
                 options={[
-                  { value: "bss", label: "Black Swan Shield" },
+                  { value: "bcs", label: "BTC Catastrophe Shield" },
+                  { value: "eas", label: "ETH Apocalypse Shield" },
                   { value: "depeg", label: "Depeg Shield" },
                   { value: "il", label: "IL Index Cover" },
                   { value: "exploit", label: "Exploit Shield" },
@@ -1216,8 +1249,8 @@ function PremiumCalculatorSection() {
                 </div>
               </div>
 
-              {/* Asset (BSS, IL) */}
-              {(product === "bss" || product === "il") && (
+              {/* Asset (BCS, EAS, IL) */}
+              {(product === "bcs" || product === "eas" || product === "il") && (
                 <CustomDropdown
                   label="Asset"
                   value={asset}
@@ -1341,10 +1374,10 @@ const VAULTS = [
     name: "Volatile Short",
     symbol: "lvsUSDC",
     cooldown: "37 days",
-    apy: "3-22%",
+    apy: "4-17%",
     base: "Aave V3",
-    premiums: "3-22%",
-    backs: ["BSS 7-30d", "IL Index 14-30d"],
+    premiums: "4-17%",
+    backs: ["BCS 7-30d", "EAS 7-30d", "IL Index 14-30d"],
     risk: "Higher",
     riskColor: "text-red-400",
     bestFor: "Quick access traders who want short commitment",
@@ -1353,23 +1386,23 @@ const VAULTS = [
       ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
       ["Cooldown", "37 days exit notice (NOT a lock)"],
       ["Max Allocation", "20% of vault TVL per product"],
-      ["Waterfall", "First choice for BSS 7-30d and IL 14-30d"],
+      ["Waterfall", "First choice for BCS 7-30d, EAS 7-30d and IL 14-30d"],
       ["During Cooldown", "Capital still earns from existing policies, no new policies assigned"],
       ["Withdrawal", "requestWithdrawal() → wait 37d → completeWithdrawal()"],
       ["Cancel", "cancelWithdrawal() returns to full availability"],
       ["USDC Yield", "Dynamic rate from Aave V3 lending on Base, independent of Lumina"],
       ["Premium Yield", "Dynamic, depends on # of policies and Kink multiplier"],
-      ["Worst Case", "BSS crash + IL spike = ~30% TVL loss in a month (5-10yr event)"],
+      ["Worst Case", "BCS/EAS crash + IL spike = ~30% TVL loss in a month (5-10yr event)"],
     ],
   },
   {
     name: "Volatile Long",
     symbol: "lvlUSDC",
     cooldown: "97 days",
-    apy: "3-25%",
+    apy: "4-21%",
     base: "Aave V3",
-    premiums: "3-25%",
-    backs: ["IL Index 60-90d", "BSS overflow"],
+    premiums: "4-21%",
+    backs: ["IL Index 60-90d", "BCS overflow", "EAS overflow"],
     risk: "Higher",
     riskColor: "text-red-400",
     bestFor: "Balanced investors who want higher yield",
@@ -1378,7 +1411,7 @@ const VAULTS = [
       ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
       ["Cooldown", "97 days exit notice"],
       ["Waterfall", "Receives overflow when VolatileShort is full (>95% utilized)"],
-      ["Backs", "IL 60-90d policies and BSS when Short vault is >95% utilized"],
+      ["Backs", "IL 60-90d policies and BCS/EAS when Short vault is >95% utilized"],
       ["Higher Yield", "Longer commitment = longer policies = more premium per dollar"],
       ["Withdrawal", "requestWithdrawal() → wait 97d → completeWithdrawal()"],
       ["Worst Case", "Same risk type as VolatileShort but longer lock = higher yield compensation"],
@@ -1605,8 +1638,8 @@ const YIELD_VAULTS: Record<YieldVaultKey, {
   risk: string
   worstCase: number
 }> = {
-  "volatile-short": { label: "Volatile Short", cooldown: 37, productId: "BLACKSWAN-002", products: "BSS + IL Index", risk: "Higher", worstCase: 0.30 },
-  "volatile-long": { label: "Volatile Long", cooldown: 97, productId: "ILPROT-001", products: "IL Index + BSS overflow", risk: "Higher", worstCase: 0.28 },
+  "volatile-short": { label: "Volatile Short", cooldown: 37, productId: "BCS-001", products: "BCS + EAS + IL Index", risk: "Higher", worstCase: 0.30 },
+  "volatile-long": { label: "Volatile Long", cooldown: 97, productId: "ILPROT-001", products: "IL Index + BCS/EAS overflow", risk: "Higher", worstCase: 0.28 },
   "stable-short": { label: "Stable Short", cooldown: 97, productId: "DEPEG-USDC-001", products: "Depeg + Exploit Shield", risk: "Low", worstCase: 0.20 },
   "stable-long": { label: "Stable Long", cooldown: 372, productId: "DEPEG-USDT-001", products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
 }
@@ -1854,13 +1887,13 @@ const RISK_SCENARIOS: Record<YieldVaultKey, {
 }[]> = {
   "volatile-short": [
     { name: "Normal Year", probability: "85%", description: "No major crashes. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
-    { name: "Market Crash", probability: "12%", description: "ETH drops 35%. BSS claims trigger. Vault loses ~15% of TVL in one month.", lossPct: 0.15, color: "amber" },
-    { name: "Black Swan", probability: "3%", description: "ETH drops 50%+ AND IL spikes simultaneously. Multiple claims trigger.", lossPct: 0.30, color: "red" },
+    { name: "Market Crash", probability: "12%", description: "ETH/BTC drops 35%. BCS/EAS claims trigger. Vault loses ~15% of TVL in one month.", lossPct: 0.15, color: "amber" },
+    { name: "Catastrophic Event", probability: "3%", description: "ETH drops 60%+ or BTC drops 50%+ AND IL spikes simultaneously. Multiple claims trigger.", lossPct: 0.30, color: "red" },
   ],
   "volatile-long": [
     { name: "Normal Year", probability: "85%", description: "No major crashes. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
-    { name: "Market Crash", probability: "12%", description: "ETH drops 35%. IL + BSS overflow claims trigger against the vault.", lossPct: 0.15, color: "amber" },
-    { name: "Black Swan", probability: "3%", description: "Severe market downturn with cascading IL and BSS claims.", lossPct: 0.28, color: "red" },
+    { name: "Market Crash", probability: "12%", description: "ETH/BTC drops 35%. IL + BCS/EAS overflow claims trigger against the vault.", lossPct: 0.15, color: "amber" },
+    { name: "Catastrophic Event", probability: "3%", description: "Severe market downturn with cascading IL and BCS/EAS claims.", lossPct: 0.28, color: "red" },
   ],
   "stable-short": [
     { name: "Normal Year", probability: "97%", description: "No depeg events. Premiums exceed claims. You earn the full estimated yield.", lossPct: 0, color: "green" },
@@ -2153,7 +2186,7 @@ function AgentSkillsSection({ perspective, onStartSetup }: { perspective: Perspe
           <div className={`${accent === "cyan" ? "bg-cyan-500/5 border-cyan-500/20" : "bg-purple-500/5 border-purple-500/20"} border rounded-xl p-6 text-center`}>
             <div className={`w-9 h-9 rounded-full ${accent === "cyan" ? "bg-cyan-500" : "bg-purple-500"} text-[#0a0a1a] flex items-center justify-center font-bold mx-auto mb-3`}>3</div>
             <h4 className={`${accent === "cyan" ? "text-cyan-400" : "text-purple-400"} font-semibold mb-2`}>{perspective === "protect" ? "Your agent buys coverage" : "Your agent deposits USDC"}</h4>
-            <p className="text-white/50 text-sm">{perspective === "protect" ? 'Tell your agent: "Buy Black Swan coverage for $10K, 14 days." Your portfolio is protected.' : 'Tell your agent: "Deposit $10K USDC into the Stable Long vault." Your capital earns yield.'}</p>
+            <p className="text-white/50 text-sm">{perspective === "protect" ? 'Tell your agent: "Buy BTC Catastrophe Shield for $10K, 14 days." Your portfolio is protected.' : 'Tell your agent: "Deposit $10K USDC into the Stable Long vault." Your capital earns yield.'}</p>
           </div>
         </div>
         <div className="text-center mb-12">
@@ -2677,11 +2710,11 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
 
 const FAQ_GENERAL = [
   { q: "What is Lumina Protocol?", a: "Lumina Protocol is the first parametric insurance platform built exclusively for AI agents operating in DeFi. Unlike traditional insurance, Lumina uses objective on-chain data from Chainlink oracles to automatically verify conditions and execute payouts. Your AI agent buys coverage via API, and if a trigger condition is met, the payout is calculated and sent to the agent's wallet automatically. Standard payouts process within minutes; large payouts may have an additional security delay." },
-  { q: "What insurance products does Lumina offer?", a: "Four parametric products: (1) Black Swan Shield — covers ETH/BTC crashes exceeding 30%, pays 80% of coverage, 7-30 day policies. (2) Depeg Shield — covers USDT or DAI losing peg below $0.95, pays 85-88%, 14-365 days. (3) IL Index Cover — covers impermanent loss exceeding 2% at policy expiry, proportional payout capped at 11.7%, 14-90 days. (4) Exploit Shield — covers DeFi protocol hacks via dual-trigger mechanism, pays 90%, 90-365 days, max $50K per wallet." },
+  { q: "What insurance products does Lumina offer?", a: "Five parametric products: (1) BTC Catastrophe Shield (BCS) — covers BTC crashes exceeding 50%, pays 80% of coverage, 7-30 day policies. (2) ETH Apocalypse Shield (EAS) — covers ETH crashes exceeding 60%, pays 80%, 7-30 days. (3) Depeg Shield — covers USDT or DAI losing peg below $0.95, pays 85-88%, 14-365 days. (4) IL Index Cover — covers impermanent loss exceeding 2% at policy expiry, proportional payout capped at 11.7%, 14-90 days. (5) Exploit Shield — covers DeFi protocol hacks via dual-trigger mechanism, pays 90%, 90-365 days, max $50K per wallet." },
   { q: "Can a human buy a policy or deposit from this website?", a: "No. This website is informational only. All operations — buying insurance, depositing in vaults, claiming payouts, withdrawing — are performed by your AI agent. The website explains, convinces, and provides the Skill file. Your agent does the rest." },
   { q: "What is USDC?", a: "USDC is Circle's native stablecoin on Base, backed 1:1 by US dollars and short-term treasuries. When you deposit USDC in a Lumina vault, your funds are lent on Aave V3 to earn a base yield PLUS insurance premiums on top." },
-  { q: "How much does a policy cost?", a: "Pricing is dynamic based on vault utilization. When utilization is low, premiums are cheaper. Above 80% utilization, premiums accelerate sharply (Kink model). Above 95%, no new policies accepted. Example: $10,000 BSS coverage for 14 days costs approximately $28 at low utilization, $75 at high utilization. A 3% protocol fee is applied to every premium." },
-  { q: "What happens when my policy triggers?", a: "The oracle detects the trigger condition, generates a signed proof, and submits it to the smart contract. The contract verifies signatures, calculates payout (coverage minus deductible), deducts 3% protocol fee, and transfers USDC to your wallet. Example: $10,000 BSS with 20% deductible = $8,000 payout, minus 3% fee = $7,760 net. The process is automatic — no forms, no waiting." },
+  { q: "How much does a policy cost?", a: "Pricing is dynamic based on vault utilization. When utilization is low, premiums are cheaper. Above 80% utilization, premiums accelerate sharply (Kink model). Above 95%, no new policies accepted. Example: $10,000 BCS coverage for 14 days costs approximately $28 at low utilization, $75 at high utilization. A 3% protocol fee is applied to every premium." },
+  { q: "What happens when my policy triggers?", a: "The oracle detects the trigger condition, generates a signed proof, and submits it to the smart contract. The contract verifies signatures, calculates payout (coverage minus deductible), deducts 3% protocol fee, and transfers USDC to your wallet. Example: $10,000 BCS with 20% deductible = $8,000 payout, minus 3% fee = $7,760 net. The process is automatic — no forms, no waiting." },
   { q: "What is the protocol fee?", a: "Lumina charges 3% on premiums (when your agent buys insurance), 3% on payouts (when your agent collects a claim), and a 3% performance fee on positive vault yield at withdrawal. The performance fee only applies when LPs withdraw with a profit — if a vault lost value, no fee is charged." },
   { q: "Is my money safe?", a: "Lumina implements multiple security layers: a 48-hour TimelockController on all admin changes, a Gnosis Safe 1-of-1 (planned upgrade to 2-of-3 multisig), separated keys for different roles, 119 automated tests, and all contracts verified on BaseScan. The protocol has undergone internal security review using dual-auditor methodology. However, a formal external audit by a Tier 1 firm is planned but not yet completed. As with any DeFi protocol, risks exist: smart contract bugs, oracle failures, or extreme market events could result in loss of funds. Only deposit what you can afford to lose." },
 ]
@@ -2690,7 +2723,7 @@ const FAQ_PROTECT = [
   { q: "What happens if the L2 sequencer goes down during a crash?", a: "The oracle blocks stale prices until 1 hour after sequencer recovery. You have a 24-hour grace period after policy expiry to submit your claim. Even with sequencer downtime, you're protected." },
   { q: "Can I cancel a policy?", a: "No. Policies are non-cancellable. The premium is paid upfront and non-refundable. This is by design — it ensures the vault always has premium income to offset potential claims." },
   { q: "How does auto-repurchase work?", a: "Your agent monitors policy expiry and buys a new policy before the current one expires. For Depeg (24h waiting), your agent repurchases at least 24h before expiry. For Exploit (14d waiting), at least 14 days before. The Skill file has the complete logic." },
-  { q: "What if trigger conditions are met but my agent doesn't claim?", a: "For most products (BSS, Depeg, Exploit), claims are resolved automatically by the oracle. However, IL Index Cover uses European-style settlement: claims can only be verified within a strict 48-hour window after policy expiration. If not processed within this window, the policy expires without payout. Make sure your agent monitors IL policy expiration dates." },
+  { q: "What if trigger conditions are met but my agent doesn't claim?", a: "For most products (BCS, EAS, Depeg, Exploit), claims are resolved automatically by the oracle. However, IL Index Cover uses European-style settlement: claims can only be verified within a strict 48-hour window after policy expiration. If not processed within this window, the policy expires without payout. Make sure your agent monitors IL policy expiration dates." },
   { q: "Why can't I insure USDC with the Depeg Shield?", a: "USDC is Lumina's settlement token — all premiums and payouts are in USDC. If USDC lost its peg, the payout would also be devalued, making the insurance ineffective. Use the Depeg Shield for USDT or DAI instead." },
   { q: "Why can't I insure against an Aave exploit?", a: "Lumina's vaults deposit USDC into Aave V3 to generate yield. If Aave were exploited, the vault funds would also be affected, making it impossible to pay claims. Exploit Shield covers a curated list of supported protocols including Compound III, Uniswap V3, MakerDAO, Curve, and Morpho." },
 ]

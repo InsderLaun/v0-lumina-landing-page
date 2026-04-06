@@ -14,7 +14,8 @@ import {
 // ─── Per-product config (pBase in bps) — from lumina-config.ts ─────────────
 // Maps legacy product IDs to the canonical config
 const PRODUCT_PBASE: Record<string, { pBaseBps: number; deductibleBps: number; triggerDesc: string }> = {
-    'BLACKSWAN-002':   { pBaseBps: PRODUCTS.BSS.pBaseBps, deductibleBps: PRODUCTS.BSS.deductibleBps, triggerDesc: 'ETH/USD drops >30% for 30 min (Chainlink)' },
+    'BCS-001':         { pBaseBps: PRODUCTS.BCS.pBaseBps, deductibleBps: PRODUCTS.BCS.deductibleBps, triggerDesc: 'BTC/USD drops >50% for 30 min (Chainlink)' },
+    'EAS-001':         { pBaseBps: PRODUCTS.EAS.pBaseBps, deductibleBps: PRODUCTS.EAS.deductibleBps, triggerDesc: 'ETH/USD drops >60% for 30 min (Chainlink)' },
     'DEPEG-USDC-001':  { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'USDC/USD stays below $0.95 for 4h (Chainlink)' },
     'DEPEG-USDT-001':  { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'USDT/USD stays below $0.95 for 4h (Chainlink)' },
     'DEPEG-DAI-001':   { pBaseBps: PRODUCTS.DEPEG.pBaseBps, deductibleBps: 500,  triggerDesc: 'DAI/USD stays below $0.95 for 4h (Chainlink)' },

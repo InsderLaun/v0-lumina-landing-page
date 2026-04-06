@@ -35,30 +35,56 @@ export interface Product {
 
 export const PRODUCTS: Product[] = [
     {
-        id: 'BLACKSWAN-002',
-        name: 'Black Swan Shield',
-        shortName: 'BSS',
+        id: 'BCS-001',
+        name: 'BTC Catastrophe Shield',
+        shortName: 'BCS',
         icon: 'ShieldAlert',
-        description: 'Protects leveraged positions against sudden price crashes',
+        description: 'Protects BTC positions against catastrophic price crashes (>50% drop)',
         agentView: {
-            tagline: 'Protect leveraged positions from flash crashes',
-            details: 'Your agent pays a premium and receives automatic USDC payout if ETH or BTC crashes beyond your threshold.',
+            tagline: 'Protect BTC positions from catastrophic crashes',
+            details: 'Your agent pays a premium and receives automatic USDC payout if BTC crashes beyond 50%.',
         },
         lpView: {
-            tagline: "You're betting ETH/BTC won't crash >X%",
-            riskDescription: 'You lose collateral if a major price crash exceeds the threshold for 30+ minutes',
+            tagline: "You're betting BTC won't crash >50%",
+            riskDescription: 'You lose collateral if a major BTC price crash exceeds the threshold for 30+ minutes',
             riskLevel: 'Medium',
             historicalProbability: 'Medium',
         },
         triggerType: 'PRICE_DROP_PCT',
-        triggerDescription: 'Price drops >X% for 30 continuous minutes (Chainlink)',
-        oracleFeeds: ['ETH/USD', 'BTC/USD'],
+        triggerDescription: 'BTC price drops >50% for 30 continuous minutes (Chainlink)',
+        oracleFeeds: ['BTC/USD'],
         premiumRange: [2.5, 7],
         deductiblePct: 5,
         durationRange: [7, 90],
         sustainedPeriod: '30 min',
-        thresholdOptions: ['10%', '15%', '20%', '25%', '30%'],
-        expandedDetail: 'Trigger: price drops >X% for 30 continuous minutes. Works for positions on any network — measures market price, not your specific position.',
+        thresholdOptions: ['30%', '40%', '50%'],
+        expandedDetail: 'Trigger: BTC price drops >50% for 30 continuous minutes. Works for positions on any network — measures market price, not your specific position.',
+    },
+    {
+        id: 'EAS-001',
+        name: 'ETH Apocalypse Shield',
+        shortName: 'EAS',
+        icon: 'ShieldAlert',
+        description: 'Protects ETH positions against apocalyptic price crashes (>60% drop)',
+        agentView: {
+            tagline: 'Protect ETH positions from apocalyptic crashes',
+            details: 'Your agent pays a premium and receives automatic USDC payout if ETH crashes beyond 60%.',
+        },
+        lpView: {
+            tagline: "You're betting ETH won't crash >60%",
+            riskDescription: 'You lose collateral if a major ETH price crash exceeds the threshold for 30+ minutes',
+            riskLevel: 'Medium',
+            historicalProbability: 'Medium',
+        },
+        triggerType: 'PRICE_DROP_PCT',
+        triggerDescription: 'ETH price drops >60% for 30 continuous minutes (Chainlink)',
+        oracleFeeds: ['ETH/USD'],
+        premiumRange: [2.5, 7],
+        deductiblePct: 5,
+        durationRange: [7, 90],
+        sustainedPeriod: '30 min',
+        thresholdOptions: ['40%', '50%', '60%'],
+        expandedDetail: 'Trigger: ETH price drops >60% for 30 continuous minutes. Works for positions on any network — measures market price, not your specific position.',
     },
     {
         id: 'DEPEG-USDC-001',
@@ -169,7 +195,8 @@ export const PRODUCTS: Product[] = [
 
 // Grouped products for the product grid display (3 depeg covers grouped)
 export const PRODUCT_GRID_DISPLAY = [
-    PRODUCTS[0], // Black Swan Shield
-    { ...PRODUCTS[1], name: 'Stablecoin Depeg Cover', description: 'Covers USDC, USDT and DAI if they lose their dollar peg', isGroup: true },
-    PRODUCTS[4], // IL Protection
+    PRODUCTS[0], // BTC Catastrophe Shield
+    PRODUCTS[1], // ETH Apocalypse Shield
+    { ...PRODUCTS[2], name: 'Stablecoin Depeg Cover', description: 'Covers USDC, USDT and DAI if they lose their dollar peg', isGroup: true },
+    PRODUCTS[5], // IL Protection
 ] as const

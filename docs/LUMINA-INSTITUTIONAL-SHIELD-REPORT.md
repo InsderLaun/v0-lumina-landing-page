@@ -67,7 +67,7 @@ Example M(U) values (verified against PremiumMath.sol comments lines 83-91):
 
 ## 1.3 Product Parameters (from Solidity)
 
-| Parameter | BSS | Depeg (DAI) | Depeg (USDT) | IL Index | Exploit |
+| Parameter | BCS/EAS | Depeg (DAI) | Depeg (USDT) | IL Index | Exploit |
 |---|---|---|---|---|---|
 | P_base (bps) | 650 | 250 | 250 | 850 | 400 |
 | riskMult (bps) | 10000 (1.0x) | 10000 (DAI) | 14000 (1.4x USDT) | 10000 (1.0x) | 10000 (1.0x) |
@@ -83,8 +83,8 @@ Example M(U) values (verified against PremiumMath.sol comments lines 83-91):
 
 | Vault | Cooldown | Products Backed | Risk Type |
 |---|---|---|---|
-| VolatileShort | 30 days | BSS (7-30d), IL (14-30d) | VOLATILE |
-| VolatileLong | 90 days | IL (60-90d), BSS overflow | VOLATILE |
+| VolatileShort | 30 days | BCS/EAS (7-30d), IL (14-30d) | VOLATILE |
+| VolatileLong | 90 days | IL (60-90d), BCS/EAS overflow | VOLATILE |
 | StableShort | 90 days | Depeg (14-90d) | STABLE |
 | StableLong | 365 days | Depeg (up to 365d), Exploit (90-365d), overflow | STABLE |
 
@@ -113,7 +113,7 @@ Where:
 - M(U) = Kink multiplier
 - 0.97 = LP receives 97% after 3% protocol fee on premiums
 
-**For VolatileShort vault:** Backs BSS (P_base=650 bps=6.5%) and IL (P_base=850 bps=8.5%).
+**For VolatileShort vault:** Backs BCS/EAS (P_base=650 bps=6.5%) and IL (P_base=850 bps=8.5%).
 Assuming equal demand: P_base_effective = (650+850)/2 = 750 bps = 7.5%
 
 **For VolatileLong vault:** Same products but longer duration, premium demand skewed to IL.
@@ -137,7 +137,7 @@ We need actuarial trigger probabilities. Based on historical data:
 
 | Product | Annual trigger probability | Source / Rationale |
 |---|---|---|
-| BSS (ETH -30%) | 8% | ETH has had ~2-3 crashes >30% per 10 years; annualized ~8% |
+| BCS/EAS (BTC -50%/ETH -60%) | 8% | ETH has had ~2-3 crashes >30% per 10 years; annualized ~8% |
 | Depeg (DAI <$0.95) | 3% | DAI briefly depegged 2022-2023; ~3% annual |
 | Depeg (USDT <$0.95) | 4% | USDT brief depegs more frequent but shallow |
 | IL (>2% net) | 25% | IL is frequent for ETH pairs in volatile markets |
@@ -147,7 +147,7 @@ Average payout as fraction of coverage when triggered:
 
 | Product | Payout/Coverage when triggered |
 |---|---|
-| BSS | 80% (binary, 20% deductible) |
+| BCS/EAS | 80% (binary, 20% deductible) |
 | Depeg DAI | 88% (binary, 12% deductible) |
 | Depeg USDT | 85% (binary, 15% deductible) |
 | IL | ~6% average (proportional, capped at 11.7%) |
@@ -157,7 +157,7 @@ Expected loss per $1 of allocated coverage per year:
 
 | Product | Prob * Payout_fraction |
 |---|---|
-| BSS | 0.08 * 0.80 = 6.4% |
+| BCS/EAS | 0.08 * 0.80 = 6.4% |
 | Depeg DAI | 0.03 * 0.88 = 2.64% |
 | Depeg USDT | 0.04 * 0.85 = 3.40% |
 | IL | 0.25 * 0.06 = 1.50% |
@@ -165,12 +165,12 @@ Expected loss per $1 of allocated coverage per year:
 
 **Per vault expected loss rate on allocated capital:**
 
-- VolatileShort: avg(BSS 6.4%, IL 1.5%) = 3.95%
+- VolatileShort: avg(BCS/EAS 6.4%, IL 1.5%) = 3.95%
 - VolatileLong: IL-dominated = ~2.0% (IL triggers more but pays less)
 - StableShort: Depeg blend = ~3.0%
 - StableLong: blend(Depeg 3.0%, Exploit 1.8%) = ~2.5%
 
-## 2.3 MASTER TABLE: VolatileShort Vault (BSS + IL)
+## 2.3 MASTER TABLE: VolatileShort Vault (BCS/EAS + IL)
 
 **Formula:**
 ```
@@ -301,16 +301,16 @@ LP_final_yield = Net_yield_pre_fee - Performance_fee
 
 ## 3.1 Maximum Possible Loss Per Vault (All Triggers Fire Simultaneously)
 
-**VolatileShort Vault** (backs BSS + IL, max 20% allocation each):
+**VolatileShort Vault** (backs BCS/EAS + IL, max 20% allocation each):
 ```
-BSS max alloc:  20% of TVL * 80% payout = 16.0% of TVL
+BCS/EAS max alloc:  20% of TVL * 80% payout = 16.0% of TVL
 IL max alloc:   20% of TVL * 11.7% payout = 2.34% of TVL
 TOTAL MAX LOSS: 18.34% of TVL
 ```
 
-**VolatileLong Vault** (backs IL + BSS overflow, max 20% each):
+**VolatileLong Vault** (backs IL + BCS/EAS overflow, max 20% each):
 ```
-BSS max alloc:  20% of TVL * 80% payout = 16.0% of TVL
+BCS/EAS max alloc:  20% of TVL * 80% payout = 16.0% of TVL
 IL max alloc:   20% of TVL * 11.7% payout = 2.34% of TVL
 TOTAL MAX LOSS: 18.34% of TVL
 ```
@@ -370,9 +370,9 @@ Premium income = $1M * 1.650% * 0.97 * 0.5 = $8,003
 
 ## 3.4 Correlation Group Caps
 
-BSS and IL Protection are correlated — a market crash triggers both simultaneously. To protect LPs, the protocol implements a combined allocation cap of 70%: the sum of capital allocated to BSS and IL cannot exceed 70% of the vault's TVL. This limits the worst-case loss in extreme correlated events from ~66% to ~45%.
+BCS/EAS and IL Protection are correlated — a market crash triggers both simultaneously. To protect LPs, the protocol implements a combined allocation cap of 70%: the sum of capital allocated to BCS/EAS and IL cannot exceed 70% of the vault's TVL. This limits the worst-case loss in extreme correlated events from ~66% to ~45%.
 
-Depeg and Exploit are NOT correlated with BSS/IL and operate under independent allocation limits.
+Depeg and Exploit are NOT correlated with BCS/EAS/IL and operate under independent allocation limits.
 
 ---
 
@@ -445,13 +445,13 @@ The reinsurer's expected cost = 80% * Probability(catastrophic event) * Average_
 
 For each vault, we need the probability of a catastrophic event where ALL products trigger simultaneously.
 
-**Key insight:** BSS and IL are correlated (both trigger on ETH crash). Depeg and Exploit are less correlated.
+**Key insight:** BCS/EAS and IL are correlated (both trigger on ETH crash). Depeg and Exploit are less correlated.
 
 **Joint catastrophic probability estimates:**
 
 | Vault | Events | Joint Annual Probability | Rationale |
 |---|---|---|---|
-| VolatileShort | BSS + IL fire together | 6% | High correlation: ETH -30% causes both |
+| VolatileShort | BCS/EAS + IL fire together | 6% | High correlation: market crash causes both |
 | VolatileLong | Same | 5% | Slightly lower, longer policies dilute |
 | StableShort | Depeg fires | 3.5% | Single product |
 | StableLong | Depeg + Exploit fire together | 0.5% | Very low correlation between stablecoin depeg and protocol exploit |
@@ -740,7 +740,7 @@ OPTION 1: "ESSENTIAL" (Low Cost, Partial Coverage)
   BUT: Only covers the SINGLE WORST product trigger (not simultaneous)
 
   Max covered loss per vault:
-    VolatileShort: BSS only = 16% of TVL → 80% = 12.8%
+    VolatileShort: BCS/EAS only = 16% of TVL → 80% = 12.8%
     StableLong: Exploit only = 9% of TVL → 80% = 7.2%
 
   Actuarial cost (single trigger):
@@ -1003,7 +1003,7 @@ Reserve / Premium = 12.6x (still conservative)
 | 10 | $325,000 | $0 | $15,000 | $310,000 | $838,750 |
 
 *Assumes 10% annual growth in LP base
-**Year 3: moderate ETH crash (-35%), BSS triggers across volatile vaults
+**Year 3: moderate ETH crash (-35%), BCS/EAS triggers across volatile vaults
 ***Year 9: severe multi-event (ETH crash + stablecoin stress)
 
 **10-Year Cumulative Profit: $838,750** on ~$2.4M total premium collected = **35% return**
@@ -1072,13 +1072,13 @@ NET RESULT YEAR 1:
 Balance end Y1: $1,049,060 (without) / $1,038,060 (with)
 ```
 
-## Year 2: CRASH (ETH -45%, BSS + IL Trigger, U spikes to 85%)
+## Year 2: CRASH (ETH -45%, BCS/EAS + IL Trigger, U spikes to 85%)
 
 ```
 SCENARIO:
   Month 1-3: Normal (U=40%)
   Month 4: ETH crashes -45% over 2 weeks
-  Month 4-6: BSS policies trigger en masse, IL policies hit max payout
+  Month 4-6: BCS/EAS policies trigger en masse, IL policies hit max payout
   Month 7-12: Recovery, U drops to 30% as policies expire
 
 PRE-CRASH INCOME (Months 1-3):
@@ -1086,7 +1086,7 @@ PRE-CRASH INCOME (Months 1-3):
 
 THE CRASH (Month 4):
   Vault utilization was 40% = $415,224 allocated
-  BSS allocation (20% of TVL): $207,612 → triggers → 80% payout = $166,090
+  BCS/EAS allocation (20% of TVL): $207,612 → triggers → 80% payout = $166,090
   IL allocation (20% of TVL): $207,612 → triggers → 11.7% payout = $24,291
   TOTAL CLAIMS AGAINST VAULT: $190,381
 
@@ -1208,7 +1208,7 @@ PRODUCT SUMMARY
 
   COVERAGE:
     Scope:        80% of catastrophic loss exceeding 3% attachment
-    Triggers:     ALL Lumina products (BSS, Depeg, IL, Exploit)
+    Triggers:     ALL Lumina products (BCS, EAS, Depeg, IL, Exploit)
     Maximum:      80% of (vault max loss - 3% attachment)
     Retention:    LP absorbs first 3% of capital + 20% of excess
 
@@ -1239,7 +1239,7 @@ KEY PARAMETERS (from Solidity code)
     Performance fee: 3%   (BaseVault.sol line 157)
 
   Product Allocations:
-    BSS: 20% max          (BlackSwanShield.sol line 37)
+    BCS/EAS: 20% max      (CatastropheShield.sol line 37)
     Depeg: 20% max        (DepegShield.sol line 39)
     IL: 20% max           (ILIndexCover.sol line 46)
     Exploit: 10% max      (ExploitShield.sol line 52)
@@ -1359,7 +1359,7 @@ APPENDIX: COMPLETE M(U) TABLE (from PremiumMath.sol)
 
 APPENDIX: PRODUCT BASE RATES (from SKILL-lumina-v2.md)
 
-  BSS:     6.5% annual (650 bps)
+  BCS/EAS: 6.5% annual (650 bps)
   DEPEG:   2.5% annual (250 bps)
   IL:      8.5% annual (850 bps)
   EXPLOIT: 4.0% annual (400 bps)
@@ -1368,7 +1368,7 @@ APPENDIX: FORMULA VERIFICATION
 
   Premium = Coverage * P_base * riskMult * durDiscount * M(U) * (duration/year) / BPS^3
 
-  Example: BSS $10K coverage, 30 days, U=50%, riskMult=1.0, durDiscount=1.0
+  Example: BCS $10K coverage, 30 days, U=50%, riskMult=1.0, durDiscount=1.0
     = $10,000 * 650 * 10000 * 10000 * 1.3125e18 / (10000^3 * 1e18 * 31536000) * 2592000
     = $10,000 * 0.065 * 1.0 * 1.0 * 1.3125 * (2592000/31536000)
     = $10,000 * 0.065 * 1.3125 * 0.08219
@@ -1383,7 +1383,7 @@ APPENDIX: FORMULA VERIFICATION
 
 All calculations derived from:
 - `PremiumMath.sol` — Kink model formula and constants
-- `BlackSwanShield.sol` — BSS parameters (20% alloc, 20% deductible, 80% payout)
+- `CatastropheShield.sol` — BCS/EAS parameters (20% alloc, 20% deductible, 80% payout)
 - `DepegShield.sol` — Depeg parameters (20% alloc, 10-15% deductible)
 - `ILIndexCover.sol` — IL parameters (20% alloc, 2% deductible, 11.7% max payout)
 - `ExploitShield.sol` — Exploit parameters (10% alloc, 10% deductible, 90% payout)

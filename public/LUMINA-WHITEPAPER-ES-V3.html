@@ -645,7 +645,7 @@
 
         <p>A diferencia del seguro tradicional, que requiere que un humano presente un reclamo, un comite lo revise y semanas de espera para recibir el pago, Lumina utiliza triggers matematicos verificados por oracles. Si la condicion se cumple (por ejemplo, ETH cae un 30%), el pago es instantaneo y automatico. Sin reclamos. Sin disputas. Sin esperar a humanos.</p>
 
-        <p>El protocolo ofrece <strong>4 productos de seguro</strong> (Black Swan Shield, Depeg Shield, IL Index Cover, Exploit Shield), <strong>4 vaults de liquidez</strong> (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de <strong>13 contratos inteligentes</strong> desplegados en produccion con proxies UUPS upgradeables.</p>
+        <p>El protocolo ofrece <strong>5 productos de seguro</strong> (BTC Catastrophe Shield, ETH Apocalypse Shield, Depeg Shield, IL Index Cover, Exploit Shield), <strong>4 vaults de liquidez</strong> (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de <strong>13 contratos inteligentes</strong> desplegados en produccion con proxies UUPS upgradeables.</p>
 
         <p>Cada flujo de interaccion comienza de la misma forma: <strong>el humano, a traves de su agente de IA</strong>, instruye la operacion deseada. El agente ejecuta la transaccion on-chain de forma autonoma, interactuando con la API de Lumina y los contratos del protocolo sin intervencion manual.</p>
 
@@ -784,7 +784,7 @@
         <p>Donde:</p>
         <ul>
             <li><strong>Coverage:</strong> monto asegurado en USDC</li>
-            <li><strong>P_base:</strong> tasa base anualizada del producto (ej: 22% para BSS, 24% para Depeg)</li>
+            <li><strong>P_base:</strong> tasa base anualizada del producto (ej: 6.5% para BCS/EAS, 2.5% para Depeg)</li>
             <li><strong>RiskMult:</strong> multiplicador de riesgo por activo</li>
             <li><strong>DurationDiscount:</strong> descuento por duracion larga</li>
             <li><strong>M(U):</strong> multiplicador de utilizacion (modelo kink)</li>
@@ -855,7 +855,7 @@
             <li><strong>API</strong> calcula la prima usando el modelo kink y devuelve los parametros</li>
             <li><strong>Agente</strong> aprueba USDC al CoverRouter y ejecuta <code>purchaseCover()</code></li>
             <li><strong>CoverRouter</strong> (<code class="address">0xd5f8678A0F2149B6342F9014CCe6d743234Ca025</code>) valida parametros y rutea al Shield correcto</li>
-            <li><strong>Shield</strong> (BSS/Depeg/IL/Exploit) valida reglas especificas del producto</li>
+            <li><strong>Shield</strong> (BCS/EAS/Depeg/IL/Exploit) valida reglas especificas del producto</li>
             <li><strong>PolicyManager</strong> (<code class="address">0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a</code>) registra la poliza on-chain</li>
             <li><strong>Vault</strong> bloquea colateral 1:1 para respaldar la cobertura</li>
             <li><strong>USDC</strong> se transfiere del agente al vault (prima) y se cobra el 3% de fee</li>
@@ -947,7 +947,7 @@
                         <td><code>0x1778...321c</code></td>
                     </tr>
                     <tr>
-                        <td>BlackSwanShield</td>
+                        <td>BTC Catastrophe Shield / ETH Apocalypse Shield</td>
                         <td>Producto</td>
                         <td>UUPS</td>
                         <td>Oracle, PolicyManager, VolatileShort</td>
@@ -987,7 +987,7 @@
 
         <h3>3.5 Colateralizacion Estricta 1:1</h3>
 
-        <p>Cada poliza emitida en Lumina esta respaldada por colateral bloqueado 1:1 en el vault correspondiente. Esto significa que si un agente compra $50,000 de cobertura BSS, el vault bloquea exactamente $50,000 en USDC (depositados en Aave V3 como aUSDC) para garantizar el pago en caso de siniestro.</p>
+        <p>Cada poliza emitida en Lumina esta respaldada por colateral bloqueado 1:1 en el vault correspondiente. Esto significa que si un agente compra $50,000 de cobertura BCS, el vault bloquea exactamente $50,000 en USDC (depositados en Aave V3 como aUSDC) para garantizar el pago en caso de siniestro.</p>
 
         <p>Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos de seguro DeFi que operan con modelos de pool compartido. Si la utilizacion del vault alcanza el 95% (U_MAX), no se aceptan nuevas polizas hasta que se libere capacidad.</p>
 
@@ -1002,11 +1002,17 @@
     <div class="section container page-break">
         <h2 id="sec-4">4. Productos de Seguro</h2>
 
-        <!-- BSS -->
-        <div class="product-card bss no-break">
-            <h3>4.1 Black Swan Shield (BSS)</h3>
+        <!-- BCS -->
+        <div class="product-card bcs no-break">
+            <h3>4.1 BTC Catastrophe Shield (BCS)</h3>
 
-            <p>El humano, a traves de su agente de IA, puede proteger sus posiciones en ETH o BTC contra caidas catastroficas del mercado. Black Swan Shield cubre escenarios de cisne negro: crasheos superiores al 30% como los vividos durante COVID (marzo 2020), el colapso de LUNA (mayo 2022) o la caida de FTX (noviembre 2022).</p>
+            <p>El humano, a traves de su agente de IA, puede proteger sus posiciones en BTC contra caidas catastroficas del mercado. BTC Catastrophe Shield cubre escenarios extremos: crasheos superiores al 50% como los vividos durante COVID (marzo 2020), el colapso de LUNA (mayo 2022) o la caida de FTX (noviembre 2022).</p>
+
+        <!-- EAS -->
+        <div class="product-card eas no-break">
+            <h3>4.1b ETH Apocalypse Shield (EAS)</h3>
+
+            <p>El humano, a traves de su agente de IA, puede proteger sus posiciones en ETH contra caidas apocalipticas del mercado. ETH Apocalypse Shield cubre los escenarios mas extremos: crasheos superiores al 60%.</p>
 
             <div class="table-wrap">
                 <table>
@@ -1014,7 +1020,7 @@
                         <tr><th>Parametro</th><th>Valor</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>Producto ID</td><td><code>BLACKSWAN-001</code></td></tr>
+                        <tr><td>Producto ID</td><td><code>BCS-001</code></td></tr>
                         <tr><td>Contrato</td><td><a class="address-link" href="https://basescan.org/address/0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" target="_blank">0x2926202bbe3f25f71ef17b25a20ebe8be028af5f</a></td></tr>
                         <tr><td>Trigger</td><td>Caida &gt; 30% desde el precio al momento de compra</td></tr>
                         <tr><td>TRIGGER_DROP_BPS</td><td><code>3000</code> (30% en puntos base)</td></tr>
@@ -1305,7 +1311,7 @@ Si U &gt; 95%: Se rechaza la poliza
             </table>
         </div>
 
-        <p><strong>Ejemplo numerico:</strong> Un agente compra Black Swan Shield por $50,000 de cobertura, 14 dias, con U=50%:</p>
+        <p><strong>Ejemplo numerico:</strong> Un agente compra BTC Catastrophe Shield por $50,000 de cobertura, 14 dias, con U=50%:</p>
         <ul>
             <li>P_base = 650 bps (6.5% anualizado)</li>
             <li>RiskMult = 1.0x (ETH base)</li>
@@ -1380,7 +1386,8 @@ U = Capital bloqueado en polizas activas / Activos totales del vault
                     <tr><th>Producto</th><th>P_base</th><th>Vault</th><th>Duracion</th><th>Trigger</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>Black Swan Shield</td><td>650 bps (6.5%)</td><td>Volatile Short/Long</td><td>7-30 dias</td><td>Caida &gt;30%</td></tr>
+                    <tr><td>BTC Catastrophe Shield</td><td>650 bps (6.5%)</td><td>Volatile Short/Long</td><td>7-30 dias</td><td>Caida BTC &gt;50%</td></tr>
+                    <tr><td>ETH Apocalypse Shield</td><td>650 bps (6.5%)</td><td>Volatile Short/Long</td><td>7-30 dias</td><td>Caida ETH &gt;60%</td></tr>
                     <tr><td>Depeg Shield</td><td>250 bps (2.5%)</td><td>Stable Short/Long</td><td>14-365 dias</td><td>Stablecoin &lt;$0.95</td></tr>
                     <tr><td>IL Index Cover</td><td>850 bps (8.5%)</td><td>Volatile Short/Long</td><td>14-90 dias</td><td>IL &gt;2% al vencimiento</td></tr>
                     <tr><td>Exploit Shield</td><td>400 bps (4.0%)</td><td>Stable Long</td><td>90-365 dias</td><td>Dual trigger (oracle+TEE)</td></tr>
@@ -1407,7 +1414,7 @@ U = Capital bloqueado en polizas activas / Activos totales del vault
 
         <p><strong>Ejemplo completo:</strong></p>
         <ol>
-            <li><strong>Agente compra BSS $50,000, prima = $280.82</strong>
+            <li><strong>Agente compra BCS $50,000, prima = $280.82</strong>
                 <ul>
                     <li>Fee protocolo: $280.82 x 3% = $8.42</li>
                     <li>Vault recibe: $280.82 - $8.42 = $272.40</li>
@@ -1452,15 +1459,15 @@ U = Capital bloqueado en polizas activas / Activos totales del vault
                     <tr>
                         <td><strong>VolatileShort</strong></td>
                         <td>37 dias</td>
-                        <td>BSS + IL Index Cover</td>
-                        <td>3 - 22%</td>
+                        <td>BCS + EAS + IL Index Cover</td>
+                        <td>4 - 17%</td>
                         <td><code>0xbd44...880d</code></td>
                     </tr>
                     <tr>
                         <td><strong>VolatileLong</strong></td>
                         <td>97 dias</td>
-                        <td>IL largo + BSS overflow</td>
-                        <td>3 - 25%</td>
+                        <td>IL largo + BCS/EAS overflow</td>
+                        <td>4 - 21%</td>
                         <td><code>0xFee5...f904</code></td>
                     </tr>
                     <tr>
@@ -1538,13 +1545,13 @@ U = Capital bloqueado en polizas activas / Activos totales del vault
                         <td>ETH/USD</td>
                         <td><a class="address-link" href="https://basescan.org/address/0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70" target="_blank">0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70</a></td>
                         <td>1,200s (20m)</td>
-                        <td>BSS, IL Index Cover</td>
+                        <td>BCS, EAS, IL Index Cover</td>
                     </tr>
                     <tr>
                         <td>BTC/USD</td>
                         <td><a class="address-link" href="https://basescan.org/address/0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E" target="_blank">0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E</a></td>
                         <td>1,200s (20m)</td>
-                        <td>BSS</td>
+                        <td>BCS, EAS</td>
                     </tr>
                     <tr>
                         <td>USDC/USD</td>
@@ -1713,7 +1720,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
     <div class="section container page-break">
         <h2 id="sec-10">10. Datos Actuariales</h2>
 
-        <h3>10.1 Black Swan Shield -- Expected Value para LPs</h3>
+        <h3>10.1 BTC Catastrophe Shield / ETH Apocalypse Shield -- Expected Value para LPs</h3>
 
         <div class="table-wrap no-break">
             <table>
@@ -1729,7 +1736,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             </table>
         </div>
 
-        <p>El margen del 38% refleja la naturaleza de cola gruesa del riesgo BSS: los eventos de cisne negro son poco frecuentes pero severos. En años sin eventos, el margen es significativamente mayor. En años con multiples eventos, el margen puede ser negativo.</p>
+        <p>El margen del 38% refleja la naturaleza de cola gruesa del riesgo BCS/EAS: los eventos catastroficos son poco frecuentes pero severos. En años sin eventos, el margen es significativamente mayor. En años con multiples eventos, el margen puede ser negativo.</p>
 
         <h3>10.2 Depeg Shield -- Expected Value para LPs</h3>
 
@@ -1891,7 +1898,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
         <div class="roadmap-phase no-break">
             <h3>Fase 1 -- Lanzamiento (Actual, Q1 2026)</h3>
             <ul>
-                <li>4 productos de seguro operativos: BSS, Depeg, IL Index, Exploit</li>
+                <li>5 productos de seguro operativos: BCS, EAS, Depeg, IL Index, Exploit</li>
                 <li>4 vaults de liquidez con yield Aave V3</li>
                 <li>Despliegue en Base L2 (Chain 8453)</li>
                 <li>13 contratos en produccion con proxies UUPS</li>
@@ -2031,7 +2038,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                     <tr><th>Shield</th><th>Direccion</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>BlackSwanShield (BSS)</td><td><a class="address-link" href="https://basescan.org/address/0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" target="_blank">0x2926202bbe3f25f71ef17b25a20ebe8be028af5f</a></td></tr>
+                    <tr><td>BTC Catastrophe Shield (BCS) / ETH Apocalypse Shield (EAS)</td><td><a class="address-link" href="https://basescan.org/address/0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" target="_blank">0x2926202bbe3f25f71ef17b25a20ebe8be028af5f</a></td></tr>
                     <tr><td>DepegShield</td><td><a class="address-link" href="https://basescan.org/address/0x7578816a803d293bbb4dbea0efbed872842679d0" target="_blank">0x7578816a803d293bbb4dbea0efbed872842679d0</a></td></tr>
                     <tr><td>ILIndexCover</td><td><a class="address-link" href="https://basescan.org/address/0x2ac0d2a9889a8a4143727a0240de3fed4650dd93" target="_blank">0x2ac0d2a9889a8a4143727a0240de3fed4650dd93</a></td></tr>
                     <tr><td>ExploitShield</td><td><a class="address-link" href="https://basescan.org/address/0x9870830c615d1b9c53dfee4136c4792de395b7a1" target="_blank">0x9870830c615d1b9c53dfee4136c4792de395b7a1</a></td></tr>
@@ -2106,7 +2113,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                 <tbody>
                     <tr>
                         <td><strong>Crash de ETH/BTC</strong></td>
-                        <td>BSS, IL Index Cover</td>
+                        <td>BCS, EAS, IL Index Cover</td>
                         <td>Caida &gt;30% en activos volatiles</td>
                         <td><span class="risk-medium">Media</span></td>
                     </tr>
@@ -2124,7 +2131,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                     </tr>
                     <tr>
                         <td><strong>Evento sistemico</strong></td>
-                        <td>BSS + Depeg + IL + Exploit</td>
+                        <td>BCS + EAS + Depeg + IL + Exploit</td>
                         <td>Colapso del ecosistema DeFi completo</td>
                         <td><span class="risk-low">Muy Baja</span></td>
                     </tr>
@@ -2135,7 +2142,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
         <h3>Analisis de correlacion</h3>
 
         <ul>
-            <li><strong>BSS e IL Index Cover</strong> tienen correlacion alta: un crash de mercado activa BSS y simultaneamente genera IL significativo. Por esta razon, ambos comparten el vault VolatileShort.</li>
+            <li><strong>BCS, EAS e IL Index Cover</strong> tienen correlacion alta: un crash de mercado activa BCS/EAS y simultaneamente genera IL significativo. Por esta razon, comparten el vault VolatileShort.</li>
             <li><strong>Depeg Shield</strong> tiene correlacion baja con los productos de volatilidad. Un depeg de stablecoin puede ocurrir independientemente de la direccion del mercado (ej: crisis bancaria, riesgo regulatorio de Tether).</li>
             <li><strong>Exploit Shield</strong> tiene correlacion baja con todos los demas productos. Los hacks de protocolos son eventos idiosincraticos que no dependen de condiciones de mercado.</li>
             <li><strong>Evento sistemico</strong> (todos los triggers simultaneos) es el escenario de peor caso. La segregacion de vaults por tipo de riesgo y el sistema de waterfall mitigan parcialmente este riesgo. La perdida maxima estimada es de -21.9% del TVL ($438K de $2M).</li>
@@ -2216,7 +2223,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
             <li><strong>Parametrico puro:</strong> Sin reclamos subjetivos, sin votaciones, sin esperas. El trigger se activa y el pago es inmediato.</li>
             <li><strong>Diseñado para agentes:</strong> API programatica, session approval para relayers, integracion OWS, documentacion SKILL.</li>
             <li><strong>Colateral 1:1:</strong> Cada poliza esta respaldada al 100% por USDC real bloqueado en el vault. Sin riesgo de subcapitalizacion.</li>
-            <li><strong>Yield real:</strong> Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 3-25%.</li>
+            <li><strong>Yield real:</strong> Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 3-21%.</li>
             <li><strong>Seguridad en capas:</strong> Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), TWAP, sequencer check.</li>
             <li><strong>Modelo de negocio transparente:</strong> 3% premium + 3% payout. Sin fees ocultos. Performance fee del 3% sobre rendimiento positivo en retiros de vault.</li>
         </ul>

@@ -46,7 +46,8 @@ Expected: {"status":"ok","chain":"base","chainId":8453}
 ┌──────────┬──────────────────────────┬────────────┬────────────┬──────────────┐
 │ Product  │ What it covers           │ Duration   │ Deductible │ Trigger      │
 ├──────────┼──────────────────────────┼────────────┼────────────┼──────────────┤
-│ BSS      │ ETH crash ≥30%           │ 7-30 days  │ 20%        │ ETH price    │
+│ BCS      │ BTC crash ≥50%           │ 7-30 days  │ 20%        │ BTC price    │
+│ EAS      │ ETH crash ≥60%           │ 7-30 days  │ 20%        │ ETH price    │
 │ DEPEG    │ USDT or DAI loses peg    │ 14-365 days│ USDT:15%   │ Peg deviation│
 │          │ (USDC excluded)          │            │ DAI:12%    │              │
 │ IL       │ Impermanent loss         │ 14-90 days │ 2%         │ IL index     │
@@ -64,8 +65,8 @@ STEP 1 — Check your USDC balance is sufficient:
 Your owner must have USDC on Base in their wallet and must have approved the CoverRouter to spend it.
 
 STEP 2 — Get a quote (optional but recommended):
-GET /api/v2/quote?productId=BSS&coverageAmount=1000000000&durationSeconds=604800
-Response: {"premium":1635000,"premiumUSD":1.64,"product":"BSS","coverage":1000000000}
+GET /api/v2/quote?productId=BCS&coverageAmount=1000000000&durationSeconds=604800
+Response: {"premium":1635000,"premiumUSD":1.64,"product":"BCS","coverage":1000000000}
 
 Premium varies based on vault utilization. This example assumes ~50% utilization.
 
@@ -76,7 +77,7 @@ POST /api/v2/purchase
 Headers: Content-Type: application/json, X-API-Key: YOUR_KEY
 Body:
 {
-  "productId": "BSS",
+  "productId": "BCS",
   "coverageAmount": 1000000000,
   "durationSeconds": 604800
 }
@@ -119,7 +120,7 @@ Each policy has:
 - triggerMet: true/false — if true and status is "claimable", you should claim
 
 CLAIMING A PAYOUT:
-When a trigger is met (e.g., ETH drops 30%+ for BSS):
+When a trigger is met (e.g., BTC drops 50%+ for BCS or ETH drops 60%+ for EAS):
 POST /api/v2/claim
 Headers: Content-Type: application/json, X-API-Key: YOUR_KEY
 Body: {"policyId":"YOUR_POLICY_ID"}
@@ -130,7 +131,7 @@ Gross Payout = coverageAmount × (1 - deductibleBps/10000)
 Protocol Fee = Gross Payout × 3%
 Net Payout = Gross Payout - Protocol Fee
 
-Example: $1000 BSS with 20% deductible:
+Example: $1000 BCS with 20% deductible:
   Gross Payout = $1000 × 0.80 = $800
   Protocol Fee = $800 × 0.03 = $24
   Net Payout (you receive) = $776
@@ -163,7 +164,7 @@ To maintain continuous coverage without gaps:
 ┌─────────┬────────────────┬────────────────────────────────────────────────────┐
 │ Product │ Waiting Period │ Repurchase Window                                  │
 ├─────────┼────────────────┼────────────────────────────────────────────────────┤
-│ BSS     │ 3600s (1h)     │ Repurchase when expiresAt - now < 7200 (2 hours)   │
+│ BCS/EAS │ 3600s (1h)     │ Repurchase when expiresAt - now < 7200 (2 hours)   │
 │ DEPEG   │ 86400s (24h)   │ Repurchase when expiresAt - now < 90000 (25 hours) │
 │ IL      │ None           │ Repurchase when expiresAt - now < 3600 (1 hour)    │
 │ EXPLOIT │ 1209600s (14d) │ Repurchase when expiresAt - now < 1296000 (15 days)│
@@ -174,7 +175,7 @@ Logic for your agent loop:
   timeLeft = policy.expiresAt - currentTime
   if (timeLeft < repurchaseWindowSeconds) → GET /quote → POST /purchase
 
-This ensures zero coverage gaps. The extra buffer (1h for BSS/IL, 25h for DEPEG, 15d for EXPLOIT) accounts for the waiting period of the new policy.
+This ensures zero coverage gaps. The extra buffer (1h for BCS/EAS/IL, 25h for DEPEG, 15d for EXPLOIT) accounts for the waiting period of the new policy.
 
 ════════════════════════════════════════════════════════════
 7. YIELD VAULTS (for earning, not insurance)
@@ -221,7 +222,7 @@ Plan withdrawals in advance. You cannot withdraw instantly.
 
 WHEN TO BUY EACH PRODUCT:
 
-BSS (Black Swan Shield):
+BCS (BTC Catastrophe Shield) / EAS (ETH Apocalypse Shield):
 - Buy when: ETH volatility is high, your portfolio has significant ETH exposure, market sentiment is fearful, VIX-crypto equivalent is elevated
 - Don't buy when: Market is calm, ETH is in a steady uptrend, your exposure is minimal
 - Recommended coverage: 50-80% of ETH exposure value
@@ -248,7 +249,7 @@ EXPLOIT (Exploit Shield):
 
 YIELD VAULTS — when to deposit:
 - Deposit when: You have idle USDC, you want passive income, you're comfortable with the lockup period
-- Choose Volatile vaults: higher yield but higher risk (covers BSS and IL claims)
+- Choose Volatile vaults: higher yield but higher risk (covers BCS/EAS and IL claims)
 - Choose Stable vaults: lower yield but lower risk (covers DEPEG and EXPLOIT claims)
 - Choose Short lockups: if you may need liquidity soon
 - Choose Long lockups: for higher yield if you can lock funds longer
@@ -258,7 +259,7 @@ MARKET DATA SOURCES (for autonomous decision-making):
 Your agent needs external data to make buy/sell decisions. Recommended free sources:
 
 - ETH price: GET https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd
-- ETH volatility: Fetch ETH price hourly, compute stddev over 24 points. If stddev > 5% of price → high volatility → consider BSS
+- ETH volatility: Fetch ETH price hourly, compute stddev over 24 points. If stddev > 5% of price → high volatility → consider EAS/BCS
 - Stablecoin peg: GET https://api.coingecko.com/api/v3/simple/price?ids=tether,dai&vs_currencies=usd — if price < 0.98 → consider DEPEG
 - Vault utilization: GET /api/v2/vaults → use utilizationPct. If > 80% → premiums expensive. If < 40% → premiums cheap
 - DeFi exploits: Monitor https://rekt.news for hack reports
@@ -282,7 +283,8 @@ Premiums are dynamic based on vault utilization (Kink Model):
 Premium formula: premium = coverageAmount × pBase × M(U) × (durationSeconds / 31,536,000)
 
 Base annual premium rates (pBase) per product:
-- BSS:     6.5%  (650 bps)  — Black Swan Shield
+- BCS:     6.5%  (650 bps)  — BTC Catastrophe Shield
+- EAS:     6.5%  (650 bps)  — ETH Apocalypse Shield
 - DEPEG:   2.5%  (250 bps)  — Stablecoin Depeg Shield
 - IL:      8.5%  (850 bps)  — IL Index Cover
 - EXPLOIT: 4.0%  (400 bps)  — Exploit Shield (Tier 1 base)
@@ -306,7 +308,7 @@ Oracle:                      0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87
 Phala Verifier:              0x468b9D2E9043c80467B610bC290b698ae23adb9B
 
 Shields:
-BSS Shield:      0x2926202bbe3f25f71ef17b25a20ebe8be028af5f
+BCS/EAS Shield:  0x2926202bbe3f25f71ef17b25a20ebe8be028af5f
 Depeg Shield:    0x7578816a803d293bbb4dbea0efbed872842679d0
 IL Index Shield: 0x2ac0d2a9889a8a4143727a0240de3fed4650dd93
 Exploit Shield:  0x9870830c615d1b9c53dfee4136c4792de395b7a1
@@ -391,25 +393,25 @@ GET /api/v2/health
 {"status":"ok","chain":"base","chainId":8453}
 
 GET /api/v2/products
-[{"id":"BSS","name":"Black Swan Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":3600,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
+[{"id":"BCS","name":"BTC Catastrophe Shield","pBaseBps":650,"deductibleBps":2000,"minDurationSeconds":604800,"maxDurationSeconds":2592000,"waitingPeriodSeconds":3600,"riskType":"VOLATILE","excludedAssets":[]},{"id":"DEPEG","name":"Depeg Shield","pBaseBps":250,"deductibleBps":{"USDT":1500,"DAI":1200},"minDurationSeconds":1209600,"maxDurationSeconds":31536000,"waitingPeriodSeconds":86400,"riskType":"STABLE","excludedAssets":["USDC"]},{"id":"IL","name":"IL Index Cover","pBaseBps":850,"deductibleBps":200,"minDurationSeconds":1209600,"maxDurationSeconds":7776000,"waitingPeriodSeconds":0,"riskType":"VOLATILE"},{"id":"EXPLOIT","name":"Exploit Shield","pBaseBps":400,"deductibleBps":1000,"minDurationSeconds":7776000,"maxDurationSeconds":31536000,"waitingPeriodSeconds":1209600,"riskType":"STABLE","excludedProtocols":["Aave V3"]}]
 
 GET /api/v2/vaults
-[{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":37,"products":["BSS","IL"],"riskProfile":"higher"}]
+[{"id":"volatile_short","name":"Volatile Short","totalValueLockedUSD":24208.19,"currentUtilizationPct":20.61,"estimatedAPY":5.7,"cooldownDays":37,"products":["BCS","EAS","IL"],"riskProfile":"higher"}]
 
 Key fields for decision-making:
 - currentUtilizationPct: if > 80 → post-kink, premiums expensive
 - estimatedAPY: total yield for LPs (Aave + premiums)
 - allocatedAssets: how much is locked for active policies
 
-GET /api/v2/quote?productId=BSS&coverageAmount=1000000000&durationSeconds=604800
-{"premium":1635000,"premiumUSD":1.64,"product":"BSS","coverage":1000000000,"utilizationPct":20.6}
+GET /api/v2/quote?productId=BCS&coverageAmount=1000000000&durationSeconds=604800
+{"premium":1635000,"premiumUSD":1.64,"product":"BCS","coverage":1000000000,"utilizationPct":20.6}
 
 POST /api/v2/purchase (requires X-API-Key header)
 Success: {"success":true,"policyId":"1","premium":1635000,"txHash":"0x..."}
 Error: {"error":"Insufficient USDC balance","required":"1635000","balance":"0"}
 
 GET /api/v2/policies?buyer=0x...
-[{"policyId":1,"product":"BSS","coverageAmount":1000000000,"coverageUSD":1000.00,"premiumPaid":1635000,"premiumUSD":1.64,"maxPayout":800000000,"maxPayoutUSD":800.00,"deductibleBps":2000,"status":"active","startedAt":1774027483,"expiresAt":1775237483,"waitingEndsAt":1774027483,"triggerMet":false,"claimable":false,"vault":"volatile_short"}]
+[{"policyId":1,"product":"BCS","coverageAmount":1000000000,"coverageUSD":1000.00,"premiumPaid":1635000,"premiumUSD":1.64,"maxPayout":800000000,"maxPayoutUSD":800.00,"deductibleBps":2000,"status":"active","startedAt":1774027483,"expiresAt":1775237483,"waitingEndsAt":1774027483,"triggerMet":false,"claimable":false,"vault":"volatile_short"}]
 
 Key fields for your agent loop:
 - status: "active" | "expired" | "claimed" | "claimable"
@@ -463,7 +465,7 @@ MAIN LOOP (runs every 3600 seconds / 1 hour):
      vaults = GET {BASE_URL}/api/v2/vaults
 
      Decision rules:
-     - ETH stddev(24h) > 5% of price → consider buying BSS
+     - ETH stddev(24h) > 5% of price → consider buying BCS/EAS
      - USDT or DAI price < 0.98 → consider buying DEPEG
      - Providing liquidity in volatile AMM → consider buying IL
      - Funds in unaudited protocol → consider buying EXPLOIT
@@ -487,7 +489,7 @@ ERROR HANDLING:
   Any other error → log, continue loop (never crash)
 
 getRepurchaseWindow(product):
-  BSS     → 3600     (1 hour before expiry)
+  BCS/EAS → 3600     (1 hour before expiry)
   DEPEG   → 90000    (25 hours before expiry)
   IL      → 3600     (1 hour before expiry)
   EXPLOIT → 1296000  (15 days before expiry)

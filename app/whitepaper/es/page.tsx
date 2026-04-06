@@ -12,15 +12,16 @@ const vaultData = [
 ]
 
 const products = [
-  { name: "Black Swan Shield", trigger: "ETH/BTC cae >30%", premium: "~0.3%", duration: "7-90 dias", color: "#00D4AA" },
+  { name: "BTC Catastrophe Shield", trigger: "BTC cae >50%", premium: "~0.3%", duration: "7-30 dias", color: "#00D4AA" },
+  { name: "ETH Apocalypse Shield", trigger: "ETH cae >60%", premium: "~0.3%", duration: "7-30 dias", color: "#06b6d4" },
   { name: "Depeg Shield", trigger: "Stablecoin < $0.95", premium: "~0.2%", duration: "7-365 dias", color: "#22d3ee" },
   { name: "IL Index Cover", trigger: "IL supera deducible", premium: "~0.4%", duration: "30-90 dias", color: "#a78bfa" },
   { name: "Exploit Shield", trigger: "Exploit de protocolo + prueba TEE", premium: "~0.5%", duration: "30-365 dias", color: "#818cf8" },
 ]
 
 const pools = [
-  { name: "Volatile Short", duration: "37 dias", covers: "BSS + IL Index", apy: "3-22% APY", color: "#00D4AA" },
-  { name: "Volatile Long", duration: "97 dias", covers: "IL largo + BSS overflow", apy: "3-25% APY", color: "#22d3ee" },
+  { name: "Volatile Short", duration: "37 dias", covers: "BCS + EAS + IL Index", apy: "4-17% APY", color: "#00D4AA" },
+  { name: "Volatile Long", duration: "97 dias", covers: "IL largo + BCS/EAS overflow", apy: "4-21% APY", color: "#22d3ee" },
   { name: "Stable Short", duration: "97 dias", covers: "Depeg corto", apy: "3-9% APY", color: "#a78bfa" },
   { name: "Stable Long", duration: "372 dias", covers: "Depeg + Exploit", apy: "3-10% APY", color: "#818cf8" },
 ]
@@ -43,7 +44,8 @@ const contracts = [
   { name: "VolatileLong Vault", addr: "0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" },
   { name: "StableShort Vault", addr: "0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" },
   { name: "StableLong Vault", addr: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" },
-  { name: "BlackSwanShield", addr: "0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" },
+  { name: "BTC Catastrophe Shield", addr: "0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" },
+  { name: "ETH Apocalypse Shield", addr: "0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" },
   { name: "DepegShield", addr: "0x7578816a803d293bbb4dbea0efbed872842679d0" },
   { name: "ILIndexCover", addr: "0x2ac0d2a9889a8a4143727a0240de3fed4650dd93" },
   { name: "ExploitShield", addr: "0x9870830c615d1b9c53dfee4136c4792de395b7a1" },
@@ -175,7 +177,7 @@ export default function WhitepaperES() {
             <li>Depositar USDC en uno de los 4 vaults especializados</li>
             <li>Tu USDC se deposita automaticamente en Aave V3, generando 3-5% APY base</li>
             <li>Las primas de seguro de los compradores de polizas fluyen a tu vault, sumando rendimiento</li>
-            <li>APY total estimado: 3-25% segun el vault</li>
+            <li>APY total estimado: 3-21% segun el vault</li>
             <li>Las shares son soulbound (no transferibles) para la estabilidad del vault</li>
             <li>Para retirar: solicitar retiro → esperar periodo de cooldown → completar retiro</li>
           </ul>

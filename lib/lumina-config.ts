@@ -56,7 +56,8 @@ export const CONTRACTS = {
     StableLong: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" as `0x${string}`,
   },
   shields: {
-    BSS: "0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" as `0x${string}`,
+    BCS: "0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" as `0x${string}`,
+    EAS: "0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" as `0x${string}`,
     Depeg: "0x7578816a803d293bbb4dbea0efbed872842679d0" as `0x${string}`,
     ILIndex: "0x2ac0d2a9889a8a4143727a0240de3fed4650dd93" as `0x${string}`,
     Exploit: "0x9870830c615d1b9c53dfee4136c4792de395b7a1" as `0x${string}`,
@@ -76,15 +77,28 @@ export const KINK_MODEL = {
 
 // PRODUCTS — per actuarial specs (docs/actuarial/)
 export const PRODUCTS = {
-  BSS: {
-    id: "BSS",
-    name: "Black Swan Shield",
-    pBaseBps: 650,         // 6.5% annual — tail risk (ETH -30%), ~0.5 events/year, competitive with Deribit puts
+  BCS: {
+    id: "BCS",
+    name: "BTC Catastrophe Shield",
+    pBaseBps: 650,         // 6.5% annual — tail risk (BTC -50%), ~0.5 events/year, competitive with Deribit puts
     deductibleBps: 2000,   // 20%
     riskType: "VOLATILE" as const,
     minDurationDays: 7,
     maxDurationDays: 30,
-    trigger: "ETH price drops ≥30%",
+    trigger: "BTC price drops ≥50%",
+    vaults: ["VolatileShort", "VolatileLong"] as const,
+    excludedAssets: [] as string[],
+    waitingPeriodDays: 0, // Effective: 1 hour (3600s) anti-front-running — enforced on-chain, not in days
+  },
+  EAS: {
+    id: "EAS",
+    name: "ETH Apocalypse Shield",
+    pBaseBps: 650,         // 6.5% annual — tail risk (ETH -60%), ~0.5 events/year, competitive with Deribit puts
+    deductibleBps: 2000,   // 20%
+    riskType: "VOLATILE" as const,
+    minDurationDays: 7,
+    maxDurationDays: 30,
+    trigger: "ETH price drops ≥60%",
     vaults: ["VolatileShort", "VolatileLong"] as const,
     excludedAssets: [] as string[],
     waitingPeriodDays: 0, // Effective: 1 hour (3600s) anti-front-running — enforced on-chain, not in days
@@ -137,7 +151,7 @@ export const VAULTS = {
     cooldownDays: 37,
     riskType: "VOLATILE" as const,
     riskLevel: "Higher",
-    products: ["BSS", "IL"],
+    products: ["BCS", "EAS", "IL"],
     worstCaseLoss: "~30%",
     normalYearProb: "85%",
   },
@@ -146,7 +160,7 @@ export const VAULTS = {
     cooldownDays: 97,
     riskType: "VOLATILE" as const,
     riskLevel: "Higher",
-    products: ["BSS", "IL"],
+    products: ["BCS", "EAS", "IL"],
     worstCaseLoss: "~28%",
     normalYearProb: "85%",
   },

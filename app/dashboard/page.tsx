@@ -32,7 +32,7 @@ const VAULT_CONFIG = [
     address: CONTRACTS.vaults.VolatileShort,
     cooldown: "37 days",
     riskType: "VOLATILE" as const,
-    products: "BSS + IL Index",
+    products: "BCS + EAS + IL Index",
     color: "purple",
     riskBadge: "Higher Risk",
     riskBadgeColor: "amber",
@@ -42,7 +42,7 @@ const VAULT_CONFIG = [
     address: CONTRACTS.vaults.VolatileLong,
     cooldown: "97 days",
     riskType: "VOLATILE" as const,
-    products: "BSS + IL Index",
+    products: "BCS + EAS + IL Index",
     color: "purple",
     riskBadge: "Higher Risk",
     riskBadgeColor: "amber",
@@ -75,9 +75,15 @@ const VAULT_CONFIG = [
 // Shield addresses (verified with eth_getCode) + display info
 const SHIELD_LIST = [
   {
-    address: CONTRACTS.shields.BSS,
-    name: PRODUCTS_CONFIG.BSS.name,
+    address: CONTRACTS.shields.BCS,
+    name: PRODUCTS_CONFIG.BCS.name,
     icon: "🛡️",
+    vaultName: "Volatile Short",
+  },
+  {
+    address: CONTRACTS.shields.EAS,
+    name: PRODUCTS_CONFIG.EAS.name,
+    icon: "⚡",
     vaultName: "Volatile Short",
   },
   {
@@ -117,7 +123,8 @@ const ADDRESS_ALIASES: Record<string, string> = {
 }
 
 const SHIELD_DESCRIPTIONS: Record<string, string> = {
-  "Black Swan Shield": "Covers extreme market crashes on volatile assets",
+  "BTC Catastrophe Shield": "Covers catastrophic BTC price crashes (>50% drop)",
+  "ETH Apocalypse Shield": "Covers apocalyptic ETH price crashes (>60% drop)",
   "Depeg Shield": "Covers stablecoin depegging events",
   "IL Index Cover": "Covers impermanent loss on liquidity positions",
   "Exploit Shield": "Covers smart contract exploits and hacks",
@@ -237,11 +244,11 @@ const STATUS_LABELS: Record<number, { label: string; color: string; pulse?: bool
 // KINK MODEL — imported from lumina-config.ts
 // ════════════════════════════════════════════
 // Blended pBase per vault type (weighted average of products — actuarial specs):
-//   VOLATILE vaults back BSS + IL -> avg pBase
+//   VOLATILE vaults back BCS + EAS + IL -> avg pBase
 //   STABLE vaults back DEPEG + EXPLOIT -> avg pBase
 function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): number {
   const aaveBaseYield = 0.04 // ~4% Aave V3 USDC lending yield (variable)
-  const volatileBlendedBps = (PRODUCTS_CONFIG.BSS.pBaseBps + PRODUCTS_CONFIG.IL.pBaseBps) / 2
+  const volatileBlendedBps = (PRODUCTS_CONFIG.BCS.pBaseBps + PRODUCTS_CONFIG.EAS.pBaseBps + PRODUCTS_CONFIG.IL.pBaseBps) / 3
   const stableBlendedBps = (PRODUCTS_CONFIG.DEPEG.pBaseBps + PRODUCTS_CONFIG.EXPLOIT.pBaseBps) / 2
   const pBaseBps = riskType === "VOLATILE" ? volatileBlendedBps : stableBlendedBps
   const pBaseRate = pBaseBps / 10000

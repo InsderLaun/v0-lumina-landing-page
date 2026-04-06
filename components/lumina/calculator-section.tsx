@@ -57,7 +57,7 @@ export function CalculatorSection() {
 }
 
 function AgentCalculator() {
-    const [productId, setProductId] = useState("BLACKSWAN-002")
+    const [productId, setProductId] = useState("BCS-001")
     const [coverage, setCoverage] = useState(10000)
     const [duration, setDuration] = useState(30)
     const [thresholdBps, setThresholdBps] = useState(2000)
@@ -191,7 +191,7 @@ function AgentCalculator() {
 
 /* ── Per-product historical risk data ── */
 const RISK_DATA: Record<string, { level: string; color: "green" | "amber" | "red"; emoji: string; description: string }> = {
-    "BLACKSWAN-002": {
+    "BCS-001": {
         level: "Medium",
         color: "amber",
         emoji: "🟡",
@@ -223,10 +223,10 @@ const RISK_DATA: Record<string, { level: string; color: "green" | "amber" | "red
     },
 }
 
-const DEFAULT_RISK = RISK_DATA["BLACKSWAN-002"]
+const DEFAULT_RISK = RISK_DATA["BCS-001"]
 
 function LPCalculator() {
-    const [productId, setProductId] = useState("BLACKSWAN-002")
+    const [productId, setProductId] = useState("BCS-001")
     const [deposit, setDeposit] = useState(10000)
     const [utilization, setUtilization] = useState(30)
     const [realUtilization, setRealUtilization] = useState<number | null>(null)
