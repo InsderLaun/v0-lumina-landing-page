@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 // LUMINA PROTOCOL — PRODUCT DATA
-// 8 Parametric Insurance Products with real specifications
+// 5 Parametric Insurance Products with real specifications (BCS, EAS, DEPEG, IL, EXPLOIT)
 // ═══════════════════════════════════════════════════════════════
 
 export type RiskLevel = 'Low' | 'Medium' | 'Higher'

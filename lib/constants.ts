@@ -65,7 +65,7 @@ export const NAV_ITEMS = [
 
 // Stats for hero section
 export const HERO_STATS = [
-    { label: 'Products', value: 8 },
+    { label: 'Products', value: 5 },
     { label: 'Chainlink Feeds', value: 5 },
     { label: 'Verified Contracts', value: 3 },
     { label: 'Resolution', value: '< 24h', isString: true },

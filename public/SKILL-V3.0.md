@@ -149,13 +149,13 @@ Verification: Oracle-signed TWAP 15 min or 3 consecutive Chainlink rounds
 Deductible: 20% — Payout: 80% of coverage (binary, all-or-nothing)
 Duration: 7 to 30 days
 Waiting period: 1 hour
-Base rate: 6.5% annualized (650 bps)
+Base rate: 15% annualized (1500 bps)
 Assets: BTC
 Max proof age: 30 minutes
 Fee: 3% on premium (purchase) + 3% on payout (claim)
 
 Example: Buy $10,000 BCS coverage for 14 days
-  Premium ≈ $10,000 × 0.065 × M(U) × (14/365) = ~$25-40 depending on utilization
+  Premium ≈ $10,000 × 0.15 × M(U) × (14/365) = ~$58-95 depending on utilization
   If trigger activates: payout = $10,000 × 80% = $8,000 gross, $7,760 net (after 3% fee)
 
 --- ETH APOCALYPSE SHIELD (EAS) ---
@@ -166,13 +166,13 @@ Verification: Oracle-signed TWAP 15 min or 3 consecutive Chainlink rounds
 Deductible: 20% — Payout: 80% of coverage (binary, all-or-nothing)
 Duration: 7 to 30 days
 Waiting period: 1 hour
-Base rate: 6.5% annualized (650 bps)
+Base rate: 20% annualized (2000 bps)
 Assets: ETH
 Max proof age: 30 minutes
 Fee: 3% on premium (purchase) + 3% on payout (claim)
 
 Example: Buy $10,000 EAS coverage for 14 days
-  Premium ≈ $10,000 × 0.065 × M(U) × (14/365) = ~$25-40 depending on utilization
+  Premium ≈ $10,000 × 0.20 × M(U) × (14/365) = ~$77-127 depending on utilization
   If trigger activates: payout = $10,000 × 80% = $8,000 gross, $7,760 net (after 3% fee)
 
 --- DEPEG SHIELD ---

@@ -42,7 +42,7 @@ Exploit: $40,000 / (0.90 × 0.97) = $45,830 coverage
 
 # SECTION 2: THE 4 INSURANCE PRODUCTS
 
-**Note on Product IDs:** The API accepts both short IDs (BCS, EAS, DEPEG, IL, EXPLOIT) and full IDs (BCS-001, EAS-001, DEPEG-STABLE-002, ILPROT-002, EXPLOIT-002). Use whichever format your integration prefers.
+**Note on Product IDs:** The API accepts both short IDs (BCS, EAS, DEPEG, IL, EXPLOIT) and full IDs (BTCCAT-001, ETHAPOC-001, DEPEG-STABLE-001, ILPROT-001, EXPLOIT-001). Use whichever format your integration prefers.
 
 ## Product 1: BTC Catastrophe Shield (BCS)
 
@@ -52,13 +52,13 @@ Exploit: $40,000 / (0.90 × 0.97) = $45,830 coverage
 
 | Parameter | Value |
 |-----------|-------|
-| Product ID | `BCS-001` |
+| Product ID | `BTCCAT-001` |
 | Trigger | BTC price drops >50% from the exact price at the moment you buy the policy |
 | Payout | 80% of coverage (20% deductible) |
 | Duration | 7 to 30 days (you choose, priced by the second) |
 | Waiting Period | 1 hour (anti-front-running) — coverage starts 1 hour after purchase |
 | Minimum Coverage | $100 |
-| Base Rate | 6.5% annualized (650 bps) |
+| Base Rate | 15% annualized (1500 bps) |
 | Protocol Fee | 3% on premium + 3% on payout. Net payout = 77.6% of coverage |
 
 **Example:**
@@ -93,13 +93,13 @@ Return on premium: $40,000 / $156 = 256x
 
 | Parameter | Value |
 |-----------|-------|
-| Product ID | `EAS-001` |
+| Product ID | `ETHAPOC-001` |
 | Trigger | ETH price drops >60% from the exact price at the moment you buy the policy |
 | Payout | 80% of coverage (20% deductible) |
 | Duration | 7 to 30 days (you choose, priced by the second) |
 | Waiting Period | 1 hour (anti-front-running) — coverage starts 1 hour after purchase |
 | Minimum Coverage | $100 |
-| Base Rate | 6.5% annualized (650 bps) |
+| Base Rate | 20% annualized (2000 bps) |
 | Protocol Fee | 3% on premium + 3% on payout. Net payout = 77.6% of coverage |
 
 **Example:**
@@ -327,7 +327,7 @@ The Kink Model (dynamic pricing) creates a self-balancing market:
 ```
 Vault TVL: $200K, Allocated: $120K → Utilization: 60%
 Kink multiplier at 60%: 1.38x
-Premium for a $50K BCS policy (14d): $50K × 0.065 × 1.38 × (14/365) = $172
+Premium for a $50K BCS policy (14d): $50K × 0.15 × 1.38 × (14/365) = $397
 
 Now an agent buys another $50K policy:
 New utilization: ($120K + $50K) / $200K = 85%
@@ -408,7 +408,7 @@ Lumina uses multiple layers to prevent gaming:
 ```
 GET /api/v2/quote
 {
-  "productId": "BCS-001",
+  "productId": "BTCCAT-001",
   "coverageAmount": 50000000000,    // $50,000 in 6 decimals (USDC)
   "durationSeconds": 1209600,       // 14 days
   "asset": "ETH",                   // For BCS/EAS and IL

@@ -95,7 +95,7 @@ Premium = Coverage x P_base x RiskMult x DurationDiscount x M(U) x (Duration / 3
 Donde:
 
 - **Coverage**: monto asegurado en USDC
-- **P_base**: tasa base anualizada del producto (ej: 6.5% para BCS/EAS, 2.5% para Depeg)
+- **P_base**: tasa base anualizada del producto (ej: 15% para BCS, 20% para EAS, 2.5% para Depeg, 8.5% para IL, 4% para Exploit)
 - **RiskMult**: multiplicador de riesgo por activo
 - **DurationDiscount**: descuento por duracion larga
 - **M(U)**: multiplicador de utilizacion (modelo kink)
@@ -169,8 +169,8 @@ El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vault
 | VolatileLong Vault      | Vault          | UUPS   | Aave V3, USDC                        | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
 | StableShort Vault       | Vault          | UUPS   | Aave V3, USDC                        | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
 | StableLong Vault        | Vault          | UUPS   | Aave V3, USDC                        | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
-| BTC Catastrophe Shield  | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f`       |
-| ETH Apocalypse Shield   | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f`       |
+| BTC Catastrophe Shield  | Producto       | non-up | Oracle, PolicyManager, VolatileShort | `0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8`       |
+| ETH Apocalypse Shield   | Producto       | non-up | Oracle, PolicyManager, VolatileShort | `0xA755D134a0b2758E9b397E11E7132a243f672A3D`       |
 | DepegShield             | Producto       | UUPS   | Oracle, PolicyManager, StableShort   | `0x7578816a803d293bbb4dbea0efbed872842679d0`       |
 | ILIndexCover            | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x2ac0d2a9889a8a4143727a0240de3fed4650dd93`       |
 | ExploitShield           | Producto       | UUPS   | Oracle, Phala TEE, PolicyManager     | `0x9870830c615d1b9c53dfee4136c4792de395b7a1`       |
@@ -196,21 +196,22 @@ Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos
 
 **Parametros del contrato:**
 
-| Parametro                | Valor                                                     |
-|--------------------------|-----------------------------------------------------------|
-| Producto ID              | `BCS-001`                                           |
-| Contrato                 | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f`              |
-| Trigger                  | Caida > 30% desde el precio al momento de compra          |
-| TRIGGER_DROP_BPS         | `3000` (30% en puntos base)                               |
-| Verificacion             | TWAP 15 minutos o 3 rounds consecutivos de Chainlink      |
-| Deducible                | 20%                                                       |
-| Payout                   | Binario: 80% del coverage                                 |
-| Duracion                 | 7 a 30 dias                                               |
-| Waiting period           | 1 hora (anti-front-running)                               |
-| Assets cubiertos         | ETH, BTC                                                  |
-| MAX_PROOF_AGE            | 30 minutos                                                |
-| Tasa base                | 22% anualizado                                            |
-| Vault                    | VolatileShort (`0xbd44547581b92805aAECc40EB2809352b9b2880d`) |
+| Parametro                | BCS — BTC Catastrophe Shield                              | EAS — ETH Apocalypse Shield                              |
+|--------------------------|-----------------------------------------------------------|----------------------------------------------------------|
+| Producto ID              | `BTCCAT-001`                                              | `ETHAPOC-001`                                            |
+| Contrato                 | `0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8`              | `0xA755D134a0b2758E9b397E11E7132a243f672A3D`             |
+| Trigger                  | Caida > 50% desde el precio al momento de compra          | Caida > 60% desde el precio al momento de compra         |
+| TRIGGER_DROP_BPS         | `5000` (50% en puntos base)                               | `6000` (60% en puntos base)                              |
+| Verificacion             | TWAP 15 minutos o 3 rounds consecutivos de Chainlink      | TWAP 15 minutos o 3 rounds consecutivos de Chainlink     |
+| Deducible                | 20%                                                       | 20%                                                      |
+| Payout                   | Binario: 80% del coverage                                 | Binario: 80% del coverage                                |
+| Duracion                 | 7 a 30 dias                                               | 7 a 30 dias                                              |
+| Waiting period           | 1 hora (anti-front-running)                               | 1 hora (anti-front-running)                              |
+| Assets cubiertos         | BTC unicamente                                            | ETH unicamente                                           |
+| MAX_PROOF_AGE            | 30 minutos                                                | 30 minutos                                               |
+| Tasa base                | 15% anualizado (1500 bps)                                 | 20% anualizado (2000 bps)                                |
+| Max allocation por vault | 30%                                                       | 25%                                                      |
+| Vault                    | VolatileShort + VolatileLong                              | VolatileShort + VolatileLong                             |
 
 **Circuit Breaker:**
 
@@ -222,10 +223,10 @@ El contrato implementa un mecanismo de circuit breaker para proteger al protocol
 **Ejemplo de pago:**
 
 ```
-Cobertura: $50,000 en ETH
+Cobertura: $50,000 en ETH (EAS — ETH Apocalypse Shield)
 Precio al comprar: $2,000
-Precio trigger: $2,000 x 0.70 = $1,400
-ETH cae a $1,350 → Trigger activado
+Precio trigger: $2,000 x 0.40 = $800   (-60%)
+ETH cae a $750 → Trigger activado
 Payout bruto: $50,000 x 80% = $40,000
 Fee protocolo (3%): $1,200
 Payout neto al agente: $38,800
@@ -246,7 +247,7 @@ Payout neto al agente: $38,800
 | Verificacion             | TWAP 30 minutos o 5 rounds consecutivos                   |
 | Duracion                 | 14 a 365 dias                                             |
 | Waiting period           | 24 horas                                                  |
-| Tasa base                | 24% anualizado                                            |
+| Tasa base                | 2.5% anualizado (250 bps)                                 |
 | Vault (corto)            | StableShort (`0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`) |
 | Vault (largo)            | StableLong (`0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`)  |
 
@@ -708,7 +709,8 @@ Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, 
 
 | Shield                 | Direccion                                          |
 |------------------------|-----------------------------------------------------|
-| BTC Catastrophe Shield (BCS) / ETH Apocalypse Shield (EAS) | `0x2926202bbe3f25f71ef17b25a20ebe8be028af5f` |
+| BTC Catastrophe Shield (BCS) | `0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8` |
+| ETH Apocalypse Shield (EAS) | `0xA755D134a0b2758E9b397E11E7132a243f672A3D` |
 | DepegShield            | `0x7578816a803d293bbb4dbea0efbed872842679d0`       |
 | ILIndexCover           | `0x2ac0d2a9889a8a4143727a0240de3fed4650dd93`       |
 | ExploitShield          | `0x9870830c615d1b9c53dfee4136c4792de395b7a1`       |

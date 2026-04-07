@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lumina Protocol — The Safety Net for Autonomous AI Agents",
     description:
-      "Parametric insurance on Base L2 for AI agents. 8 products. 100% automated resolution via Chainlink oracles.",
+      "Parametric insurance on Base L2 for AI agents. 5 products. 100% automated resolution via Chainlink oracles.",
     url: "https://lumina-org.com",
     siteName: "Lumina Protocol",
     type: "website",

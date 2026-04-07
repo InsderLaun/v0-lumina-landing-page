@@ -56,8 +56,8 @@ export const CONTRACTS = {
     StableLong: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" as `0x${string}`,
   },
   shields: {
-    BCS: "0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" as `0x${string}`,
-    EAS: "0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" as `0x${string}`,
+    BCS: "0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8" as `0x${string}`,
+    EAS: "0xA755D134a0b2758E9b397E11E7132a243f672A3D" as `0x${string}`,
     Depeg: "0x7578816a803d293bbb4dbea0efbed872842679d0" as `0x${string}`,
     ILIndex: "0x2ac0d2a9889a8a4143727a0240de3fed4650dd93" as `0x${string}`,
     Exploit: "0x9870830c615d1b9c53dfee4136c4792de395b7a1" as `0x${string}`,
@@ -80,7 +80,7 @@ export const PRODUCTS = {
   BCS: {
     id: "BCS",
     name: "BTC Catastrophe Shield",
-    pBaseBps: 650,         // 6.5% annual — tail risk (BTC -50%), ~0.5 events/year, competitive with Deribit puts
+    pBaseBps: 1500,        // 15% annual — tail risk (BTC -50%), recalibrated 2026-04-06 post BSS split
     deductibleBps: 2000,   // 20%
     riskType: "VOLATILE" as const,
     minDurationDays: 7,
@@ -93,7 +93,7 @@ export const PRODUCTS = {
   EAS: {
     id: "EAS",
     name: "ETH Apocalypse Shield",
-    pBaseBps: 650,         // 6.5% annual — tail risk (ETH -60%), ~0.5 events/year, competitive with Deribit puts
+    pBaseBps: 2000,        // 20% annual — tail risk (ETH -60%), recalibrated 2026-04-06 post BSS split
     deductibleBps: 2000,   // 20%
     riskType: "VOLATILE" as const,
     minDurationDays: 7,
