@@ -188,11 +188,11 @@ Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos
 
 ### 4.1 BTC Catastrophe Shield (BCS)
 
-**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en BTC contra caidas catastroficas del mercado. BTC Catastrophe Shield cubre escenarios extremos: crasheos superiores al 50% como los vividos durante COVID (marzo 2020), el colapso de LUNA (mayo 2022) o la caida de FTX (noviembre 2022).
+**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en BTC contra caidas catastroficas del mercado. BTC Catastrophe Shield cubre escenarios extremos: crasheos superiores al 50% como el vivido durante COVID (marzo 2020). Eventos como LUNA (mayo 2022, BTC -42%) o FTX (noviembre 2022, BTC -26%) NO activan este producto porque las caidas de BTC fueron menores al 50%.
 
 ### 4.1b ETH Apocalypse Shield (EAS)
 
-**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en ETH contra caidas apocalipticas del mercado. ETH Apocalypse Shield cubre los escenarios mas extremos: crasheos superiores al 60%.
+**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en ETH contra caidas apocalipticas del mercado. ETH Apocalypse Shield cubre los escenarios mas extremos: crasheos superiores al 60%. Solo un evento de esta magnitud ha ocurrido en los ultimos 8 anos (COVID, marzo 2020), cuando ETH cayo de $230 a $80 en 2 dias. Eventos como China (mayo 2021, ETH -56%) o LUNA (junio 2022, ETH -51%) NO activan este producto.
 
 **Parametros del contrato:**
 

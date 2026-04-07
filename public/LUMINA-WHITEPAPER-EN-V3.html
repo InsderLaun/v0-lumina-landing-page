@@ -784,7 +784,7 @@
         <p>Where:</p>
         <ul>
             <li><strong>Coverage:</strong> insured amount in USDC</li>
-            <li><strong>P_base:</strong> annualized base rate for the product (e.g.: 6.5% for BCS/EAS, 2.5% for Depeg)</li>
+            <li><strong>P_base:</strong> annualized base rate for the product (e.g.: 15% for BCS, 20% for EAS, 2.5% for Depeg)</li>
             <li><strong>RiskMult:</strong> risk multiplier per asset</li>
             <li><strong>DurationDiscount:</strong> discount for long duration</li>
             <li><strong>M(U):</strong> utilization multiplier (kink model)</li>
@@ -1006,13 +1006,7 @@
         <div class="product-card bcs no-break">
             <h3>4.1 BTC Catastrophe Shield (BCS)</h3>
 
-            <p>The human, through their AI agent, can protect their BTC positions against catastrophic market crashes. BTC Catastrophe Shield covers extreme scenarios: crashes exceeding 50% such as those experienced during COVID (March 2020), the LUNA collapse (May 2022), or the FTX crash (November 2022).</p>
-
-        <!-- EAS -->
-        <div class="product-card eas no-break">
-            <h3>4.1b ETH Apocalypse Shield (EAS)</h3>
-
-            <p>The human, through their AI agent, can protect their ETH positions against apocalyptic market crashes. ETH Apocalypse Shield covers the most extreme scenarios: crashes exceeding 60%.</p>
+            <p>Through their AI agent, users can protect their BTC positions against catastrophic market crashes. BTC Catastrophe Shield covers extreme scenarios: drops greater than 50% like the one during COVID (March 2020). Events like LUNA (May 2022, BTC -42%) or FTX (November 2022, BTC -26%) do NOT trigger this product because BTC drops were less than 50%.</p>
 
             <div class="table-wrap">
                 <table>
@@ -1020,19 +1014,55 @@
                         <tr><th>Parameter</th><th>Value</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>Product ID</td><td><code>BCS-001</code></td></tr>
-                        <tr><td>Contract</td><td><a class="address-link" href="https://basescan.org/address/0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" target="_blank">0x2926202bbe3f25f71ef17b25a20ebe8be028af5f</a></td></tr>
-                        <tr><td>Trigger</td><td>Drop &gt; 30% from the price at time of purchase</td></tr>
-                        <tr><td>TRIGGER_DROP_BPS</td><td><code>3000</code> (30% in basis points)</td></tr>
+                        <tr><td>Product ID</td><td><code>BTCCAT-001</code></td></tr>
+                        <tr><td>Contract</td><td><a class="address-link" href="https://basescan.org/address/0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8" target="_blank">0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8</a></td></tr>
+                        <tr><td>Trigger</td><td>Drop &gt; 50% from purchase price</td></tr>
+                        <tr><td>TRIGGER_DROP_BPS</td><td><code>5000</code> (50% in basis points)</td></tr>
                         <tr><td>Verification</td><td>TWAP 15 minutes or 3 consecutive Chainlink rounds</td></tr>
                         <tr><td>Deductible</td><td>20%</td></tr>
                         <tr><td>Payout</td><td>Binary: 80% of coverage</td></tr>
                         <tr><td>Duration</td><td>7 to 30 days</td></tr>
                         <tr><td>Waiting period</td><td>1 hour (anti-front-running)</td></tr>
-                        <tr><td>Covered assets</td><td>ETH, BTC</td></tr>
+                        <tr><td>Covered assets</td><td>BTC only</td></tr>
                         <tr><td>MAX_PROOF_AGE</td><td>30 minutes</td></tr>
-                        <tr><td>Base rate</td><td>22% annualized</td></tr>
-                        <tr><td>Vault</td><td>VolatileShort (<code>0xbd44...880d</code>)</td></tr>
+                        <tr><td>Base rate</td><td>15% annualized (1500 BPS)</td></tr>
+                        <tr><td>Max allocation</td><td>30% of vault (3000 BPS)</td></tr>
+                        <tr><td>Vault</td><td>VolatileShort (37 days cooldown)</td></tr>
+                        <tr><td>Historical frequency</td><td>~0.125 events/year (1 in 8 years)</td></tr>
+                        <tr><td>Reference event</td><td>COVID March 2020: BTC $9,100 &rarr; $3,800 (-58%)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EAS -->
+        <div class="product-card eas no-break">
+            <h3>4.1b ETH Apocalypse Shield (EAS)</h3>
+
+            <p>Through their AI agent, users can protect their ETH positions against apocalyptic market crashes. ETH Apocalypse Shield covers the most extreme scenarios: drops greater than 60%. Only one event of this magnitude has occurred in the last 8 years (COVID, March 2020), when ETH dropped from $230 to $80 in 2 days. Events like China (May 2021, ETH -56%) or LUNA (June 2022, ETH -51%) do NOT trigger this product.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Parameter</th><th>Value</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Product ID</td><td><code>ETHAPOC-001</code></td></tr>
+                        <tr><td>Contract</td><td><a class="address-link" href="https://basescan.org/address/0xA755D134a0b2758E9b397E11E7132a243f672A3D" target="_blank">0xA755D134a0b2758E9b397E11E7132a243f672A3D</a></td></tr>
+                        <tr><td>Trigger</td><td>Drop &gt; 60% from purchase price</td></tr>
+                        <tr><td>TRIGGER_DROP_BPS</td><td><code>6000</code> (60% in basis points)</td></tr>
+                        <tr><td>Verification</td><td>TWAP 15 minutes or 3 consecutive Chainlink rounds</td></tr>
+                        <tr><td>Deductible</td><td>20%</td></tr>
+                        <tr><td>Payout</td><td>Binary: 80% of coverage</td></tr>
+                        <tr><td>Duration</td><td>7 to 30 days</td></tr>
+                        <tr><td>Waiting period</td><td>1 hour (anti-front-running)</td></tr>
+                        <tr><td>Covered assets</td><td>ETH only</td></tr>
+                        <tr><td>MAX_PROOF_AGE</td><td>30 minutes</td></tr>
+                        <tr><td>Base rate</td><td>20% annualized (2000 BPS)</td></tr>
+                        <tr><td>Max allocation</td><td>25% of vault (2500 BPS)</td></tr>
+                        <tr><td>Vault</td><td>VolatileLong (97 days cooldown)</td></tr>
+                        <tr><td>Historical frequency</td><td>~0.125 events/year (1 in 8 years)</td></tr>
+                        <tr><td>Reference event</td><td>COVID March 2020: ETH $230 &rarr; $80 (-65%)</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1314,18 +1344,18 @@ Net payout to agent: <span class="value">$38,800</span>
         <p><strong>Numerical example:</strong> An agent buys BTC Catastrophe Shield for $50,000 coverage, 14 days, with U=50%:</p>
 
         <div class="code-block">
-P_base = 650 bps (6.5% annualized)
+P_base = 1500 bps (15% annualized)
 RiskMult = 1.0x (ETH base)
 DurationDiscount = 1.0x
 <span class="var">M(U)</span> = 1 + (0.50/0.80) x 0.5 = 1.3125x
-<span class="var">Premium</span> = 50,000 x 0.065 x 1.0 x 1.0 x 1.3125 x (14/365) = <strong>$163.70</strong>
+<span class="var">Premium</span> = 50,000 x 0.15 x 1.0 x 1.0 x 1.3125 x (14/365) = <strong>$377.57</strong>
         </div>
 
         <p>Same scenario with U=85%:</p>
 
         <div class="code-block">
 <span class="var">M(U)</span> = 1 + 0.5 + ((0.85-0.80)/0.20) x 3.0 = 2.25x
-<span class="var">Premium</span> = 50,000 x 0.065 x 1.0 x 1.0 x 2.25 x (14/365) = <strong>$280.82</strong>
+<span class="var">Premium</span> = 50,000 x 0.15 x 1.0 x 1.0 x 2.25 x (14/365) = <strong>$647.26</strong>
         </div>
 
         <h3>5.3 Vault Utilization</h3>
@@ -1388,8 +1418,8 @@ DurationDiscount = 1.0x
                     <tr><th>Product</th><th>P_base</th><th>Vault</th><th>Duration</th><th>Trigger</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>BTC Catastrophe Shield</td><td>650 bps (6.5%)</td><td>Volatile Short/Long</td><td>7-30 days</td><td>&gt;50% BTC drop</td></tr>
-                    <tr><td>ETH Apocalypse Shield</td><td>650 bps (6.5%)</td><td>Volatile Short/Long</td><td>7-30 days</td><td>&gt;60% ETH drop</td></tr>
+                    <tr><td>BTC Catastrophe Shield</td><td>1500 bps (15%)</td><td>Volatile Short/Long</td><td>7-30 days</td><td>&gt;50% BTC drop</td></tr>
+                    <tr><td>ETH Apocalypse Shield</td><td>2000 bps (20%)</td><td>Volatile Short/Long</td><td>7-30 days</td><td>&gt;60% ETH drop</td></tr>
                     <tr><td>Depeg Shield</td><td>250 bps (2.5%)</td><td>Stable Short/Long</td><td>14-365 days</td><td>Stablecoin &lt;$0.95</td></tr>
                     <tr><td>IL Index Cover</td><td>850 bps (8.5%)</td><td>Volatile Short/Long</td><td>14-90 days</td><td>IL &gt;2% at expiry</td></tr>
                     <tr><td>Exploit Shield</td><td>400 bps (4.0%)</td><td>Stable Long</td><td>90-365 days</td><td>Dual trigger (oracle+TEE)</td></tr>
@@ -2035,7 +2065,8 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                     <tr><th>Shield</th><th>Address</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>BTC Catastrophe Shield (BCS) / ETH Apocalypse Shield (EAS)</td><td><a class="address-link" href="https://basescan.org/address/0x2926202bbe3f25f71ef17b25a20ebe8be028af5f" target="_blank">0x2926202bbe3f25f71ef17b25a20ebe8be028af5f</a></td></tr>
+                    <tr><td>BTC Catastrophe Shield (BCS)</td><td><a class="address-link" href="https://basescan.org/address/0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8" target="_blank">0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8</a></td></tr>
+                    <tr><td>ETH Apocalypse Shield (EAS)</td><td><a class="address-link" href="https://basescan.org/address/0xA755D134a0b2758E9b397E11E7132a243f672A3D" target="_blank">0xA755D134a0b2758E9b397E11E7132a243f672A3D</a></td></tr>
                     <tr><td>DepegShield</td><td><a class="address-link" href="https://basescan.org/address/0x7578816a803d293bbb4dbea0efbed872842679d0" target="_blank">0x7578816a803d293bbb4dbea0efbed872842679d0</a></td></tr>
                     <tr><td>ILIndexCover</td><td><a class="address-link" href="https://basescan.org/address/0x2ac0d2a9889a8a4143727a0240de3fed4650dd93" target="_blank">0x2ac0d2a9889a8a4143727a0240de3fed4650dd93</a></td></tr>
                     <tr><td>ExploitShield</td><td><a class="address-link" href="https://basescan.org/address/0x9870830c615d1b9c53dfee4136c4792de395b7a1" target="_blank">0x9870830c615d1b9c53dfee4136c4792de395b7a1</a></td></tr>
