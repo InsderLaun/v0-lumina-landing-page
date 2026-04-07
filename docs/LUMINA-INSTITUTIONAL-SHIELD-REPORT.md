@@ -2,9 +2,16 @@
 # LUMINA INSTITUTIONAL SHIELD
 ## Definitive Reinsurance Product for Institutional LPs ($100K+)
 
+> **HISTORICAL — pre-BCS/EAS migration.** Tables in this report use the actuarial
+> parameters of the original BSS-only era (VolatileShort 3.3%–22.2%, VolatileLong
+> 3.3%–24.7%). Current production values are VolatileShort 3.9%–16.9% and
+> VolatileLong 4.0%–20.5%, after the split into BTCCatastropheShield (BCS) and
+> ETHApocalypseShield (EAS) on 2026-04-06. See CHANGELOG.md in LUMINA-PROTOCOL
+> for the migration record.
+
 **Authors:** Financial Mathematics Team, Reinsurance Actuary, Insurance Commercial Director
 **Date:** April 2026
-**Version:** 1.0 — FINAL
+**Version:** 1.0 — FINAL (historical)
 
 ---
 

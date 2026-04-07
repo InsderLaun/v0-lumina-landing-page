@@ -1125,7 +1125,7 @@ function PremiumCalculatorSection() {
   const [stablecoin, setStablecoin] = useState("USDT")
   const [protocol, setProtocol] = useState("Compound")
   const [vaultUtilizations, setVaultUtilizations] = useState<Record<string, number>>({
-    bss: 20, il: 20, depeg: 20, exploit: 20,
+    bcs: 20, eas: 20, il: 20, depeg: 20, exploit: 20,
   })
   const [refreshing, setRefreshing] = useState(false)
 
@@ -1136,10 +1136,10 @@ function PremiumCalculatorSection() {
       .then(data => {
         if (data.vaults) {
           const addrMap: Record<string, string[]> = {
-            [CONTRACTS.vaults.VolatileShort.toLowerCase()]: ["bss", "il"],
+            [CONTRACTS.vaults.VolatileShort.toLowerCase()]: ["bcs", "eas", "il"],
             [CONTRACTS.vaults.StableShort.toLowerCase()]: ["depeg", "exploit"],
           }
-          const utils: Record<string, number> = { bss: 20, il: 20, depeg: 20, exploit: 20 }
+          const utils: Record<string, number> = { bcs: 20, eas: 20, il: 20, depeg: 20, exploit: 20 }
           for (const v of data.vaults) {
             const products = addrMap[v.address?.toLowerCase()]
             if (products && !v.error) {
