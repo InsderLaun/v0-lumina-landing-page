@@ -308,10 +308,11 @@ Oracle:                      0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87
 Phala Verifier:              0x468b9D2E9043c80467B610bC290b698ae23adb9B
 
 Shields:
-BCS/EAS Shield:  0x2926202bbe3f25f71ef17b25a20ebe8be028af5f
-Depeg Shield:    0x7578816a803d293bbb4dbea0efbed872842679d0
-IL Index Shield: 0x2ac0d2a9889a8a4143727a0240de3fed4650dd93
-Exploit Shield:  0x9870830c615d1b9c53dfee4136c4792de395b7a1
+BCS Shield (BTC):  0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8
+EAS Shield (ETH):  0xA755D134a0b2758E9b397E11E7132a243f672A3D
+Depeg Shield:      0x7578816a803d293bbb4dbea0efbed872842679d0
+IL Index Shield:   0x2ac0d2a9889a8a4143727a0240de3fed4650dd93
+Exploit Shield:    0x9870830c615d1b9c53dfee4136c4792de395b7a1
 
 ════════════════════════════════════════════════════════════
 11. ERROR HANDLING
