@@ -520,11 +520,12 @@ Vaults:
   StableLong:        0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c
 
 Shields:
-  BCS:               0x2926202bbe3f25f71ef17b25a20ebe8be028af5f
-  EAS:               0x2926202bbe3f25f71ef17b25a20ebe8be028af5f
+  BCS:               0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8
+  EAS:               0xA755D134a0b2758E9b397E11E7132a243f672A3D
   Depeg:             0x7578816a803d293bbb4dbea0efbed872842679d0
   ILIndex:           0x2ac0d2a9889a8a4143727a0240de3fed4650dd93
   Exploit:           0x9870830c615d1b9c53dfee4136c4792de395b7a1
+  BSS (deprecated):  0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e
 
 Governance:
   TimelockController: 0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a
