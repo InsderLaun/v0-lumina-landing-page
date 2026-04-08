@@ -32,3 +32,10 @@ factura*
 recibo*
 REPO-HYGIENE*
 *.zip
+
+# Block ALL PDFs by default (personal docs / receipts / legal papers
+# keep ending up in public/ and getting served on lumina-org.com).
+# Whitepapers are the only PDFs allowed — explicit allow-list below.
+*.pdf
+!**/LUMINA-WHITEPAPER-*.pdf
+!**/LUMINA-SUMMARY-*.pdf
