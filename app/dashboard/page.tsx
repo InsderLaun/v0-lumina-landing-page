@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
 import { disconnectWallet, getStoredWallet, truncateAddress, setupWalletListeners, isDisclaimerAccepted } from '@/lib/wallet'
+import { VaultActions } from '@/components/lumina/vault-actions'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
 type Tab = (typeof TABS)[number]
@@ -1163,9 +1164,7 @@ export default function DashboardPage() {
             return (
               <div
                 key={vault.address}
-                className={`bg-white/[0.03] border border-white/10 rounded-xl p-5 transition-all ${
-                  !hasPosition ? "opacity-50" : ""
-                }`}
+                className="bg-white/[0.03] border border-white/10 rounded-xl p-5 transition-all"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
@@ -1311,6 +1310,19 @@ export default function DashboardPage() {
                     </div>
                   )
                 })}
+
+                {/* Write actions: deposit + request/complete withdrawal.
+                    Uses wagmi+RainbowKit independently from the legacy
+                    dashboard wallet flow — first click prompts a wallet
+                    connect via the standard wagmi connector. */}
+                <VaultActions
+                  vaultAddress={vault.address as `0x${string}`}
+                  vaultName={vault.name}
+                  userShares={data.userShares}
+                  pendingV1Shares={data.withdrawalShares}
+                  pendingV1ReadyAt={data.cooldownEnd}
+                  pendingV2Queue={data.withdrawalQueueV2}
+                />
               </div>
             )
           })}
