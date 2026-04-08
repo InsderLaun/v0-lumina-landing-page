@@ -16,3 +16,19 @@ out/
 .firebase/
 .firebaserc
 firebase.json
+
+# Sensitive personal files / secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+*.cert
+*.p12
+*.exe
+*.msi
+*.docx
+comprobante*
+factura*
+recibo*
+REPO-HYGIENE*
+*.zip
