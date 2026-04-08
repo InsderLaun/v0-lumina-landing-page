@@ -1,5 +1,5 @@
 LUMINA PROTOCOL — SKILL FILE FOR AI AGENTS
-Version: 3.0 | Chain: Base Mainnet (8453) | Settlement: USDC | March 2026
+Version: 3.0 | Chain: Base Mainnet (8453) | Settlement: USDC | April 2026
 
 ════════════════════════════════════════════════════════════
 1. WHAT IS LUMINA?
@@ -32,14 +32,14 @@ Step 2 — Create your API key:
 Step 3 — Get a price quote:
   curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote \
     -H "Content-Type: application/json" \
-    -d '{"productId":"BCS","coverageAmount":1000000000,"durationSeconds":1209600,"buyer":"0xYOUR_WALLET"}'
+    -d '{"productId":"BTCCAT-001","coverageAmount":1000000000,"durationSeconds":1209600,"buyer":"0xYOUR_WALLET"}'
   Note: Quotes expire in 5 minutes (300 seconds).
 
 Step 4 — Buy a policy:
   curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
     -H "Content-Type: application/json" \
     -H "X-API-Key: lum_YOUR_KEY" \
-    -d '{"productId":"BCS","coverageAmount":1000000000,"durationSeconds":1209600}'
+    -d '{"productId":"BTCCAT-001","coverageAmount":1000000000,"durationSeconds":1209600}'
   Requires: USDC balance + USDC approved to CoverRouter (0xd5f8678A0F2149B6342F9014CCe6d743234Ca025)
 
 Step 5 — Check your policies:
@@ -75,7 +75,7 @@ Status codes: 200, 404, 500
 
 --- POST /api/v2/quote ---
 No auth required.
-Body: { "productId": "BCS", "coverageAmount": 1000000000, "durationSeconds": 1209600, "buyer": "0x..." }
+Body: { "productId": "BTCCAT-001", "coverageAmount": 1000000000, "durationSeconds": 1209600, "buyer": "0x..." }
 Optional body fields: "asset" (for BCS: "BTC", for EAS: "ETH"), "stablecoin" (for DEPEG: "USDT" or "DAI"), "protocol" (for EXPLOIT: protocol address)
 Response: { "quote": { "productId", "productName", "coverageAmount", "premiumAmount", "durationSeconds", "asset", "stablecoin", "protocol", "buyer", "deadline", "nonce", "utilizationAtQuote" }, "signature": "0x...", "signedQuote": {...} }
 Quotes expire in 300 seconds (5 minutes). Get a fresh quote before each purchase.
@@ -83,11 +83,11 @@ Status codes: 200, 400, 500
 
 --- POST /api/v2/purchase ---
 Requires: X-API-Key header
-Body: { "productId": "BCS", "coverageAmount": 1000000000, "durationSeconds": 1209600 }
-  productId: "BCS" | "DEPEG" | "IL" | "EXPLOIT"
+Body: { "productId": "BTCCAT-001", "coverageAmount": 1000000000, "durationSeconds": 1209600 }
+  productId: "BTCCAT-001" | "DEPEG" | "IL" | "EXPLOIT"
   coverageAmount: 6 decimals. Min $100 (100000000), Max $100,000 (100000000000)
   durationSeconds: Min 604800 (7 days), Max 31536000 (365 days) — varies by product
-Response: { "success": true, "txHash": "0x...", "product": "BTC Catastrophe Shield", "productId": "BCS", "coverage": "1000000000", "premium": "...", "premiumUSD": "...", "durationDays": 14, "wallet": "0x...", "explorer": "https://basescan.org/tx/0x...", "message": "Policy purchased successfully." }
+Response: { "success": true, "txHash": "0x...", "product": "Black Swan Shield", "productId": "BTCCAT-001", "coverage": "1000000000", "premium": "...", "premiumUSD": "...", "durationDays": 14, "wallet": "0x...", "explorer": "https://basescan.org/tx/0x...", "message": "Policy purchased successfully." }
 Status codes: 201, 400, 401, 409, 429, 500
 
 --- GET /api/v2/policies ---
@@ -100,7 +100,7 @@ Status codes: 200, 400, 500
 
 --- POST /api/v2/renew ---
 Requires: X-API-Key header
-Body: { "productId": "BCS", "durationSeconds": 1209600 }
+Body: { "productId": "BTCCAT-001", "durationSeconds": 1209600 }
 Response: { "message": "Use POST /purchase with these parameters to renew:", "suggestedParams": { "productId", "coverageAmount", "durationSeconds" }, "note": "Premium will be recalculated based on current vault utilization.", "previousPolicy": {...} }
 This is a convenience endpoint. It finds your last policy for the product and suggests params for /purchase. It does NOT execute the purchase.
 Status codes: 200, 400, 401, 404, 500
@@ -143,14 +143,15 @@ RATE LIMITS:
 
 --- BTC CATASTROPHE SHIELD (BCS) ---
 What it covers: BTC price crashes exceeding 50%
-Product ID: "BCS"
+Product ID: "BTCCAT-001"  (short alias also accepted: "BCS")
 Trigger: Price drops >50% from purchase price (TRIGGER_DROP_BPS = 5000)
 Verification: Oracle-signed TWAP 15 min or 3 consecutive Chainlink rounds
 Deductible: 20% — Payout: 80% of coverage (binary, all-or-nothing)
 Duration: 7 to 30 days
 Waiting period: 1 hour
 Base rate: 15% annualized (1500 bps)
-Assets: BTC
+Max allocation per vault: 30%
+Assets: BTC only
 Max proof age: 30 minutes
 Fee: 3% on premium (purchase) + 3% on payout (claim)
 
@@ -160,20 +161,26 @@ Example: Buy $10,000 BCS coverage for 14 days
 
 --- ETH APOCALYPSE SHIELD (EAS) ---
 What it covers: ETH price crashes exceeding 60%
-Product ID: "EAS"
+Product ID: "ETHAPOC-001"  (short alias also accepted: "EAS")
 Trigger: Price drops >60% from purchase price (TRIGGER_DROP_BPS = 6000)
 Verification: Oracle-signed TWAP 15 min or 3 consecutive Chainlink rounds
 Deductible: 20% — Payout: 80% of coverage (binary, all-or-nothing)
 Duration: 7 to 30 days
 Waiting period: 1 hour
 Base rate: 20% annualized (2000 bps)
-Assets: ETH
+Max allocation per vault: 25%
+Assets: ETH only
 Max proof age: 30 minutes
 Fee: 3% on premium (purchase) + 3% on payout (claim)
 
 Example: Buy $10,000 EAS coverage for 14 days
   Premium ≈ $10,000 × 0.20 × M(U) × (14/365) = ~$77-127 depending on utilization
   If trigger activates: payout = $10,000 × 80% = $8,000 gross, $7,760 net (after 3% fee)
+
+NOTE: BLACK SWAN SHIELD (BSS, BLACKSWAN-001) is DEPRECATED as of 2026-04-06.
+It was replaced by BCS (BTC) and EAS (ETH). New policies are blocked at the
+router level (`isProductAvailable("BLACKSWAN-001") = false`). totalPolicies = 0
+on-chain — no legacy positions exist.
 
 --- DEPEG SHIELD ---
 What it covers: Stablecoin losing its peg (dropping below $0.95)
@@ -198,7 +205,7 @@ Formula: IL = 1 - (2 × sqrt(r)) / (1 + r), where r = priceAtExpiry / priceAtPur
 Payout: Proportional — Coverage × max(0, IL% - 2%) × 90%
 Payout cap: 11.7% of coverage (max IL 13% × 90% factor)
 Duration: 14 to 90 days
-Waiting period: 1 hour (anti-front-running)
+Waiting period: 1 hour
 Settlement window: 48 HOURS after expiry. If you miss this window, the claim is lost.
 Base rate: 8.5% annualized (850 bps)
 Asset: ETH
@@ -246,12 +253,12 @@ DURATION REFERENCE (in seconds):
 
 Four vaults, each with a different risk profile and cooldown period:
 
-| Vault          | Cooldown | Products            | Est. APY  | Address                                    |
-|----------------|----------|---------------------|-----------|--------------------------------------------|
-| VolatileShort  | 30 days  | BCS + EAS + IL      | 4-17%     | 0xbd44547581b92805aAECc40EB2809352b9b2880d |
-| VolatileLong   | 90 days  | IL long + BCS/EAS overflow | 4-21% | 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904 |
-| StableShort    | 90 days  | Depeg short         | 2.7-9.0%  | 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC |
-| StableLong     | 365 days | Depeg + Exploit     | 2.8-10.3% | 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c |
+| Vault          | Cooldown | Products              | Est. APY     | Address                                    |
+|----------------|----------|-----------------------|--------------|--------------------------------------------|
+| VolatileShort  | 37 days  | BCS + EAS + IL        | 3.9 - 16.9%  | 0xbd44547581b92805aAECc40EB2809352b9b2880d |
+| VolatileLong   | 97 days  | IL long + BCS/EAS spill | 4.0 - 20.5% | 0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904 |
+| StableShort    | 97 days  | Depeg short           | 2.7 - 9.0%   | 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC |
+| StableLong     | 372 days | Depeg + Exploit       | 2.8 - 10.3%  | 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c |
 
 YIELD SOURCES:
   Layer 1: Aave V3 base yield (~3-5% APY) — USDC deposited automatically
@@ -263,7 +270,7 @@ HOW TO DEPOSIT: On-chain transaction directly to the vault contract.
 
 HOW TO WITHDRAW:
   1. Call requestWithdrawal(shares) on the vault — starts cooldown timer
-  2. Wait for cooldown period (30 to 365 days depending on vault)
+  2. Wait for cooldown period (37 to 372 days depending on vault)
   3. Call completeWithdrawal(receiverAddress) — receive USDC + accumulated yield
   Partial withdrawals allowed (any number of shares). Up to 10 concurrent withdrawal requests.
 
@@ -274,6 +281,40 @@ PERFORMANCE FEE: 3% charged ONLY on positive yield (profit above your deposit co
 SHARES ARE SOULBOUND: Vault shares cannot be transferred or sold. This prevents market manipulation. You can only deposit and withdraw through the vault contract.
 
 NEW DEPOSITS: You can deposit more USDC at any time. Shares accumulate. New deposits do NOT affect existing withdrawal requests or cooldowns.
+
+════════════════════════════════════════════════════════════
+5b. LP RISKS
+════════════════════════════════════════════════════════════
+
+SHARE PRICE DECREASE DURING COOLDOWN:
+  Vault share price can decrease if the vault pays out claims while your withdrawal is
+  pending. You withdraw at the share price at completion time, not at request time.
+  Example: Request withdrawal at $1.05/share → vault pays large claim → share price
+  drops to $0.98 → you receive $0.98 per share.
+
+PERFORMANCE FEE:
+  3% fee on positive yield at withdrawal. Charged only on profit above deposit cost.
+  This reduces your net return. No fee if you withdraw at a loss.
+
+USDC DEPEG RISK:
+  Lumina Protocol uses USDC at a 1:1 ratio for all settlements. If USDC depegs from
+  $1.00, all vault assets, premiums, and payouts are affected. The protocol does not
+  hedge against USDC devaluation.
+
+AAVE V3 DEPENDENCY:
+  Vault idle capital is deposited into Aave V3 for base yield and liquidity. If Aave
+  experiences an exploit, liquidity crisis, or extended downtime, vault withdrawals
+  and payouts may be delayed or impaired.
+
+COOLDOWN IS IRREVOCABLE:
+  Once you call requestWithdrawal, the cooldown cannot be cancelled or reversed. You
+  are committed to waiting the full cooldown period (37 to 372 days depending on vault).
+  You cannot re-deposit those shares during the cooldown.
+
+DAILY WITHDRAWAL LIMIT:
+  At high vault utilization, daily withdrawal amounts may be capped. If many LPs
+  withdraw simultaneously, a queue forms and your withdrawal may be delayed beyond
+  the cooldown period until sufficient liquidity is available.
 
 ════════════════════════════════════════════════════════════
 6. PRICING MODEL (Kink)
@@ -370,12 +411,38 @@ COMMON ERRORS AND REMEDIES:
 ════════════════════════════════════════════════════════════
 
 Smart Contracts: 119 tests passing. Solidity 0.8.20. CEI pattern. SafeERC20. ReentrancyGuard.
-Governance: TimelockController (48h delay) + Gnosis Safe 1-of-1 (planned 2-of-3 multisig). No instant admin changes.
+Governance: TimelockController (48h delay) + Gnosis Safe (2-of-3 multisig). No instant admin changes.
 Oracle: Multisig-capable (N-of-M). Chainlink TWAP verification. L2 sequencer uptime check (1h grace).
 API: Rate limiting, CORS restrictions, Helmet headers, NonceManager, sanitized errors.
 
 Collateral: Strict 1:1. Every $1 of coverage = $1 USDC locked in vault. Max utilization 95%.
 Session approval: Buyers must authorize relayers before purchases can be made on their behalf.
+
+ADDITIONAL SECURITY MECHANISMS:
+
+Option E — Targeted veto for scheduled payouts:
+  cancelScheduledPayout can be called within the delay window by EMERGENCY_ROLE only.
+  Maximum 3 vetos per week to prevent abuse.
+
+Sequencer downtime extension:
+  Claim grace period is automatically extended by the duration of any L2 sequencer downtime.
+  Minimum extension: 2 hours.
+
+Two-phase allocation release:
+  executePayout must complete before releaseAllocation. Allocation is only released if
+  USDC actually leaves the vault, preventing premature capital unlocking.
+
+Cooldown irrevocable:
+  Once an LP initiates a withdrawal request (requestWithdrawal), it cannot be cancelled.
+  The cooldown runs to completion.
+
+Product freeze:
+  Individual products can be halted independently without affecting other products.
+  Frozen products reject new purchases but existing policies remain valid.
+
+Try/catch on Aave interactions:
+  All Aave V3 deposit/withdraw calls are wrapped in try/catch. If Aave fails,
+  payouts and withdrawals are queued in a pending queue for later processing.
 
 NEVER share your private key with anyone — not even Lumina. The API only needs your wallet address and API key.
 
@@ -398,7 +465,7 @@ api_key = key["apiKey"]  # Save this! Shown only once
 
 # 2. Get quote
 quote = requests.post(f"{API}/quote", json={
-    "productId": "BCS",
+    "productId": "BTCCAT-001",
     "coverageAmount": 10000000000,  # $10,000 (6 decimals)
     "durationSeconds": 1209600,     # 14 days
     "buyer": "0xYourAgentWallet"
@@ -409,7 +476,7 @@ print(f"Premium: {quote['quote']['premiumAmount']}")
 policy = requests.post(f"{API}/purchase",
     headers={"X-API-Key": api_key},
     json={
-        "productId": "BCS",
+        "productId": "BTCCAT-001",
         "coverageAmount": 10000000000,
         "durationSeconds": 1209600
     }
@@ -439,7 +506,7 @@ const quoteRes = await fetch(`${API}/quote`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    productId: "BCS",
+    productId: "BTCCAT-001",
     coverageAmount: 10000000000,
     durationSeconds: 1209600,
     buyer: "0xYourWallet"
@@ -451,7 +518,7 @@ const quote = await quoteRes.json();
 const purchaseRes = await fetch(`${API}/purchase`, {
   method: "POST",
   headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
-  body: JSON.stringify({ productId: "BCS", coverageAmount: 10000000000, durationSeconds: 1209600 })
+  body: JSON.stringify({ productId: "BTCCAT-001", coverageAmount: 10000000000, durationSeconds: 1209600 })
 });
 const policy = await purchaseRes.json();
 
@@ -520,16 +587,18 @@ Vaults:
   StableLong:        0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c
 
 Shields:
-  BCS:               0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8
-  EAS:               0xA755D134a0b2758E9b397E11E7132a243f672A3D
+  BSS:               0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e  (DEPRECATED — split into BCS+EAS)
+  BSS (orphan):      0x2926202bbe3f25f71ef17b25a20ebe8be028af5f  (legacy deploy, never registered in CoverRouter)
   Depeg:             0x7578816a803d293bbb4dbea0efbed872842679d0
   ILIndex:           0x2ac0d2a9889a8a4143727a0240de3fed4650dd93
   Exploit:           0x9870830c615d1b9c53dfee4136c4792de395b7a1
-  BSS (deprecated):  0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e
+  BCS (BTCCAT-001):  0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8
+  EAS (ETHAPOC-001): 0xA755D134a0b2758E9b397E11E7132a243f672A3D
 
 Governance:
   TimelockController: 0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a
   Gnosis Safe (2/3):  0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD
+  EmergencyPause:     0xc7ac8c19c3f10f820d7e42f07e6e257bacc22876
 
 External:
   USDC (Circle):     0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
@@ -552,6 +621,6 @@ Sales: labs@lumina-org.com
 VERIFICATION
 ════════════════════════════════════════════════════════════
 
-Every data point in this SKILL was extracted from the source code on March 31, 2026.
+Every data point in this SKILL was extracted from the source code on April 4, 2026.
 Sources: api/src/index.js, src/libraries/PremiumMath.sol, src/core/CoverRouter.sol,
 src/vaults/BaseVault.sol, src/products/*.sol, docs/PRODUCTION-ADDRESSES.md, lib/lumina-config.ts
