@@ -6,6 +6,20 @@ declare global {
 
 export const BASE_CHAIN_ID = '0x2105';
 
+// Custom event fired by setStoredWallet so any component using
+// useLuminaWallet() in the same tab gets a re-render. The DOM
+// `storage` event only fires across tabs, so we dispatch our own.
+const WALLET_CHANGED_EVENT = 'lumina:wallet-changed';
+
+const dispatchWalletChanged = () => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.dispatchEvent(new Event(WALLET_CHANGED_EVENT));
+  } catch {
+    // Older browsers — fall through silently
+  }
+};
+
 // ── Storage: Wallet ──
 export const getStoredWallet = (): string | null => {
   if (typeof window === 'undefined') return null;
@@ -19,6 +33,7 @@ const setStoredWallet = (address: string | null) => {
   } else {
     localStorage.removeItem('lumina_wallet');
   }
+  dispatchWalletChanged();
 };
 
 // ── Storage: Disclaimer ──
@@ -79,6 +94,16 @@ export const connectWallet = async (): Promise<string | null> => {
     const address = accounts[0].toLowerCase();
     await ensureBaseNetwork();
     setStoredWallet(address);
+    // Mirror the connection into wagmi so write actions in
+    // VaultActions / DepositLPModal see the same session without a
+    // second popup. The bridge call is fire-and-forget — we don't
+    // block the user-facing connect flow on it.
+    try {
+      const { bridgeWagmi } = await import('./wallet-bridge');
+      bridgeWagmi().catch((err) => console.warn('[Lumina] bridgeWagmi failed:', err));
+    } catch (err) {
+      console.warn('[Lumina] could not load wallet-bridge:', err);
+    }
     return address;
   } catch (error: any) {
     if (error.code === 4001) console.log('[Lumina] User rejected connection.');
@@ -90,6 +115,14 @@ export const connectWallet = async (): Promise<string | null> => {
 export const disconnectWallet = () => {
   setStoredWallet(null);
   clearDisclaimer();
+  // Also tear down the wagmi side so disconnect is atomic — without
+  // this, useAccount() would still return the previous address until
+  // the next page load.
+  if (typeof window !== 'undefined') {
+    import('./wallet-bridge')
+      .then(({ unbridgeWagmi }) => unbridgeWagmi().catch(() => {}))
+      .catch(() => {});
+  }
 };
 
 // ── Base network enforcement ──
@@ -125,7 +158,14 @@ export const setupWalletListeners = (onAccountChange: (addr: string | null) => v
   window.ethereum.on('accountsChanged', (accounts: string[]) => {
     if (accounts.length > 0) {
       const addr = accounts[0].toLowerCase();
+      // setStoredWallet dispatches `lumina:wallet-changed` so
+      // every consumer of useLuminaWallet() picks up the new value.
       setStoredWallet(addr);
+      // Re-bridge wagmi so its useAccount() stays in sync with the
+      // injected provider's currently-selected account.
+      import('./wallet-bridge')
+        .then(({ bridgeWagmi }) => bridgeWagmi().catch(() => {}))
+        .catch(() => {});
       onAccountChange(addr);
     } else {
       disconnectWallet();

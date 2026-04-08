@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { CONTRACTS, PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, PROTOCOL, CHAIN, calcKinkMultiplier } from '@/lib/lumina-config'
 import { disconnectWallet, getStoredWallet, truncateAddress, setupWalletListeners, isDisclaimerAccepted } from '@/lib/wallet'
+import { useLuminaWallet } from '@/hooks/use-lumina-wallet'
 import { VaultActions } from '@/components/lumina/vault-actions'
 
 const TABS = ["Overview", "My Vaults", "My Policies", "Agent Activity", "Emergency"] as const
@@ -268,7 +269,12 @@ function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): num
 // COMPONENT
 // ════════════════════════════════════════════
 export default function DashboardPage() {
-  const [walletAddress, setWalletAddress] = useState<string | null>(null)
+  // Single source of truth for the connected wallet. `useLuminaWallet`
+  // returns the wagmi address when wagmi has it, else falls back to
+  // localStorage so the first paint is never `null` and write actions
+  // can lift the legacy session into wagmi on demand.
+  const { address: luminaAddress, isConnected } = useLuminaWallet()
+  const walletAddress = luminaAddress
   const [walletChecked, setWalletChecked] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>("Overview")
   const [vaultData, setVaultData] = useState<VaultData[]>([])
@@ -279,38 +285,43 @@ export default function DashboardPage() {
   const [copiedAddr, setCopiedAddr] = useState<string | null>(null)
   const [now, setNow] = useState(Date.now())
 
-  const connected = !!walletAddress
+  const connected = isConnected
 
-  // Initialize dashboard — read from localStorage, never trigger wallet popup
+  // Initialize dashboard — re-runs when the connected address changes
+  // (account switch in MetaMask, or first wagmi resolve after a
+  // legacy-only session). Never opens a popup.
   useEffect(() => {
     const initDashboard = async () => {
-      const stored = getStoredWallet()
       const accepted = isDisclaimerAccepted()
 
       // No wallet or no disclaimer → show public data + connect banner
-      if (!stored || !accepted) {
+      if (!luminaAddress || !accepted) {
         try { await fetchVaultData() } catch(e) { console.error('[Lumina] Public data:', e) }
         setWalletChecked(true)
         return
       }
 
-      // All good → load user data using stored address
-      setWalletAddress(stored)
-      try { await fetchVaultData(stored) } catch(e) { console.error('[Lumina] Vault data:', e) }
+      // All good → load user data using the unified address
+      try { await fetchVaultData(luminaAddress) } catch(e) { console.error('[Lumina] Vault data:', e) }
       setWalletChecked(true)
 
-      // Listeners (only registers if wallet in localStorage)
+      // Wallet listeners (account / chain change). The legacy
+      // setupWalletListeners writes through to localStorage which
+      // dispatches `lumina:wallet-changed`, so useLuminaWallet
+      // re-renders and this effect re-runs with the new address.
       setupWalletListeners((newAddr) => {
-        if (newAddr) {
-          setWalletAddress(newAddr)
-        } else {
+        if (!newAddr) {
           disconnectWallet()
           window.location.href = '/'
         }
+        // Account-change branch: useLuminaWallet picks the new
+        // address up via the `lumina:wallet-changed` event, so we
+        // do not need to manually setWalletAddress here.
       })
     }
     initDashboard()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [luminaAddress])
 
   // ════════════════════════════════════════════
   // ethCall with retry (single RPC call)

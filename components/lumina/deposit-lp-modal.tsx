@@ -3,9 +3,11 @@
 import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, ExternalLink, Loader2, TrendingUp } from "lucide-react"
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import { parseUnits, formatUnits } from "viem"
 import { useUSDCBalance, useUSDCAllowance } from "@/hooks/use-web3"
+import { useLuminaWallet } from "@/hooks/use-lumina-wallet"
+import { bridgeWagmi } from "@/lib/wallet-bridge"
 import { CONTRACTS, CHAIN } from "@/lib/lumina-config"
 import { CONTRACTS as LEGACY_CONTRACTS } from "@/lib/constants"
 import { ERC20_ABI, BASE_VAULT_ABI } from "@/lib/abis"
@@ -61,7 +63,20 @@ const VAULT_OPTIONS = [
 const MIN_DEPOSIT_USDC = 100 // BaseVault.MIN_DEPOSIT = 100e6
 
 export function DepositLPModal({ open, onClose }: DepositLPModalProps) {
-    const { address } = useAccount()
+    // Unified wallet source. Uses wagmi if available, otherwise the
+    // legacy localStorage. The first time the user clicks "Approve"
+    // we lazily call bridgeWagmi() so wagmi can sign the tx without
+    // a second authorisation popup.
+    const { address, isWagmiConnected } = useLuminaWallet()
+    const [bridging, setBridging] = useState(false)
+    useEffect(() => {
+        if (open && address && !isWagmiConnected && !bridging) {
+            setBridging(true)
+            bridgeWagmi()
+                .catch(() => { /* user can retry on click */ })
+                .finally(() => setBridging(false))
+        }
+    }, [open, address, isWagmiConnected, bridging])
     const [selectedVault, setSelectedVault] = useState<typeof VAULT_OPTIONS[number] | null>(null)
     const [step, setStep] = useState(1)
     const [depositAmount, setDepositAmount] = useState(1000)

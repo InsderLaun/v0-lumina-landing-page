@@ -21,6 +21,10 @@ export default function ConnectPage() {
   const handleAcceptAndConnect = async () => {
     setConnecting(true)
     setError(null)
+    // connectWallet() opens MetaMask, persists the address to
+    // localStorage, AND fires `bridgeWagmi()` in the background so
+    // the wagmi context picks up the same session without a second
+    // popup. The user only authorises once.
     const addr = await connectWallet()
     if (addr) {
       setDisclaimerAccepted()

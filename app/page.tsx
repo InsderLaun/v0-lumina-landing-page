@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { calculateYield } from "@/lib/pricing"
 import { PRODUCTS as PRODUCTS_CONFIG, KINK_MODEL, CONTRACTS, TOKENS, PROTOCOL, CHAIN, calcKinkMultiplier as calcKinkMultiplierFromConfig, calculatePremium } from '@/lib/lumina-config'
 import { disconnectWallet, getStoredWallet, truncateAddress, isDisclaimerAccepted } from '@/lib/wallet'
+import { useLuminaWallet } from '@/hooks/use-lumina-wallet'
 
 type Perspective = "protect" | "earn"
 
@@ -48,14 +49,20 @@ export default function Home() {
   const [showWhitepaper, setShowWhitepaper] = useState(false)
   const [wpStep, setWpStep] = useState<"lang" | "version">("lang")
   const [wpLang, setWpLang] = useState<"en" | "es">("en")
-  const [walletAddress, setWalletAddress] = useState<string | null>(null)
+  // Unified wallet source: prefers wagmi, falls back to legacy
+  // localStorage. The legacy disclaimer guard is preserved — we
+  // only "show" the wallet if the user accepted the disclaimer.
+  const { address: luminaAddress } = useLuminaWallet()
+  const [disclaimerOk, setDisclaimerOk] = useState(false)
+  useEffect(() => { setDisclaimerOk(isDisclaimerAccepted()) }, [])
+  const walletAddress = disclaimerOk ? luminaAddress : null
+  // Backward-compat shim: the inline Navbar still expects a
+  // setWalletAddress function on the Disconnect button. Disconnect
+  // already happens through `disconnectWallet()` (which clears
+  // localStorage AND wagmi via the bridge); the local setter is
+  // a no-op now because the address comes from useLuminaWallet().
+  const setWalletAddress = (_: string | null) => { /* no-op — managed by useLuminaWallet */ }
   const aaveYield = useAaveYield()
-
-  // Check localStorage only — never touch window.ethereum on landing
-  useEffect(() => {
-    const stored = getStoredWallet()
-    if (stored && isDisclaimerAccepted()) setWalletAddress(stored)
-  }, [])
 
   // Listen for whitepaper modal open from navbar
   useEffect(() => {
