@@ -16,7 +16,7 @@ const products = [
   { name: "ETH Apocalypse Shield", trigger: "ETH drops >60%", premium: "~0.3%", duration: "7-30 days", color: "#06b6d4" },
   { name: "Depeg Shield", trigger: "Stablecoin < $0.95", premium: "~0.2%", duration: "7-365 days", color: "#22d3ee" },
   { name: "IL Index Cover", trigger: "IL exceeds deductible", premium: "~0.4%", duration: "30-90 days", color: "#a78bfa" },
-  { name: "Exploit Shield", trigger: "Protocol exploit + TEE proof", premium: "~0.5%", duration: "30-365 days", color: "#818cf8" },
+  { name: "Exploit Shield", trigger: "Protocol exploit + Phala worker ECDSA verification", premium: "~0.5%", duration: "30-365 days", color: "#818cf8" },
 ]
 
 const pools = [
@@ -38,24 +38,24 @@ const metrics = [
 const contracts = [
   { name: "CoverRouter", addr: "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025" },
   { name: "PolicyManager", addr: "0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" },
-  { name: "LuminaOracle", addr: "0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87" },
+  { name: "LuminaOracleV2", addr: "0x87B576f688bE0E1d7d23A299f55b475658215105" },
   { name: "PhalaVerifier", addr: "0x468b9D2E9043c80467B610bC290b698ae23adb9B" },
   { name: "VolatileShort Vault", addr: "0xbd44547581b92805aAECc40EB2809352b9b2880d" },
   { name: "VolatileLong Vault", addr: "0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" },
   { name: "StableShort Vault", addr: "0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" },
   { name: "StableLong Vault", addr: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" },
-  { name: "BTC Catastrophe Shield", addr: "0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8" },
-  { name: "ETH Apocalypse Shield", addr: "0xA755D134a0b2758E9b397E11E7132a243f672A3D" },
-  { name: "DepegShield", addr: "0x7578816a803d293bbb4dbea0efbed872842679d0" },
-  { name: "ILIndexCover", addr: "0x2ac0d2a9889a8a4143727a0240de3fed4650dd93" },
-  { name: "ExploitShield", addr: "0x9870830c615d1b9c53dfee4136c4792de395b7a1" },
+  { name: "BTC Catastrophe Shield", addr: "0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21" },
+  { name: "ETH Apocalypse Shield", addr: "0x70f1c92EFcFe55e8d460aAa6d626779536b15128" },
+  { name: "DepegShield", addr: "0x881f683291122c3A72bdD504F71ddCAf47d9AE0e" },
+  { name: "ILIndexCover", addr: "0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a" },
+  { name: "ExploitShield", addr: "0x63D340AE7229BB464bC801f225651341ebcD3693" },
   { name: "EmergencyPause", addr: "0xc7ac8c19c3f10f820d7e42f07e6e257bacc22876" },
   { name: "TimelockController", addr: "0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a" },
 ]
 
 const securityLayers = [
   { layer: "Smart Contracts", detail: "119 tests, CEI pattern, SafeERC20, ReentrancyGuard, Solidity 0.8.20" },
-  { layer: "Oracle", detail: "1-of-1 (planned 2-of-3), Chainlink TWAP, L2 sequencer uptime check, 1h grace period" },
+  { layer: "Oracle", detail: "1-of-1 (planned 2-of-3), Chainlink spot price verified via EIP-712, L2 sequencer uptime check, 1h grace period" },
   { layer: "Governance", detail: "TimelockController (48h delay), Gnosis Safe 1-of-1 (planned 2-of-3 multisig)" },
   { layer: "API", detail: "Rate limiting, CORS restrictions, Helmet headers, NonceManager, sanitized errors" },
 ]

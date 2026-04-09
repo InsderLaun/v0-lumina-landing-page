@@ -37,7 +37,7 @@ Lumina Protocol es la primera infraestructura de seguro parametrico descentraliz
 
 A diferencia del seguro tradicional, que requiere que un humano presente un reclamo, un comite lo revise y semanas de espera para recibir el pago, Lumina utiliza triggers matematicos verificados por oracles. Si la condicion se cumple (por ejemplo, ETH cae un 30%), el pago es instantaneo y automatico. Sin reclamos. Sin disputas. Sin esperar a humanos.
 
-El protocolo ofrece **5 productos de seguro** (BTC Catastrophe Shield, ETH Apocalypse Shield, Depeg Shield, IL Index Cover, Exploit Shield), **4 vaults de liquidez** (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de **13 contratos inteligentes** desplegados en produccion con proxies UUPS upgradeables.
+El protocolo ofrece **5 productos de seguro** (BTC Catastrophe Shield, ETH Apocalypse Shield, Depeg Shield, IL Index Cover, Exploit Shield), **4 vaults de liquidez** (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de **13 contratos inteligentes** desplegados en produccion. Los contratos Core (CoverRouter, PolicyManager), vaults y shields usan proxies UUPS actualizables bajo TimelockController; los contratos Oracle (LuminaOracleV2, LuminaPhalaVerifier) son **NO actualizables** (Ownable) y su reemplazo requiere re-despliegue.
 
 Cada flujo de interaccion comienza de la misma forma: **el humano, a traves de su agente de IA**, instruye la operacion deseada. El agente ejecuta la transaccion on-chain de forma autonoma, interactuando con la API de Lumina y los contratos del protocolo sin intervencion manual.
 
@@ -163,17 +163,17 @@ El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vault
 |-------------------------|----------------|--------|--------------------------------------|----------------------------------------------------|
 | CoverRouter             | Core           | UUPS   | Todos los Shields, PolicyManager     | `0xd5f8678A0F2149B6342F9014CCe6d743234Ca025`       |
 | PolicyManager           | Core           | UUPS   | Vaults, Shields                      | `0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a`       |
-| LuminaOracle            | Oracle         | UUPS   | Chainlink feeds, Sequencer           | `0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87`       |
-| LuminaPhalaVerifier     | Oracle         | UUPS   | Phala TEE network                    | `0x468b9D2E9043c80467B610bC290b698ae23adb9B`       |
+| LuminaOracleV2          | Oracle         | NO actualizable (Ownable) | Chainlink feeds, Sequencer     | `0x87B576f688bE0E1d7d23A299f55b475658215105`       |
+| LuminaPhalaVerifier     | Oracle         | NO actualizable (Ownable, lista de workers EOA curada por admin) | Red de workers Phala | `0x468b9D2E9043c80467B610bC290b698ae23adb9B`       |
 | VolatileShort Vault     | Vault          | UUPS   | Aave V3, USDC                        | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
 | VolatileLong Vault      | Vault          | UUPS   | Aave V3, USDC                        | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
 | StableShort Vault       | Vault          | UUPS   | Aave V3, USDC                        | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
 | StableLong Vault        | Vault          | UUPS   | Aave V3, USDC                        | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
-| BTC Catastrophe Shield  | Producto       | non-up | Oracle, PolicyManager, VolatileShort | `0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8`       |
-| ETH Apocalypse Shield   | Producto       | non-up | Oracle, PolicyManager, VolatileShort | `0xA755D134a0b2758E9b397E11E7132a243f672A3D`       |
-| DepegShield             | Producto       | UUPS   | Oracle, PolicyManager, StableShort   | `0x7578816a803d293bbb4dbea0efbed872842679d0`       |
-| ILIndexCover            | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x2ac0d2a9889a8a4143727a0240de3fed4650dd93`       |
-| ExploitShield           | Producto       | UUPS   | Oracle, Phala TEE, PolicyManager     | `0x9870830c615d1b9c53dfee4136c4792de395b7a1`       |
+| BTC Catastrophe Shield  | Producto       | non-up | Oracle, PolicyManager, VolatileShort | `0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21`       |
+| ETH Apocalypse Shield   | Producto       | non-up | Oracle, PolicyManager, VolatileShort | `0x70f1c92EFcFe55e8d460aAa6d626779536b15128`       |
+| DepegShield             | Producto       | UUPS   | Oracle, PolicyManager, StableShort   | `0x881f683291122c3A72bdD504F71ddCAf47d9AE0e`       |
+| ILIndexCover            | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a`       |
+| ExploitShield           | Producto       | UUPS   | Oracle, Phala worker ECDSA, PolicyManager | `0x63D340AE7229BB464bC801f225651341ebcD3693`       |
 | TimelockController      | Governance     | --     | Gnosis Safe                          | `0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a`       |
 
 ### 3.5 Colateralizacion Estricta 1:1
@@ -199,10 +199,10 @@ Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos
 | Parametro                | BCS — BTC Catastrophe Shield                              | EAS — ETH Apocalypse Shield                              |
 |--------------------------|-----------------------------------------------------------|----------------------------------------------------------|
 | Producto ID              | `BTCCAT-001`                                              | `ETHAPOC-001`                                            |
-| Contrato                 | `0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8`              | `0xA755D134a0b2758E9b397E11E7132a243f672A3D`             |
+| Contrato                 | `0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21`              | `0x70f1c92EFcFe55e8d460aAa6d626779536b15128`             |
 | Trigger                  | Caida > 50% desde el precio al momento de compra          | Caida > 60% desde el precio al momento de compra         |
 | TRIGGER_DROP_BPS         | `5000` (50% en puntos base)                               | `6000` (60% en puntos base)                              |
-| Verificacion             | TWAP 15 minutos o 3 rounds consecutivos de Chainlink      | TWAP 15 minutos o 3 rounds consecutivos de Chainlink     |
+| Verificacion             | Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2) | Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2) |
 | Deducible                | 20%                                                       | 20%                                                      |
 | Payout                   | Binario: 80% del coverage                                 | Binario: 80% del coverage                                |
 | Duracion                 | 7 a 30 dias                                               | 7 a 30 dias                                              |
@@ -241,10 +241,10 @@ Payout neto al agente: $38,800
 | Parametro                | Valor                                                     |
 |--------------------------|-----------------------------------------------------------|
 | Producto ID              | `DEPEG-STABLE-001`                                        |
-| Contrato                 | `0x7578816a803d293bbb4dbea0efbed872842679d0`              |
+| Contrato                 | `0x881f683291122c3A72bdD504F71ddCAf47d9AE0e`              |
 | Trigger                  | Precio stablecoin < $0.95                                 |
 | TRIGGER_PRICE            | `95_000_000` (8 decimales Chainlink)                      |
-| Verificacion             | TWAP 30 minutos o 5 rounds consecutivos                   |
+| Verificacion             | Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2) |
 | Duracion                 | 14 a 365 dias                                             |
 | Waiting period           | 24 horas                                                  |
 | Tasa base                | 2.5% anualizado (250 bps)                                 |
@@ -280,7 +280,7 @@ Los descuentos por duracion incentivan polizas de largo plazo, lo cual beneficia
 | Parametro                | Valor                                                     |
 |--------------------------|-----------------------------------------------------------|
 | Producto ID              | `IL-INDEX-001`                                            |
-| Contrato                 | `0x2ac0d2a9889a8a4143727a0240de3fed4650dd93`              |
+| Contrato                 | `0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a`              |
 | Trigger                  | IL > 2% al vencimiento de la poliza                       |
 | Estilo                   | European-style (resolucion solo al vencimiento)           |
 | Ventana de resolucion    | 48 horas post-vencimiento                                 |
@@ -332,9 +332,9 @@ El payout maximo absoluto es **$5,850** por cada **$50,000** de cobertura (11.7%
 | Parametro                | Valor                                                     |
 |--------------------------|-----------------------------------------------------------|
 | Producto ID              | `EXPLOIT-SHIELD-001`                                      |
-| Contrato                 | `0x9870830c615d1b9c53dfee4136c4792de395b7a1`              |
+| Contrato                 | `0x63D340AE7229BB464bC801f225651341ebcD3693`              |
 | Trigger dual             | (1) Token de gobernanza -25% en 24h AND (2) Receipt token -30% por 4h O contrato pausado |
-| Verificacion             | Oracle (Chainlink) + Phala TEE                            |
+| Verificacion             | Oracle (Precio spot de Chainlink via prueba firmada EIP-712) + Verificacion ECDSA del worker de Phala (lista curada por admin — NO atestacion de hardware) |
 | Deducible                | 10%                                                       |
 | Payout                   | Binario: 90% del coverage                                 |
 | Cap por wallet           | $50,000                                                   |
@@ -348,9 +348,9 @@ El dual trigger requiere que **ambas condiciones** se cumplan simultaneamente:
 
 1. **Trigger primario (Oracle):** El token de gobernanza del protocolo cubierto debe haber caido al menos un 25% en las ultimas 24 horas, verificado por Chainlink.
 
-2. **Trigger secundario (TEE):** Al menos una de estas condiciones: (a) el receipt token del protocolo ha caido un 30% o mas durante al menos 4 horas consecutivas, o (b) el contrato principal del protocolo ha sido pausado.
+2. **Trigger secundario (worker Phala):** Al menos una de estas condiciones: (a) el receipt token del protocolo ha caido un 30% o mas durante al menos 4 horas consecutivas, o (b) el contrato principal del protocolo ha sido pausado.
 
-La verificacion del trigger secundario la realiza el **Phala TEE** (Trusted Execution Environment) en `0x468b9D2E9043c80467B610bC290b698ae23adb9B`, lo que proporciona una capa adicional de seguridad contra manipulacion de oracles.
+La verificacion del trigger secundario la realiza el contrato **LuminaPhalaVerifier** en `0x468b9D2E9043c80467B610bC290b698ae23adb9B` mediante verificacion ECDSA de una firma producida por un worker Phala autorizado. La lista de workers autorizados es curada manualmente por el admin (Gnosis Safe). **Esto NO es atestacion de hardware SGX/TDX on-chain** — es una lista curada por admin de EOAs (Externally Owned Accounts) que se asume firman desde entornos Phala legitimos. La verificacion on-chain es estrictamente `ecrecover(hash, sig) ∈ authorizedWorkers`.
 
 **Protocolos Cubiertos:**
 
@@ -418,11 +418,11 @@ Se han disenado tres productos adicionales para futuras versiones del protocolo:
 
 ## 6. ORACLE Y VERIFICACION
 
-### 6.1 LuminaOracle
+### 6.1 LuminaOracleV2 (NO actualizable)
 
-El contrato LuminaOracle (`0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87`) es el componente central de verificacion de datos del protocolo. Opera con un esquema multisig N-of-M que puede expandirse segun las necesidades de descentralizacion.
+El contrato LuminaOracleV2 (`0x87B576f688bE0E1d7d23A299f55b475658215105`) es el componente central de verificacion de datos del protocolo. Es **NO actualizable** (Ownable, sin proxy UUPS). Para reemplazarlo: desplegar un nuevo oracle, llamar `CoverRouter.setOracle(newOracle)` Y re-desplegar cada Shield (el campo `oracle` en cada Shield es `immutable`).
 
-Actualmente opera en modo 1-of-1 (expandible a N-of-M). El oracle verifica los feeds de Chainlink, implementa un chequeo de sequencer de 1 hora para Base L2, y valida la frescura de los datos antes de aceptarlos como input para triggers.
+Opera con un esquema multisig N-of-M que puede expandirse segun las necesidades de descentralizacion. Actualmente opera en modo 1-of-1 (expandible a N-of-M). El oracle verifica los feeds de Chainlink, implementa un chequeo de sequencer de 1 hora para Base L2, y valida la frescura de los datos antes de aceptarlos como input para triggers.
 
 ### 6.2 Tabla de Feeds de Chainlink
 
@@ -447,11 +447,16 @@ Firmas = firma_signer1 ++ firma_signer2 ++ ... ++ firma_signerN
 
 La funcion `verifyPackedMultisig` deserializa las firmas, verifica que cada una proviene de un firmante autorizado, que estan en orden correcto (para prevenir duplicados), y que se alcanza el umbral N-of-M requerido.
 
-### 6.4 Phala TEE para Exploit Shield
+### 6.4 LuminaPhalaVerifier para Exploit Shield
 
-El contrato LuminaPhalaVerifier (`0x468b9D2E9043c80467B610bC290b698ae23adb9B`) utiliza Phala Network como Trusted Execution Environment para verificar el trigger secundario de Exploit Shield. El TEE ejecuta logica de verificacion en un entorno aislado y tamper-proof, proporcionando una capa de seguridad independiente del oracle principal.
+El contrato LuminaPhalaVerifier (`0x468b9D2E9043c80467B610bC290b698ae23adb9B`) verifica el trigger secundario de Exploit Shield mediante **verificacion ECDSA de firmas producidas por workers Phala autorizados** sobre una lista curada por admin. Es **NO actualizable** (Ownable, lista de workers EOA curada por admin).
 
-Esto es critico para Exploit Shield porque los exploits pueden involucrar manipulacion de oracles. Al usar un TEE independiente, Lumina garantiza que la verificacion del trigger no puede ser comprometida por el mismo vector de ataque que causo el exploit.
+**Importante — lo que NO hace este contrato:**
+- NO verifica atestaciones remotas SGX/TDX on-chain.
+- NO verifica firmas de enclaves de hardware on-chain.
+- NO valida que el worker EOA pertenezca realmente a un enclave Phala.
+
+**Lo que SI hace:** `ecrecover(dataHash, signature)` y verifica que el address recuperado esta en `_authorizedWorkers`, donde `_authorizedWorkers` es una lista mantenida por el owner (Gnosis Safe). La suposicion de confianza es que el admin agrega unicamente workers cuyos keys fueron verificados off-chain como originados en enclaves Phala legitimos.
 
 ---
 
@@ -527,7 +532,7 @@ La API que conecta a los agentes de IA con los contratos implementa:
 La seguridad del oracle se basa en tres capas:
 
 - **Multisig:** Verificacion N-of-M de firmas para datos de oracle
-- **Chainlink TWAP:** Uso de precios promedio ponderados por tiempo, no precios spot
+- **Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2):** El relayer lee `latestRoundData` del feed de Chainlink y firma el resultado con `signTypedData`. NO hay computo de TWAP on-chain
 - **Sequencer check:** Verificacion de que el sequencer de Base L2 ha estado activo durante al menos 1 hora antes de aceptar datos de oracle
 
 ### 8.5 Session Approval
@@ -601,8 +606,8 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 | Riesgo                         | Probabilidad | Impacto  | Mitigacion                                                                          |
 |--------------------------------|--------------|----------|--------------------------------------------------------------------------------------|
 | Bug en smart contract          | Baja         | Critico  | 119 tests, CEI, ReentrancyGuard, Solidity 0.8.20, proxies UUPS para upgrades         |
-| Manipulacion de oracle         | Baja         | Alto     | TWAP (no precio spot), multisig, sequencer check 1h, MAX_PROOF_AGE 30min            |
-| Flash loan attack              | Baja         | Alto     | TWAP multiples rounds, colateral 1:1, no dependencia de precios spot                |
+| Manipulacion de oracle         | Baja         | Alto     | Pruebas firmadas EIP-712 (replay protection), multisig, sequencer check 1h, MAX_PROOF_AGE 30min |
+| Flash loan attack              | Baja         | Alto     | Waiting period 1h, colateral 1:1, staleness Chainlink 20 min                        |
 | Sequencer de Base L2 offline   | Media        | Medio    | Sequencer check de 1 hora, polizas no expiran durante downtime                      |
 | Precio stale en Chainlink      | Media        | Medio    | Staleness checks por feed (1200s volatiles, 86400s stables), rechazo automatico     |
 | Subcapitalizacion del vault    | Muy Baja     | Critico  | Colateral 1:1, U_MAX 95%, rechazo automatico de nuevas polizas al alcanzar limite   |
@@ -620,8 +625,8 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 - 5 productos de seguro operativos: BCS, EAS, Depeg, IL Index, Exploit
 - 4 vaults de liquidez con yield Aave V3
 - Despliegue en Base L2 (Chain 8453)
-- 13 contratos en produccion con proxies UUPS
-- Oracle con Chainlink feeds y soporte Phala TEE
+- 13 contratos en produccion (core/vaults/shields con UUPS; oracle y PhalaVerifier NO actualizables)
+- Oracle con Chainlink feeds (precio spot verificado via EIP-712) y verificacion ECDSA de workers Phala
 - API para agentes de IA
 - Gobernanza via TimelockController + Gnosis Safe
 
@@ -650,7 +655,7 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 
 ### 12.1 Estructura del Protocolo
 
-Lumina Protocol opera como un protocolo descentralizado desplegado en Base L2 (Chain 8453). Los contratos inteligentes son inmutables en su logica core, con capacidad de upgrade a traves de proxies UUPS controlados por un TimelockController con delay de 48 horas y una Gnosis Safe 1-of-1 (planned 2-of-3).
+Lumina Protocol opera como un protocolo descentralizado desplegado en Base L2 (Chain 8453). Los contratos inteligentes son inmutables en su logica core, con capacidad de upgrade a traves de proxies UUPS (para contratos core, vaults y shields) controlados por un TimelockController con delay de 48 horas y una Gnosis Safe 1-of-1 (planned 2-of-3). Los contratos Oracle (LuminaOracleV2, LuminaPhalaVerifier) son NO actualizables (Ownable).
 
 El protocolo no custodia fondos de usuarios. Los depositos de LPs se mantienen en Aave V3, y los pagos de siniestros se ejecutan directamente desde los vaults a las wallets de los agentes. El protocolo solo cobra fees como intermediario.
 
@@ -693,7 +698,7 @@ Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, 
 |------------------------|-----------------------------------------------------|
 | CoverRouter            | `0xd5f8678A0F2149B6342F9014CCe6d743234Ca025`       |
 | PolicyManager          | `0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a`       |
-| LuminaOracle           | `0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87`       |
+| LuminaOracleV2         | `0x87B576f688bE0E1d7d23A299f55b475658215105`       |
 | LuminaPhalaVerifier    | `0x468b9D2E9043c80467B610bC290b698ae23adb9B`       |
 
 ### Vaults
@@ -709,11 +714,11 @@ Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, 
 
 | Shield                 | Direccion                                          |
 |------------------------|-----------------------------------------------------|
-| BTC Catastrophe Shield (BCS) | `0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8` |
-| ETH Apocalypse Shield (EAS) | `0xA755D134a0b2758E9b397E11E7132a243f672A3D` |
-| DepegShield            | `0x7578816a803d293bbb4dbea0efbed872842679d0`       |
-| ILIndexCover           | `0x2ac0d2a9889a8a4143727a0240de3fed4650dd93`       |
-| ExploitShield          | `0x9870830c615d1b9c53dfee4136c4792de395b7a1`       |
+| BTC Catastrophe Shield (BCS) | `0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21` |
+| ETH Apocalypse Shield (EAS) | `0x70f1c92EFcFe55e8d460aAa6d626779536b15128` |
+| DepegShield            | `0x881f683291122c3A72bdD504F71ddCAf47d9AE0e`       |
+| ILIndexCover           | `0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a`       |
+| ExploitShield          | `0x63D340AE7229BB464bC801f225651341ebcD3693`       |
 
 ### Contratos Externos
 
@@ -819,7 +824,7 @@ Lumina Protocol representa la primera infraestructura de seguro parametrico dise
 - **Disenado para agentes:** API programatica, session approval para relayers, integracion OWS, documentacion SKILL.
 - **Colateral 1:1:** Cada poliza esta respaldada al 100% por USDC real bloqueado en el vault. Sin riesgo de subcapitalizacion.
 - **Yield real:** Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 3-21%.
-- **Seguridad en capas:** Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), TWAP, sequencer check.
+- **Seguridad en capas:** Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), pruebas EIP-712, sequencer check.
 - **Modelo de negocio transparente:** 3% premium + 3% payout. Sin fees ocultos. Sin fee en retiros de vault.
 
 **Vision:**
