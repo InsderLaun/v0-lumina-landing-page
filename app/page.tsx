@@ -430,6 +430,8 @@ export default function Home() {
                 <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Depeg Shield</a>
                 <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">IL Index Cover</a>
                 <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Exploit Shield</a>
+                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Flash BTC</a>
+                <a href="#products" className="block text-sm text-white/40 hover:text-white transition-colors">Flash ETH</a>
               </div>
             </div>
 
@@ -879,6 +881,64 @@ const PRODUCTS = [
       ["Anti-Insider", "14-day waiting makes timing attacks impractical"],
     ],
   },
+  {
+    key: "flash-btc",
+    emoji: "⚡",
+    label: "Flash BTC",
+    tagline: "Ultra-short coverage against sudden BTC flash crashes",
+    analogy: "Like lightning insurance — 24h or 48h protection against sudden BTC drops. No waiting period.",
+    rows: [
+      ["Trigger", "BTC drops >18% in 24h policy or >22% in 48h policy"],
+      ["Payout", "80% of coverage (net 77.6% after 3% fee)"],
+      ["Duration", "24h or 48h"],
+      ["Waiting Period", "None — instant coverage"],
+      ["Price", "From 1.13% per 24h"],
+    ],
+    example: "$50K coverage, 24h → Premium $565 → If triggered: receive $38,800 → Return: 68x",
+    technicalDetails: [
+      ["Product ID", "FLASH-BTC"],
+      ["Risk Type", "VOLATILE"],
+      ["Oracle", "Chainlink spot price, EIP-712 signed by LuminaOracleV2"],
+      ["Strike Price", "Captured at moment of purchase"],
+      ["24h Trigger", "strikePrice × 0.82 (−18%)"],
+      ["48h Trigger", "strikePrice × 0.78 (−22%)"],
+      ["Deductible", "20%"],
+      ["Max Allocation", "30% of vault"],
+      ["Grace Period", "24h post-expiry to submit claim"],
+      ["Vault", "FlashVault (7d cooldown)"],
+      ["Kink Model", "P_base 113% annualized (24h) / 82.5% (48h) × M(U) × duration"],
+      ["Protocol Fee", "3% on premium + 3% on payout + 3% on vault yield"],
+    ],
+  },
+  {
+    key: "flash-eth",
+    emoji: "⚡",
+    label: "Flash ETH",
+    tagline: "Ultra-short coverage against sudden ETH flash crashes",
+    analogy: "Like lightning insurance — 24h or 48h protection against sudden ETH drops. No waiting period.",
+    rows: [
+      ["Trigger", "ETH drops >20% in 24h policy or >28% in 48h policy"],
+      ["Payout", "80% of coverage (net 77.6% after 3% fee)"],
+      ["Duration", "24h or 48h"],
+      ["Waiting Period", "None — instant coverage"],
+      ["Price", "From 1.13% per 24h"],
+    ],
+    example: "$50K coverage, 24h → Premium $565 → If triggered: receive $38,800 → Return: 68x",
+    technicalDetails: [
+      ["Product ID", "FLASH-ETH"],
+      ["Risk Type", "VOLATILE"],
+      ["Oracle", "Chainlink spot price, EIP-712 signed by LuminaOracleV2"],
+      ["Strike Price", "Captured at moment of purchase"],
+      ["24h Trigger", "strikePrice × 0.80 (−20%)"],
+      ["48h Trigger", "strikePrice × 0.72 (−28%)"],
+      ["Deductible", "20%"],
+      ["Max Allocation", "30% of vault"],
+      ["Grace Period", "24h post-expiry to submit claim"],
+      ["Vault", "FlashVault (7d cooldown)"],
+      ["Kink Model", "P_base 113% annualized (24h) / 82.5% (48h) × M(U) × duration"],
+      ["Protocol Fee", "3% on premium + 3% on payout + 3% on vault yield"],
+    ],
+  },
 ]
 
 function ProductsSection() {
@@ -1027,7 +1087,7 @@ function ProductsSection() {
 /*  PREMIUM CALCULATOR                                       */
 /* ═══════════════════════════════════════════════════════════ */
 
-type CalcProduct = "bcs" | "eas" | "depeg" | "il" | "exploit"
+type CalcProduct = "bcs" | "eas" | "depeg" | "il" | "exploit" | "flash-btc" | "flash-eth"
 
 const CALC_DURATION_RANGES: Record<CalcProduct, [number, number, number]> = {
   bcs: [7, 30, 14],
@@ -1035,6 +1095,8 @@ const CALC_DURATION_RANGES: Record<CalcProduct, [number, number, number]> = {
   depeg: [30, 365, 90],
   il: [30, 90, 30],
   exploit: [30, 365, 180],
+  "flash-btc": [1, 2, 1],
+  "flash-eth": [1, 2, 1],
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1049,6 +1111,8 @@ const CALC_PRODUCT_CONFIG: Record<CalcProduct, { pBaseBps: number; riskType: "VO
   depeg:   { pBaseBps: PRODUCTS_CONFIG.DEPEG.pBaseBps, riskType: PRODUCTS_CONFIG.DEPEG.riskType },
   il:      { pBaseBps: PRODUCTS_CONFIG.IL.pBaseBps, riskType: PRODUCTS_CONFIG.IL.riskType },
   exploit: { pBaseBps: PRODUCTS_CONFIG.EXPLOIT.pBaseBps, riskType: PRODUCTS_CONFIG.EXPLOIT.riskType },
+  "flash-btc": { pBaseBps: PRODUCTS_CONFIG.FLASH_BTC.pBaseBps, riskType: PRODUCTS_CONFIG.FLASH_BTC.riskType },
+  "flash-eth": { pBaseBps: PRODUCTS_CONFIG.FLASH_ETH.pBaseBps, riskType: PRODUCTS_CONFIG.FLASH_ETH.riskType },
 }
 
 // Use imported calcKinkMultiplier from lumina-config
@@ -1065,6 +1129,8 @@ function getCalcDeductible(product: CalcProduct, stablecoin: string, protocol: s
       return 0.10
     case "il": return 0.02
     case "exploit": return 0.10
+    case "flash-btc": return 0.20
+    case "flash-eth": return 0.20
   }
 }
 
@@ -1132,7 +1198,7 @@ function PremiumCalculatorSection() {
   const [stablecoin, setStablecoin] = useState("USDT")
   const [protocol, setProtocol] = useState("Compound")
   const [vaultUtilizations, setVaultUtilizations] = useState<Record<string, number>>({
-    bcs: 20, eas: 20, il: 20, depeg: 20, exploit: 20,
+    bcs: 20, eas: 20, il: 20, depeg: 20, exploit: 20, "flash-btc": 20, "flash-eth": 20,
   })
   const [refreshing, setRefreshing] = useState(false)
 
@@ -1145,8 +1211,9 @@ function PremiumCalculatorSection() {
           const addrMap: Record<string, string[]> = {
             [CONTRACTS.vaults.VolatileShort.toLowerCase()]: ["bcs", "eas", "il"],
             [CONTRACTS.vaults.StableShort.toLowerCase()]: ["depeg", "exploit"],
+            [CONTRACTS.vaults.FlashVault.toLowerCase()]: ["flash-btc", "flash-eth"],
           }
-          const utils: Record<string, number> = { bcs: 20, eas: 20, il: 20, depeg: 20, exploit: 20 }
+          const utils: Record<string, number> = { bcs: 20, eas: 20, il: 20, depeg: 20, exploit: 20, "flash-btc": 20, "flash-eth": 20 }
           for (const v of data.vaults) {
             const products = addrMap[v.address?.toLowerCase()]
             if (products && !v.error) {
@@ -1223,6 +1290,8 @@ function PremiumCalculatorSection() {
                   { value: "depeg", label: "Depeg Shield" },
                   { value: "il", label: "IL Index Cover" },
                   { value: "exploit", label: "Exploit Shield" },
+                  { value: "flash-btc", label: "Flash BTC" },
+                  { value: "flash-eth", label: "Flash ETH" },
                 ]}
               />
 
@@ -1469,6 +1538,31 @@ const VAULTS = [
       ["Worst Case", "Simultaneous depeg + exploit = ~25% TVL loss (once per decade)"],
     ],
   },
+  {
+    name: "Flash Vault",
+    symbol: "lfUSDC",
+    cooldown: "7 days",
+    apy: "27.8-132.4%",
+    base: "Aave V3",
+    premiums: "27.8-132.4%",
+    backs: ["Flash BTC 24-48h", "Flash ETH 24-48h"],
+    risk: "Higher",
+    riskColor: "text-red-400",
+    bestFor: "Active LPs seeking highest yield from ultra-short flash insurance premiums",
+    technicalDetails: [
+      ["Contract", "FlashVault.sol"],
+      ["Standard", "ERC-4626 with soulbound shares (non-transferable)"],
+      ["Cooldown", "7 days exit notice — shortest commitment"],
+      ["Max Allocation", "30% of vault TVL per product"],
+      ["Backs", "Flash BTC (24h/48h) and Flash ETH (24h/48h)"],
+      ["High Turnover", "Ultra-short policies = rapid premium collection"],
+      ["Withdrawal", "requestWithdrawal() → wait 7d → completeWithdrawal()"],
+      ["Cancel", "cancelWithdrawal() returns to full availability"],
+      ["USDC Yield", "Dynamic rate from Aave V3 lending on Base, independent of Lumina"],
+      ["Premium Yield", "Dynamic, depends on # of flash policies and Kink multiplier"],
+      ["Worst Case", "Simultaneous BTC + ETH flash crash = ~35% TVL loss"],
+    ],
+  },
 ]
 
 function VaultsSection() {
@@ -1635,7 +1729,7 @@ function VaultsSection() {
 /*  YIELD CALCULATOR SECTION                                 */
 /* ═══════════════════════════════════════════════════════════ */
 
-type YieldVaultKey = "volatile-short" | "volatile-long" | "stable-short" | "stable-long"
+type YieldVaultKey = "volatile-short" | "volatile-long" | "stable-short" | "stable-long" | "flash"
 
 const YIELD_VAULTS: Record<YieldVaultKey, {
   label: string
@@ -1649,6 +1743,7 @@ const YIELD_VAULTS: Record<YieldVaultKey, {
   "volatile-long": { label: "Volatile Long", cooldown: 97, productId: "ILPROT-001", products: "IL Index + BCS/EAS overflow", risk: "Higher", worstCase: 0.28 },
   "stable-short": { label: "Stable Short", cooldown: 97, productId: "DEPEG-USDC-001", products: "Depeg + Exploit Shield", risk: "Low", worstCase: 0.20 },
   "stable-long": { label: "Stable Long", cooldown: 372, productId: "DEPEG-USDT-001", products: "Depeg + Exploit Shield", risk: "Very Low", worstCase: 0.25 },
+  "flash": { label: "Flash Vault", cooldown: 7, productId: "FLASH-BTC", products: "Flash BTC + Flash ETH", risk: "Higher", worstCase: 0.35 },
 }
 
 function YieldCalculatorSection() {
@@ -1656,7 +1751,7 @@ function YieldCalculatorSection() {
   const [vault, setVault] = useState<YieldVaultKey>("volatile-short")
   const [deposit, setDeposit] = useState(10000)
   const [realUtilizations, setRealUtilizations] = useState<Record<string, number>>({
-    "volatile-short": 20, "volatile-long": 20, "stable-short": 20, "stable-long": 20,
+    "volatile-short": 20, "volatile-long": 20, "stable-short": 20, "stable-long": 20, "flash": 20,
   })
   const [refreshingYield, setRefreshingYield] = useState(false)
 
@@ -1671,8 +1766,9 @@ function YieldCalculatorSection() {
             [CONTRACTS.vaults.VolatileLong.toLowerCase()]: "volatile-long",
             [CONTRACTS.vaults.StableShort.toLowerCase()]: "stable-short",
             [CONTRACTS.vaults.StableLong.toLowerCase()]: "stable-long",
+            [CONTRACTS.vaults.FlashVault.toLowerCase()]: "flash",
           }
-          const utils: Record<string, number> = { "volatile-short": 20, "volatile-long": 20, "stable-short": 20, "stable-long": 20 }
+          const utils: Record<string, number> = { "volatile-short": 20, "volatile-long": 20, "stable-short": 20, "stable-long": 20, "flash": 20 }
           for (const v of data.vaults) {
             const key = map[v.address?.toLowerCase()]
             if (key && !v.error) {
@@ -1739,6 +1835,7 @@ function YieldCalculatorSection() {
                   { value: "volatile-long", label: "Volatile Long" },
                   { value: "stable-short", label: "Stable Short" },
                   { value: "stable-long", label: "Stable Long" },
+                  { value: "flash", label: "Flash Vault" },
                 ]}
               />
 
@@ -2717,7 +2814,7 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
 
 const FAQ_GENERAL = [
   { q: "What is Lumina Protocol?", a: "Lumina Protocol is the first parametric insurance platform built exclusively for AI agents operating in DeFi. Unlike traditional insurance, Lumina uses objective on-chain data from Chainlink oracles to automatically verify conditions and execute payouts. Your AI agent buys coverage via API, and if a trigger condition is met, the payout is calculated and sent to the agent's wallet automatically. Standard payouts process within minutes; large payouts may have an additional security delay." },
-  { q: "What insurance products does Lumina offer?", a: "Five parametric products: (1) BTC Catastrophe Shield (BCS) — covers BTC crashes exceeding 50%, pays 80% of coverage, 7-30 day policies. (2) ETH Apocalypse Shield (EAS) — covers ETH crashes exceeding 60%, pays 80%, 7-30 days. (3) Depeg Shield — covers USDT or DAI losing peg below $0.95, pays 85-88%, 14-365 days. (4) IL Index Cover — covers impermanent loss exceeding 2% at policy expiry, proportional payout capped at 11.7%, 14-90 days. (5) Exploit Shield — covers DeFi protocol hacks via dual-trigger mechanism, pays 90%, 90-365 days, max $50K per wallet." },
+  { q: "What insurance products does Lumina offer?", a: "Seven parametric products: (1) BTC Catastrophe Shield (BCS) — covers BTC crashes exceeding 50%, pays 80% of coverage, 7-30 day policies. (2) ETH Apocalypse Shield (EAS) — covers ETH crashes exceeding 60%, pays 80%, 7-30 days. (3) Depeg Shield — covers USDT or DAI losing peg below $0.95, pays 85-88%, 14-365 days. (4) IL Index Cover — covers impermanent loss exceeding 2% at policy expiry, proportional payout capped at 11.7%, 14-90 days. (5) Exploit Shield — covers DeFi protocol hacks via dual-trigger mechanism, pays 90%, 90-365 days, max $50K per wallet. (6) Flash BTC — ultra-short 24h/48h coverage against BTC flash crashes exceeding 18-22%, no waiting period. (7) Flash ETH — ultra-short 24h/48h coverage against ETH flash crashes exceeding 20-28%, no waiting period. Both Flash products are backed by the Flash Vault (7-day cooldown)." },
   { q: "Can a human buy a policy or deposit from this website?", a: "No. This website is informational only. All operations — buying insurance, depositing in vaults, claiming payouts, withdrawing — are performed by your AI agent. The website explains, convinces, and provides the Skill file. Your agent does the rest." },
   { q: "What is USDC?", a: "USDC is Circle's native stablecoin on Base, backed 1:1 by US dollars and short-term treasuries. When you deposit USDC in a Lumina vault, your funds are lent on Aave V3 to earn a base yield PLUS insurance premiums on top." },
   { q: "How much does a policy cost?", a: "Pricing is dynamic based on vault utilization. When utilization is low, premiums are cheaper. Above 80% utilization, premiums accelerate sharply (Kink model). Above 95%, no new policies accepted. Example: $10,000 BCS coverage for 14 days costs approximately $28 at low utilization, $75 at high utilization. A 3% protocol fee is applied to every premium." },
@@ -2736,7 +2833,7 @@ const FAQ_PROTECT = [
 ]
 
 const FAQ_EARN = [
-  { q: "How do I deposit in a vault?", a: "Vault deposits are on-chain transactions (not through the API). You need USDC on Base L2, then approve and call the deposit function on the vault contract. Minimum deposit is $100. You'll receive non-transferable (soulbound) shares. Four vaults available: VolatileShort (37-day cooldown, highest risk/reward), VolatileLong (97-day), StableShort (97-day), and StableLong (372-day, most conservative)." },
+  { q: "How do I deposit in a vault?", a: "Vault deposits are on-chain transactions (not through the API). You need USDC on Base L2, then approve and call the deposit function on the vault contract. Minimum deposit is $100. You'll receive non-transferable (soulbound) shares. Five vaults available: VolatileShort (37-day cooldown, highest risk/reward), VolatileLong (97-day), StableShort (97-day), StableLong (372-day, most conservative), and FlashVault (7-day cooldown, backs Flash BTC + Flash ETH)." },
   { q: "How much can I earn as an LP?", a: "Returns come from insurance premiums plus Aave V3 lending yield. In normal conditions (40% utilization, no claims): expect 5-10% APY. In high demand (70%+): 10-25% APY. However, if many policies trigger simultaneously, returns go negative. In extreme scenarios, LPs can lose 30-50% of their deposit. A 3% performance fee is charged only on positive returns when you withdraw." },
   { q: "What's the worst that can happen as an LP?", a: "In extreme events (market crash triggering multiple policies simultaneously), a vault could lose 30-50% of TVL from insurance payouts. If Aave V3 were exploited, additional losses are possible since vault idle capital is deposited there. The protocol guarantees it can always pay claims, but LP capital absorbs the losses. VolatileShort has the highest risk. Only deposit what you can afford to lose." },
   { q: "Is the APY guaranteed?", a: "No. The base yield comes from Aave V3 lending on Base and fluctuates with market demand. The premium yield depends on insurance policy volume and vault utilization. Both fluctuate. The numbers shown are estimates based on current conditions." },
