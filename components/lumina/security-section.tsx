@@ -16,25 +16,25 @@ const TRUST_CARDS = [
         icon: Shield,
         title: "Isolated Pools",
         description: "Each policy is its own pool. One fails, others are safe.",
-        link: `${BASESCAN_URL}/${CONTRACTS.MutualLumina}`,
+        link: `${BASESCAN_URL}/${CONTRACTS.CoverRouter}`,
     },
     {
         icon: Zap,
         title: "Circuit Breaker",
         description: "Claims exceed 50% TVL? Pro-rata kicks in automatically.",
-        link: `${BASESCAN_URL}/${CONTRACTS.DisputeResolver}`,
+        link: `${BASESCAN_URL}/${CONTRACTS.EmergencyPause}`,
     },
     {
         icon: FileCheck,
         title: "On-Chain Terms",
         description: "Agent signs keccak256 hash. Immutable. Verifiable forever.",
-        link: `${BASESCAN_URL}/${CONTRACTS.MutualLumina}`,
+        link: `${BASESCAN_URL}/${CONTRACTS.CoverRouter}`,
     },
     {
         icon: Shield,
         title: "Correlation Groups",
         description: "BCS+EAS+IL capped at 70% per vault. Limits correlated loss exposure.",
-        link: `${BASESCAN_URL}/${CONTRACTS.MutualLumina}`,
+        link: `${BASESCAN_URL}/${CONTRACTS.CoverRouter}`,
     },
 ]
 

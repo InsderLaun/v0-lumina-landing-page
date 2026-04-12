@@ -47,7 +47,7 @@ export const ORACLES = {
 export const CONTRACTS = {
   CoverRouter: "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025" as `0x${string}`,
   PolicyManager: "0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" as `0x${string}`,
-  Oracle: "0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87" as `0x${string}`,
+  Oracle: "0x87B576f688bE0E1d7d23A299f55b475658215105" as `0x${string}`,
   Phala: "0x468b9D2E9043c80467B610bC290b698ae23adb9B" as `0x${string}`,
   vaults: {
     VolatileShort: "0xbd44547581b92805aAECc40EB2809352b9b2880d" as `0x${string}`,
@@ -56,11 +56,11 @@ export const CONTRACTS = {
     StableLong: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" as `0x${string}`,
   },
   shields: {
-    BCS: "0x36e37899D9D89bf367FA66da6e3CebC726Df4ce8" as `0x${string}`,
-    EAS: "0xA755D134a0b2758E9b397E11E7132a243f672A3D" as `0x${string}`,
-    Depeg: "0x7578816a803d293bbb4dbea0efbed872842679d0" as `0x${string}`,
-    ILIndex: "0x2ac0d2a9889a8a4143727a0240de3fed4650dd93" as `0x${string}`,
-    Exploit: "0x9870830c615d1b9c53dfee4136c4792de395b7a1" as `0x${string}`,
+    BCS: "0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21" as `0x${string}`,
+    EAS: "0x70f1c92EFcFe55e8d460aAa6d626779536b15128" as `0x${string}`,
+    Depeg: "0x881f683291122c3A72bdD504F71ddCAf47d9AE0e" as `0x${string}`,
+    ILIndex: "0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a" as `0x${string}`,
+    Exploit: "0x63D340AE7229BB464bC801f225651341ebcD3693" as `0x${string}`,
   },
   EmergencyPause: "0xc7ac8c19c3f10f820d7e42f07e6e257bacc22876" as `0x${string}`,
   TimelockController: "0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a" as `0x${string}`,

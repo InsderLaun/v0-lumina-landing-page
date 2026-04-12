@@ -73,7 +73,7 @@ curl -X POST /api/v1/quote \\
   -d '{"productId":"BCS-001","coverageAmount":10000}'
 
 # 3. Approve USDC on-chain (ERC-20 approve)
-# 4. Create pool on-chain (MutualLumina.createPool)
+# 4. Create pool on-chain (CoverRouter.purchasePolicy)
 
 # 5. Confirm purchase
 curl -X POST /api/v1/purchase \\

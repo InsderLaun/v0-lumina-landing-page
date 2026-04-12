@@ -752,7 +752,7 @@ const PRODUCTS = [
     technicalDetails: [
       ["Product ID", "BTCCAT-001"],
       ["Risk Type", "VOLATILE"],
-      ["Oracle", "Chainlink TWAP 15 min or 3 consecutive roundIds"],
+      ["Oracle", "Chainlink spot price, EIP-712 signed by LuminaOracleV2"],
       ["Strike Price", "Captured at moment of purchase"],
       ["Trigger Price", "strikePrice × 0.50"],
       ["Deductible", "20%"],
@@ -780,7 +780,7 @@ const PRODUCTS = [
     technicalDetails: [
       ["Product ID", "ETHAPOC-001"],
       ["Risk Type", "VOLATILE"],
-      ["Oracle", "Chainlink TWAP 15 min or 3 consecutive roundIds"],
+      ["Oracle", "Chainlink spot price, EIP-712 signed by LuminaOracleV2"],
       ["Strike Price", "Captured at moment of purchase"],
       ["Trigger Price", "strikePrice × 0.40"],
       ["Deductible", "20%"],
@@ -799,7 +799,7 @@ const PRODUCTS = [
     analogy: "Like fire insurance — 24h waiting because you can smell the smoke before it burns. Covers USDT and DAI depegs. USDC excluded (settlement token).",
     description: "Protects your agent's stablecoin holdings against depeg events. Covers USDT and DAI. USDC is excluded because it's Lumina's settlement token — insuring it would create circular risk.",
     rows: [
-      ["Trigger", "Stablecoin TWAP 30 min < $0.95"],
+      ["Trigger", "Stablecoin spot price < $0.95, EIP-712 signed"],
       ["Covers", "USDT (net 82.5%), DAI (net 85.4%). USDC excluded — it's Lumina's settlement token."],
       ["Duration", "14–365 days"],
       ["Waiting Period", "24 hours"],
@@ -809,7 +809,7 @@ const PRODUCTS = [
     technicalDetails: [
       ["Product ID", "DEPEG-STABLE-001"],
       ["Risk Type", "STABLE"],
-      ["Oracle", "Chainlink TWAP 30 min or 5 consecutive roundIds"],
+      ["Oracle", "Chainlink spot price, EIP-712 signed by LuminaOracleV2"],
       ["Threshold", "Absolute $0.95 (not relative)"],
       ["Risk Multipliers", "DAI 1.2x, USDT 1.4x (USDC excluded — settlement token)"],
       ["Deductibles", "DAI 12%, USDT 15%"],
@@ -837,7 +837,7 @@ const PRODUCTS = [
     technicalDetails: [
       ["Product ID", "ILPROT-001"],
       ["Risk Type", "VOLATILE"],
-      ["Oracle", "Chainlink TWAP 15 min at expiry"],
+      ["Oracle", "Chainlink spot price at expiry, EIP-712 signed"],
       ["Formula", "IL% = 1 - 2√r / (1+r), where r = currentPrice / strikePrice"],
       ["Deductible", "2% restable (subtracted, not multiplicative)"],
       ["Payout Cap", "11.7% of coverage"],
@@ -867,7 +867,7 @@ const PRODUCTS = [
     technicalDetails: [
       ["Product ID", "EXPLOIT-001"],
       ["Risk Type", "STABLE"],
-      ["Oracle", "Chainlink TWAP 15 min (governance) + Phala TEE attestation (receipt token)"],
+      ["Oracle", "Chainlink spot (governance) EIP-712 signed + Phala TEE attestation (receipt token)"],
       ["Condition 1", "Governance token drops >25% in 24h"],
       ["Condition 2", "Receipt token drops >30% sustained 4h OR contract paused"],
       ["Both Required", "Both conditions must be met simultaneously"],
@@ -1959,7 +1959,7 @@ function RiskScenariosSection({ vaultKey, deposit, monthlyTotal, annualTotal }: 
         })}
       </div>
       <p className="text-xs text-white/25 leading-relaxed mt-4">
-        These scenarios are estimates based on historical DeFi events and actuarial modeling. Past events do not guarantee future outcomes. The Kink Model and protocol safeguards (TWAP, circuit breakers, dual triggers) significantly reduce claim probability.
+        These scenarios are estimates based on historical DeFi events and actuarial modeling. Past events do not guarantee future outcomes. The Kink Model and protocol safeguards (EIP-712 proofs, circuit breakers, dual triggers) significantly reduce claim probability.
       </p>
     </div>
   )
@@ -2594,7 +2594,7 @@ function SecuritySection({ perspective }: { perspective: Perspective }) {
   ]
 
   const protections = [
-    "TWAP price verification (anti flash-crash)",
+    "EIP-712 signed price proofs (anti flash-crash)",
     "L2 Sequencer uptime check with 1h grace period",
     "Circuit breakers on extreme volatility",
     "Waiting periods (24h Depeg, 14d Exploit)",

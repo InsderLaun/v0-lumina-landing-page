@@ -1,0 +1,930 @@
+═══════════════════════════════════════════════════════════
+AUTORIZACIÓN PREVIA — válida para toda esta sesión
+═══════════════════════════════════════════════════════════
+
+MODO: AUDITORÍA READ-ONLY. NO modificás código en ningún repo
+del usuario (LUMINA-PROTOCOL, v0-lumina-landing-page, ni nada
+fuera de /tmp). NO commits, NO pushes, NO deploys, NO cambios
+on-chain.
+
+Tenés permiso explícito para hacer SIN preguntar:
+
+LECTURA DE CÓDIGO:
+- Read, Glob, Grep en cualquier path del usuario
+- git log, git diff, git show, git blame en cualquier repo
+- forge build, forge test, forge inspect (read-only)
+- node -c, npm ls, pnpm ls (syntax checks, dependency trees)
+
+CONSULTAS ON-CHAIN (Base mainnet, RPC público):
+- cualquier cast call (read-only views)
+- cast storage (read-only)
+- cast nonce, cast balance, cast code, cast block
+- cast keccak, cast --format-bytes32-string (helpers locales)
+- queryFilter de eventos pasados
+
+CONSULTAS HTTP / API:
+- curl GET a cualquier URL pública
+- curl GET a https://lumina-protocol-production.up.railway.app/*
+- curl GET a https://lumina-org.com/* y https://www.lumina-org.com/*
+- curl HEAD para chequear códigos HTTP
+- WebFetch a páginas públicas si necesitás contexto externo
+
+CLONES TEMPORALES Y WORKSPACE:
+- git clone de repos públicos a /tmp/* (read-only checkout)
+- mkdir/rm -rf dentro de /tmp/* exclusivamente
+- Lectura de archivos en /tmp/*
+
+SUBAGENTES Y PARALELIZACIÓN:
+- Lanzar tantos subagentes paralelos como sean útiles para
+  paralelizar checks independientes (file-disjoint).
+- run_in_background para forge test, queries lentas, scans largos.
+- Tareas en background sin esperar mi confirmación.
+
+ESCRITURA — SOLO los archivos de output del audit:
+- Write/Edit en C:\Users\AGUSTIN\Desktop\*.txt o *.md (reportes)
+- Write/Edit en /tmp/* (workspace temporal)
+- NO Write/Edit en ningún path de los repos del usuario.
+
+PROHIBIDO sin pedir confirmación explícita:
+- Cualquier cast send, cast call --trace con value, broadcast tx
+- forge script con --broadcast
+- git add, git commit, git push, git checkout, git reset
+- gh pr create, gh issue create, gh release
+- railway service restart, railway deploy, gcloud, vercel
+- npm install, pnpm install (modifica node_modules — usar --dry-run si necesitás chequear deps)
+- Modificar/borrar cualquier archivo fuera de /tmp/* o Desktop/*.txt
+- Mandar cualquier mensaje a Slack/Notion/Gmail vía MCP
+- Cualquier operación que cueste gas o ETH
+
+COMUNICACIÓN:
+- No me hagas preguntas hasta que termine la fase actual.
+- Reportá milestones cuando una fase termine, no progreso continuo.
+- Si una check falla o devuelve algo inesperado, registralo en el
+  reporte y SEGUÍ. No me pares para preguntar — el reporte final
+  va a tener una sección "DISCREPANCIAS" donde voy a ver todo.
+- Si un check requiere una credencial que no tenés, marcalo como
+  "SKIPPED — credencial faltante: <cuál>" y seguí.
+
+DATOS SENSIBLES:
+NO incluyas en el reporte de output:
+- Private keys (ni siquiera prefijos)
+- API keys de Railway/Vercel/etc
+- Mnemonics
+- HMAC salts
+Si encontrás alguno hardcodeado en código → reportalo como CRITICAL pero
+NO copies el valor literal al reporte. Solo el path:line donde está.
+
+OUTPUT DEL AUDIT:
+- Guardá el reporte completo en C:\Users\AGUSTIN\Desktop\LUMINA-FINAL-PRELAUNCH-AUDIT.txt
+- Incluí outputs verbatim (no parafraseés greps, cast calls, curls)
+- Tabla maestra al final con SI/NO/PARCIAL por cada item
+- Sección de discrepancias con severity (CRITICAL/HIGH/MED/LOW)
+
+Cleanup al final:
+- rm -rf /tmp/audit-* /tmp/final-audit /tmp/final-audit-v0
+
+═══════════════════════════════════════════════════════════
+PARALELIZACIÓN — LANZÁ 5 AGENTES SIMULTÁNEOS
+═══════════════════════════════════════════════════════════
+
+GRUPOS PARALELIZABLES (lanzá un subagente por grupo, en paralelo):
+
+Agent 1: MÓDULO 1.1-1.4 (contratos, oracle V2, router, vaults)
+  → lee src/**/*.sol + hace cast calls on-chain
+  → forge build una sola vez (warm cache)
+
+Agent 2: MÓDULO 1.5-1.8 (shields V2, governance, tests, hackeo vectors)
+  → lee src/products/*V2.sol + test/ + hace cast calls on-chain
+  → forge test una sola vez
+
+Agent 3: MÓDULO 2 completo (flujo comercial, API calls, simulación pago)
+  → hace curl a la API Railway + lee api/src/*.js
+
+Agent 4: MÓDULO 3 completo (conectividad, agent simulation, UX)
+  → hace curl a lumina-org.com + lee docs/ y public/
+
+Agent 5: MÓDULO 4 completo (documentación, whitepapers, cross-check)
+  → lee docs/ + public/ + app/whitepaper/ + hace curls a web
+
+Cada agente escribe su sección en el archivo de output.
+El agente principal reconcilia al final en MÓDULO 5 y 6.
+No hay dependencias entre agentes — pueden correr 100% en paralelo.
+
+Para análisis exploratorio amplio (ej: "buscar todos los lugares
+donde se calcula un payout"), usá el agent Explore con
+thoroughness="very thorough".
+
+═══════════════════════════════════════════════════════════
+MISIÓN
+═══════════════════════════════════════════════════════════
+
+Auditoría TOTAL de Lumina Protocol pre-launch. Mañana se lanza.
+Necesito verificar que ABSOLUTAMENTE TODO funciona. Sé el auditor
+más exhaustivo posible. Si encontrás ALGO mal, por más pequeño
+que sea, reportalo.
+
+Cloná desde GitHub (es lo que el mundo ve):
+git clone https://github.com/org-lumina/LUMINA-PROTOCOL.git /tmp/final-audit
+git clone https://github.com/org-lumina/v0-lumina-landing-page.git /tmp/final-audit-v0
+cd /tmp/final-audit
+
+forge build (una sola vez, warm cache para todo el audit)
+
+NO modifiques nada. Solo VERIFICÁ y REPORTÁ.
+Guardá TODO en C:\Users\AGUSTIN\Desktop\LUMINA-FINAL-PRELAUNCH-AUDIT.txt
+
+El reporte debe tener score de 0-10 para CADA categoría.
+Necesito 10/10 en todo para lanzar mañana.
+
+CONTEXTO DEL PROTOCOLO:
+- Lumina Protocol: parametric DeFi insurance for AI agents on Base L2 (chain 8453)
+- Settlement: USDC
+- 5 productos activos: BCS, EAS, IL, DEPEG, EXPLOIT (+ BSS deprecated)
+- 4 vaults: VolatileShort, VolatileLong, StableShort, StableLong
+- Oracle V2 con EIP-712 domain separation (recién deployado)
+- 5 shields V2 (recién deployados y migrados via Safe/Timelock)
+- Circuit breakers activos (10 payouts/día, $50K threshold, 24h delay)
+- Relayer auto-claim con 4 fases corriendo en Railway
+- Gnosis Safe 2/3 multisig → TimelockController → CoverRouter
+- TVL = $0 (seed deposit pendiente)
+
+ADDRESSES DE PRODUCCIÓN (Base mainnet 8453):
+- CoverRouter proxy: 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025
+- PolicyManager proxy: 0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a
+- LuminaOracleV2: 0x87B576f688bE0E1d7d23A299f55b475658215105
+- LuminaOracle V1 (deprecated): 0x4d1140ac8f8cb9d4fb4f16cae9c9cba13c44bc87
+- EmergencyPause: 0xc7ac8c19c3f10f820d7e42f07e6e257bacc22876
+- TimelockController: 0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a
+- Gnosis Safe 2/3: 0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD
+- VolatileShort: 0xbd44547581b92805aAECc40EB2809352b9b2880d
+- VolatileLong: 0xFee5d6DAdA0A41407e9EA83D4F357DA6214Ff904
+- StableShort: 0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC
+- StableLong: 0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c
+- BCS V2: 0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21
+- EAS V2: 0x70f1c92EFcFe55e8d460aAa6d626779536b15128
+- Depeg V2: 0x881f683291122c3A72bdD504F71ddCAf47d9AE0e
+- IL V2: 0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a
+- Exploit V2: 0x63D340AE7229BB464bC801f225651341ebcD3693
+- BSS (deprecated): 0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e
+- USDC on Base: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+- OracleKey: 0x933b15dd4F42bd2EE2794C1D188882aBCCDa977E
+- API: https://lumina-protocol-production.up.railway.app/api/v2
+- Web: https://lumina-org.com
+- GitHub: org-lumina/LUMINA-PROTOCOL + org-lumina/v0-lumina-landing-page
+
+################################################################################
+#                                                                              #
+#   MÓDULO 1 — SEGURIDAD DE SMART CONTRACTS (Agents 1+2)                      #
+#                                                                              #
+################################################################################
+
+========================================
+1.1 — INVENTARIO DE CONTRATOS (Agent 1)
+========================================
+
+Listá TODOS los contratos .sol del proyecto:
+find src/ -name "*.sol" | sort
+
+Para CADA contrato:
+| Archivo | Tipo (core/oracle/product/interface) | Upgradeable? | Owner on-chain |
+
+========================================
+1.2 — ORACLE V2 SECURITY (Agent 1)
+========================================
+
+1.2.1 — EIP-712 Domain Separation:
+cat src/oracle/LuminaOracleV2.sol | grep -A10 "DOMAIN_TYPEHASH\|PRICE_PROOF_TYPEHASH\|DOMAIN_SEPARATOR"
+
+¿Incluye chainId? ¿Incluye verifyingContract?
+¿El DOMAIN_SEPARATOR es immutable (seteado en constructor)?
+
+Verificar on-chain:
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "DOMAIN_SEPARATOR()(bytes32)" --rpc-url https://mainnet.base.org
+
+¿Es non-zero?
+
+1.2.2 — Signature Verification:
+grep -B5 -A30 "function verifyPriceProofEIP712\|function verifySignature\|function verifyPackedMultisig" src/oracle/LuminaOracleV2.sol
+
+¿Usa ECDSA.tryRecover de OpenZeppelin? (anti-malleability)
+¿Chequea que el signer == oracleKey?
+¿Multisig path enforces strict ordering?
+
+1.2.3 — Replay Protection:
+¿Un proof de testnet puede usarse en mainnet? Verificar que chainId está en el digest.
+¿Un proof del oracle viejo (V1) puede usarse en shields V2?
+¿Un proof para BCS puede triggerear EAS? (cross-product)
+¿Un proof para policy A puede triggerear policy B? (cross-policy — esto es expected behavior)
+
+1.2.4 — Oracle Key:
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "oracleKey()(address)" --rpc-url https://mainnet.base.org
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "requiredSignatures()(uint256)" --rpc-url https://mainnet.base.org 2>/dev/null || echo "N/A"
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "owner()(address)" --rpc-url https://mainnet.base.org
+
+¿oracleKey = 0x933b15dd4F42bd2EE2794C1D188882aBCCDa977E?
+¿owner = Timelock (0xd0De...747a)?
+¿requiredSignatures = 1? (1-of-1 — documented risk)
+
+1.2.5 — Chainlink Integration:
+Para CADA feed, verificar que es un contrato real de Chainlink:
+
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "getFeedConfig(bytes32)" $(cast --format-bytes32-string "BTC") --rpc-url https://mainnet.base.org
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "getFeedConfig(bytes32)" $(cast --format-bytes32-string "ETH") --rpc-url https://mainnet.base.org
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "getFeedConfig(bytes32)" $(cast --format-bytes32-string "USDC") --rpc-url https://mainnet.base.org
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "getFeedConfig(bytes32)" $(cast --format-bytes32-string "USDT") --rpc-url https://mainnet.base.org
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "getFeedConfig(bytes32)" $(cast --format-bytes32-string "DAI") --rpc-url https://mainnet.base.org
+
+Para CADA feed address que devuelva, verificar que es Chainlink real:
+cast call <FEED_ADDRESS> "description()(string)" --rpc-url https://mainnet.base.org
+cast call <FEED_ADDRESS> "decimals()(uint8)" --rpc-url https://mainnet.base.org
+cast call <FEED_ADDRESS> "latestRoundData()(uint80,int256,uint256,uint256,uint80)" --rpc-url https://mainnet.base.org
+
+| Feed | Address | Description | Decimals | Price | Stale? | Real Chainlink? |
+
+1.2.6 — Staleness Protection:
+grep -n "maxStaleness\|StalePriceAsset\|staleness" src/oracle/LuminaOracleV2.sol | head -10
+¿BTC/ETH staleness = 1200s (20 min)?
+¿Stables staleness = 86400s (24h)?
+
+1.2.7 — Sequencer Uptime Check:
+grep -n "sequencer\|SEQUENCER\|checkSequencer\|getSequencerDowntime" src/oracle/LuminaOracleV2.sol | head -10
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "sequencerUptimeFeed()(address)" --rpc-url https://mainnet.base.org
+¿Hay un grace period después de que el sequencer vuelve? ¿Cuánto?
+
+1.2.8 — Price Zero Protection:
+grep -n "price.*<=.*0\|InvalidPriceAsset\|answer.*<=.*0" src/oracle/LuminaOracleV2.sol | head -10
+¿Revierte si Chainlink devuelve 0?
+
+1.2.9 — TEE / Phala Verifier:
+cat src/oracle/LuminaPhalaVerifier.sol | head -60
+¿Qué hace realmente? ¿Es ECDSA contra EOA allow-list o verificación real de SGX/TDX?
+¿Solo lo usa ExploitShield?
+¿La doc dice honestamente lo que es?
+
+========================================
+1.3 — COVERROUTER SECURITY (Agent 1)
+========================================
+
+1.3.1 — Verificar que apunta a Oracle V2:
+cast call 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025 "oracle()(address)" --rpc-url https://mainnet.base.org
+¿Es 0x87B576f688bE0E1d7d23A299f55b475658215105? (V2)
+
+1.3.2 — Verificar shields V2:
+for pid in "BTCCAT-001" "ETHAPOC-001" "DEPEG-STABLE-001" "ILPROT-001" "EXPLOIT-001"; do
+  shield=$(cast call 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025 "getProductShield(bytes32)(address)" $(cast keccak "$pid") --rpc-url https://mainnet.base.org 2>/dev/null)
+  echo "  $pid → $shield"
+done
+
+| Producto | Shield V2 esperada | Shield on-chain | ¿Coincide? |
+| BTCCAT-001 | 0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21 | ? | ? |
+| ETHAPOC-001 | 0x70f1c92EFcFe55e8d460aAa6d626779536b15128 | ? | ? |
+| DEPEG-STABLE-001 | 0x881f683291122c3A72bdD504F71ddCAf47d9AE0e | ? | ? |
+| ILPROT-001 | 0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a | ? | ? |
+| EXPLOIT-001 | 0x63D340AE7229BB464bC801f225651341ebcD3693 | ? | ? |
+
+1.3.3 — Circuit Breakers:
+cast call 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025 "maxPayoutsPerDay()(uint256)" --rpc-url https://mainnet.base.org
+cast call 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025 "largePayoutThreshold()(uint256)" --rpc-url https://mainnet.base.org
+cast call 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025 "largePayoutDelay()(uint256)" --rpc-url https://mainnet.base.org
+
+¿maxPayoutsPerDay = 10?
+¿largePayoutThreshold = 50000000000 ($50K USDC)?
+¿largePayoutDelay = 86400 (24h)?
+
+1.3.4 — triggerPayout Security:
+grep -B5 -A50 "function triggerPayout" src/core/CoverRouter.sol | head -70
+
+¿Tiene nonReentrant?
+¿Tiene CEI pattern (_policyResolved antes de external calls)?
+¿Quién puede llamarla? (cualquiera, relayer, owner?)
+¿EmergencyPause la afecta? (no — by design)
+¿Anti-griefing para que solo relayer/agent pueda llamar las primeras 6h?
+
+1.3.5 — updateProductShield:
+grep -B5 -A20 "function updateProductShield" src/core/CoverRouter.sol
+¿Tiene onlyOwner?
+¿Qué pasa con las pólizas existentes cuando se cambia el shield?
+
+1.3.6 — Correlation Groups:
+cast call 0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a "getCorrelationGroup(bytes32)" $(cast keccak "VOLATILE_CRASH") --rpc-url https://mainnet.base.org 2>/dev/null
+¿Existe? ¿Cap = 4000 (40%)? ¿Tiene BCS + EAS?
+
+========================================
+1.4 — VAULT SECURITY (Agent 1)
+========================================
+
+1.4.1 — Para CADA vault:
+for vault in "0xbd44547581b92805aAECc40EB2809352b9b2880d" "0xFee5d6DAdA0A41407e9EA83D4F357DA6214Ff904" "0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c"; do
+  echo "=== $vault ==="
+  cast call $vault "totalAssets()(uint256)" --rpc-url https://mainnet.base.org
+  cast call $vault "owner()(address)" --rpc-url https://mainnet.base.org
+  cast call $vault "asset()(address)" --rpc-url https://mainnet.base.org
+  cast call $vault "paused()(bool)" --rpc-url https://mainnet.base.org 2>/dev/null || echo "no paused()"
+done
+
+¿Owner = Timelock? ¿Asset = USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)?
+¿Paused = false? ¿TVL = 0? (esperado)
+
+1.4.2 — Aave Integration:
+grep -n "aToken\|aave\|AAVE\|_supplyToAave\|_withdrawFromAave\|aavePool" src/core/BaseVault.sol | head -20
+¿El vault deposita USDC en Aave automáticamente?
+¿Qué pasa si Aave está pausado durante un payout?
+
+1.4.3 — ERC-4626 Compliance:
+grep -n "function deposit\|function withdraw\|function redeem\|function convertToAssets\|function convertToShares" src/core/BaseVault.sol | head -15
+
+========================================
+1.5 — SHIELD V2 SECURITY (Agent 2)
+========================================
+
+Para CADA shield V2, verificar _doVerifyAndCalculate:
+
+1.5.1 — BCS V2 (0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21):
+grep -B5 -A40 "_doVerifyAndCalculate" src/products/BTCCatastropheShieldV2.sol | head -60
+¿Usa _verifyPriceProofEIP712? (no el viejo _verifyOracleSignature)
+¿Trigger: verifiedPrice < strikePrice × 50/100?
+¿Chequea: freshness, asset=="BTC", window, price>0?
+¿Payout: 80% coverage (binary)?
+
+cast call 0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21 "oracle()(address)" --rpc-url https://mainnet.base.org
+cast call 0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21 "router()(address)" --rpc-url https://mainnet.base.org
+cast call 0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21 "TRIGGER_DROP_BPS()(uint256)" --rpc-url https://mainnet.base.org
+cast call 0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21 "MAX_ALLOCATION_BPS()(uint256)" --rpc-url https://mainnet.base.org
+cast call 0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21 "DEDUCTIBLE_BPS()(uint256)" --rpc-url https://mainnet.base.org
+
+1.5.2 — EAS V2 (0x70f1c92EFcFe55e8d460aAa6d626779536b15128):
+Repetir todos los checks de 1.5.1 pero para EAS.
+
+1.5.3 — Depeg V2 (0x881f683291122c3A72bdD504F71ddCAf47d9AE0e):
+Repetir. Verificar que USDC es rechazado on-chain (circular risk).
+
+1.5.4 — IL V2 (0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a):
+Repetir. Verificar IL computation on-chain (ILMath.calculateIL).
+
+1.5.5 — Exploit V2 (0x63D340AE7229BB464bC801f225651341ebcD3693):
+Repetir. Verificar DUAL proof (oracle + phala). Verificar que usa EIP-712 para AMBOS proofs.
+
+Tabla resumen:
+| Shield | oracle()=V2? | router()=CoverRouter? | Trigger | MaxAlloc | Deductible | EIP-712? |
+
+========================================
+1.6 — GOVERNANCE SECURITY (Agent 2)
+========================================
+
+1.6.1 — Timelock:
+cast call 0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a "getMinDelay()(uint256)" --rpc-url https://mainnet.base.org
+¿minDelay = 0? (risk documented but accepted for now)
+
+1.6.2 — EmergencyPause:
+cast call 0xc7ac8c19c3f10f820d7e42f07e6e257bacc22876 "protocolPaused()(bool)" --rpc-url https://mainnet.base.org
+¿Paused = false?
+
+1.6.3 — Gnosis Safe:
+¿Safe = 0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD?
+¿Es 2-of-3?
+
+========================================
+1.7 — TESTS (Agent 2)
+========================================
+
+cd /tmp/final-audit
+forge test --summary 2>&1 | tail -20
+
+¿Todos pasan? ¿Cuántos tests? ¿Cuántas suites?
+¿Hay tests para EIP-712?
+¿Hay tests para cross-chain replay?
+¿Hay tests para circuit breakers?
+
+grep -rn "test.*EIP712\|test.*Domain\|test.*Replay\|test.*CircuitBreaker\|test.*MaxPayout" test/ | head -20
+
+========================================
+1.8 — HACKEO VECTORS (Agent 2)
+========================================
+
+Analizá CADA vector de ataque posible:
+
+| Vector | ¿Protegido? | Cómo | Score /10 |
+| Reentrancy en triggerPayout | ? | ? | ? |
+| Flash loan attack | ? | ? | ? |
+| Oracle manipulation (Chainlink) | ? | ? | ? |
+| Cross-chain proof replay | ? | ? | ? |
+| Cross-product proof replay (BTC→EAS) | ? | ? | ? |
+| Oracle key compromise (drain all) | ? | ? | ? |
+| Phala worker compromise | ? | ? | ? |
+| Frontrunning de triggerPayout | ? | ? | ? |
+| Sandwich attack en purchasePolicy | ? | ? | ? |
+| Governance attack (Safe compromise) | ? | ? | ? |
+| Timelock bypass (minDelay=0) | ? | ? | ? |
+| USDC blacklist del vault address | ? | ? | ? |
+| Aave pool pause durante payout | ? | ? | ? |
+| Sequencer downtime durante crash real | ? | ? | ? |
+| Integer overflow/underflow | ? | ? | ? |
+| Storage collision en UUPS proxy | ? | ? | ? |
+| Selfdestruct de contratos | ? | ? | ? |
+| DoS en el relayer (ETH balance 0) | ? | ? | ? |
+| Double-payout (same policy twice) | ? | ? | ? |
+| Griefing triggerPayout (unauthorized caller) | ? | ? | ? |
+
+################################################################################
+#                                                                              #
+#   MÓDULO 2 — FLUJO COMERCIAL COMPLETO (Agent 3)                             #
+#                                                                              #
+################################################################################
+
+========================================
+2.1 — FLUJO COMPRADOR (AI Agent via API)
+========================================
+
+2.1.1 — Health:
+curl -s https://lumina-protocol-production.up.railway.app/api/v2/health | python3 -m json.tool
+
+2.1.2 — Discover products:
+curl -s https://lumina-protocol-production.up.railway.app/api/v2/products | python3 -m json.tool
+
+¿5 ACTIVE + 1 DEPRECATED?
+¿Cada producto tiene: id, name, status, pBaseBps, shield, riskType, durationSeconds?
+¿Los shield addresses son las V2?
+
+2.1.3 — Quote CADA producto activo + BSS deprecated:
+
+echo "=== BCS 7d $10K ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BTCCAT-001","coverageAmount":"10000000000","durationSeconds":604800,"asset":"BTC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== EAS 7d $10K ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"ETHAPOC-001","coverageAmount":"10000000000","durationSeconds":604800,"asset":"ETH","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== IL 14d $10K ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"ILPROT-001","coverageAmount":"10000000000","durationSeconds":1209600,"asset":"ETH","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== DEPEG 14d $10K ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"DEPEG-STABLE-001","coverageAmount":"10000000000","durationSeconds":1209600,"asset":"USDT","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== EXPLOIT 90d $10K ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"EXPLOIT-001","coverageAmount":"10000000000","durationSeconds":7776000,"asset":"ETH","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== BSS (debe rechazar deprecated) ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BLACKSWAN-001","coverageAmount":"10000000000","durationSeconds":2592000,"asset":"ETH","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+| Producto | Response | ¿Correcto? |
+
+2.1.4 — TODOS los edge cases de validación (12 tests):
+
+echo "=== 1. BCS + asset:ETH (incorrecto) ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BTCCAT-001","coverageAmount":"10000000000","durationSeconds":604800,"asset":"ETH","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 2. BCS duration 3 días (muy corta) ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BTCCAT-001","coverageAmount":"10000000000","durationSeconds":259200,"asset":"BTC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 3. BCS duration 60 días (muy larga) ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BTCCAT-001","coverageAmount":"10000000000","durationSeconds":5184000,"asset":"BTC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 4. DEPEG + USDC (circular risk) ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"DEPEG-STABLE-001","coverageAmount":"10000000000","durationSeconds":1209600,"asset":"USDC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 5. EAS + asset:BTC (incorrecto) ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"ETHAPOC-001","coverageAmount":"10000000000","durationSeconds":604800,"asset":"BTC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 6. DEPEG + asset:ETH (incorrecto) ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"DEPEG-STABLE-001","coverageAmount":"10000000000","durationSeconds":1209600,"asset":"ETH","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 7. Coverage $50 (< min $100) ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BTCCAT-001","coverageAmount":"50000000","durationSeconds":604800,"asset":"BTC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 8. Coverage negativa ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BTCCAT-001","coverageAmount":"-1","durationSeconds":604800,"asset":"BTC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 9. Duration 0 ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BTCCAT-001","coverageAmount":"10000000000","durationSeconds":0,"asset":"BTC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+echo "=== 10. Buyer inválido ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"BTCCAT-001","coverageAmount":"10000000000","durationSeconds":604800,"asset":"BTC","buyer":"not-an-address"}'
+
+echo "=== 11. Body vacío ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{}'
+
+echo "=== 12. Producto inexistente ==="
+curl -s -X POST https://lumina-protocol-production.up.railway.app/api/v2/quote -H "Content-Type: application/json" -d '{"productId":"NOEXISTE-001","coverageAmount":"10000000000","durationSeconds":604800,"asset":"BTC","buyer":"0x000000000000000000000000000000000000dEaD"}'
+
+| # | Test | Error esperado | Error real | ¿Match? |
+
+2.1.5 — Policies, Vaults, Keys:
+curl -s "https://lumina-protocol-production.up.railway.app/api/v2/policies?buyer=0x000000000000000000000000000000000000dEaD" | python3 -m json.tool
+curl -s https://lumina-protocol-production.up.railway.app/api/v2/vaults | python3 -m json.tool
+
+2.1.6 — Relayer Status:
+curl -s https://lumina-protocol-production.up.railway.app/api/v2/relayer/status | python3 -m json.tool
+
+¿running: true?
+¿oracle.address = 0x87B576f688bE0E1d7d23A299f55b475658215105? (V2)
+¿oracleKey = 0x933b15dd...977E?
+¿errors = 0?
+¿Las 4 fases activas (auto-claim, cleanup, execute-pending, monitor-vaults)?
+
+========================================
+2.2 — FLUJO LP (Humano via Dashboard)
+========================================
+
+2.2.1 — Dashboard accessible:
+curl -s -o /dev/null -w "%{http_code}" https://lumina-org.com/dashboard
+
+2.2.2 — Wallet connection files:
+ls /tmp/final-audit-v0/hooks/use-lumina-wallet.ts
+ls /tmp/final-audit-v0/lib/wallet-bridge.ts
+
+2.2.3 — Deposit modal:
+grep -n "VolatileShort\|VolatileLong\|StableShort\|StableLong\|MutualLumina\|0x2926" /tmp/final-audit-v0/components/lumina/deposit-lp-modal.tsx | head -15
+¿Usa vaults reales? ¿Sin MutualLumina? ¿Sin 0x2926?
+
+2.2.4 — VaultActions:
+ls /tmp/final-audit-v0/components/lumina/vault-actions.tsx
+grep -n "deposit\|withdrawal\|requestWithdrawal\|completeWithdrawal" /tmp/final-audit-v0/components/lumina/vault-actions.tsx | head -15
+
+2.2.5 — ABIs:
+grep -n "BASE_VAULT_ABI\|deposit.*uint256\|requestWithdrawalV2\|completeWithdrawalV2" /tmp/final-audit-v0/lib/abis.ts | head -15
+
+2.2.6 — Web3Provider:
+grep -n "Web3Provider" /tmp/final-audit-v0/app/providers.tsx
+
+========================================
+2.3 — SIMULACIÓN DE PAGO COMPLETO
+========================================
+
+Simulá paso a paso qué pasa si BTC cae 55% (de $70K a $31.5K):
+
+2.3.1 — Precio actual BTC:
+cast call 0x87B576f688bE0E1d7d23A299f55b475658215105 "getLatestPrice(bytes32)(int256)" $(cast --format-bytes32-string "BTC") --rpc-url https://mainnet.base.org
+
+2.3.2 — Trazá el flujo de pago completo para una póliza BCS activa:
+1. Relayer lee precio del oracle V2
+2. Relayer itera pólizas activas de BCS V2
+3. Precio < triggerPrice → trigger!
+4. Relayer genera EIP-712 proof (domain: name="LuminaOracle", version="2", chainId=8453, verifyingContract=0x87B5...)
+5. Relayer llama CoverRouter.triggerPayout
+6. CoverRouter → BCS V2._doVerifyAndCalculate
+7. BCS V2 → Oracle V2.verifyPriceProofEIP712 (verifica firma + domain)
+8. Verifica: signature, freshness (30min), asset=="BTC", window
+9. Verifica: verifiedPrice < triggerPrice
+10. Calcula payout: coverage × 80%
+11. CoverRouter chequea circuit breakers
+12. Vault retira USDC de Aave
+13. Vault transfiere USDC al buyer
+14. Policy marked as resolved
+
+¿Hay algún paso que fallaría? ¿Cuál?
+
+Verificar el código del relayer para confirmar que firma EIP-712:
+grep -n "signTypedData\|EIP712\|domain.*LuminaOracle\|PRICE_PROOF" /tmp/final-audit/api/src/relayer.js | head -15
+
+2.3.3 — Simulación de cooldown LP:
+grep -n "requestWithdrawalV2\|completeWithdrawalV2\|cooldownDuration" src/core/BaseVault.sol | head -15
+
+################################################################################
+#                                                                              #
+#   MÓDULO 3 — CONECTIVIDAD Y AGENT SIMULATION (Agent 4)                      #
+#                                                                              #
+################################################################################
+
+========================================
+3.1 — API ESTABILIDAD (5 llamadas consecutivas)
+========================================
+
+for i in 1 2 3 4 5; do
+  echo "Call $i:"
+  curl -s https://lumina-protocol-production.up.railway.app/api/v2/products | python3 -c "
+import sys,json
+try:
+  d=json.load(sys.stdin)
+  prods=d.get('products',[])
+  active=[p['id'] for p in prods if p.get('status')=='ACTIVE']
+  unknown=[p['id'] for p in prods if p.get('status')=='UNKNOWN']
+  print(f'  ACTIVE={len(active)} UNKNOWN={len(unknown)}', end='')
+  if unknown: print(f' → {unknown}', end='')
+  print()
+except: print('  ERROR')
+"
+  sleep 3
+done
+
+¿5/5 estable? ¿0 UNKNOWN?
+
+========================================
+3.2 — TODOS LOS ENDPOINTS
+========================================
+
+curl -s https://lumina-protocol-production.up.railway.app/api/v2/health
+curl -s https://lumina-protocol-production.up.railway.app/api/v2/products | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'{len(d.get(\"products\",[]))} products')"
+curl -s https://lumina-protocol-production.up.railway.app/api/v2/vaults | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'{len(d.get(\"vaults\",[]))} vaults')"
+curl -s "https://lumina-protocol-production.up.railway.app/api/v2/policies?buyer=0x000000000000000000000000000000000000dEaD" | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'{d.get(\"count\",\"?\")} policies')"
+curl -s https://lumina-protocol-production.up.railway.app/api/v2/relayer/status | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'running={d.get(\"running\")} errors={d.get(\"totalErrors\",d.get(\"errors\",\"?\"))}')"
+
+| Endpoint | Funciona? | Response correcto? |
+
+========================================
+3.3 — SIMULACIÓN DE AI AGENT (Getting Started)
+========================================
+
+3.3.1 — Descargá el SKILL como lo haría un agent:
+curl -sS -L -o /tmp/agent-skill.md https://lumina-org.com/SKILL-V3.0.md
+curl -sS -L -o /tmp/agent-quickstart.md https://lumina-org.com/AI-AGENT-QUICK-START.md
+curl -sS -L -o /tmp/agent-openapi.yaml https://lumina-org.com/openapi.yaml
+
+¿Todos HTTP 200?
+
+3.3.2 — Leé el SKILL COMPLETO y respondé como un AI agent:
+- ¿Entiendo qué es Lumina?
+- ¿Sé los productos disponibles?
+- ¿Sé los productIds exactos?
+- ¿Sé la URL de la API?
+- ¿Sé el formato del body para /quote?
+- ¿Sé cómo autenticarme (API key)?
+- ¿Sé cómo comprar una póliza (option A on-chain + option B via API)?
+- ¿Sé las addresses de los contratos?
+- ¿Hay algún paso ambiguo o confuso?
+- ¿La info de cooldowns, APY, pBase es correcta?
+
+3.3.3 — Seguí el Quick Start paso a paso:
+PASO 1: Discover → ejecutá el ejemplo del Quick Start
+PASO 2: Quote → ejecutá el ejemplo
+PASO 3: Purchase → ¿la doc explica claramente el flow?
+PASO 4: Check policy → ejecutá el ejemplo
+PASO 5: Claim → ¿la doc explica quién triggerea y cómo?
+¿El Quick Start funciona end-to-end? ¿Algún paso falla?
+
+3.3.4 — Verificar que NO hay info vieja en los docs servidos:
+grep "pending.*re-registration\|DEPEG.*pending\|BSS.*active\|6\.5%\|22%.*annual\|MutualLumina\|0x2926\|TWAP 15\|UUPS" /tmp/agent-skill.md /tmp/agent-quickstart.md /tmp/agent-openapi.yaml | grep -v "deprecated\|legacy\|replaced\|NOT\|removed\|Chainlink spot\|not.*UUPS\|NOT.*upgradeable" | head -10
+
+Si hay output → dato viejo encontrado.
+
+3.3.5 — ¿Las shield addresses en el SKILL son V1 o V2?
+grep "0x36e37899\|0xA755D134\|0x7578816a\|0x2ac0d2a9\|0x9870830c" /tmp/agent-skill.md | head -5
+grep "0x6E0A46B2\|0x70f1c92E\|0x881f6832\|0x01Df7f29\|0x63D340AE" /tmp/agent-skill.md | head -5
+
+¿Tiene V1? → necesita actualización
+¿Tiene V2? → ✓
+
+========================================
+3.4 — UX PARA HUMANOS
+========================================
+
+3.4.1 — Todas las páginas:
+for url in "https://lumina-org.com" "https://lumina-org.com/connect" "https://lumina-org.com/dashboard" "https://lumina-org.com/whitepaper/es" "https://lumina-org.com/whitepaper/en" "https://lumina-org.com/tutorial.html" "https://lumina-org.com/terminos"; do
+  code=$(curl -sS -o /dev/null -w "%{http_code}" -L "$url")
+  echo "  $code  $url"
+done
+
+3.4.2 — Archivos sensibles (DEBEN ser 404):
+for url in "comprobante.pdf" "REPO-HYGIENE-AUDIT.md" "LUMINA-SKILL.txt" ".env" "ilovepdf_merged.pdf" "Pedido%20de%20indagatoria%20romeo.pdf" "api/src/index.js"; do
+  code=$(curl -sS -o /dev/null -w "%{http_code}" -L "https://lumina-org.com/$url")
+  echo "  $code  $url  $([ $code -eq 404 ] && echo '✓' || echo '⚠️ DEBERÍA SER 404')"
+done
+
+################################################################################
+#                                                                              #
+#   MÓDULO 4 — DOCUMENTACIÓN Y WHITEPAPERS (Agent 5)                          #
+#                                                                              #
+################################################################################
+
+========================================
+4.1 — SKILL-V3.0.md
+========================================
+
+4.1.1 — ¿Sincronizado entre repos?
+diff /tmp/final-audit/docs/SKILL-V3.0.md /tmp/final-audit-v0/public/SKILL-V3.0.md | head -10
+
+4.1.2 — ¿Datos correctos?
+grep -c "BTCCAT-001" /tmp/final-audit/docs/SKILL-V3.0.md
+grep -c "ETHAPOC-001" /tmp/final-audit/docs/SKILL-V3.0.md
+grep "1500\|2000\|850\|250\|400" /tmp/final-audit/docs/SKILL-V3.0.md | grep -i "pbase\|bps\|rate" | head -10
+grep "37 day\|97 day\|372 day" /tmp/final-audit/docs/SKILL-V3.0.md | head -5
+grep "3\.9.*16\.9\|4\.0.*20\.5\|2\.7.*9\.0\|2\.8.*10\.3" /tmp/final-audit/docs/SKILL-V3.0.md | head -5
+
+4.1.3 — ¿Sin claims falsos?
+grep -i "TWAP\|UUPS\|upgradeable\|TEE.*tamper\|TEE.*hardware" /tmp/final-audit/docs/SKILL-V3.0.md | head -10
+
+========================================
+4.2 — AI-AGENT-QUICK-START.md
+========================================
+
+diff /tmp/final-audit/docs/AI-AGENT-QUICK-START.md /tmp/final-audit-v0/public/AI-AGENT-QUICK-START.md | head -10
+grep "All 5 products.*ACTIVE\|5 products.*registered" /tmp/final-audit/docs/AI-AGENT-QUICK-START.md
+
+========================================
+4.3 — OpenAPI
+========================================
+
+diff /tmp/final-audit/docs/openapi.yaml /tmp/final-audit-v0/public/openapi.yaml | head -10
+grep "VAULT_EMPTY\|INVALID_ASSET\|INVALID_BUYER\|QuoteErrorResponse" /tmp/final-audit/docs/openapi.yaml | head -10
+
+========================================
+4.4 — WHITEPAPERS
+========================================
+
+4.4.1 — Inventario:
+for url in \
+  "https://lumina-org.com/LUMINA-WHITEPAPER-ES-V3.html" \
+  "https://lumina-org.com/LUMINA-WHITEPAPER-EN-V3.html" \
+  "https://lumina-org.com/LUMINA-WHITEPAPER-ES-V3.md" \
+  "https://lumina-org.com/LUMINA-WHITEPAPER-ES.pdf" \
+  "https://lumina-org.com/LUMINA-WHITEPAPER-EN.pdf" \
+  "https://lumina-org.com/whitepaper/es" \
+  "https://lumina-org.com/whitepaper/en"; do
+  code=$(curl -sS -o /dev/null -w "%{http_code}" -L "$url")
+  echo "  $code  $url"
+done
+
+4.4.2 — ¿Datos correctos en whitepapers ES?
+curl -sS -L https://lumina-org.com/LUMINA-WHITEPAPER-ES-V3.html | grep -oE "BTCCAT|ETHAPOC|5000|6000|1500|2000|0x36e3|0xA755|0x2926|0x6E0A|0x70f1|0x881f|0x87B5|650|22%|UUPS|TWAP" | sort | uniq -c | sort -rn
+
+4.4.3 — ¿Datos correctos en whitepapers EN?
+curl -sS -L https://lumina-org.com/LUMINA-WHITEPAPER-EN-V3.html | grep -oE "BTCCAT|ETHAPOC|5000|6000|1500|2000|0x36e3|0xA755|0x2926|0x6E0A|0x70f1|0x881f|0x87B5|650|22%|UUPS|TWAP" | sort | uniq -c | sort -rn
+
+Para AMBOS:
+¿Aparece 0x2926? ❌ no debería
+¿Aparece UUPS? ❌ no debería (excepto en contexto "NOT UUPS")
+¿Aparece TWAP? ❌ no debería (excepto en contexto "NOT TWAP" o "Chainlink spot")
+
+4.4.4 — ¿Las addresses son V2 o V1?
+grep -n "0x6E0A46B2\|0x70f1c92E\|0x881f6832\|0x01Df7f29\|0x63D340AE\|0x87B576f6" /tmp/final-audit/docs/LUMINA-WHITEPAPER-ES-V3.md | head -10
+grep -n "0x36e37899\|0xA755D134\|0x7578816a\|0x2ac0d2a9\|0x9870830c\|0x4d1140ac" /tmp/final-audit/docs/LUMINA-WHITEPAPER-ES-V3.md | head -10
+
+Si tiene V1 addresses → necesita actualización para V2.
+
+========================================
+4.5 — PRODUCTION-ADDRESSES.md
+========================================
+
+cat /tmp/final-audit/docs/PRODUCTION-ADDRESSES.md
+
+¿Tiene las V2 addresses?
+¿Las V1 están marcadas como deprecated?
+¿El oracle V2 (0x87B5...) está listado?
+
+========================================
+4.6 — lumina-config.ts (frontend)
+========================================
+
+grep -n "pBaseBps\|shield.*0x\|0x2926\|MutualLumina" /tmp/final-audit-v0/lib/lumina-config.ts | head -20
+
+¿pBase correctos? ¿Sin MutualLumina? ¿Sin 0x2926?
+
+========================================
+4.7 — .gitignore
+========================================
+
+grep "\.env\|\.pem\|\.key\|\.pdf\|comprobante\|REPO-HYGIENE" /tmp/final-audit-v0/.gitignore | head -10
+grep "\.env\|\.pem\|\.key" /tmp/final-audit/.gitignore | head -10
+
+################################################################################
+#                                                                              #
+#   MÓDULO 5 — CROSS-CHECK TOTAL (Agent principal reconcilia)                  #
+#                                                                              #
+################################################################################
+
+TABLA MAESTRA — para CADA dato, verificá en TODAS las fuentes:
+
+| Dato | API prod | On-chain | Frontend config | SKILL web | WP-ES | WP-EN | GitHub code | ¿SYNC? |
+|------|---------|---------|----------------|-----------|-------|-------|-------------|--------|
+| BCS activo | ? | ? | ? | ? | ? | ? | ? | ? |
+| BCS shield V2 0x6E0A | ? | ? | ? | ? | ? | ? | ? | ? |
+| BCS pBase 1500 | ? | N/A | ? | ? | ? | ? | ? | ? |
+| BCS trigger 5000 BPS | N/A | ? | N/A | ? | ? | ? | ? | ? |
+| EAS activo | ? | ? | ? | ? | ? | ? | ? | ? |
+| EAS shield V2 0x70f1 | ? | ? | ? | ? | ? | ? | ? | ? |
+| EAS pBase 2000 | ? | N/A | ? | ? | ? | ? | ? | ? |
+| DEPEG activo | ? | ? | ? | ? | ? | ? | ? | ? |
+| DEPEG shield V2 0x881f | ? | ? | ? | ? | ? | ? | ? | ? |
+| IL activo | ? | ? | ? | ? | ? | ? | ? | ? |
+| IL shield V2 0x01Df | ? | ? | ? | ? | ? | ? | ? | ? |
+| EXPLOIT activo | ? | ? | ? | ? | ? | ? | ? | ? |
+| EXPLOIT shield V2 0x63D3 | ? | ? | ? | ? | ? | ? | ? | ? |
+| BSS deprecated | ? | ? | ? | ? | ? | ? | ? | ? |
+| Oracle V2 0x87B5 | ? | ? | N/A | ? | ? | ? | ? | ? |
+| Oracle V1 deprecated | N/A | N/A | N/A | ? | ? | ? | ? | ? |
+| EIP-712 domain separation | N/A | ? | N/A | ? | ? | ? | ? | ? |
+| Circuit breakers on | N/A | ? | N/A | ? | ? | ? | ? | ? |
+| Relayer firma EIP-712 | ? | N/A | N/A | N/A | N/A | N/A | ? | ? |
+| Cooldown VS 37d | ? | ? | ? | ? | ? | ? | ? | ? |
+| Cooldown VL 97d | ? | ? | ? | ? | ? | ? | ? | ? |
+| Cooldown SS 97d | ? | ? | ? | ? | ? | ? | ? | ? |
+| Cooldown SL 372d | ? | ? | ? | ? | ? | ? | ? | ? |
+| 0x2926 eliminado | N/A | N/A | ? | ? | ? | ? | ? | ? |
+| MutualLumina eliminado | N/A | N/A | ? | N/A | N/A | N/A | ? | ? |
+| TWAP claim removed | N/A | N/A | N/A | ? | ? | ? | ? | ? |
+| UUPS claim removed | N/A | N/A | N/A | ? | ? | ? | ? | ? |
+| TEE claim honest | N/A | N/A | N/A | ? | ? | ? | ? | ? |
+
+################################################################################
+#                                                                              #
+#   MÓDULO 6 — RESUMEN FINAL (Agent principal)                                #
+#                                                                              #
+################################################################################
+
+========================================
+6.1 — SCORE POR CATEGORÍA
+========================================
+
+| # | Categoría | Score /10 | Comentario |
+|---|-----------|----------|-----------|
+| 1 | Oracle V2 (EIP-712, domain, Chainlink feeds) | ? | ? |
+| 2 | Shield V2 security (5 shields) | ? | ? |
+| 3 | CoverRouter (circuit breakers, auth, oracle V2) | ? | ? |
+| 4 | Vault security (ERC-4626, Aave, ownership) | ? | ? |
+| 5 | Governance (Timelock, Safe, EmergencyPause) | ? | ? |
+| 6 | Replay protection (cross-chain, cross-product, V1→V2) | ? | ? |
+| 7 | Hackeo vectors (20 vectors analizados) | ? | ? |
+| 8 | API funcionalidad (health, products, vaults, quotes) | ? | ? |
+| 9 | API validaciones (12 edge cases) | ? | ? |
+| 10 | API estabilidad (5/5 calls sin UNKNOWN) | ? | ? |
+| 11 | Relayer (4 fases, EIP-712, oracle V2, errors) | ? | ? |
+| 12 | Dashboard (deposit, withdraw, wallet unification) | ? | ? |
+| 13 | Agent simulation (SKILL + Quick Start end-to-end) | ? | ? |
+| 14 | UX humano (landing, connect, whitepapers, tutorial) | ? | ? |
+| 15 | Documentación accuracy (sin TWAP/UUPS/TEE falsos) | ? | ? |
+| 16 | Cross-check sync (API vs on-chain vs docs vs frontend) | ? | ? |
+| 17 | Security files (archivos sensibles 404, .gitignore) | ? | ? |
+| 18 | Tests (161+ tests, EIP-712, replay, circuit breakers) | ? | ? |
+| 19 | Payout simulation correctness (BCS crash scenario) | ? | ? |
+| 20 | Chainlink integration (5 feeds, staleness, sequencer) | ? | ? |
+| **TOTAL** | | **/200** | |
+
+========================================
+6.2 — BUGS Y DISCREPANCIAS ENCONTRADAS
+========================================
+
+| # | Severidad | Módulo | Categoría | Descripción | Bloqueante para launch? |
+
+Severidades: CRITICAL / HIGH / MEDIUM / LOW / INFO
+
+========================================
+6.3 — ¿LISTO PARA LAUNCH?
+========================================
+
+| Flujo | Funciona? | Bloqueante? | Notas |
+| AI Agent descubre productos via API | ? | ? | ? |
+| AI Agent pide quote via API | ? | ? | ? |
+| AI Agent compra póliza via API | ? | ? | ? |
+| AI Agent verifica póliza on-chain | ? | ? | ? |
+| Oracle paga correctamente en crash | ? | ? | ? |
+| Relayer auto-claim detecta trigger | ? | ? | ? |
+| Relayer cleanup libera collateral | ? | ? | ? |
+| Humano deposita via dashboard | ? | ? | ? |
+| Humano retira via dashboard (2-step) | ? | ? | ? |
+| Humano cambia wallet en MetaMask | ? | ? | ? |
+| Skills descargables para agents | ? | ? | ? |
+| Whitepapers ES + EN accesibles | ? | ? | ? |
+| OpenAPI descargable | ? | ? | ? |
+| Archivos sensibles inaccesibles | ? | ? | ? |
+
+========================================
+6.4 — ¿QUÉ FALTA PARA 10/10 EN CADA CATEGORÍA?
+========================================
+
+Lista CADA cosa que falta, por más mínima que sea.
+Clasificá como BLOQUEANTE o NO-BLOQUEANTE.
+Para cada BLOQUEANTE, estimá cuánto toma arreglarlo.
+
+========================================
+6.5 — TOP 10 HALLAZGOS (ordenados por severidad)
+========================================
+
+1. ?
+2. ?
+3. ?
+4. ?
+5. ?
+6. ?
+7. ?
+8. ?
+9. ?
+10. ?
+
+========================================
+6.6 — VEREDICTO FINAL
+========================================
+
+¿Lumina Protocol está listo para lanzar mañana?
+SÍ / NO / PARCIALMENTE
+
+Si PARCIALMENTE → ¿qué es bloqueante y qué no?
+Si hay algo bloqueante → ¿cuánto toma arreglarlo?
+
+¿Un AI agent puede conectarse, descubrir productos, pedir quote,
+comprar una póliza y cobrar automáticamente si se triggerea?
+SÍ / NO / PARCIALMENTE
+
+¿Un humano puede conectar wallet, depositar USDC, ver sus vaults,
+pedir withdrawal y completarla después del cooldown?
+SÍ / NO / PARCIALMENTE
+
+¿El oráculo va a pagar correctamente cuando haya un crash real?
+SÍ / NO / PARCIALMENTE
+
+¿Los docs, whitepapers, skills y tutorials son correctos y
+consistentes entre sí y con lo que hay on-chain?
+SÍ / NO / PARCIALMENTE
+
+========================================
+LIMPIAR
+========================================
+
+rm -rf /tmp/final-audit /tmp/final-audit-v0 /tmp/agent-skill.md /tmp/agent-quickstart.md /tmp/agent-openapi.yaml
