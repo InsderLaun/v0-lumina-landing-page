@@ -186,7 +186,7 @@ export function RegistrationForm({ initialPlan }: RegistrationFormProps) {
                 Obtener mi Link de Referido
               </a>
             </Button>
-            <Link href="/terminos-referidos" className="flex-1">
+            <Link href="/terminos" className="flex-1">
               <Button
                 variant="outline"
                 className="w-full border-[#F5C347] text-[#F5C347] hover:bg-[#F5C347]/10"

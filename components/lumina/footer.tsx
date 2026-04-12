@@ -16,9 +16,9 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
     {
         title: "Developers",
         links: [
-            { label: "API Docs", href: `${GITHUB_URL}/tree/main/docs/API-REFERENCE.md`, external: true },
+            { label: "API Docs", href: `${GITHUB_URL}/tree/main/docs/openapi.yaml`, external: true },
             { label: "GitHub", href: GITHUB_URL, external: true },
-            { label: "Integration Guides", href: `${GITHUB_URL}/tree/main/docs/INTEGRATION-GUIDES.md`, external: true },
+            { label: "Integration Guides", href: `${GITHUB_URL}/tree/main/docs/AI-AGENT-QUICK-START.md`, external: true },
             { label: "Skill Docs", href: `${GITHUB_URL}/tree/main/docs`, external: true },
         ],
     },

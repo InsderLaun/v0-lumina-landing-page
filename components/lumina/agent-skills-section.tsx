@@ -20,7 +20,7 @@ const luminaService = {
 };
 
 await acp.registerService(luminaService);`,
-        link: `${GITHUB_URL}/tree/main/docs/INTEGRATION-GUIDES.md`,
+        link: `${GITHUB_URL}/tree/main/docs/AI-AGENT-QUICK-START.md`,
         linkLabel: "Full ACP Guide →",
     },
     {
@@ -38,7 +38,7 @@ export default {
     LUMINA_WALLET_KEY: process.env.WALLET_PRIVATE_KEY,
   },
 };`,
-        link: `${GITHUB_URL}/tree/main/docs/INTEGRATION-GUIDES.md`,
+        link: `${GITHUB_URL}/tree/main/docs/AI-AGENT-QUICK-START.md`,
         linkLabel: "Full ElizaOS Guide →",
     },
     {
@@ -57,7 +57,7 @@ def lumina_get_quote(product_id: str, coverage: int, duration: int):
               "durationDays": duration}
     )
     return response.json()`,
-        link: `${GITHUB_URL}/tree/main/docs/INTEGRATION-GUIDES.md`,
+        link: `${GITHUB_URL}/tree/main/docs/AI-AGENT-QUICK-START.md`,
         linkLabel: "Full LangChain Guide →",
     },
     {
@@ -78,7 +78,7 @@ curl -X POST /api/v1/quote \\
 # 5. Confirm purchase
 curl -X POST /api/v1/purchase \\
   -d '{"quoteId":"QT-abc123","txHash":"0x..."}'`,
-        link: `${GITHUB_URL}/tree/main/docs/API-REFERENCE.md`,
+        link: `${GITHUB_URL}/tree/main/docs/openapi.yaml`,
         linkLabel: "Full API Reference →",
     },
 ]

@@ -1130,7 +1130,7 @@ export default function DashboardPage() {
           Connect your agent with the Skill file to start seeing activity here.
         </p>
         <Link
-          href="/docs/skill"
+          href="/SKILL-V3.0.md"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-white"
         >
           Give Your Agent the Skill
@@ -1364,7 +1364,7 @@ export default function DashboardPage() {
           <p className="text-white/50 text-sm mb-1">No active policies found.</p>
           <p className="text-white/30 text-xs mb-6">Your agent hasn&apos;t bought any insurance yet.</p>
           <Link
-            href="/docs/skill"
+            href="/SKILL-V3.0.md"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 transition-all text-white"
           >
             Give Your Agent the Skill

@@ -2154,7 +2154,7 @@ function AgentSkillsSection({ perspective, onStartSetup }: { perspective: Perspe
   const textAccent = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
   const checkColor = accent === "cyan" ? "text-cyan-400" : "text-purple-400"
 
-  const skillUrl = "lumina-org.com/skill-v2.md"
+  const skillUrl = "lumina-org.com/SKILL-V3.0.md"
   const githubUrl = "lumina-org.com/LUMINA-SKILL.txt"
 
   const hl = (text: string) => {

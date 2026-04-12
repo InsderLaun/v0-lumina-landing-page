@@ -202,7 +202,7 @@ export function DeveloperZone() {
                     {/* GitHub doc links */}
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
                         <a
-                            href={`${GITHUB_URL}/tree/main/docs/API-REFERENCE.md`}
+                            href={`${GITHUB_URL}/tree/main/docs/openapi.yaml`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-base text-lumina-cyan hover:underline"
@@ -210,7 +210,7 @@ export function DeveloperZone() {
                             📖 Full API Reference <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                         <a
-                            href={`${GITHUB_URL}/tree/main/docs/INTEGRATION-GUIDES.md`}
+                            href={`${GITHUB_URL}/tree/main/docs/AI-AGENT-QUICK-START.md`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-base text-lumina-cyan hover:underline"
@@ -218,7 +218,7 @@ export function DeveloperZone() {
                             🔧 Integration Guides <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                         <a
-                            href={`${GITHUB_URL}/tree/main/docs/SKILL-lumina-insurance.md`}
+                            href={`${GITHUB_URL}/tree/main/docs/SKILL-V3.0.md`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-base text-lumina-cyan hover:underline"

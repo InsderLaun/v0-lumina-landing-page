@@ -154,7 +154,7 @@ export function CalculatorSection() {
 
           <div className="mt-6 text-center">
             <a
-              href="/precios"
+              href="/#products"
               className="group inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
             >
               {"Ver Planes"}
