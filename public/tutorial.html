@@ -373,7 +373,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <div style="margin-top:16px;margin-bottom:12px;padding:14px;background:rgba(34,211,238,0.05);border:1px solid rgba(34,211,238,0.15);border-radius:8px">
 <p style="color:#22d3ee;font-size:0.85rem;font-weight:600;margin-bottom:6px">💬 Using ChatGPT or Claude?</p>
-<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Tell your agent: <em>"Buy a BTC Catastrophe Shield for $100, 7 days duration."</em> Your agent will call the Lumina API and respond with a confirmation including the policy ID.</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Tell your agent: <em>"Buy a BTC Catastrophe Shield (BTCCAT-001) for $100, 7 days duration, asset BTC."</em> Your agent will call the Lumina API and respond with a confirmation including the policy ID.</p>
 </div>
 
 <div style="margin-bottom:12px;padding:14px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:8px">
@@ -386,8 +386,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <pre style="margin-top:8px">curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
   -H "Content-Type: application/json" \
   -H "X-API-Key: lum_your_key_here" \
-  -d '{"productId":"BCS","coverageAmount":100000000,"durationSeconds":604800}'</pre>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This buys $100 BTC Catastrophe Shield for 7 days.</p>
+  -d '{"productId":"BTCCAT-001","coverageAmount":100000000,"durationSeconds":604800,"asset":"BTC"}'</pre>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This buys $100 BTC Catastrophe Shield for 7 days. Note: <code>"asset":"BTC"</code> is required for BCS/EAS. Use <code>"stablecoin":"USDT"</code> for DEPEG.</p>
 </details>
 
 <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the Dashboard to see your active policy.</p>
@@ -446,15 +446,20 @@ function finishSetup() {
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:8px">Quick reference — <a href="https://www.lumina-org.com/#products" style="color:#22d3ee">view full details on the main page</a></p>
 <div style="overflow-x:auto">
 <table class="table-insurance" style="width:100%">
-<tr><th>Product</th><th>ID</th><th>Protects Against</th><th>Duration</th><th>Deductible</th></tr>
-<tr><td>BTC Catastrophe Shield</td><td><code>BCS</code></td><td>BTC crash &#x2265;50%</td><td>7-30d</td><td>20%</td></tr>
-<tr><td>ETH Apocalypse Shield</td><td><code>EAS</code></td><td>ETH crash &#x2265;60%</td><td>7-30d</td><td>20%</td></tr>
-<tr><td>Depeg Shield</td><td><code>DEPEG</code></td><td>USDT or DAI loses peg</td><td>14-365d</td><td>USDT:15% / DAI:12%</td></tr>
-<tr><td>IL Index Cover</td><td><code>IL</code></td><td>Impermanent loss</td><td>14-90d</td><td>2%</td></tr>
-<tr><td>Exploit Shield</td><td><code>EXPLOIT</code></td><td>External protocol hacks (excl. Aave)</td><td>90-365d</td><td>10%</td></tr>
+<tr><th>Product</th><th>API productId</th><th>Required field</th><th>Protects Against</th><th>Duration</th><th>Deductible</th></tr>
+<tr><td>BTC Catastrophe Shield</td><td><code>BTCCAT-001</code></td><td><code>"asset":"BTC"</code></td><td>BTC crash &#x2265;50%</td><td>7-30d</td><td>20%</td></tr>
+<tr><td>ETH Apocalypse Shield</td><td><code>ETHAPOC-001</code></td><td><code>"asset":"ETH"</code></td><td>ETH crash &#x2265;60%</td><td>7-30d</td><td>20%</td></tr>
+<tr><td>Depeg Shield</td><td><code>DEPEG</code></td><td><code>"stablecoin":"USDT"</code></td><td>USDT or DAI loses peg</td><td>14-365d</td><td>USDT:15% / DAI:12%</td></tr>
+<tr><td>IL Index Cover</td><td><code>IL</code></td><td><code>"asset":"ETH"</code></td><td>Impermanent loss</td><td>14-90d</td><td>2%</td></tr>
+<tr><td>Exploit Shield</td><td><code>EXPLOIT</code></td><td><code>"asset":"ETH"</code></td><td>External protocol hacks (excl. Aave)</td><td>90-365d</td><td>10%</td></tr>
 </table>
 </div>
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Your agent decides when to buy based on market conditions. Policies are purchased and claimed automatically via the API. You only set the spending limit.</p>
+
+<div class="warning" style="margin-top:16px">
+<p class="warning-title">&#x26A0;&#xFE0F; Important for API calls</p>
+<p style="font-size:0.85rem">The wallet that approved USDC on-chain must be the EXACT same wallet registered with your API key. If they differ, purchases will fail with "Wallet mismatch". Always include the <code>"asset"</code> field in quote/purchase requests (see table above).</p>
+</div>
 </div>
 </div>
 
@@ -485,9 +490,31 @@ function finishSetup() {
 .table-vaults tr:hover td{background:rgba(139,92,246,0.03)}
 </style>
 
+<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;margin-top:24px">
+<h2 style="margin-top:0;border:none;padding:0;color:rgba(255,255,255,0.6)">&#x1F4CB; Contract Addresses (Base Mainnet)</h2>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:16px">All contracts verified on <a href="https://basescan.org" target="_blank">Basescan</a>. Chain ID: 8453.</p>
+<table style="font-size:0.8rem">
+<tr><th>Contract</th><th>Address</th></tr>
+<tr><td>CoverRouter</td><td><code><a href="https://basescan.org/address/0xd5f8678A0F2149B6342F9014CCe6d743234Ca025" target="_blank" style="color:#22d3ee">0xd5f8678A...Ca025</a></code></td></tr>
+<tr><td>PolicyManager</td><td><code><a href="https://basescan.org/address/0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" target="_blank" style="color:#22d3ee">0xCCA07e...0162a</a></code></td></tr>
+<tr><td>LuminaOracleV2</td><td><code><a href="https://basescan.org/address/0x87B576f688bE0E1d7d23A299f55b475658215105" target="_blank" style="color:#22d3ee">0x87B576...15105</a></code></td></tr>
+<tr><td>USDC</td><td><code><a href="https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" target="_blank" style="color:#22d3ee">0x833589...02913</a></code></td></tr>
+<tr><td colspan="2" style="color:rgba(255,255,255,0.3);padding-top:8px;font-style:italic">Shields V2</td></tr>
+<tr><td>BCS (BTCCatastropheShieldV2)</td><td><code style="font-size:0.75rem">0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21</code></td></tr>
+<tr><td>EAS (ETHApocalypseShieldV2)</td><td><code style="font-size:0.75rem">0x70f1c92EFcFe55e8d460aAa6d626779536b15128</code></td></tr>
+<tr><td>Depeg (DepegShieldV2)</td><td><code style="font-size:0.75rem">0x881f683291122c3A72bdD504F71ddCAf47d9AE0e</code></td></tr>
+<tr><td>IL (ILIndexCoverV2)</td><td><code style="font-size:0.75rem">0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a</code></td></tr>
+<tr><td>Exploit (ExploitShieldV2)</td><td><code style="font-size:0.75rem">0x63D340AE7229BB464bC801f225651341ebcD3693</code></td></tr>
+<tr><td colspan="2" style="color:rgba(255,255,255,0.3);padding-top:8px;font-style:italic">Governance</td></tr>
+<tr><td>TimelockController</td><td><code style="font-size:0.75rem">0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a</code></td></tr>
+<tr><td>Gnosis Safe (2/3)</td><td><code style="font-size:0.75rem">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</code></td></tr>
+</table>
+<p style="color:rgba(255,255,255,0.3);font-size:0.75rem;margin-top:12px;margin-bottom:0">Full documentation: <a href="/LUMINA-SKILL.txt" style="color:#22d3ee">SKILL File</a> &middot; <a href="https://github.com/org-lumina/LUMINA-PROTOCOL" target="_blank" style="color:#22d3ee">GitHub</a> &middot; 240 tests passing &middot; Solidity 0.8.20</p>
+</div>
+
 <h2>Need Help?</h2>
 <p>Email <a href="mailto:support@lumina-org.com">support@lumina-org.com</a> or visit the <a href="/dashboard">Dashboard</a>.</p>
-<p style="margin-top:40px;color:rgba(255,255,255,0.3);font-size:0.8rem">Lumina Protocol — Insurance for the Machine Economy</p>
+<p style="margin-top:40px;color:rgba(255,255,255,0.3);font-size:0.8rem">Lumina Protocol — Insurance for the Machine Economy &middot; Last updated: April 12, 2026</p>
 </div>
 
 <script>
