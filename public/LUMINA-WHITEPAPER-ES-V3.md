@@ -37,11 +37,11 @@ Lumina Protocol es la primera infraestructura de seguro parametrico descentraliz
 
 A diferencia del seguro tradicional, que requiere que un humano presente un reclamo, un comite lo revise y semanas de espera para recibir el pago, Lumina utiliza triggers matematicos verificados por oracles. Si la condicion se cumple (por ejemplo, ETH cae un 30%), el pago es instantaneo y automatico. Sin reclamos. Sin disputas. Sin esperar a humanos.
 
-El protocolo ofrece **5 productos de seguro** (BTC Catastrophe Shield, ETH Apocalypse Shield, Depeg Shield, IL Index Cover, Exploit Shield), **4 vaults de liquidez** (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de **13 contratos inteligentes** desplegados en produccion. Los contratos Core (CoverRouter, PolicyManager), vaults y shields usan proxies UUPS actualizables bajo TimelockController; los contratos Oracle (LuminaOracleV2, LuminaPhalaVerifier) son **NO actualizables** (Ownable) y su reemplazo requiere re-despliegue.
+El protocolo ofrece **4 productos de seguro** (Black Swan Shield, Depeg Shield, IL Index Cover, Exploit Shield), **4 vaults de liquidez** (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de **13 contratos inteligentes** desplegados en produccion. Los contratos Core (CoverRouter, PolicyManager), vaults y shields usan proxies UUPS actualizables bajo TimelockController; los contratos Oracle (LuminaOracleV2, LuminaPhalaVerifier) son **NO actualizables** (Ownable) y su reemplazo requiere re-despliegue.
 
 Cada flujo de interaccion comienza de la misma forma: **el humano, a traves de su agente de IA**, instruye la operacion deseada. El agente ejecuta la transaccion on-chain de forma autonoma, interactuando con la API de Lumina y los contratos del protocolo sin intervencion manual.
 
-El modelo de negocio es simple y transparente: una comision del 3% sobre la prima pagada por el asegurado y un 3% sobre el pago de siniestro. No se cobra comision alguna a los proveedores de liquidez al retirar fondos de los vaults.
+El modelo de negocio es simple y transparente: una comision del 3% sobre la prima pagada por el asegurado, un 3% sobre el pago de siniestro, y un 3% de performance fee sobre el rendimiento positivo (ganancia) cuando los proveedores de liquidez retiran fondos de los vaults.
 
 ---
 
@@ -124,8 +124,8 @@ U_MAX = 95% → se rechaza la poliza (no se puede comprar cobertura)
 | 40%              | 1.25x               | +25% sobre la prima base      |
 | 60%              | 1.38x               | +38% sobre la prima base      |
 | 80%              | 1.50x               | +50% (punto kink)             |
-| 85%              | 2.25x               | +125% (zona agresiva)          |
-| 90%              | 2.25x               | +125% (zona agresiva)         |
+| 85%              | 2.25x               | +125% (zona agresiva)         |
+| 90%              | 3.00x               | +200% (zona agresiva)         |
 | 95%              | 3.75x               | RECHAZADO (U_MAX alcanzado)   |
 
 Este modelo garantiza que cuando la capacidad del vault esta holgada, las primas son competitivas. A medida que la utilizacion se acerca al 80%, las primas suben gradualmente. Por encima del 80%, el crecimiento es exponencial, protegiendo a los LPs de sobreexposicion.
@@ -153,9 +153,9 @@ El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vault
 3. **Vault** recibe el USDC y lo deposita en **Aave V3** (`0xA238Dd80C259a72e81d7e4664a9801593F98d1c5`)
 4. El LP recibe **shares soulbound** (no transferibles) proporcionales a su deposito
 5. Las shares acumulan yield de dos fuentes: tasa base de Aave V3 (3-5% APY) + primas de seguro
-6. Para retirar, el LP inicia un periodo de **cooldown** (37 a 372 dias segun el vault)
+6. Para retirar, el LP inicia un periodo de **cooldown** (30 a 365 dias segun el vault)
 7. Tras el cooldown, el LP puede ejecutar `withdraw()` y recibir sus USDC + yield acumulado
-8. **No se cobra ninguna comision al retirar fondos del vault**
+8. **Se cobra un 3% de performance fee sobre el rendimiento positivo (ganancia) al retirar**
 
 ### 3.4 Tabla de Arquitectura de Contratos
 
@@ -169,8 +169,7 @@ El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vault
 | VolatileLong Vault      | Vault          | UUPS   | Aave V3, USDC                        | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
 | StableShort Vault       | Vault          | UUPS   | Aave V3, USDC                        | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
 | StableLong Vault        | Vault          | UUPS   | Aave V3, USDC                        | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
-| BTC Catastrophe Shield  | Producto       | non-up | Oracle, PolicyManager, VolatileShort | `0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21`       |
-| ETH Apocalypse Shield   | Producto       | non-up | Oracle, PolicyManager, VolatileShort | `0x70f1c92EFcFe55e8d460aAa6d626779536b15128`       |
+| BlackSwanShield (deprecated) | Producto  | UUPS   | Oracle, PolicyManager, VolatileShort | `0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e`       |
 | DepegShield             | Producto       | UUPS   | Oracle, PolicyManager, StableShort   | `0x881f683291122c3A72bdD504F71ddCAf47d9AE0e`       |
 | ILIndexCover            | Producto       | UUPS   | Oracle, PolicyManager, VolatileShort | `0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a`       |
 | ExploitShield           | Producto       | UUPS   | Oracle, Phala worker ECDSA, PolicyManager | `0x63D340AE7229BB464bC801f225651341ebcD3693`       |
@@ -178,7 +177,7 @@ El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vault
 
 ### 3.5 Colateralizacion Estricta 1:1
 
-Cada poliza emitida en Lumina esta respaldada por colateral bloqueado 1:1 en el vault correspondiente. Esto significa que si un agente compra $50,000 de cobertura BCS, el vault bloquea exactamente $50,000 en USDC (depositados en Aave V3 como aUSDC) para garantizar el pago en caso de siniestro.
+Cada poliza emitida en Lumina esta respaldada por colateral bloqueado 1:1 en el vault correspondiente. Esto significa que si un agente compra $50,000 de cobertura BCS o EAS, el vault bloquea exactamente $50,000 en USDC (depositados en Aave V3 como aUSDC) para garantizar el pago en caso de siniestro.
 
 Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos de seguro DeFi que operan con modelos de pool compartido. Si la utilizacion del vault alcanza el 95% (U_MAX), no se aceptan nuevas polizas hasta que se libere capacidad.
 
@@ -186,13 +185,9 @@ Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos
 
 ## 4. PRODUCTOS DE SEGURO
 
-### 4.1 BTC Catastrophe Shield (BCS)
+### 4.1 BTC Catastrophe Shield (BCS) y ETH Apocalypse Shield (EAS)
 
-**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en BTC contra caidas catastroficas del mercado. BTC Catastrophe Shield cubre escenarios extremos: crasheos superiores al 50% como el vivido durante COVID (marzo 2020). Eventos como LUNA (mayo 2022, BTC -42%) o FTX (noviembre 2022, BTC -26%) NO activan este producto porque las caidas de BTC fueron menores al 50%.
-
-### 4.1b ETH Apocalypse Shield (EAS)
-
-**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en ETH contra caidas apocalipticas del mercado. ETH Apocalypse Shield cubre los escenarios mas extremos: crasheos superiores al 60%. Solo un evento de esta magnitud ha ocurrido en los ultimos 8 anos (COVID, marzo 2020), cuando ETH cayo de $230 a $80 en 2 dias. Eventos como China (mayo 2021, ETH -56%) o LUNA (junio 2022, ETH -51%) NO activan este producto.
+**Descripcion:** El humano, a traves de su agente de IA, puede proteger sus posiciones en BTC y ETH contra caidas catastroficas del mercado. BCS cubre crasheos superiores al 50% en BTC como el vivido durante COVID (marzo 2020); eventos como LUNA (mayo 2022, BTC -42%) o FTX (noviembre 2022, BTC -26%) NO activan BCS porque las caidas de BTC fueron menores al 50%. EAS cubre crasheos superiores al 60% en ETH; solo un evento de esta magnitud ha ocurrido en los ultimos 8 anos (COVID, marzo 2020), cuando ETH cayo de $230 a $80 en 2 dias, y eventos como China (mayo 2021, ETH -56%) o LUNA (junio 2022, ETH -51%) NO activan EAS. Reemplazan al producto legacy Black Swan Shield (BSS, deprecated 2026-04-06).
 
 **Parametros del contrato:**
 
@@ -201,17 +196,22 @@ Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos
 | Producto ID              | `BTCCAT-001`                                              | `ETHAPOC-001`                                            |
 | Contrato                 | `0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21`              | `0x70f1c92EFcFe55e8d460aAa6d626779536b15128`             |
 | Trigger                  | Caida > 50% desde el precio al momento de compra          | Caida > 60% desde el precio al momento de compra         |
-| TRIGGER_DROP_BPS         | `5000` (50% en puntos base)                               | `6000` (60% en puntos base)                              |
+| TRIGGER_DROP_BPS         | `5000` (50%)                                              | `6000` (60%)                                             |
 | Verificacion             | Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2) | Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2) |
 | Deducible                | 20%                                                       | 20%                                                      |
 | Payout                   | Binario: 80% del coverage                                 | Binario: 80% del coverage                                |
 | Duracion                 | 7 a 30 dias                                               | 7 a 30 dias                                              |
-| Waiting period           | 1 hora (anti-front-running)                               | 1 hora (anti-front-running)                              |
+| Waiting period           | 1 hora                                                    | 1 hora                                                   |
 | Assets cubiertos         | BTC unicamente                                            | ETH unicamente                                           |
 | MAX_PROOF_AGE            | 30 minutos                                                | 30 minutos                                               |
 | Tasa base                | 15% anualizado (1500 bps)                                 | 20% anualizado (2000 bps)                                |
 | Max allocation por vault | 30%                                                       | 25%                                                      |
+| Correlation cap          | VOLATILE_CRASH 40% combinado con EAS                      | VOLATILE_CRASH 40% combinado con BCS                     |
 | Vault                    | VolatileShort + VolatileLong                              | VolatileShort + VolatileLong                             |
+
+**Producto legacy (deprecated):** Black Swan Shield (BSS, `BLACKSWAN-001`,
+`0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e`) — `setProductActive(false)`,
+totalPolicies = 0, no acepta nuevas polizas.
 
 **Circuit Breaker:**
 
@@ -334,10 +334,11 @@ El payout maximo absoluto es **$5,850** por cada **$50,000** de cobertura (11.7%
 | Producto ID              | `EXPLOIT-SHIELD-001`                                      |
 | Contrato                 | `0x63D340AE7229BB464bC801f225651341ebcD3693`              |
 | Trigger dual             | (1) Token de gobernanza -25% en 24h AND (2) Receipt token -30% por 4h O contrato pausado |
-| Verificacion             | Oracle (Precio spot de Chainlink via prueba firmada EIP-712) + Verificacion ECDSA del worker de Phala (lista curada por admin — NO atestacion de hardware) |
+| Verificacion             | Oracle (precio spot de Chainlink via prueba firmada EIP-712) + Verificacion ECDSA del worker de Phala (lista curada por admin — NO atestación de hardware) |
 | Deducible                | 10%                                                       |
 | Payout                   | Binario: 90% del coverage                                 |
 | Cap por wallet           | $50,000                                                   |
+| Lifetime cap por wallet  | $150,000                                                  |
 | Duracion                 | 90 a 365 dias                                             |
 | Waiting period           | 14 dias                                                   |
 | Vault                    | StableLong (`0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`)  |
@@ -350,7 +351,7 @@ El dual trigger requiere que **ambas condiciones** se cumplan simultaneamente:
 
 2. **Trigger secundario (worker Phala):** Al menos una de estas condiciones: (a) el receipt token del protocolo ha caido un 30% o mas durante al menos 4 horas consecutivas, o (b) el contrato principal del protocolo ha sido pausado.
 
-La verificacion del trigger secundario la realiza el contrato **LuminaPhalaVerifier** en `0x468b9D2E9043c80467B610bC290b698ae23adb9B` mediante verificacion ECDSA de una firma producida por un worker Phala autorizado. La lista de workers autorizados es curada manualmente por el admin (Gnosis Safe). **Esto NO es atestacion de hardware SGX/TDX on-chain** — es una lista curada por admin de EOAs (Externally Owned Accounts) que se asume firman desde entornos Phala legitimos. La verificacion on-chain es estrictamente `ecrecover(hash, sig) ∈ authorizedWorkers`.
+La verificacion del trigger secundario la realiza el contrato **LuminaPhalaVerifier** en `0x468b9D2E9043c80467B610bC290b698ae23adb9B` mediante verificacion ECDSA de una firma producida por un worker Phala autorizado. La lista de workers autorizados es curada manualmente por el admin (Gnosis Safe). **Esto NO es atestación de hardware SGX/TDX on-chain** — es una lista curada por admin de EOAs (Externally Owned Accounts) que se asume firman desde entornos Phala legitimos. La verificacion on-chain es estrictamente `ecrecover(hash, sig) ∈ authorizedWorkers`.
 
 **Protocolos Cubiertos:**
 
@@ -375,10 +376,10 @@ Lumina opera con cuatro vaults especializados, cada uno con un periodo de cooldo
 
 | Vault                | Cooldown | Productos Asignados             | APY Estimado | Direccion                                          |
 |----------------------|----------|---------------------------------|--------------|-----------------------------------------------------|
-| **VolatileShort**    | 37 dias  | BCS + EAS + IL Index Cover      | 4 - 17%       | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
-| **VolatileLong**     | 97 dias  | IL largo + BCS/EAS overflow     | 4 - 21%       | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
-| **StableShort**      | 97 dias  | Depeg corto                     | 2.7 - 9.0%   | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
-| **StableLong**       | 372 dias | Depeg largo + Exploit Shield    | 2.8 - 10.3%  | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
+| **VolatileShort**    | 30 dias  | BSS + IL Index Cover            | 12 - 16%     | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
+| **VolatileLong**     | 90 dias  | IL largo + BSS overflow         | 15 - 19%     | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
+| **StableShort**      | 90 dias  | Depeg corto                     | 11 - 15%     | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
+| **StableLong**       | 365 dias | Depeg largo + Exploit Shield    | 18 - 27%     | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
 
 Los vaults con cooldowns mas largos ofrecen mayor APY estimado porque asumen mayor riesgo (polizas de mayor duracion, eventos menos frecuentes pero de mayor impacto).
 
@@ -420,16 +421,31 @@ Se han disenado tres productos adicionales para futuras versiones del protocolo:
 
 ### 6.1 LuminaOracleV2 (NO actualizable)
 
-El contrato LuminaOracleV2 (`0x87B576f688bE0E1d7d23A299f55b475658215105`) es el componente central de verificacion de datos del protocolo. Es **NO actualizable** (Ownable, sin proxy UUPS). Para reemplazarlo: desplegar un nuevo oracle, llamar `CoverRouter.setOracle(newOracle)` Y re-desplegar cada Shield (el campo `oracle` en cada Shield es `immutable`).
+El contrato LuminaOracleV2 es el componente central de verificacion de datos del protocolo. Es **NO actualizable** (Ownable, sin proxy UUPS). Para reemplazarlo: desplegar un nuevo oracle, llamar `CoverRouter.setOracle(newOracle)` Y re-desplegar cada Shield (el campo `oracle` en cada Shield es `immutable`).
 
 Opera con un esquema multisig N-of-M que puede expandirse segun las necesidades de descentralizacion. Actualmente opera en modo 1-of-1 (expandible a N-of-M). El oracle verifica los feeds de Chainlink, implementa un chequeo de sequencer de 1 hora para Base L2, y valida la frescura de los datos antes de aceptarlos como input para triggers.
+
+**Diseño EIP-712:** Todas las pruebas de claim son typed data EIP-712 firmadas por el backend oracle. El dominio EIP-712 fija cada prueba a (`chainId = 8453`, `verifyingContract = LuminaOracleV2`), lo que previene:
+- **Replay cross-chain:** una prueba firmada contra Base Sepolia (chainId 84532) no puede reutilizarse en Base mainnet (chainId 8453).
+- **Replay cross-contract:** una prueba firmada para un oracle no puede reutilizarse contra un despliegue distinto.
+- Las pruebas son typed data estandar EIP-712 — auditables y compatibles con hardware wallets (`signTypedData`).
+
+El relayer firma con `signTypedData` (no keccak raw) el siguiente struct:
+
+```
+PriceProof(int256 price, bytes32 asset, uint256 verifiedAt)
+```
+
+NO hay computo de TWAP on-chain. NO hay atestación de hardware SGX/TDX on-chain. NO hay actualizabilidad UUPS del oracle.
+
+**Circuit breakers:** `maxPayoutsPerDay`, `largePayoutThreshold`, `largePayoutDelay`. Los valores por defecto se configuran en el momento del despliegue (ver PRODUCTION-ADDRESSES.md para los valores activos).
 
 ### 6.2 Tabla de Feeds de Chainlink
 
 | Feed           | Direccion                                          | Staleness    | Productos que lo usan          |
 |----------------|-----------------------------------------------------|--------------|--------------------------------|
-| ETH/USD        | `0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70`       | 1,200s (20m) | EAS, IL Index Cover            |
-| BTC/USD        | `0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E`       | 1,200s (20m) | BCS                            |
+| ETH/USD        | `0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70`       | 1,200s (20m) | BSS, IL Index Cover            |
+| BTC/USD        | `0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E`       | 1,200s (20m) | BSS                            |
 | USDC/USD       | `0x7e860098F58bBFC8648a4311b374B1D669a2bc6B`       | 86,400s (24h)| Referencia interna             |
 | USDT/USD       | `0xf19d560eB8d2ADf07BD6D13ed03e1D11215721F9`       | 86,400s (24h)| Depeg Shield                   |
 | DAI/USD        | `0x591e79239a7d679378eC8c847e5038150364C78F`       | 86,400s (24h)| Depeg Shield                   |
@@ -470,7 +486,7 @@ Lumina Protocol genera ingresos a traves de un modelo de comision dual, simple y
 |-------------------------------|----------|------------------------------------------------------|
 | Compra de poliza (premium)    | 3%       | El 3% de la prima va al protocolo, el 97% al vault  |
 | Pago de siniestro (payout)    | 3%       | El 3% del payout va al protocolo, el 97% al agente  |
-| Retiro de vault (withdrawal)  | **0%**   | No se cobra fee a los LPs al retirar                |
+| Retiro de vault (withdrawal)  | **3% performance** | Sobre el rendimiento positivo (ganancia sobre el deposito original) |
 
 ### 7.2 Fee Receiver
 
@@ -482,9 +498,13 @@ Protocol Fee Receiver: 0x2b4D825417f568231e809E31B9332ED146760337
 
 Esta direccion es controlada por el TimelockController con un delay de 48 horas, lo que asegura transparencia y capacidad de auditoria.
 
-### 7.3 Sin Fee en Retiros de Vault
+### 7.3 Performance Fee en Retiros de Vault
 
-No se cobra fee a los LPs al retirar fondos de los vaults. El codigo de BaseVault.sol no contiene logica de fee en withdrawal. Esta decision de diseno incentiva la participacion de LPs al garantizar que el 100% de su capital + yield acumulado les sera devuelto al completar el periodo de cooldown.
+Se cobra un 3% de performance fee unicamente sobre el rendimiento positivo (ganancia) al retirar fondos de los vaults. El fee se calcula sobre la diferencia entre el monto retirado y el cost basis (deposito original). Si no hay ganancia, no se cobra fee alguno.
+
+**Ejemplo:** Un LP deposita $10,000 USDC. Tras acumular yield, retira $10,500 USDC. La ganancia es $500 ($10,500 - $10,000). El performance fee es 3% x $500 = $15. El LP recibe neto $10,485.
+
+Esta estructura alinea los incentivos del protocolo con los de los LPs: Lumina solo cobra cuando el LP efectivamente gana dinero.
 
 ### 7.4 Escalabilidad del Modelo
 
@@ -516,7 +536,7 @@ Los 13 contratos del protocolo han sido desarrollados con las mejores practicas 
 La gobernanza del protocolo implementa un modelo de seguridad en capas:
 
 - **TimelockController** (`0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a`): Delay de 48 horas para todas las operaciones administrativas. Cualquier cambio en parametros criticos requiere un periodo de espera que permite a los LPs reaccionar.
-- **Gnosis Safe 1-of-1 (planned 2-of-3)** (`0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD`): Actualmente 1-of-1 signatario. Upgrade planificado para requerir al menos 2 de 3 signatarios autorizados.
+- **Gnosis Safe 2-of-3** (`0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD`): Las transacciones administrativas requieren la firma de al menos 2 de 3 signatarios autorizados.
 
 ### 8.3 API y Backend
 
@@ -529,11 +549,14 @@ La API que conecta a los agentes de IA con los contratos implementa:
 
 ### 8.4 Oracle
 
-La seguridad del oracle se basa en tres capas:
+La seguridad del oracle se basa en las siguientes capas:
 
-- **Multisig:** Verificacion N-of-M de firmas para datos de oracle
-- **Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2):** El relayer lee `latestRoundData` del feed de Chainlink y firma el resultado con `signTypedData`. NO hay computo de TWAP on-chain
-- **Sequencer check:** Verificacion de que el sequencer de Base L2 ha estado activo durante al menos 1 hora antes de aceptar datos de oracle
+- **EIP-712 domain separation:** Cada prueba de claim es typed data EIP-712 fijada a (chainId 8453, direccion del contrato LuminaOracleV2), previniendo replay cross-chain y cross-contract.
+- **Multisig:** Verificacion N-of-M de firmas para datos de oracle (expandible desde 1-of-1 actual).
+- **Precio spot de Chainlink verificado via prueba firmada EIP-712:** El relayer lee `latestRoundData` del feed de Chainlink y firma el resultado con `signTypedData`. NO hay computo de TWAP on-chain.
+- **Sequencer check:** Verificacion de que el sequencer de Base L2 ha estado activo durante al menos 1 hora antes de aceptar datos de oracle.
+- **NO actualizable:** Reemplazar el oracle requiere desplegar uno nuevo, llamar `CoverRouter.setOracle()` y re-desplegar cada Shield (`Shield.oracle` es `immutable`).
+- **Circuit breakers:** `maxPayoutsPerDay`, `largePayoutThreshold`, `largePayoutDelay`, configurables mediante batch de Gnosis Safe.
 
 ### 8.5 Session Approval
 
@@ -547,7 +570,7 @@ Lumina integra el estandar OWS (Open Wallet Standard) para facilitar la interacc
 
 ## 9. DATOS ACTUARIALES
 
-### 9.1 BTC Catastrophe Shield / ETH Apocalypse Shield -- Expected Value para LPs
+### 9.1 Black Swan Shield -- Expected Value para LPs
 
 | Metrica                      | Valor                  |
 |------------------------------|------------------------|
@@ -556,7 +579,7 @@ Lumina integra el estandar OWS (Open Wallet Standard) para facilitar la interacc
 | Ganancia neta anual          | +$20,000               |
 | Margen                       | 38%                    |
 
-El margen del 38% refleja la naturaleza de cola gruesa del riesgo BCS/EAS: los eventos catastroficos son poco frecuentes pero severos. En anos sin eventos, el margen es significativamente mayor. En anos con multiples eventos, el margen puede ser negativo.
+El margen del 38% refleja la naturaleza de cola gruesa del riesgo BSS: los eventos de cisne negro son poco frecuentes pero severos. En anos sin eventos, el margen es significativamente mayor. En anos con multiples eventos, el margen puede ser negativo.
 
 ### 9.2 Depeg Shield -- Expected Value para LPs
 
@@ -587,7 +610,7 @@ El modelo de payout proporcional de IL Index Cover y el deducible del 2% crean u
 | Ganancia neta anual          | +$2,000                |
 | Margen                       | 65%                    |
 
-Exploit Shield tiene el menor volumen absoluto pero el mayor margen porcentual. El dual trigger, el waiting period de 14 dias y el cap de $50,000 por wallet limitan significativamente la exposicion.
+Exploit Shield tiene el menor volumen absoluto pero el mayor margen porcentual. El dual trigger, el waiting period de 14 dias y el cap de $50,000 por wallet y el lifetime cap de $150,000 por wallet limitan significativamente la exposicion.
 
 ### 9.5 Peor Escenario Sistemico
 
@@ -614,7 +637,7 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 | Exploit de Aave V3             | Muy Baja     | Critico  | Riesgo aceptado; Aave V3 es el protocolo DeFi mas auditado; no se cubre (circular)  |
 | Depeg de USDC                  | Muy Baja     | Critico  | Riesgo de denominacion aceptado; no se cubre USDC (circular)                        |
 | Caida simultanea multiple      | Muy Baja     | Alto     | Vaults segregados por tipo de riesgo, waterfall de prioridad, grupos de correlacion  |
-| Ataque de gobernanza           | Muy Baja     | Critico  | TimelockController 48h + Gnosis Safe 1-of-1 (planned 2-of-3), delay permite reaccion de la comunidad |
+| Ataque de gobernanza           | Muy Baja     | Critico  | TimelockController 48h + Gnosis Safe 2-of-3, delay permite reaccion de la comunidad |
 
 ---
 
@@ -622,7 +645,7 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 
 ### Fase 1 -- Lanzamiento (Actual, Q1 2026)
 
-- 5 productos de seguro operativos: BCS, EAS, Depeg, IL Index, Exploit
+- 4 productos de seguro operativos: BSS, Depeg, IL Index, Exploit
 - 4 vaults de liquidez con yield Aave V3
 - Despliegue en Base L2 (Chain 8453)
 - 13 contratos en produccion (core/vaults/shields con UUPS; oracle y PhalaVerifier NO actualizables)
@@ -655,7 +678,7 @@ Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria g
 
 ### 12.1 Estructura del Protocolo
 
-Lumina Protocol opera como un protocolo descentralizado desplegado en Base L2 (Chain 8453). Los contratos inteligentes son inmutables en su logica core, con capacidad de upgrade a traves de proxies UUPS (para contratos core, vaults y shields) controlados por un TimelockController con delay de 48 horas y una Gnosis Safe 1-of-1 (planned 2-of-3). Los contratos Oracle (LuminaOracleV2, LuminaPhalaVerifier) son NO actualizables (Ownable).
+Lumina Protocol opera como un protocolo descentralizado desplegado en Base L2 (Chain 8453). Los contratos inteligentes son inmutables en su logica core, con capacidad de upgrade a traves de proxies UUPS controlados por un TimelockController con delay de 48 horas y una Gnosis Safe 2-of-3.
 
 El protocolo no custodia fondos de usuarios. Los depositos de LPs se mantienen en Aave V3, y los pagos de siniestros se ejecutan directamente desde los vaults a las wallets de los agentes. El protocolo solo cobra fees como intermediario.
 
@@ -690,7 +713,7 @@ Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, 
 | Contrato               | Direccion                                          |
 |------------------------|-----------------------------------------------------|
 | TimelockController     | `0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a`       |
-| Gnosis Safe 1-of-1 (planned 2-of-3)   | `0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD`       |
+| Gnosis Safe (2-of-3)   | `0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD`       |
 
 ### Core
 
@@ -705,17 +728,18 @@ Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, 
 
 | Vault                  | Cooldown  | Direccion                                          |
 |------------------------|-----------|-----------------------------------------------------|
-| VolatileShort          | 37 dias   | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
-| VolatileLong           | 97 dias   | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
-| StableShort            | 97 dias   | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
-| StableLong             | 372 dias  | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
+| VolatileShort          | 30 dias   | `0xbd44547581b92805aAECc40EB2809352b9b2880d`       |
+| VolatileLong           | 90 dias   | `0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904`       |
+| StableShort            | 90 dias   | `0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC`       |
+| StableLong             | 365 dias  | `0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c`       |
 
 ### Shields (Productos)
 
 | Shield                 | Direccion                                          |
 |------------------------|-----------------------------------------------------|
-| BTC Catastrophe Shield (BCS) | `0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21` |
-| ETH Apocalypse Shield (EAS) | `0x70f1c92EFcFe55e8d460aAa6d626779536b15128` |
+| BlackSwanShield (BSS, deprecated) | `0x54CDc21DEDA49841513a6a4A903dc0A0a9e7844e` |
+| BTCCatastropheShield (BCS) | `0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21`       |
+| ETHApocalypseShield (EAS) | `0x70f1c92EFcFe55e8d460aAa6d626779536b15128`        |
 | DepegShield            | `0x881f683291122c3A72bdD504F71ddCAf47d9AE0e`       |
 | ILIndexCover           | `0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a`       |
 | ExploitShield          | `0x63D340AE7229BB464bC801f225651341ebcD3693`       |
@@ -755,14 +779,14 @@ Los productos de Lumina estan disenados para cubrir riesgos con baja correlacion
 
 | Grupo de Correlacion     | Productos Afectados              | Trigger                                       | Probabilidad Conjunta |
 |--------------------------|----------------------------------|------------------------------------------------|------------------------|
-| **Crash de ETH/BTC**     | BCS, EAS, IL Index Cover         | Caida >50% BTC / >60% ETH                     | Media                  |
+| **Crash de ETH/BTC**     | BSS, IL Index Cover              | Caida >30% en activos volatiles                | Media                  |
 | **Crisis de stablecoin** | Depeg Shield                     | Depeg de DAI o USDT por debajo de $0.95        | Baja                   |
 | **Exploit de protocolo** | Exploit Shield                   | Hack o vulnerabilidad en protocolo cubierto    | Baja                   |
-| **Evento sistemico**     | BCS + EAS + Depeg + IL + Exploit | Colapso del ecosistema DeFi completo           | Muy Baja               |
+| **Evento sistemico**     | BSS + Depeg + IL + Exploit       | Colapso del ecosistema DeFi completo           | Muy Baja               |
 
 **Analisis de correlacion:**
 
-- **BCS, EAS e IL Index Cover** tienen correlacion alta: un crash de mercado activa BCS/EAS y simultaneamente genera IL significativo. Por esta razon, comparten el vault VolatileShort.
+- **BSS e IL Index Cover** tienen correlacion alta: un crash de mercado activa BSS y simultaneamente genera IL significativo. Por esta razon, ambos comparten el vault VolatileShort.
 
 - **Depeg Shield** tiene correlacion baja con los productos de volatilidad. Un depeg de stablecoin puede ocurrir independientemente de la direccion del mercado (ej: crisis bancaria, riesgo regulatorio de Tether).
 
@@ -823,9 +847,9 @@ Lumina Protocol representa la primera infraestructura de seguro parametrico dise
 - **Parametrico puro:** Sin reclamos subjetivos, sin votaciones, sin esperas. El trigger se activa y el pago es inmediato.
 - **Disenado para agentes:** API programatica, session approval para relayers, integracion OWS, documentacion SKILL.
 - **Colateral 1:1:** Cada poliza esta respaldada al 100% por USDC real bloqueado en el vault. Sin riesgo de subcapitalizacion.
-- **Yield real:** Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 3-21%.
-- **Seguridad en capas:** Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), pruebas EIP-712, sequencer check.
-- **Modelo de negocio transparente:** 3% premium + 3% payout. Sin fees ocultos. Sin fee en retiros de vault.
+- **Yield real:** Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 11-27%.
+- **Seguridad en capas:** Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 2-of-3, pruebas oracle firmadas EIP-712, sequencer check.
+- **Modelo de negocio transparente:** 3% premium + 3% payout. Sin fees ocultos. Performance fee del 3% sobre rendimiento positivo en retiros de vault.
 
 **Vision:**
 
