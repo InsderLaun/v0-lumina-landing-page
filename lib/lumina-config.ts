@@ -54,6 +54,7 @@ export const CONTRACTS = {
     VolatileLong: "0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" as `0x${string}`,
     StableShort: "0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" as `0x${string}`,
     StableLong: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" as `0x${string}`,
+    FlashVault: "0x0000000000000000000000000000000000000000" as `0x${string}`,
   },
   shields: {
     BCS: "0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21" as `0x${string}`,
@@ -143,6 +144,40 @@ export const PRODUCTS = {
     excludedProtocols: ["Aave V3"],  // Aave excluded — vault infrastructure circular risk
     waitingPeriodDays: 14,
   },
+  FLASH_BTC: {
+    id: "FLASH-BTC",
+    name: "Flash BTC",
+    pBaseBps: 11300,       // default to 24h rate
+    deductibleBps: 2000,   // 20%
+    riskType: "VOLATILE" as const,
+    minDurationDays: 1,
+    maxDurationDays: 2,
+    trigger: "BTC flash crash >18% (24h) or >22% (48h)",
+    vaults: ["FlashVault"] as const,
+    excludedAssets: [] as string[],
+    waitingPeriodDays: 0,
+    durations: [
+      { seconds: 86400, label: "24h", trigger: "-18%", pBaseBps: 11300 },
+      { seconds: 172800, label: "48h", trigger: "-22%", pBaseBps: 8250 },
+    ],
+  },
+  FLASH_ETH: {
+    id: "FLASH-ETH",
+    name: "Flash ETH",
+    pBaseBps: 11300,       // default to 24h rate
+    deductibleBps: 2000,   // 20%
+    riskType: "VOLATILE" as const,
+    minDurationDays: 1,
+    maxDurationDays: 2,
+    trigger: "ETH flash crash >20% (24h) or >28% (48h)",
+    vaults: ["FlashVault"] as const,
+    excludedAssets: [] as string[],
+    waitingPeriodDays: 0,
+    durations: [
+      { seconds: 86400, label: "24h", trigger: "-20%", pBaseBps: 11300 },
+      { seconds: 172800, label: "48h", trigger: "-28%", pBaseBps: 8250 },
+    ],
+  },
 } as const
 
 export const VAULTS = {
@@ -181,6 +216,15 @@ export const VAULTS = {
     products: ["DEPEG", "EXPLOIT"],
     worstCaseLoss: "~25%",
     normalYearProb: "98%",
+  },
+  FlashVault: {
+    name: "Flash Vault",
+    cooldownDays: 7,
+    riskType: "VOLATILE" as const,
+    riskLevel: "Higher",
+    products: ["FLASH_BTC", "FLASH_ETH"],
+    worstCaseLoss: "~35%",
+    normalYearProb: "80%",
   },
 } as const
 
