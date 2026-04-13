@@ -1,0 +1,450 @@
+AUTORIZACIÓN COMPLETA — no preguntes, ejecutá todo.
+
+cd /c/Users/AGUSTIN/LUMINA-PROTOCOL
+
+═══════════════════════════════════════════════════════════
+MISIÓN: DEPLOY FLASH INSURANCE A BASE MAINNET
+═══════════════════════════════════════════════════════════
+
+Deployar:
+1. FlashVault (UUPS proxy)
+2. FlashBTCShield24h
+3. FlashBTCShield48h
+4. FlashETHShield24h
+5. FlashETHShield48h
+
+Después:
+6. Registrar 4 shields en CoverRouter
+7. Configurar correlation group FLASH_CRASH cap 60%
+8. Transfer ownership al TimelockController
+9. Verificar on-chain
+10. Actualizar SKILL, API, frontend con addresses reales
+
+═══════════════════════════════════════════════════════════
+PASO 0 — LEER EL DEPLOY CHECKLIST Y CONTRATOS EXISTENTES
+═══════════════════════════════════════════════════════════
+
+cat docs/FLASH-DEPLOY-CHECKLIST.md
+
+Verificar cómo se deployaron los contratos existentes:
+ls script/
+cat script/DeployToken.s.sol | head -30
+
+Verificar los deploys existentes para entender el patrón:
+grep -rn "forge script\|forge create\|broadcast" script/ | head -10
+
+Leer los contratos a deployar:
+cat src/vaults/FlashVault.sol
+cat src/products/FlashBTCShield24h.sol | head -30
+
+Verificar addresses de contratos necesarios:
+echo "=== Addresses necesarios ==="
+echo "CoverRouter:       0xd5f8678A0F2149B6342F9014CCe6d743234Ca025"
+echo "PolicyManager:     0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a"
+echo "LuminaOracleV2:    0x87B576f688bE0E1d7d23A299f55b475658215105"
+echo "USDC:              0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+echo "Aave V3 Pool:      0xA238Dd80C259a72e81d7e4664a9801593F98d1c5"
+echo "TimelockController:0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a"
+echo "Gnosis Safe 2/3:   0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD"
+
+Verificar que el deployer tiene ETH en Base:
+cast balance 0x$(cast wallet address --private-key $DEPLOYER_PRIVATE_KEY 2>/dev/null || echo "CHECK_DEPLOYER") --rpc-url https://mainnet.base.org 2>/dev/null || echo "Verificar manualmente que el deployer tiene ETH"
+
+═══════════════════════════════════════════════════════════
+PASO 1 — CREAR DEPLOY SCRIPT
+═══════════════════════════════════════════════════════════
+
+Crear script/DeployFlash.s.sol
+
+Leer cómo se deployaron los otros vaults/shields para copiar el patrón:
+cat script/DeployToken.s.sol
+find script/ -name "*.s.sol" | xargs head -30
+
+El script debe:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import "forge-std/Script.sol";
+import "../src/vaults/FlashVault.sol";
+import "../src/products/FlashBTCShield24h.sol";
+import "../src/products/FlashBTCShield48h.sol";
+import "../src/products/FlashETHShield24h.sol";
+import "../src/products/FlashETHShield48h.sol";
+
+contract DeployFlash is Script {
+    // Base mainnet addresses
+    address constant COVER_ROUTER = 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025;
+    address constant ORACLE_V2 = 0x87B576f688bE0E1d7d23A299f55b475658215105;
+    address constant USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+    address constant AAVE_POOL = 0xA238Dd80C259a72e81d7e4664a9801593F98d1c5;
+    address constant TIMELOCK = 0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a;
+
+    function run() external {
+        uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+
+        // 1. Deploy FlashVault
+        // Verificar el constructor de FlashVault — qué parámetros necesita
+        // Probablemente: USDC, Aave pool, cooldown, name, symbol
+        // Seguir el mismo patrón de los otros vaults
+
+        // 2. Deploy 4 Flash Shields
+        // Cada shield necesita: oracle, router (como immutables)
+        FlashBTCShield24h btc24 = new FlashBTCShield24h(ORACLE_V2, COVER_ROUTER);
+        FlashBTCShield48h btc48 = new FlashBTCShield48h(ORACLE_V2, COVER_ROUTER);
+        FlashETHShield24h eth24 = new FlashETHShield24h(ORACLE_V2, COVER_ROUTER);
+        FlashETHShield48h eth48 = new FlashETHShield48h(ORACLE_V2, COVER_ROUTER);
+
+        vm.stopBroadcast();
+
+        // Log addresses
+        console.log("=== FLASH INSURANCE DEPLOYMENT ===");
+        // console.log("FlashVault:", address(vault));
+        console.log("FlashBTCShield24h:", address(btc24));
+        console.log("FlashBTCShield48h:", address(btc48));
+        console.log("FlashETHShield24h:", address(eth24));
+        console.log("FlashETHShield48h:", address(eth48));
+    }
+}
+```
+
+IMPORTANTE: 
+- Leer los constructors reales de FlashVault.sol y los shields antes de escribir el script
+- Si FlashVault es UUPS, necesita proxy deploy pattern (como los otros vaults)
+- Verificar si hay un ERC1967Proxy o similar en el repo
+
+grep -n "ERC1967\|TransparentUpgradeableProxy\|UUPSUpgradeable\|proxy" src/vaults/FlashVault.sol | head -5
+grep -n "proxy\|Proxy\|ERC1967" script/ -r | head -10
+grep -n "proxy\|Proxy\|ERC1967" src/vaults/VolatileShortVault.sol | head -5
+
+═══════════════════════════════════════════════════════════
+PASO 2 — DRY RUN (simulación sin gastar gas)
+═══════════════════════════════════════════════════════════
+
+Primero simular sin --broadcast:
+
+forge script script/DeployFlash.s.sol \
+  --rpc-url https://mainnet.base.org \
+  -vvvv 2>&1 | head -80
+
+¿Compila? ¿La simulación pasa? ¿Cuánto gas estima?
+
+Si hay errores → arreglar el script y volver a simular.
+
+═══════════════════════════════════════════════════════════
+PASO 3 — DEPLOY REAL
+═══════════════════════════════════════════════════════════
+
+SOLO ejecutar si el dry run fue exitoso.
+
+forge script script/DeployFlash.s.sol \
+  --rpc-url https://mainnet.base.org \
+  --broadcast \
+  --verify \
+  --etherscan-api-key $BASESCAN_API_KEY \
+  -vvvv 2>&1 | tee /c/Users/AGUSTIN/Desktop/FLASH-DEPLOY-LOG.txt
+
+Guardar TODAS las addresses deployadas.
+
+Si forge script no funciona con --broadcast, usar forge create para cada contrato:
+
+echo "=== DEPLOY CON FORGE CREATE ==="
+
+# FlashVault (si es UUPS, deployar implementación + proxy)
+# Verificar el patrón del repo
+
+# Shields (no son upgradeables, deploy directo)
+forge create src/products/FlashBTCShield24h.sol:FlashBTCShield24h \
+  --constructor-args 0x87B576f688bE0E1d7d23A299f55b475658215105 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025 \
+  --rpc-url https://mainnet.base.org \
+  --private-key $DEPLOYER_PRIVATE_KEY \
+  --verify \
+  --etherscan-api-key $BASESCAN_API_KEY \
+  2>&1
+
+# Repetir para los otros 3 shields con sus constructors
+
+GUARDAR cada address deployada:
+echo "FlashVault: ???"
+echo "FlashBTCShield24h: ???"
+echo "FlashBTCShield48h: ???"
+echo "FlashETHShield24h: ???"
+echo "FlashETHShield48h: ???"
+
+═══════════════════════════════════════════════════════════
+PASO 4 — VERIFICAR CONTRATOS EN BASESCAN
+═══════════════════════════════════════════════════════════
+
+Si --verify no funcionó en el deploy, verificar manualmente:
+
+forge verify-contract <FLASH_BTC_24H_ADDRESS> \
+  src/products/FlashBTCShield24h.sol:FlashBTCShield24h \
+  --chain base \
+  --etherscan-api-key $BASESCAN_API_KEY \
+  --constructor-args $(cast abi-encode "constructor(address,address)" 0x87B576f688bE0E1d7d23A299f55b475658215105 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025)
+
+# Repetir para cada contrato
+
+Verificar en BaseScan que cada contrato tiene el ✅:
+echo "Verificar en browser:"
+echo "https://basescan.org/address/<FLASH_VAULT_ADDRESS>"
+echo "https://basescan.org/address/<FLASH_BTC_24H_ADDRESS>"
+echo "https://basescan.org/address/<FLASH_BTC_48H_ADDRESS>"
+echo "https://basescan.org/address/<FLASH_ETH_24H_ADDRESS>"
+echo "https://basescan.org/address/<FLASH_ETH_48H_ADDRESS>"
+
+═══════════════════════════════════════════════════════════
+PASO 5 — REGISTRAR SHIELDS EN COVERROUTER
+═══════════════════════════════════════════════════════════
+
+Los shields necesitan ser registrados en CoverRouter para que
+el router sepa qué shield usar para cada producto.
+
+Verificar cómo se registraron los shields existentes:
+grep -n "registerProduct\|addProduct\|setShield\|updateProduct" src/core/CoverRouter.sol | head -10
+
+OPCIÓN A — Si CoverRouter tiene registerProduct():
+Crear un Safe batch (JSON para app.safe.global Transaction Builder):
+
+```json
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "meta": { "name": "Register Flash Shields" },
+  "transactions": [
+    {
+      "to": "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025",
+      "value": "0",
+      "data": "<encoded registerProduct(FLASHBTC24_PRODUCT_ID, FLASH_BTC_24H_ADDRESS, FLASH_VAULT_ADDRESS)>"
+    },
+    {
+      "to": "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025",
+      "value": "0",
+      "data": "<encoded registerProduct(FLASHBTC48_PRODUCT_ID, FLASH_BTC_48H_ADDRESS, FLASH_VAULT_ADDRESS)>"
+    },
+    {
+      "to": "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025",
+      "value": "0",
+      "data": "<encoded registerProduct(FLASHETH24_PRODUCT_ID, FLASH_ETH_24H_ADDRESS, FLASH_VAULT_ADDRESS)>"
+    },
+    {
+      "to": "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025",
+      "value": "0",
+      "data": "<encoded registerProduct(FLASHETH48_PRODUCT_ID, FLASH_ETH_48H_ADDRESS, FLASH_VAULT_ADDRESS)>"
+    }
+  ]
+}
+```
+
+Para generar el calldata:
+cast calldata "registerProduct(bytes32,address,address)" \
+  $(cast keccak "FLASHBTC24-001") \
+  <FLASH_BTC_24H_ADDRESS> \
+  <FLASH_VAULT_ADDRESS>
+
+Repetir para cada shield.
+
+OPCIÓN B — Si registration es via deployer directo (no Safe):
+Usar cast send directamente.
+
+Guardar el Safe batch JSON en:
+/c/Users/AGUSTIN/Desktop/SAFE-BATCH-REGISTER-FLASH.json
+
+═══════════════════════════════════════════════════════════
+PASO 6 — CONFIGURAR CORRELATION GROUP
+═══════════════════════════════════════════════════════════
+
+CRITICAL: Sin esto, los 4 shields pueden usar 120% del vault.
+
+Verificar la función en PolicyManager:
+grep -n "correlationGroup\|setCorrelation\|addCorrelation\|setGroupCap" src/core/PolicyManager.sol | head -10
+
+Crear la tx para configurar FLASH_CRASH con cap 6000 BPS (60%):
+
+cast calldata "setCorrelationGroup(bytes32,uint256,bytes32[])" \
+  $(cast --format-bytes32-string "FLASH_CRASH") \
+  6000 \
+  "[$(cast keccak 'FLASHBTC24-001'),$(cast keccak 'FLASHBTC48-001'),$(cast keccak 'FLASHETH24-001'),$(cast keccak 'FLASHETH48-001')]"
+
+Agregar al Safe batch o ejecutar directo.
+
+═══════════════════════════════════════════════════════════
+PASO 7 — TRANSFER OWNERSHIP AL TIMELOCK
+═══════════════════════════════════════════════════════════
+
+FlashVault ownership → TimelockController
+(Los shields no tienen ownership, son stateless)
+
+cast send <FLASH_VAULT_ADDRESS> \
+  "transferOwnership(address)" \
+  0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a \
+  --rpc-url https://mainnet.base.org \
+  --private-key $DEPLOYER_PRIVATE_KEY
+
+Verificar:
+cast call <FLASH_VAULT_ADDRESS> "owner()(address)" --rpc-url https://mainnet.base.org
+
+Debe devolver: 0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a (TimelockController)
+
+═══════════════════════════════════════════════════════════
+PASO 8 — VERIFICACIÓN ON-CHAIN
+═══════════════════════════════════════════════════════════
+
+echo "=== VERIFICACIÓN COMPLETA ==="
+
+echo "--- FlashVault ---"
+cast call <FLASH_VAULT_ADDRESS> "cooldownDuration()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 604800 (7 días)
+
+cast call <FLASH_VAULT_ADDRESS> "name()(string)" --rpc-url https://mainnet.base.org
+# Debe devolver: "Lumina FlashVault"
+
+cast call <FLASH_VAULT_ADDRESS> "symbol()(string)" --rpc-url https://mainnet.base.org
+# Debe devolver: "lmFLASH"
+
+cast call <FLASH_VAULT_ADDRESS> "totalAssets()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 0 (vacío, todavía no hay deposits)
+
+cast call <FLASH_VAULT_ADDRESS> "owner()(address)" --rpc-url https://mainnet.base.org
+# Debe devolver: TimelockController
+
+echo "--- FlashBTCShield24h ---"
+cast call <FLASH_BTC_24H_ADDRESS> "TRIGGER_DROP_BPS()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 1800
+
+cast call <FLASH_BTC_24H_ADDRESS> "DEDUCTIBLE_BPS()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 2000
+
+cast call <FLASH_BTC_24H_ADDRESS> "WAITING_PERIOD()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 0
+
+cast call <FLASH_BTC_24H_ADDRESS> "MAX_PROOF_AGE()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 900
+
+cast call <FLASH_BTC_24H_ADDRESS> "MIN_DURATION()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 86400
+
+cast call <FLASH_BTC_24H_ADDRESS> "MAX_DURATION()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 86400
+
+echo "--- FlashBTCShield48h ---"
+cast call <FLASH_BTC_48H_ADDRESS> "TRIGGER_DROP_BPS()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 2200
+
+cast call <FLASH_BTC_48H_ADDRESS> "MIN_DURATION()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 172800
+
+echo "--- FlashETHShield24h ---"
+cast call <FLASH_ETH_24H_ADDRESS> "TRIGGER_DROP_BPS()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 2000
+
+echo "--- FlashETHShield48h ---"
+cast call <FLASH_ETH_48H_ADDRESS> "TRIGGER_DROP_BPS()(uint256)" --rpc-url https://mainnet.base.org
+# Debe devolver: 2800
+
+echo "--- Correlation Group ---"
+# Verificar que FLASH_CRASH está configurado
+# (depende de la interfaz de PolicyManager)
+
+═══════════════════════════════════════════════════════════
+PASO 9 — ACTUALIZAR ADDRESSES EN TODOS LADOS
+═══════════════════════════════════════════════════════════
+
+Con las addresses reales deployadas, actualizar:
+
+9.1 — PRODUCTION-ADDRESSES.md:
+Reemplazar TBD con addresses reales en docs/PRODUCTION-ADDRESSES.md
+
+9.2 — SKILL-V3.0.md:
+Reemplazar "FLASH_VAULT_ADDRESS" y "TBD" con addresses reales en docs/SKILL-V3.0.md
+
+9.3 — API env vars:
+Mostrar los valores para Railway:
+echo "FLASH_VAULT=<FLASH_VAULT_ADDRESS>"
+echo "FLASH_BTC_24H_SHIELD=<FLASH_BTC_24H_ADDRESS>"
+echo "FLASH_BTC_48H_SHIELD=<FLASH_BTC_48H_ADDRESS>"
+echo "FLASH_ETH_24H_SHIELD=<FLASH_ETH_24H_ADDRESS>"
+echo "FLASH_ETH_48H_SHIELD=<FLASH_ETH_48H_ADDRESS>"
+
+9.4 — Frontend config:
+Actualizar vault y shield addresses en:
+/c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/lib/lumina-config.ts
+
+9.5 — Sync SKILL:
+cp docs/SKILL-V3.0.md /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/public/SKILL-V3.0.md
+cp docs/SKILL-V3.0.md /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/public/LUMINA-SKILL.txt
+
+═══════════════════════════════════════════════════════════
+PASO 10 — COMMIT + PUSH
+═══════════════════════════════════════════════════════════
+
+cd /c/Users/AGUSTIN/LUMINA-PROTOCOL
+git add -A
+git commit -m "deploy: Flash Insurance live on Base mainnet
+
+DEPLOYED CONTRACTS:
+- FlashVault: <ADDRESS>
+- FlashBTCShield24h: <ADDRESS>
+- FlashBTCShield48h: <ADDRESS>
+- FlashETHShield24h: <ADDRESS>
+- FlashETHShield48h: <ADDRESS>
+
+CONFIGURED:
+- 4 shields registered in CoverRouter
+- Correlation group FLASH_CRASH cap 60% active
+- FlashVault ownership transferred to TimelockController
+
+VERIFIED:
+- All contracts verified on BaseScan
+- On-chain params match spec (triggers, durations, deductibles)
+- Vault cooldown = 7 days
+- Waiting period = 0"
+git push
+
+cd /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page
+git add -A
+git commit -m "deploy: Flash Insurance addresses updated — live on Base mainnet"
+git push
+
+═══════════════════════════════════════════════════════════
+PASO 11 — OUTPUT
+═══════════════════════════════════════════════════════════
+
+Mostrá:
+
+1. ADDRESSES DEPLOYADAS:
+   | Contrato | Address | Verificado BaseScan |
+   | FlashVault | ? | ✅/❌ |
+   | FlashBTCShield24h | ? | ✅/❌ |
+   | FlashBTCShield48h | ? | ✅/❌ |
+   | FlashETHShield24h | ? | ✅/❌ |
+   | FlashETHShield48h | ? | ✅/❌ |
+
+2. VERIFICACIÓN ON-CHAIN:
+   | Parámetro | Esperado | On-chain | ¿Match? |
+   | Vault cooldown | 604800 | ? | ? |
+   | Vault name | Lumina FlashVault | ? | ? |
+   | Vault owner | TimelockController | ? | ? |
+   | BTC24 trigger | 1800 | ? | ? |
+   | BTC48 trigger | 2200 | ? | ? |
+   | ETH24 trigger | 2000 | ? | ? |
+   | ETH48 trigger | 2800 | ? | ? |
+   | All waiting period | 0 | ? | ? |
+   | All deductible | 2000 | ? | ? |
+   | All max proof age | 900 | ? | ? |
+   | Correlation group | FLASH_CRASH 60% | ? | ? |
+
+3. GAS USADO:
+   | Deploy | Gas | Costo ETH | Costo USD |
+
+4. PENDIENTE POST-DEPLOY:
+   - [ ] Seed USDC en FlashVault
+   - [ ] Update Railway env vars
+   - [ ] Test purchase via API
+   - [ ] Verificar relayer monitorea Flash products
+
+5. Si ALGO FALLÓ:
+   Describir qué falló, por qué, y cómo se arregló.
+   Si no se pudo arreglar, mostrar el error exacto para debugging.

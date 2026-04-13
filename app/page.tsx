@@ -206,9 +206,9 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base font-medium mt-[60px]"
           >
-            <span className="text-cyan-400"><span className="font-bold">4</span> Products</span>
+            <span className="text-cyan-400"><span className="font-bold">7</span> Products</span>
             <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
-            <span className="text-purple-400"><span className="font-bold">4</span> Vaults</span>
+            <span className="text-purple-400"><span className="font-bold">5</span> Vaults</span>
             <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
             <span className="text-cyan-400"><span className="font-bold">24</span> Audited Contracts</span>
             <span className="hidden sm:inline w-1 h-1 rounded-full bg-white/30" />
@@ -383,7 +383,7 @@ export default function Home() {
           <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#10B981] rounded-xl p-5 hover:border-[#10B98140] transition-all">
             <p className="text-white font-bold text-lg">Q2 2026</p>
             <p className="text-[#10B981] text-xs font-semibold uppercase tracking-widest mb-3">Launch</p>
-            <p className="text-[#9CA3AF] text-sm leading-relaxed">Protocol live on Base L2. Real USDC settlement. Four insurance products. Aave V3 yield. Multisig oracle. API-first for AI agents.</p>
+            <p className="text-[#9CA3AF] text-sm leading-relaxed">Protocol live on Base L2. Real USDC settlement. Seven insurance products. Aave V3 yield. Multisig oracle. API-first for AI agents.</p>
           </div>
           <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#00D4AA] rounded-xl p-5 hover:border-[#00D4AA40] transition-all">
             <p className="text-white font-bold text-lg">Q3 2026</p>
@@ -957,7 +957,7 @@ function ProductsSection() {
           Insurance Products
         </h2>
         <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
-          Four parametric products. Each with its own trigger, payout, and oracle verification.
+          Seven parametric products. Each with its own trigger, payout, and oracle verification.
         </p>
 
         {/* Tabs */}
@@ -1579,7 +1579,7 @@ function VaultsSection() {
           Yield Vaults
         </h2>
         <p className="text-white/50 text-center mb-12 max-w-xl mx-auto">
-          Four vaults. Each backs different products with different risk and cooldown.
+          Five vaults. Each backs different products with different risk and cooldown.
         </p>
 
         {/* Vault cards */}
@@ -2404,7 +2404,7 @@ function getIntegrationModals(perspective: Perspective): Record<IntegrationKey, 
       steps: isEarn
         ? [
             "Your agent reads the Skill file (a document that teaches it everything about Lumina)",
-            "Your agent calls our API: GET /api/v2/vaults → sees all 4 vaults with APY and utilization",
+            "Your agent calls our API: GET /api/v2/vaults → sees all 5 vaults with APY and utilization",
             "Your agent approves USDC and calls the vault contract to deposit",
             "Done. Your USDC earns yield indefinitely. Your agent monitors and manages withdrawals.",
           ]

@@ -1,0 +1,277 @@
+═══════════════════════════════════════════════════════════
+PROMPT 2 — ANÁLISIS ACTUARIAL, MATEMÁTICO Y COMERCIAL
+Flash Insurance de Lumina Protocol
+═══════════════════════════════════════════════════════════
+
+Sos un actuario senior y analista DeFi. Necesito que evalúes los
+productos Flash Insurance de Lumina Protocol desde 3 ángulos:
+actuarial (¿los números cierran?), matemático (¿las fórmulas son
+correctas?) y comercial (¿el producto es vendible?).
+
+Sé brutalmente honesto. Si algo no cierra, decímelo.
+
+═══════════════════════════════════════════════════════════
+CONTEXTO DEL PROTOCOLO
+═══════════════════════════════════════════════════════════
+
+Lumina Protocol = seguros paramétricos para agentes de IA en Base L2.
+Liquidación en USDC. Oracle: Chainlink spot + EIP-712.
+Ya tiene 5 productos en producción (BCS, EAS, Depeg, IL, Exploit).
+Ahora agrega 2 productos nuevos: Flash BTC y Flash ETH.
+
+═══════════════════════════════════════════════════════════
+FLASH INSURANCE — DATOS COMPLETOS
+═══════════════════════════════════════════════════════════
+
+PRODUCTOS (2 user-facing × 2 duraciones = 4 shields on-chain):
+
+| Producto | Asset | Duración | Strike | pBase BPS | Prima $10K U=0% |
+|----------|-------|----------|--------|-----------|-----------------|
+| Flash BTC 24h | BTC | 24 horas | -18% | 11300 | $30.96 |
+| Flash BTC 48h | BTC | 48 horas | -22% | 8250 | $45.21 |
+| Flash ETH 24h | ETH | 24 horas | -20% | 11300 | $30.96 |
+| Flash ETH 48h | ETH | 48 horas | -28% | 8250 | $45.21 |
+
+Deductible: 20% → payout 80% del coverage
+Waiting period: 0 (cobertura inmediata)
+Max proof age: 15 minutos
+Fee: 3% premium (del buyer) + 3% payout (del vault, agente recibe 100%)
+Performance fee LP: 3% solo sobre ganancia al retirar
+
+FlashVault: cooldown 7 días, correlation group FLASH_CRASH cap 60%
+
+DATOS HISTÓRICOS (fuente: DefiLlama, 1,095 días, abr 2023 - abr 2026):
+
+Volatilidad:
+- BTC σ diario: ±2.45%, peor día: -14.12%
+- ETH σ diario: ±3.42%, peor día: -15.03%
+
+Hits por strike (¿cuántos días el asset cayó más que el strike?):
+- BTC -18% en 24h: 0 de 1,095 días
+- BTC -22% en 48h: 0 de 1,095 días
+- ETH -20% en 24h: 0 de 1,095 días
+- ETH -28% en 48h: 0 de 1,095 días
+
+Buffer de seguridad:
+- BTC 24h: strike -18% vs peor día -14.12% = 3.9 puntos porcentuales
+- ETH 24h: strike -20% vs peor día -15.03% = 5.0 puntos porcentuales
+
+Probabilidad Poisson (Upper Confidence Bound 95%, k=0, n=1095):
+λ_upper = -ln(0.05) / 1095 = 0.274% por período
+
+PRICING MODEL (Kink, usado por todos los productos de Lumina):
+
+Premium = Coverage × (pBase / 10000) × M(U) × (Duration / 365)
+
+M(U) utilization multiplier:
+  U ≤ 80%: M(U) = 1 + (U / 0.80) × 0.5
+  U > 80%: M(U) = 1.5 + ((U - 0.80) / 0.20) × 3.0
+  U > 95%: RECHAZADO
+
+═══════════════════════════════════════════════════════════
+ANÁLISIS 1 — ACTUARIAL
+═══════════════════════════════════════════════════════════
+
+Preguntas a responder:
+
+1. ¿Los strikes (-18%, -22%, -20%, -28%) son apropiados?
+   - ¿El buffer de 3.9pp (BTC) y 5.0pp (ETH) es suficiente?
+   - ¿Qué pasaría si el peor día futuro es 1.5x el peor histórico?
+     BTC: -14.12% × 1.5 = -21.18% → ¿supera el strike de -18%?
+     ETH: -15.03% × 1.5 = -22.55% → ¿supera el strike de -20%?
+   - ¿Hay riesgo de que eventos tipo COVID-crash (BTC -40% en 2 días, marzo 2020) rompan los strikes?
+   - ¿Deberían ser más conservadores (ej: -25% BTC, -30% ETH)?
+
+2. ¿La probabilidad Poisson (0.274%) es una buena estimación?
+   - Con solo 1,095 días de datos, ¿es confiable?
+   - ¿Las colas de crypto siguen una distribución normal o fat-tailed?
+   - Si es fat-tailed, ¿la Poisson subestima el riesgo?
+
+3. ¿El Expected Loss ($10 per $10K) es realista?
+   - EL = 0.10% × $10,000 = $10.00
+   - ¿Este cap al 0.10% es conservador, justo o agresivo?
+
+4. ¿El Safety Loading de 3× es estándar para este tipo de riesgo?
+   - Prima técnica = $10 × 3 = $30
+   - ¿En seguros tradcionales se usa 2×? ¿3×? ¿5×?
+   - ¿Para riesgo de cola (tail risk) debería ser más alto?
+
+5. ¿El modelo de vault (colateral 1:1) es solvente?
+   - Max allocation 30% per shield × 4 shields = 120% sin correlation group
+   - Con correlation group 60% → max exposure = 60% del vault
+   - ¿Es suficiente? ¿Qué pasa si 2 shields triggerean simultáneamente?
+   - Escenario: BTC -25% Y ETH -30% simultáneo
+     Flash BTC 24h triggerea + Flash ETH 24h triggerea
+     Si ambos están al 30% allocation: 60% del vault se paga
+     Vault sobrevive con 40% restante → ¿es aceptable?
+
+6. ¿El período de 3 años (1,095 días) es suficiente para calibrar?
+   - ¿Deberían usar datos desde 2017? ¿Desde 2013?
+   - ¿El mercado 2023-2026 fue "normal" o inusualmente calmo?
+
+7. ¿El riesgo de correlación está bien manejado?
+   - BTC y ETH caen juntos en crashes sistémicos
+   - ¿El cap de 60% en el correlation group es suficiente?
+   - ¿Debería ser 50%? ¿40%?
+
+═══════════════════════════════════════════════════════════
+ANÁLISIS 2 — MATEMÁTICO
+═══════════════════════════════════════════════════════════
+
+Verificar CADA cálculo:
+
+1. Derivación del pBase:
+
+   Flash 24h:
+   LP net = $30/día por $10K cobertura (del análisis actuarial)
+   Buyer paga = $30 / 0.97 = $30.93 (3% protocol fee)
+   $30.93 = $10,000 × (pBase/10000) × 1.0 × (1/365)
+   pBase = $30.93 × 365 = 11,289.45 → redondeado 11,300
+   ¿El redondeo introduce error significativo?
+   Error: (11,300 - 11,289.45) / 11,289.45 = 0.093%
+   ¿Aceptable?
+
+   Flash 48h:
+   LP net = $43.84/2 días → buyer = $43.84/0.97 = $45.20
+   $45.20 = $10,000 × (pBase/10000) × 1.0 × (2/365)
+   pBase = $45.20 × 365 / 2 = 8,249 → redondeado 8,250
+   ¿OK?
+
+2. Premium completo con Kink:
+
+   Calcular independientemente para cada nivel U:
+   
+   Flash 24h, $10K:
+   | U% | M(U) | Premium exact | SKILL dice | Delta |
+   | 0 | 1.000 | ? | $30.96 | ? |
+   | 10 | 1.063 | ? | $32.89 | ? |
+   | 20 | 1.125 | ? | $34.83 | ? |
+   | 30 | 1.188 | ? | $36.76 | ? |
+   | 40 | 1.250 | ? | $38.70 | ? |
+   | 50 | 1.313 | ? | $40.63 | ? |
+   | 60 | 1.375 | ? | $42.57 | ? |
+   | 70 | 1.438 | ? | $44.50 | ? |
+   | 80 | 1.500 | ? | $46.44 | ? |
+   | 85 | 2.250 | ? | $69.66 | ? |
+   | 90 | 3.000 | ? | $92.88 | ? |
+
+   Flash 48h, $10K:
+   Mismo ejercicio con pBase 8250 y duration 2/365.
+
+3. LP APY:
+
+   Fórmula: APY = ((U × TVL × pBase/10000 × M(U) × 0.97) + ((1-U) × TVL × 0.04)) / TVL
+
+   Vault $100K:
+   | U% | Primas annual | Aave annual | Total | APY |
+   | 20 | ? | ? | ? | 27.8%? |
+   | 50 | ? | ? | ? | 73.9%? |
+   | 80 | ? | ? | ? | 132.4%? |
+
+   ¿Los APY del SKILL son correctos?
+
+4. Payout math:
+
+   Coverage $10K, deductible 20%:
+   Payout = $10,000 × (10000 - 2000) / 10000 = $8,000
+   Fee = $8,000 × 3% = $240 (del vault)
+   Agente recibe: $8,000
+   Vault paga total: $8,240
+
+   ¿Correcto?
+
+5. Trigger math:
+
+   BTC 24h, strike $80,000:
+   triggerPrice = $80,000 × (10000 - 1800) / 10000 = $65,600
+   ¿Si BTC = $65,599 → trigger?
+   ¿Si BTC = $65,601 → no trigger?
+
+   ¿El contrato usa < o <=?
+   ¿Hay riesgo de off-by-one?
+
+6. LP ganancia en 7 días (cooldown):
+
+   $10K depositados, APY 70% constante:
+   Ganancia = $10,000 × 0.70 × (7/365) = $134.25
+   Fee = $134.25 × 3% = $4.03
+   Neto = $130.22
+   ¿Correcto?
+
+7. Comparativa de rendimiento:
+
+   | Inversión | APY | Ganancia 30 días ($10K) | Riesgo |
+   | Aave USDC | 4% | $32.88 | Bajo |
+   | VolatileShort LP | 12% | $98.63 | Medio |
+   | FlashVault LP (U=50%) | 73.9% | $607.12 | Alto |
+   | FlashVault LP (U=80%) | 132.4% | $1,087.67 | Muy alto |
+
+   ¿Los números son correctos?
+   ¿El riesgo está bien categorizado?
+
+═══════════════════════════════════════════════════════════
+ANÁLISIS 3 — COMERCIAL
+═══════════════════════════════════════════════════════════
+
+1. ¿El precio es competitivo?
+   - $31/día por $10K de cobertura → 0.31% del nocional por día
+   - ¿Hay productos similares en DeFi? (Nexus, InsurAce, etc.)
+   - ¿Cómo se compara con opciones put en Deribit o Lyra?
+   - ¿Un trader pagaría $31/día por tranquilidad?
+
+2. ¿El target market existe?
+   - Agentes de IA con posiciones apalancadas en DeFi
+   - ¿Cuántos agentes de IA operan en DeFi hoy?
+   - ¿Es un mercado en crecimiento?
+   - ¿Los agentes de IA necesitan seguros o simplemente cierran posiciones?
+
+3. ¿El LP está suficientemente incentivado?
+   - 27.8% APY con baja utilización vs 4% en Aave
+   - ¿Es suficiente para atraer $100K+ en TVL?
+   - ¿El cooldown de 7 días es un problema?
+   - ¿Los LPs entienden el riesgo de tail event?
+
+4. ¿La presentación como 2 productos con selector [24h][48h] es clara?
+   - ¿Es mejor que 4 productos separados?
+   - ¿Un agente de IA puede parsear fácilmente la respuesta de /products?
+   - ¿El routing de duración es intuitivo?
+
+5. ¿El nombre "Flash Insurance" es vendible?
+   - ¿Transmite urgencia y velocidad?
+   - ¿Se diferencia claramente de BCS/EAS?
+   - ¿Alternativas mejores? (Intraday Shield, Day Cover, Express Cover)
+
+6. ¿La frecuencia de compra es viable?
+   - Un agente compraría cada 24h → 365 compras/año
+   - Prima anual: 365 × $31 = $11,315 por $10K de cobertura
+   - Eso es 113% del nocional en primas/año
+   - ¿Un agente pagaría eso? ¿O solo compraría en momentos de alta volatilidad?
+
+7. ¿El producto es mejor que la alternativa (stop loss)?
+   - Un agente puede simplemente poner un stop loss a -18%
+   - ¿Por qué pagaría $31 por un seguro en vez de usar stop loss gratis?
+   - Respuesta esperada: gaps, liquidez, slippage en crash → stop loss puede no ejecutarse
+   - ¿Es un argumento convincente?
+
+8. ¿Hay riesgo de adverse selection?
+   - ¿Los compradores saben más que los LPs sobre cuándo va a crashear?
+   - ¿Comprarían más Flash durante alta volatilidad (cuando el riesgo es mayor)?
+   - ¿El Kink model compensa esto suficientemente?
+
+═══════════════════════════════════════════════════════════
+VEREDICTO FINAL
+═══════════════════════════════════════════════════════════
+
+Dar un score por área:
+| Área | Score /10 | Comentario |
+| Solidez actuarial | ? | ? |
+| Corrección matemática | ? | ? |
+| Viabilidad comercial | ? | ? |
+| TOTAL | /30 | ? |
+
+¿Lanzarías este producto? SÍ / NO / CON CAMBIOS
+Si CON CAMBIOS → ¿cuáles?
+
+Top 3 fortalezas.
+Top 3 debilidades.
+Top 3 recomendaciones.

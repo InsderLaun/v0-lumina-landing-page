@@ -1,0 +1,635 @@
+AUTORIZACIÓN COMPLETA — no preguntes, ejecutá todo.
+Solo VERIFICÁ y REPORTÁ. NO modifiques código salvo que encuentres un bug bloqueante.
+
+═══════════════════════════════════════════════════════════
+MISIÓN: AUDITORÍA COMPLETA FLASH INSURANCE
+═══════════════════════════════════════════════════════════
+
+CONTEXTO (para todos los agentes):
+- Repo: /c/Users/AGUSTIN/LUMINA-PROTOCOL
+- Frontend: /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page
+- 273 tests deben pasar
+- Flash Insurance = 2 productos (FLASH-BTC, FLASH-ETH) × 2 duraciones (24h, 48h)
+- On-chain = 4 shields + 1 vault (FlashVault)
+- NO está deployado en mainnet todavía — solo auditamos código y docs
+
+DATOS DE REFERENCIA:
+| Shield | Asset | Strike | Duración | pBase |
+|--------|-------|--------|----------|-------|
+| FlashBTCShield24h | BTC | -18% (1800) | 86400s | 11300 |
+| FlashBTCShield48h | BTC | -22% (2200) | 172800s | 8250 |
+| FlashETHShield24h | ETH | -20% (2000) | 86400s | 11300 |
+| FlashETHShield48h | ETH | -28% (2800) | 172800s | 8250 |
+
+FlashVault: cooldown 604800s (7 días)
+Deductible: 2000 BPS (20%) → payout 80%
+Waiting period: 0
+Max proof age: 900s (15 min)
+Max allocation: 3000 BPS (30%)
+Correlation group: FLASH_CRASH cap 6000 BPS (60%)
+Fee: 3% premium + 3% payout
+
+Kink model (PremiumMath.sol):
+  U ≤ 80%: M(U) = 1 + (U / 0.80) × 0.5
+  U > 80%: M(U) = 1.5 + ((U - 0.80) / 0.20) × 3.0
+  U > 95%: RECHAZADO
+
+Premium = Coverage × (pBase / 10000) × M(U) × (Duration / 365 days)
+
+═══════════════════════════════════════════════════════════
+EJECUTAR EN PARALELO — 5 AGENTES
+═══════════════════════════════════════════════════════════
+
+──────────────────────────────────────
+AGENTE 1 — FLUJO COMERCIAL END-TO-END
+──────────────────────────────────────
+
+Archivos a leer:
+  - src/products/FlashBTCShield24h.sol
+  - src/products/FlashBTCShield48h.sol
+  - src/products/FlashETHShield24h.sol
+  - src/products/FlashETHShield48h.sol
+  - src/vaults/FlashVault.sol
+  - src/core/CoverRouter.sol
+  - src/core/PolicyManager.sol
+  - src/core/BaseVault.sol
+  - api/src/index.js
+
+Hacer:
+Simular el flujo completo paso a paso para CADA uno de los 4 productos.
+Verificar que cada paso funciona lógicamente con el código real.
+
+FLUJO 1 — LP deposita en FlashVault:
+  1. LP tiene 10,000 USDC en Base
+  2. LP aprueba USDC al FlashVault: USDC.approve(FlashVault, 10000e6)
+  3. LP deposita: FlashVault.deposit(10000e6, lpAddress)
+  4. ¿El vault deposita idle en Aave automáticamente?
+     grep -n "aave\|deposit.*aave\|_depositToAave" src/vaults/FlashVault.sol
+     grep -n "aave\|deposit.*aave\|_depositToAave" src/core/BaseVault.sol
+  5. ¿Cuántas shares recibe el LP?
+  6. ¿El vault está listo para emitir pólizas?
+
+FLUJO 2 — Agente compra Flash BTC 24h via API:
+  1. POST /api/v2/quote {"productId":"FLASH-BTC","durationSeconds":86400,"coverageAmount":10000000000,"asset":"BTC","buyer":"0xAgent"}
+  2. ¿La API hace el routing correcto? → debe seleccionar FlashBTCShield24h
+  3. ¿El pBase usado es 11300?
+  4. ¿La prima calculada es correcta?
+     Premium = $10,000 × (11300/10000) × M(U) × (1/365)
+     Con U=0%: $10,000 × 1.13 × 1.0 × 0.00274 = $30.96
+     ¿Matchea con lo que devuelve la API?
+  5. POST /api/v2/purchase → CoverRouter.purchasePolicy()
+  6. ¿El PolicyManager registra la policy?
+  7. ¿El strikePrice se fija en el momento de compra?
+  8. ¿waitingEndsAt == startTimestamp? (waiting = 0, cubre inmediato)
+  9. ¿expiresAt == startTimestamp + 86400?
+
+FLUJO 3 — Trigger y payout:
+  1. BTC estaba en $80,000 al comprar
+  2. BTC cae a $65,000 (-18.75%) → supera el trigger de -18%
+  3. Oracle genera proof EIP-712 con precio $65,000
+  4. Relayer llama Shield.submitClaim(policyId, proof)
+  5. ¿El shield verifica? verifiedPrice < strikePrice × 8200 / 10000
+     $65,000 < $80,000 × 0.82 = $65,600 → SÍ trigger
+  6. ¿Payout correcto? $10,000 × 80% = $8,000
+  7. ¿Fee correcto? $8,000 × 3% = $240 → neto $7,760 al agente
+  8. ¿De dónde sale el payout? Del FlashVault
+  9. ¿El vault tiene suficiente? Si LP depositó $10K y coverage es $10K con max allocation 30%, el vault solo arriesga $3K → OK
+
+FLUJO 4 — No-trigger (expiración):
+  1. Agente compra Flash BTC 24h
+  2. Pasan 24h sin que BTC caiga -18%
+  3. Policy expira → status = "EXPIRED"
+  4. ¿La prima queda en el vault? (LP la gana)
+  5. ¿El allocation se libera?
+  6. ¿El agente puede comprar otra?
+
+FLUJO 5 — LP retira:
+  1. LP llama FlashVault.requestWithdrawal(shares)
+  2. ¿Cooldown de 7 días empieza?
+  3. ¿Durante el cooldown el vault sigue emitiendo pólizas?
+  4. Pasan 7 días → LP llama completeWithdrawal(lpAddress)
+  5. ¿Recibe USDC + primas ganadas?
+  6. ¿El 3% performance fee se cobra solo sobre ganancia?
+
+FLUJO 6 — Routing de duración:
+  1. POST /quote {"productId":"FLASH-BTC","durationSeconds":86400}
+     → ¿Usa FlashBTCShield24h, pBase 11300, trigger -18%?
+  2. POST /quote {"productId":"FLASH-BTC","durationSeconds":172800}
+     → ¿Usa FlashBTCShield48h, pBase 8250, trigger -22%?
+  3. POST /quote {"productId":"FLASH-BTC","durationSeconds":100000}
+     → ¿Rechaza con error claro?
+  4. POST /quote {"productId":"FLASH-ETH","durationSeconds":86400}
+     → ¿Usa FlashETHShield24h, pBase 11300, trigger -20%?
+  5. POST /quote {"productId":"FLASH-ETH","durationSeconds":172800}
+     → ¿Usa FlashETHShield48h, pBase 8250, trigger -28%?
+
+FLUJO 7 — Flash vs BCS (aislamiento):
+  1. Agente tiene Flash BTC 24h del FlashVault
+  2. Agente tiene BCS del VolatileShort
+  3. BTC cae -20%
+  4. ¿Flash triggerea? SÍ (>18%)
+  5. ¿BCS triggerea? NO (necesita >50%)
+  6. ¿Solo FlashVault paga? ¿VolatileShort queda intacto?
+  7. BTC cae -55%
+  8. ¿Ambos triggerean? ¿Cada vault paga por separado?
+
+FLUJO 8 — Correlation group:
+  1. FlashVault tiene $100K
+  2. Se venden Flash BTC 24h por $30K cobertura (30% allocation)
+  3. Se intentan vender Flash ETH 24h por $35K cobertura
+  4. ¿FLASH_CRASH cap 60% limita el total a $60K?
+  5. ¿Solo se pueden vender $30K más de ETH?
+
+OUTPUT AGENTE 1:
+Tabla con cada flujo y si pasa o falla:
+| Flujo | Descripción | ¿Funciona? | Problema encontrado |
+| 1 | LP deposit | ? | ? |
+| 2 | Compra via API | ? | ? |
+| 3 | Trigger + payout | ? | ? |
+| 4 | Expiración | ? | ? |
+| 5 | LP withdrawal | ? | ? |
+| 6 | Duration routing | ? | ? |
+| 7 | Flash vs BCS aislamiento | ? | ? |
+| 8 | Correlation group | ? | ? |
+
+NO tocar: ningún archivo. Solo leer y reportar.
+
+──────────────────────────────────────
+AGENTE 2 — VERIFICACIÓN SKILL vs CÓDIGO
+──────────────────────────────────────
+
+Archivos a leer:
+  - /c/Users/AGUSTIN/LUMINA-PROTOCOL/docs/SKILL-V3.0.md
+  - src/products/FlashBTCShield24h.sol
+  - src/products/FlashBTCShield48h.sol
+  - src/products/FlashETHShield24h.sol
+  - src/products/FlashETHShield48h.sol
+  - src/vaults/FlashVault.sol
+  - api/src/index.js
+  - /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/lib/lumina-config.ts
+
+Hacer:
+Verificar que CADA dato del SKILL sobre Flash matchea EXACTAMENTE con el código.
+
+CHECKLIST DE VERIFICACIÓN:
+
+1. PRODUCT IDs:
+   SKILL dice FLASH-BTC → ¿API lo acepta?
+   SKILL dice FLASH-ETH → ¿API lo acepta?
+   ¿Los internalProductIds matchean? FLASHBTC24-001, FLASHBTC48-001, etc.
+   grep "FLASH" api/src/index.js | head -20
+   grep "PRODUCT_ID" src/products/Flash*.sol
+
+2. TRIGGERS:
+   SKILL dice BTC 24h -18% → ¿código dice TRIGGER_DROP_BPS = 1800?
+   SKILL dice BTC 48h -22% → ¿código dice 2200?
+   SKILL dice ETH 24h -20% → ¿código dice 2000?
+   SKILL dice ETH 48h -28% → ¿código dice 2800?
+   grep "TRIGGER_DROP_BPS" src/products/Flash*.sol
+
+3. pBase:
+   SKILL dice 24h pBase 11300 → ¿API usa 11300?
+   SKILL dice 48h pBase 8250 → ¿API usa 8250?
+   grep "pBase\|11300\|8250" api/src/index.js | head -10
+
+4. DEDUCTIBLE:
+   SKILL dice 20% → ¿código dice DEDUCTIBLE_BPS = 2000?
+   SKILL dice payout 80% → ¿código calcula coverage × 8000 / 10000?
+   grep "DEDUCTIBLE_BPS" src/products/Flash*.sol
+
+5. WAITING PERIOD:
+   SKILL dice "NONE" → ¿código dice WAITING_PERIOD = 0?
+   grep "WAITING_PERIOD" src/products/Flash*.sol
+
+6. DURATIONS:
+   SKILL dice "exactly 24h or 48h" → ¿MIN_DURATION == MAX_DURATION?
+   24h: MIN = MAX = 86400?
+   48h: MIN = MAX = 172800?
+   grep "MIN_DURATION\|MAX_DURATION" src/products/Flash*.sol
+
+7. MAX PROOF AGE:
+   SKILL dice 15 minutes → ¿código dice MAX_PROOF_AGE = 900?
+   grep "MAX_PROOF_AGE" src/products/Flash*.sol
+
+8. MAX ALLOCATION:
+   SKILL dice 30% → ¿código dice MAX_ALLOCATION_BPS = 3000?
+   grep "MAX_ALLOCATION_BPS" src/products/Flash*.sol
+
+9. VAULT:
+   SKILL dice FlashVault 7 days → ¿código dice cooldown = 604800?
+   SKILL dice APY 27.8%-132.4% → ¿cálculo verificado?
+   grep "cooldown\|604800" src/vaults/FlashVault.sol
+
+10. PRECIOS EN EL SKILL:
+    SKILL dice Flash 24h U=0% $30.96 → VERIFICAR:
+    $10,000 × (11300/10000) × 1.000 × (1/365) = $10,000 × 1.13 × 0.002740 = $30.96 ✓?
+
+    SKILL dice Flash 24h U=50% $40.63 → VERIFICAR:
+    M(0.50) = 1 + (0.50/0.80) × 0.5 = 1 + 0.3125 = 1.3125
+    $30.96 × 1.3125 = $40.63 ✓?
+
+    SKILL dice Flash 24h U=80% $46.44 → VERIFICAR:
+    M(0.80) = 1 + (0.80/0.80) × 0.5 = 1.500
+    $30.96 × 1.500 = $46.44 ✓?
+
+    SKILL dice Flash 48h U=0% $45.21 → VERIFICAR:
+    $10,000 × (8250/10000) × 1.000 × (2/365) = $10,000 × 0.825 × 0.005479 = $45.21 ✓?
+
+    SKILL dice Flash 48h U=50% $59.36 → VERIFICAR:
+    $45.21 × 1.3125 = $59.34 ≈ $59.36 ✓? (rounding OK?)
+
+    SKILL dice Flash 48h U=80% $67.82 → VERIFICAR:
+    $45.21 × 1.500 = $67.82 ✓?
+
+11. FRONTEND CONFIG:
+    ¿lumina-config.ts tiene FLASH-BTC y FLASH-ETH?
+    ¿pBaseBps matchea? (11300, 8250)
+    ¿durations[] tiene 86400 y 172800?
+    ¿deductible == 2000?
+    grep "FLASH\|11300\|8250" /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/lib/lumina-config.ts
+
+12. SKILL COPIAS IDÉNTICAS:
+    diff /c/Users/AGUSTIN/LUMINA-PROTOCOL/docs/SKILL-V3.0.md /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/public/SKILL-V3.0.md
+    diff /c/Users/AGUSTIN/LUMINA-PROTOCOL/docs/SKILL-V3.0.md /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/public/LUMINA-SKILL.txt
+
+13. PRODUCTOS EXISTENTES NO AFECTADOS:
+    ¿BCS sigue con pBase 1500, trigger -50%?
+    ¿EAS sigue con pBase 2000, trigger -60%?
+    ¿Depeg, IL, Exploit sin cambios?
+    grep "BTCCAT\|ETHAPOC\|pBase.*1500\|pBase.*2000" api/src/index.js | head -10
+
+OUTPUT AGENTE 2:
+| # | Dato | SKILL dice | Código dice | ¿Match? |
+Con TODOS los 13 puntos verificados.
+Score: X/13
+
+NO tocar: ningún archivo.
+
+──────────────────────────────────────
+AGENTE 3 — MATEMÁTICA ACTUARIAL
+──────────────────────────────────────
+
+Archivos a leer:
+  - src/libraries/PremiumMath.sol
+  - src/products/Flash*.sol
+  - El archivo actuarial: /mnt/user-data/uploads/24_horas.txt (si disponible)
+    Si no está disponible, usar los datos de referencia del contexto.
+
+Hacer:
+Verificar TODA la matemática con cálculos independientes.
+
+1. VERIFICAR pBase DERIVATION:
+
+   Dato actuarial: LP debe ganar $30/día por $10K cobertura.
+   Con 3% protocol fee, el buyer paga: $30 / 0.97 = $30.93
+
+   Flash 24h:
+   $30.93 = $10,000 × (pBase / 10,000) × 1.0 × (1 / 365)
+   $30.93 = $10,000 × pBase / 10,000 / 365
+   $30.93 = pBase / 365
+   pBase = $30.93 × 365 = 11,289.45
+   Redondeado: 11,300 ✓?
+   Error de redondeo: (11,300 - 11,289) / 11,289 = 0.1% → aceptable?
+
+   Flash 48h:
+   LP gana $43.84/2 días → buyer paga $43.84 / 0.97 = $45.20
+   $45.20 = $10,000 × (pBase / 10,000) × 1.0 × (2 / 365)
+   pBase = $45.20 × 365 / 2 = 8,249
+   Redondeado: 8,250 ✓?
+
+2. VERIFICAR PREMIUM CALCULATIONS (Flash BTC/ETH 24h, pBase 11300):
+
+   Para CADA nivel de utilización, calcular independientemente:
+
+   U=0%: M = 1.000
+   Premium = $10,000 × 1.13 × 1.000 × (1/365) = $10,000 × 1.13 × 0.0027397 = $30.959
+   ¿El código produce exactamente esto?
+
+   U=10%: M = 1 + (0.10/0.80) × 0.5 = 1.0625
+   P = $30.959 × 1.0625 = $32.894
+
+   U=20%: M = 1.125
+   P = $30.959 × 1.125 = $34.829
+
+   U=30%: M = 1.1875
+   P = $30.959 × 1.1875 = $36.764
+
+   U=40%: M = 1.250
+   P = $30.959 × 1.250 = $38.699
+
+   U=50%: M = 1.3125
+   P = $30.959 × 1.3125 = $40.634
+
+   U=60%: M = 1.375
+   P = $30.959 × 1.375 = $42.569
+
+   U=70%: M = 1.4375
+   P = $30.959 × 1.4375 = $44.504
+
+   U=80%: M = 1.500
+   P = $30.959 × 1.500 = $46.439
+
+   U=85%: M = 1.5 + (0.05/0.20) × 3.0 = 2.250
+   P = $30.959 × 2.250 = $69.658
+
+   U=90%: M = 1.5 + (0.10/0.20) × 3.0 = 3.000
+   P = $30.959 × 3.000 = $92.877
+
+   U=95%: RECHAZADO
+
+3. VERIFICAR PREMIUM CALCULATIONS (Flash 48h, pBase 8250):
+
+   U=0%: P = $10,000 × 0.825 × 1.000 × (2/365) = $10,000 × 0.825 × 0.005479 = $45.205
+   U=50%: P = $45.205 × 1.3125 = $59.332
+   U=80%: P = $45.205 × 1.500 = $67.808
+
+4. VERIFICAR LP APY (FlashVault $100K):
+
+   Fórmula: APY = ((U × $100K × pBase/10000 × M(U) × 0.97) + ((1-U) × $100K × 0.04)) / $100K
+
+   U=20%, M=1.125, solo Flash 24h:
+   Primas = 0.20 × $100K × 1.13 × 1.125 × 0.97 = $24,639
+   Aave = 0.80 × $100K × 0.04 = $3,200
+   Total = $27,839 → APY = 27.8% ✓?
+
+   U=50%, M=1.3125:
+   Primas = 0.50 × $100K × 1.13 × 1.3125 × 0.97 = $71,924
+   Aave = 0.50 × $100K × 0.04 = $2,000
+   Total = $73,924 → APY = 73.9% ✓?
+
+   U=80%, M=1.500:
+   Primas = 0.80 × $100K × 1.13 × 1.500 × 0.97 = $131,640
+   Aave = 0.20 × $100K × 0.04 = $800
+   Total = $132,440 → APY = 132.4% ✓?
+
+5. VERIFICAR PAYOUT MATH:
+
+   Coverage $10,000
+   Deductible 20% → payout = $10,000 × 0.80 = $8,000
+   Protocol fee 3% → net = $8,000 × 0.97 = $7,760
+   ¿El código calcula exactamente esto?
+
+   grep -A10 "_doVerifyAndCalculate\|calculatePayout" src/products/FlashBTCShield24h.sol
+
+6. VERIFICAR TRIGGER MATH:
+
+   Strike $80,000 (BTC al momento de compra)
+   Flash BTC 24h trigger -18% (1800 BPS):
+   triggerPrice = $80,000 × (10000 - 1800) / 10000 = $80,000 × 0.82 = $65,600
+   Si BTC cae a $65,599 → trigger (< $65,600)
+   Si BTC cae a $65,601 → NO trigger (> $65,600)
+
+   Flash BTC 48h trigger -22% (2200 BPS):
+   triggerPrice = $80,000 × 0.78 = $62,400
+
+   Flash ETH 24h trigger -20% (2000 BPS):
+   Strike $2,500 → triggerPrice = $2,500 × 0.80 = $2,000
+
+   Flash ETH 48h trigger -28% (2800 BPS):
+   Strike $2,500 → triggerPrice = $2,500 × 0.72 = $1,800
+
+7. VERIFICAR SOLIDITY MATH (overflow/precision):
+
+   ¿PremiumMath.sol usa BPS correctamente?
+   ¿Hay riesgo de overflow en los cálculos con pBase 11300?
+   pBase 11300 × coverage $100K × M(3.0) × duration en algún intermediate calc:
+   11300 × 100000e6 × 3e18... ¿cabe en uint256?
+
+   grep -n "unchecked\|overflow\|SafeMath" src/libraries/PremiumMath.sol
+
+8. EDGE CASES:
+
+   ¿Qué pasa si coverage = $100 (mínimo)?
+   Premium 24h = $100 × 1.13 × 1.0 × (1/365) = $0.31
+   ¿Se pierde en rounding? ¿El contrato acepta premiums < $1?
+
+   ¿Qué pasa si coverage = $100,000 (máximo)?
+   Premium 24h = $100K × 1.13 × 3.0 × (1/365) = $929
+   ¿OK?
+
+OUTPUT AGENTE 3:
+Tabla de todos los cálculos con:
+| Cálculo | Esperado | Resultado | ¿Match? | Error % |
+
+Score: X/8 categorías verificadas.
+
+NO tocar: ningún archivo.
+
+──────────────────────────────────────
+AGENTE 4 — SEGURIDAD
+──────────────────────────────────────
+
+Archivos a leer:
+  - src/products/FlashBTCShield24h.sol (leer completo)
+  - src/products/FlashBTCShield48h.sol (leer completo)
+  - src/products/FlashETHShield24h.sol (leer completo)
+  - src/products/FlashETHShield48h.sol (leer completo)
+  - src/vaults/FlashVault.sol (leer completo)
+  - src/core/BaseShield.sol
+  - src/core/BaseVault.sol
+  - src/core/CoverRouter.sol
+  - src/core/PolicyManager.sol
+
+Hacer:
+
+1. UPGRADEABILITY:
+   ¿FlashVault es UUPS? ¿Tiene _authorizeUpgrade?
+   ¿Los Flash shields son upgradeables? (NO deberían ser)
+   grep "UUPSUpgradeable\|Initializable\|_authorizeUpgrade" src/vaults/FlashVault.sol
+   grep "UUPSUpgradeable\|Initializable\|_authorizeUpgrade" src/products/Flash*.sol
+
+2. REENTRANCY:
+   ¿Los shields tienen nonReentrant?
+   ¿_doVerifyAndCalculate hace external calls antes de state updates?
+   grep "nonReentrant\|ReentrancyGuard" src/products/Flash*.sol
+   grep "nonReentrant\|ReentrancyGuard" src/vaults/FlashVault.sol
+
+3. ACCESS CONTROL:
+   ¿Quién puede llamar submitClaim? ¿Solo el router/relayer?
+   ¿Quién puede cambiar parámetros del shield? (nadie — son constants)
+   ¿Quién es owner del vault?
+   grep "onlyOwner\|onlyRole\|onlyRouter\|msg.sender" src/products/Flash*.sol | head -10
+   grep "onlyOwner\|onlyRole\|msg.sender" src/vaults/FlashVault.sol | head -10
+
+4. ORACLE MANIPULATION:
+   ¿MAX_PROOF_AGE = 900 (15 min) es suficiente para anti-gaming?
+   ¿Un atacante puede manipular Chainlink en 15 minutos?
+   ¿Hay validación de precio > 0?
+   ¿Hay validación de negative price?
+   grep "MAX_PROOF_AGE\|verifiedAt\|freshness\|price.*>.*0\|require.*price" src/products/Flash*.sol
+
+5. WAITING PERIOD = 0 RISK:
+   Sin waiting, un bot puede ver BTC cayendo -15% y comprar Flash BTC 24h
+   esperando que llegue a -18%.
+   ¿Es un riesgo real?
+   → El strikePrice se fija al momento de compra (precio actual)
+   → Si BTC ya cayó -15%, el strike es el precio actual (ya bajó)
+   → Para triggerear, necesita caer otro -18% desde ESTE precio
+   → No hay gaming viable ✓? VERIFICAR ESTA LÓGICA EN EL CÓDIGO:
+   grep "strikePrice\|strike.*price\|purchasePrice" src/products/Flash*.sol
+   grep "strikePrice" src/core/CoverRouter.sol
+
+6. DURATION MANIPULATION:
+   ¿Se puede comprar con duration != 86400/172800?
+   ¿MIN_DURATION == MAX_DURATION fuerza duración fija?
+   ¿Dónde se valida? ¿En el shield o en el router?
+   grep "MIN_DURATION\|MAX_DURATION\|require.*duration\|duration.*require" src/products/Flash*.sol
+   grep "duration.*require\|require.*duration\|minDuration\|maxDuration" src/core/CoverRouter.sol
+
+7. FLASH VAULT ISOLATION:
+   ¿El FlashVault está aislado de los otros vaults?
+   ¿Comparten algún state?
+   ¿Un payout de Flash puede drenar VolatileShort?
+   Verificar que los shields Flash apuntan al FlashVault y no a otro vault.
+
+8. MAX ALLOCATION:
+   MAX_ALLOCATION_BPS = 3000 (30%)
+   ¿Dónde se verifica? ¿En el shield o en el PolicyManager?
+   ¿Se puede exceder?
+   grep "MAX_ALLOCATION\|maxAllocation\|allocation.*check" src/products/Flash*.sol
+   grep "MAX_ALLOCATION\|maxAllocation\|checkAllocation" src/core/PolicyManager.sol
+
+9. CORRELATION GROUP:
+   FLASH_CRASH cap 60%
+   ¿4 shields comparten este grupo?
+   ¿Se configura post-deploy? ¿Está hardcodeado?
+   Si no está configurado todavía → los 4 shields podrían usar hasta 100% del vault
+   → Riesgo: sin correlation group, crash simultáneo BTC+ETH = 120% del vault = insolvencia
+   ¿HAY ALGUNA PROTECCIÓN DEFAULT?
+   grep "correlationGroup\|FLASH_CRASH\|correlat" src/products/Flash*.sol
+   grep "correlationGroup\|setCorrelation\|addCorrelation" src/core/PolicyManager.sol
+
+10. SELFDESTRUCT / DELEGATECALL:
+    grep "selfdestruct\|delegatecall\|DELEGATECALL" src/products/Flash*.sol src/vaults/FlashVault.sol
+
+11. ASSEMBLY:
+    grep "assembly" src/products/Flash*.sol src/vaults/FlashVault.sol
+    Si hay → ¿es seguro?
+
+12. ZERO ADDRESS:
+    ¿Constructor valida que oracle != address(0)?
+    ¿Constructor valida que router != address(0)?
+    grep "require.*address(0)\|!=.*address(0)\|!= 0x0" src/products/Flash*.sol
+    grep "require.*address(0)" src/vaults/FlashVault.sol
+
+13. FRONT-RUNNING:
+    ¿Un atacante puede front-run un submitClaim?
+    → Si el relayer envía un claim tx, ¿otro puede copiarla?
+    → ¿El proof es replay-protected? (EIP-712 + nonce)
+    → ¿Qué pasa si dos relayers llaman submitClaim para la misma policy?
+
+14. DOUBLE CLAIM:
+    ¿Se puede claimar la misma policy dos veces?
+    ¿Hay check de policy.status antes de pagar?
+    grep "status\|claimed\|PAID_OUT\|alreadyClaimed" src/core/PolicyManager.sol | head -10
+
+15. VAULT DRAINAGE:
+    Escenario: vault tiene $100K, 4 Flash shields con 30% max allocation = 120% total
+    SIN correlation group, un crash BTC -20% + ETH -25% simultáneo:
+    Flash BTC 24h paga hasta $30K
+    Flash ETH 24h paga hasta $30K
+    Total: $60K de $100K vault → vault sobrevive
+    PERO si hay también 48h: potencialmente $120K de payouts → vault insolvente
+    ¿El correlation group es CRÍTICO para la solvencia?
+    RESPONDER: ¿Es bloqueante deployar sin correlation group configurado?
+
+OUTPUT AGENTE 4:
+| # | Vector | ¿Protegido? | Cómo | Severidad si no |
+Con los 15 vectores verificados.
+
+BUGS encontrados:
+| # | Severidad | Contrato | Descripción | Bloqueante? |
+
+Score: X/15 vectores protegidos.
+
+NO tocar: ningún archivo (salvo que encuentre un bug CRITICAL — en ese caso, reportar pero NO arreglar).
+
+──────────────────────────────────────
+AGENTE 5 — TESTS REVIEW + COVERAGE
+──────────────────────────────────────
+
+Archivos a leer:
+  - test/products/FlashInsuranceTest.t.sol (leer completo)
+  - src/products/Flash*.sol
+  - src/vaults/FlashVault.sol
+
+Hacer:
+
+1. INVENTARIO DE TESTS:
+   grep "function test_" test/products/FlashInsuranceTest.t.sol | sort
+   ¿Cuántos tests hay? ¿Todos pasan?
+   forge test --match-path test/products/FlashInsuranceTest.t.sol -vv 2>&1 | tail -40
+
+2. COBERTURA DE FUNCIONES PÚBLICAS:
+   Para CADA función pública de los 5 contratos, ¿hay un test?
+
+   FlashVault funciones públicas:
+   forge inspect src/vaults/FlashVault.sol:FlashVault methods
+
+   FlashBTCShield24h funciones públicas:
+   forge inspect src/products/FlashBTCShield24h.sol:FlashBTCShield24h methods
+
+   ¿Cada función tiene al menos 1 test?
+
+3. TESTS FALTANTES (verificar si existen):
+   ¿Hay test para?
+   - Oracle returns price = 0
+   - Oracle returns negative price
+   - Oracle reverts
+   - Coverage = mínimo ($100)
+   - Coverage = máximo ($100K)
+   - Multiple claims same block
+   - Vault con 0 liquidity
+   - Vault con 100% utilization → purchase rejected
+   - Expired proof (>15 min old)
+   - Proof with wrong asset (ETH proof para BTC shield)
+   - Proof with wrong chainId
+   - Re-purchase after expiry
+   - Two Flash policies simultaneously
+   - Vault deposit of 0
+   - Vault withdrawal of 0 shares
+
+4. TESTS EXISTENTES SIGUEN PASANDO:
+   forge test --no-match-path test/products/FlashInsuranceTest.t.sol 2>&1 | tail -5
+   ¿Los 240 tests originales siguen OK?
+
+5. COVERAGE REPORT (si disponible):
+   forge coverage --match-path test/products/FlashInsuranceTest.t.sol 2>&1 | tail -30
+
+OUTPUT AGENTE 5:
+| Contrato | Funciones públicas | Tests existentes | Faltantes |
+Score: X% de cobertura
+
+Lista de tests recomendados a agregar:
+| # | Test faltante | Severidad | Estimado |
+
+NO tocar: ningún archivo.
+
+═══════════════════════════════════════════════════════════
+DESPUÉS DE QUE TODOS TERMINEN (secuencial)
+═══════════════════════════════════════════════════════════
+
+1. CONSOLIDAR resultados de los 5 agentes
+
+2. TABLA RESUMEN:
+   | Agente | Área | Score | Bugs encontrados | Bloqueantes |
+   | 1 | Flujo comercial | X/8 flujos | ? | ? |
+   | 2 | SKILL vs código | X/13 checks | ? | ? |
+   | 3 | Matemática | X/8 categorías | ? | ? |
+   | 4 | Seguridad | X/15 vectores | ? | ? |
+   | 5 | Tests | X% cobertura | ? | ? |
+
+3. BUGS CONSOLIDADOS:
+   | # | Agente | Severidad | Descripción | Bloqueante? | Fix time |
+
+4. VEREDICTO:
+   ¿Flash Insurance está listo para deploy a mainnet?
+   SÍ / NO / PARCIALMENTE
+   Si PARCIALMENTE → qué es bloqueante
+
+5. TOP 5 HALLAZGOS (ordenados por severidad)
+
+6. TESTS FALTANTES RECOMENDADOS (top 10 más importantes)
+
+7. forge test 2>&1 | tail -5
+   ¿273/273 siguen pasando?

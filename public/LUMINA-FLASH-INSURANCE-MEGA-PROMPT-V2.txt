@@ -1,0 +1,698 @@
+AUTORIZACIÓN COMPLETA — no preguntes, ejecutá todo.
+
+TODO el código debe quedar commiteado y pusheado a GitHub.
+Repos:
+- /c/Users/AGUSTIN/LUMINA-PROTOCOL (contratos + API)
+- /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page (frontend)
+Deploy web: git push al frontend (Vercel auto-deploya)
+
+################################################################################
+#                                                                              #
+#   MISIÓN: DESARROLLAR FLASH INSURANCE (2 productos × 2 duraciones + vault) #
+#                                                                              #
+################################################################################
+
+Primero leé la base existente para entender el stack:
+
+cd /c/Users/AGUSTIN/LUMINA-PROTOCOL
+
+cat src/core/BaseVault.sol | head -80
+cat src/products/BTCCatastropheShieldV2.sol | head -80
+cat src/core/CoverRouter.sol | head -80
+cat src/libraries/PremiumMath.sol | head -80
+grep -n "pBase\|TRIGGER_DROP_BPS\|MAX_ALLOCATION_BPS\|DEDUCTIBLE_BPS\|WAITING_PERIOD\|MAX_PROOF_AGE" src/products/BTCCatastropheShieldV2.sol | head -15
+ls src/products/
+ls src/core/
+ls src/vaults/
+
+════════════════════════════════════════════════════════════
+CONTEXTO
+════════════════════════════════════════════════════════════
+
+Lumina Protocol — Base mainnet (8453), USDC settlement.
+
+CONTRATOS EXISTENTES:
+- CoverRouter: 0xd5f8678A0F2149B6342F9014CCe6d743234Ca025
+- PolicyManager: 0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a
+- LuminaOracleV2: 0x87B576f688bE0E1d7d23A299f55b475658215105
+- TimelockController: 0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a
+- USDC: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+- Aave V3 Pool: 0xA238Dd80C259a72e81d7e4664a9801593F98d1c5
+
+PRODUCTOS EXISTENTES:
+- BCS (BTCCAT-001): BTC -50%, 7-30d, pBase 1500
+- EAS (ETHAPOC-001): ETH -60%, 7-30d, pBase 2000
+- Depeg, IL, Exploit
+
+NUEVO — FLASH INSURANCE:
+Para el usuario son 2 productos con selector de duración.
+On-chain son 4 shields (porque los triggers son diferentes por duración).
+1 vault nuevo (FlashVault) aislado de los existentes.
+
+PRESENTACIÓN AL USUARIO:
+
+🛡️ Flash BTC → elige [24h] o [48h]
+🛡️ Flash ETH → elige [24h] o [48h]
+
+API: el agente envía productId "FLASH-BTC" o "FLASH-ETH" + durationSeconds.
+El backend rutea automáticamente al shield correcto según la duración.
+
+ON-CHAIN (4 shields, transparente para el usuario):
+| Shield interno | Trigger | Duración | pBase |
+|----------------|---------|----------|-------|
+| FlashBTCShield24h | BTC -18% | 24h | 11300 |
+| FlashBTCShield48h | BTC -22% | 48h | 8250 |
+| FlashETHShield24h | ETH -20% | 24h | 11300 |
+| FlashETHShield48h | ETH -28% | 48h | 8250 |
+
+VAULT NUEVO — FlashVault:
+- Cooldown: 7 días
+- Productos: solo Flash (BTC + ETH, 24h + 48h)
+- Aave V3: sí (idle capital)
+- Max allocation: 30% per shield
+- Correlation group: FLASH_CRASH cap 60%
+
+MATEMÁTICA ACTUARIAL:
+Basada en 1,095 días de datos (2023-2026), 0 hits históricos.
+- BTC peor día: -14.12% → strike -18% (buffer 3.9pp)
+- ETH peor día: -15.03% → strike -20% (buffer 5.0pp)
+- Deductible: 20% en todos → payout 80%
+- Waiting period: 0 (sin espera)
+- Max proof age: 15 minutos
+
+PRECIOS ($10K cobertura, con Kink model):
+| Producto | U=0% | U=50% | U=80% (kink) | U=90% |
+|----------|------|-------|-------------|-------|
+| Flash BTC 24h | $30.96 | $40.63 | $46.44 | $92.88 |
+| Flash BTC 48h | $45.21 | $59.36 | $67.82 | $135.63 |
+| Flash ETH 24h | $30.96 | $40.63 | $46.44 | $92.88 |
+| Flash ETH 48h | $45.21 | $59.36 | $67.82 | $135.63 |
+
+LP APY FlashVault ($100K, mezcla 24h/48h):
+  U=20% → 27.8%
+  U=50% → 73.9%
+  U=80% → 132.4%
+
+################################################################################
+#                                                                              #
+#   PARTE 1 — SMART CONTRACTS                                                 #
+#                                                                              #
+################################################################################
+
+════════════════════════════════════════
+1.1 — FlashVault.sol
+════════════════════════════════════════
+
+Creá src/vaults/FlashVault.sol
+
+Heredar de BaseVault (como los otros 4 vaults).
+Mirá cómo están hechos:
+cat src/vaults/VolatileShortVault.sol
+
+Parámetros:
+- cooldownDuration = 604800 (7 días)
+- Nombre: "Lumina FlashVault"
+- Símbolo: "lmFLASH"
+- UUPS upgradeable
+- Owner: deployer (se transfiere al TimelockController post-deploy)
+
+════════════════════════════════════════
+1.2 — FlashBTCShield24h.sol
+════════════════════════════════════════
+
+Creá src/products/FlashBTCShield24h.sol
+
+Heredar de BaseShield (como BTCCatastropheShieldV2).
+Mirá cómo está hecho:
+cat src/products/BTCCatastropheShieldV2.sol
+
+```solidity
+bytes32 public constant PRODUCT_ID = keccak256("FLASHBTC24-001");
+uint256 public constant TRIGGER_DROP_BPS = 1800;    // -18%
+uint256 public constant MAX_ALLOCATION_BPS = 3000;   // 30%
+uint256 public constant DEDUCTIBLE_BPS = 2000;       // 20% deductible → 80% payout
+uint256 public constant WAITING_PERIOD = 0;           // SIN waiting
+uint256 public constant MAX_PROOF_AGE = 900;          // 15 minutos
+uint256 public constant MIN_DURATION = 86400;         // 24h exactas
+uint256 public constant MAX_DURATION = 86400;         // 24h exactas (fija)
+bytes32 public constant ASSET = "BTC";
+```
+
+_doVerifyAndCalculate:
+- Usa _verifyPriceProofEIP712 (igual que BCS V2)
+- Trigger: verifiedPrice < strikePrice × (10000 - 1800) / 10000
+  → precio cayó más de 18% desde el strike
+- Payout: coverage × 8000 / 10000 = 80%
+- Freshness: block.timestamp <= verifiedAt + 900
+- Asset: proofAsset == "BTC"
+- Window: verifiedAt >= startTimestamp (waiting = 0)
+
+Constructor inmutables:
+- oracle: LuminaOracleV2
+- router: CoverRouter
+
+════════════════════════════════════════
+1.3 — FlashBTCShield48h.sol
+════════════════════════════════════════
+
+Creá src/products/FlashBTCShield48h.sol
+
+Igual que FlashBTCShield24h pero:
+```solidity
+bytes32 public constant PRODUCT_ID = keccak256("FLASHBTC48-001");
+uint256 public constant TRIGGER_DROP_BPS = 2200;    // -22%
+uint256 public constant MIN_DURATION = 172800;       // 48h exactas
+uint256 public constant MAX_DURATION = 172800;       // 48h exactas
+```
+Todo lo demás idéntico.
+
+════════════════════════════════════════
+1.4 — FlashETHShield24h.sol
+════════════════════════════════════════
+
+Creá src/products/FlashETHShield24h.sol
+
+```solidity
+bytes32 public constant PRODUCT_ID = keccak256("FLASHETH24-001");
+uint256 public constant TRIGGER_DROP_BPS = 2000;    // -20%
+bytes32 public constant ASSET = "ETH";
+uint256 public constant MIN_DURATION = 86400;        // 24h
+uint256 public constant MAX_DURATION = 86400;        // 24h
+```
+Resto idéntico a FlashBTCShield24h.
+
+════════════════════════════════════════
+1.5 — FlashETHShield48h.sol
+════════════════════════════════════════
+
+Creá src/products/FlashETHShield48h.sol
+
+```solidity
+bytes32 public constant PRODUCT_ID = keccak256("FLASHETH48-001");
+uint256 public constant TRIGGER_DROP_BPS = 2800;    // -28%
+bytes32 public constant ASSET = "ETH";
+uint256 public constant MIN_DURATION = 172800;       // 48h
+uint256 public constant MAX_DURATION = 172800;       // 48h
+```
+
+════════════════════════════════════════
+1.6 — Correlation Group FLASH_CRASH
+════════════════════════════════════════
+
+Los 4 shields comparten riesgo → correlation group FLASH_CRASH cap 60%.
+Se configura post-deploy via Safe batch en PolicyManager.
+
+Verificar cómo se configuró VOLATILE_CRASH:
+grep -n "correlationGroup\|VOLATILE_CRASH\|addCorrelation" src/core/PolicyManager.sol | head -10
+
+################################################################################
+#                                                                              #
+#   PARTE 2 — API: 2 PRODUCTOS CON ROUTING DE DURACIÓN                       #
+#                                                                              #
+################################################################################
+
+La clave: el usuario ve 2 productos (FLASH-BTC, FLASH-ETH).
+La API rutea al shield correcto según la duración que pida.
+
+Leer cómo están los productos actuales:
+grep -n "BTCCAT\|ETHAPOC\|products\[" api/src/index.js | head -20
+
+════════════════════════════════════════
+2.1 — Productos en la API
+════════════════════════════════════════
+
+Agregar 2 productos (NO 4) visibles al usuario:
+
+```javascript
+{
+  name: "Flash BTC",
+  id: "FLASH-BTC",
+  riskType: "volatile",
+  vaults: [process.env.FLASH_VAULT || "0x0000..."],
+  assets: ["BTC"],
+  stablecoins: [],
+  status: "ACTIVE",
+  waitingPeriod: 0,
+  description: "Ultra-short coverage against BTC flash crashes. Choose 24h or 48h.",
+  durations: [
+    {
+      seconds: 86400,
+      label: "24h",
+      trigger: "-18%",
+      pBase: 11300,
+      shield: process.env.FLASH_BTC_24H_SHIELD || "0x0000...",
+      internalProductId: "FLASHBTC24-001"
+    },
+    {
+      seconds: 172800,
+      label: "48h",
+      trigger: "-22%",
+      pBase: 8250,
+      shield: process.env.FLASH_BTC_48H_SHIELD || "0x0000...",
+      internalProductId: "FLASHBTC48-001"
+    }
+  ],
+  deductible: 2000,
+  maxProofAge: 900
+},
+{
+  name: "Flash ETH",
+  id: "FLASH-ETH",
+  riskType: "volatile",
+  vaults: [process.env.FLASH_VAULT || "0x0000..."],
+  assets: ["ETH"],
+  stablecoins: [],
+  status: "ACTIVE",
+  waitingPeriod: 0,
+  description: "Ultra-short coverage against ETH flash crashes. Choose 24h or 48h.",
+  durations: [
+    {
+      seconds: 86400,
+      label: "24h",
+      trigger: "-20%",
+      pBase: 11300,
+      shield: process.env.FLASH_ETH_24H_SHIELD || "0x0000...",
+      internalProductId: "FLASHETH24-001"
+    },
+    {
+      seconds: 172800,
+      label: "48h",
+      trigger: "-28%",
+      pBase: 8250,
+      shield: process.env.FLASH_ETH_48H_SHIELD || "0x0000...",
+      internalProductId: "FLASHETH48-001"
+    }
+  ],
+  deductible: 2000,
+  maxProofAge: 900
+}
+```
+
+════════════════════════════════════════
+2.2 — Routing en /quote y /purchase
+════════════════════════════════════════
+
+Cuando llega un request con productId "FLASH-BTC" o "FLASH-ETH",
+la API debe:
+
+1. Leer durationSeconds del body
+2. Buscar en el array durations[] la entrada que matchea
+3. Usar el internalProductId y pBase de esa entrada para calcular la prima
+4. Usar el shield address de esa entrada para el CoverRouter
+
+```javascript
+// En el handler de /quote y /purchase:
+function resolveFlashProduct(productId, durationSeconds) {
+  const product = products.find(p => p.id === productId);
+  if (!product || !product.durations) return null;
+  
+  const duration = product.durations.find(d => d.seconds === durationSeconds);
+  if (!duration) {
+    return { error: "INVALID_DURATION", 
+             message: `Flash ${productId} only accepts: ${product.durations.map(d => d.label).join(' or ')}` };
+  }
+  
+  return {
+    ...product,
+    pBase: duration.pBase,
+    shield: duration.shield,
+    productId: duration.internalProductId,
+    minDuration: duration.seconds,
+    maxDuration: duration.seconds,
+    trigger: duration.trigger
+  };
+}
+```
+
+Validaciones especiales para Flash:
+- durationSeconds DEBE ser exactamente 86400 o 172800
+  → Si mandan otro valor: "Flash products accept 86400 (24h) or 172800 (48h) only"
+- asset: "BTC" para FLASH-BTC, "ETH" para FLASH-ETH
+- No hay stablecoin field
+
+════════════════════════════════════════
+2.3 — GET /products response
+════════════════════════════════════════
+
+El response de /products debe mostrar los Flash como 2 productos
+con el array de duraciones disponibles:
+
+```json
+{
+  "name": "Flash BTC",
+  "id": "FLASH-BTC",
+  "status": "ACTIVE",
+  "waitingPeriod": 0,
+  "deductible": 2000,
+  "description": "Ultra-short coverage against BTC flash crashes",
+  "durations": [
+    { "seconds": 86400, "label": "24h", "trigger": "-18%", "pBase": 11300 },
+    { "seconds": 172800, "label": "48h", "trigger": "-22%", "pBase": 8250 }
+  ]
+}
+```
+
+════════════════════════════════════════
+2.4 — Relayer support
+════════════════════════════════════════
+
+Verificar que el relayer monitorea Flash policies:
+grep -n "products\|activeProducts\|iterate\|scan" api/src/relayer.js | head -20
+
+El relayer necesita iterar los 4 internalProductIds para detectar triggers.
+Si lee productos dinámicamente → funciona automático.
+Si tiene productos hardcodeados → agregar los 4 internos.
+
+################################################################################
+#                                                                              #
+#   PARTE 3 — TESTS                                                           #
+#                                                                              #
+################################################################################
+
+Creá test/products/FlashInsuranceTest.t.sol
+
+Verificar cómo están hechos los tests existentes:
+cat test/products/BTCCatastropheShieldV2Test.t.sol | head -50
+
+═══════════════════════════════
+Tests FlashBTCShield24h (15 tests):
+═══════════════════════════════
+
+test_product_id: PRODUCT_ID == keccak256("FLASHBTC24-001")
+test_trigger_1800_bps: TRIGGER_DROP_BPS == 1800
+test_deductible_2000_bps: DEDUCTIBLE_BPS == 2000
+test_waiting_period_zero: WAITING_PERIOD == 0
+test_duration_fixed_24h: MIN_DURATION == MAX_DURATION == 86400
+test_max_proof_age_15min: MAX_PROOF_AGE == 900
+test_asset_btc: ASSET == bytes32("BTC")
+
+test_trigger_at_18pct:
+  Strike $100K → price $82K (-18%) → TRIGGER → payout $8K
+
+test_no_trigger_at_17pct:
+  Strike $100K → price $83K (-17%) → NO trigger
+
+test_trigger_at_30pct:
+  Strike $100K → price $70K (-30%) → TRIGGER (binary, still 80%)
+
+test_payout_80pct:
+  Coverage $10K → payout $8K → after 3% fee = $7,760
+
+test_eip712_required:
+  Sin proof → revierte
+  Wrong asset → revierte
+  Expired proof (>15min) → revierte
+  Valid proof → pasa
+
+test_no_waiting_immediate_trigger:
+  Comprar → trigger en el mismo block → paga
+
+test_reject_wrong_duration:
+  Intentar duration != 86400 → revierte
+
+test_max_allocation_30pct: MAX_ALLOCATION_BPS == 3000
+
+═══════════════════════════════
+Tests FlashBTCShield48h (5 tests, solo diferencias):
+═══════════════════════════════
+
+test_product_id: keccak256("FLASHBTC48-001")
+test_trigger_2200_bps: -22%
+test_duration_48h: MIN/MAX == 172800
+test_trigger_at_22pct: price -22% → trigger
+test_no_trigger_at_21pct: price -21% → no trigger
+
+═══════════════════════════════
+Tests FlashETHShield24h (5 tests):
+═══════════════════════════════
+
+test_product_id: keccak256("FLASHETH24-001")
+test_trigger_2000_bps: -20%
+test_asset_eth: ASSET == "ETH"
+test_trigger_at_20pct: trigger
+test_no_trigger_at_19pct: no trigger
+
+═══════════════════════════════
+Tests FlashETHShield48h (5 tests):
+═══════════════════════════════
+
+test_product_id: keccak256("FLASHETH48-001")
+test_trigger_2800_bps: -28%
+test_duration_48h: 172800
+test_trigger_at_28pct: trigger
+test_no_trigger_at_27pct: no trigger
+
+═══════════════════════════════
+Tests FlashVault (5 tests):
+═══════════════════════════════
+
+test_cooldown_7_days: cooldownDuration == 604800
+test_deposit_withdraw: flujo completo
+test_name_symbol: "Lumina FlashVault" / "lmFLASH"
+test_owner: deployer → se cambia post-deploy
+test_aave_integration: deposita idle en Aave
+
+═══════════════════════════════
+Tests de integración (5 tests):
+═══════════════════════════════
+
+test_full_flow_flash_btc_24h:
+  Deposit FlashVault → comprar Flash BTC 24h → trigger → payout
+
+test_premium_kink_flash_24h:
+  pBase 11300 → U=0% premium = $30.96 → U=80% = $46.44
+  Tolerance ±$0.50
+
+test_flash_isolated_from_volatile_short:
+  Trigger Flash → VolatileShort intacto
+
+test_both_durations_coexist:
+  Comprar Flash BTC 24h + Flash BTC 48h del mismo vault
+
+test_flash_expires_correctly:
+  Comprar 24h → warp 25h → trigger → no se puede (expirada)
+
+TOTAL: ~40 tests
+
+################################################################################
+#                                                                              #
+#   PARTE 4 — DOCUMENTACIÓN                                                   #
+#                                                                              #
+################################################################################
+
+════════════════════════════════════════
+4.1 — SKILL-V3.0.md (master en backend)
+════════════════════════════════════════
+
+Editar /c/Users/AGUSTIN/LUMINA-PROTOCOL/docs/SKILL-V3.0.md:
+
+A) PRODUCT QUICK REFERENCE — agregar 2 filas (no 4):
+
+| Flash BTC | FLASH-BTC | — | BTC | -18%/-22% | 80% | 24h/48h | FlashVault |
+| Flash ETH | FLASH-ETH | — | ETH | -20%/-28% | 80% | 24h/48h | FlashVault |
+
+B) INSURANCE PRODUCTS — agregar después de EXPLOIT:
+
+--- FLASH BTC ---
+What it covers: BTC flash crashes in 24 or 48 hours
+Product ID: "FLASH-BTC"
+Duration options:
+  24h: Trigger >18% drop (TRIGGER_DROP_BPS = 1800), pBase 11300
+  48h: Trigger >22% drop (TRIGGER_DROP_BPS = 2200), pBase 8250
+Verification: Chainlink spot price verified via EIP-712 signed proof (LuminaOracleV2)
+Deductible: 20% — Payout: 80% of coverage (binary, all-or-nothing)
+Duration: Choose exactly 24 hours OR exactly 48 hours (fixed, not flexible)
+Waiting period: NONE — coverage starts immediately at purchase
+Max allocation per vault: 30%
+Assets: BTC only
+Max proof age: 15 minutes
+Fee: 3% on premium + 3% on payout
+Required quote field: "asset": "BTC"
+Required durationSeconds: 86400 (24h) OR 172800 (48h) — no other value accepted
+
+Pricing ($10,000 coverage):
+  24h at 0% util: $30.96 | at 50%: $40.63 | at 80% (kink): $46.44
+  48h at 0% util: $45.21 | at 50%: $59.36 | at 80% (kink): $67.82
+
+Historical basis: BTC never dropped -18% in 24h in 1,095 days (worst: -14.12%).
+
+--- FLASH ETH ---
+What it covers: ETH flash crashes in 24 or 48 hours
+Product ID: "FLASH-ETH"
+Duration options:
+  24h: Trigger >20% drop (TRIGGER_DROP_BPS = 2000), pBase 11300
+  48h: Trigger >28% drop (TRIGGER_DROP_BPS = 2800), pBase 8250
+All other parameters same as Flash BTC but for ETH.
+Required quote field: "asset": "ETH"
+
+Pricing ($10,000 coverage):
+  24h at 0% util: $30.96 | at 50%: $40.63 | at 80% (kink): $46.44
+  48h at 0% util: $45.21 | at 50%: $59.36 | at 80% (kink): $67.82
+
+Historical basis: ETH never dropped -20% in 24h in 1,095 days (worst: -15.03%).
+
+C) /purchase productId list — agregar:
+  productId: "BTCCAT-001" | "ETHAPOC-001" | "FLASH-BTC" | "FLASH-ETH" | "DEPEG" | "IL" | "EXPLOIT"
+
+D) /quote body — agregar nota:
+  For FLASH-BTC and FLASH-ETH: durationSeconds must be exactly 86400 (24h) or 172800 (48h).
+  The API selects the appropriate trigger level based on the duration you choose.
+
+E) DECISION FRAMEWORK (4b) — agregar:
+
+IF your agent has leveraged positions (margin, perps, futures):
+  → Buy Flash BTC (FLASH-BTC) or Flash ETH (FLASH-ETH)
+  → Choose 24h for daily protection, 48h for weekends
+  → Protects against overnight flash crashes that trigger liquidations
+  → Cost: ~$31-47 per $10K coverage per day
+  → Renew every 24h/48h during high-volatility periods
+
+F) VAULTS — agregar fila:
+| FlashVault     | 7 days   | Flash BTC + Flash ETH | 27.8 - 132.4% | FLASH_VAULT_ADDRESS |
+
+G) CLAIM RESOLUTION — agregar:
+FLASH BTC: Oracle detects >18%/22% BTC drop → EIP-712 proof → 80% payout instantly
+FLASH ETH: Oracle detects >20%/28% ETH drop → EIP-712 proof → 80% payout instantly
+
+H) RENEWAL STRATEGY — agregar:
+  FLASH 24h: 300 (5 minutes before — no waiting period, short duration)
+  FLASH 48h: 300 (5 minutes before)
+
+I) CONTRACT ADDRESSES — agregar (post-deploy):
+  FlashVault:          FLASH_VAULT_ADDRESS
+  FlashBTCShield24h:   address
+  FlashBTCShield48h:   address
+  FlashETHShield24h:   address
+  FlashETHShield48h:   address
+
+════════════════════════════════════════
+4.2 — Sincronizar copias
+════════════════════════════════════════
+
+cp /c/Users/AGUSTIN/LUMINA-PROTOCOL/docs/SKILL-V3.0.md /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/public/SKILL-V3.0.md
+cp /c/Users/AGUSTIN/LUMINA-PROTOCOL/docs/SKILL-V3.0.md /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/public/LUMINA-SKILL.txt
+
+Verificar idénticos:
+diff /c/Users/AGUSTIN/LUMINA-PROTOCOL/docs/SKILL-V3.0.md /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/public/SKILL-V3.0.md
+diff /c/Users/AGUSTIN/LUMINA-PROTOCOL/docs/SKILL-V3.0.md /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page/public/LUMINA-SKILL.txt
+
+════════════════════════════════════════
+4.3 — Frontend config
+════════════════════════════════════════
+
+cd /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page
+
+grep -n "pBaseBps\|BTCCAT\|products" lib/lumina-config.ts | head -20
+
+Agregar 2 productos Flash (no 4) con el array durations[]:
+
+```typescript
+{
+  name: "Flash BTC",
+  id: "FLASH-BTC",
+  riskType: "volatile",
+  status: "ACTIVE",
+  waitingPeriod: 0,
+  deductible: 2000,
+  asset: "BTC",
+  description: "Ultra-short BTC flash crash coverage",
+  durations: [
+    { seconds: 86400, label: "24h", trigger: "-18%", pBaseBps: 11300 },
+    { seconds: 172800, label: "48h", trigger: "-22%", pBaseBps: 8250 }
+  ]
+},
+{
+  name: "Flash ETH",
+  id: "FLASH-ETH",
+  riskType: "volatile",
+  status: "ACTIVE",
+  waitingPeriod: 0,
+  deductible: 2000,
+  asset: "ETH",
+  description: "Ultra-short ETH flash crash coverage",
+  durations: [
+    { seconds: 86400, label: "24h", trigger: "-20%", pBaseBps: 11300 },
+    { seconds: 172800, label: "48h", trigger: "-28%", pBaseBps: 8250 }
+  ]
+}
+```
+
+Verificar que los componentes de UI muestren el selector de duración:
+grep -rn "duration\|Duration\|minDuration\|maxDuration" components/ --include="*.tsx" | head -10
+
+Si el UI tiene un selector de duración → los Flash van a mostrar [24h] [48h]
+Si no tiene → agregar un toggle/selector para productos con durations[]
+
+################################################################################
+#                                                                              #
+#   PARTE 5 — BUILD, TEST, COMMIT, PUSH                                       #
+#                                                                              #
+################################################################################
+
+cd /c/Users/AGUSTIN/LUMINA-PROTOCOL
+
+forge build 2>&1 | tail -20
+forge test --match-path test/products/FlashInsuranceTest.t.sol -vv 2>&1 | tail -40
+forge test 2>&1 | tail -5
+
+Si algo falla → arreglalo y seguí.
+
+COMMIT BACKEND:
+git add -A
+git commit -m "feat: Flash Insurance — 2 products × 2 durations + FlashVault
+
+NEW PRODUCTS (user-facing):
+- Flash BTC (FLASH-BTC): 24h (-18%) or 48h (-22%), pBase 11300/8250
+- Flash ETH (FLASH-ETH): 24h (-20%) or 48h (-28%), pBase 11300/8250
+- No waiting period, 15min max proof age, 20% deductible
+
+NEW CONTRACTS (on-chain):
+- FlashVault.sol: 7-day cooldown, UUPS, isolated from existing vaults
+- FlashBTCShield24h.sol, FlashBTCShield48h.sol
+- FlashETHShield24h.sol, FlashETHShield48h.sol
+
+API DESIGN:
+- User sends productId='FLASH-BTC' + durationSeconds=86400
+- API routes to FlashBTCShield24h automatically
+- /products shows 2 products with durations[] array
+
+ACTUARIAL:
+- 1,095 days of data, 0 historical hits
+- BTC worst day -14.12% (strike -18%, buffer 3.9pp)
+- ETH worst day -15.03% (strike -20%, buffer 5.0pp)
+- LP APY: 27.8% at 20% util, 73.9% at 50%, 132.4% at 80%
+
+~40 tests, all passing"
+git push
+
+COMMIT FRONTEND:
+cd /c/Users/AGUSTIN/Desktop/v0-lumina-landing-page
+git add -A
+git commit -m "feat: Flash Insurance in frontend + SKILL sync
+
+- 2 Flash products with duration selector in lumina-config
+- SKILL updated with Flash BTC/ETH documentation
+- FlashVault in vault table"
+git push
+
+################################################################################
+#                                                                              #
+#   PARTE 6 — OUTPUT                                                           #
+#                                                                              #
+################################################################################
+
+Mostrá:
+1. forge build result
+2. forge test result (total + Flash específicos)
+3. Contratos nuevos creados (5)
+4. Tests nuevos (cuántos)
+5. Cómo funciona el routing en la API (FLASH-BTC → shield interno)
+6. Archivos modificados
+7. SKILL sincronizado (3 idénticos)
+8. Si algo cambió del diseño, explicá por qué
+9. Pendiente post-deploy:
+   - Deploy FlashVault + 4 shields
+   - Register 4 shields en CoverRouter
+   - Set correlation group FLASH_CRASH cap 60%
+   - Update env vars en Railway
+   - Update SKILL con addresses reales

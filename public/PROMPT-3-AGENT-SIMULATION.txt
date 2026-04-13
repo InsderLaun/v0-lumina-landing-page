@@ -1,0 +1,327 @@
+═══════════════════════════════════════════════════════════
+PROMPT 3 — SIMULACIÓN DE AGENTES AUTÓNOMOS
+¿Comprarían el seguro? ¿Depositarían en el vault?
+═══════════════════════════════════════════════════════════
+
+Sos un simulador de agentes de IA autónomos que operan en DeFi.
+Vas a simular 6 agentes diferentes, cada uno con su perfil, portfolio
+y lógica de decisión. Cada agente debe analizar Flash Insurance de
+Lumina Protocol y dar su veredicto independiente.
+
+SEPARAR EN DOS ANÁLISIS:
+A) ¿Me conviene COMPRAR Flash Insurance? (como buyer)
+B) ¿Me conviene DEPOSITAR en el FlashVault? (como LP)
+
+Cada agente analiza AMBAS opciones por separado.
+
+═══════════════════════════════════════════════════════════
+DATOS DEL PRODUCTO
+═══════════════════════════════════════════════════════════
+
+Flash Insurance = seguros ultra-cortos contra crashes relámpago.
+Base L2, USDC settlement, automático vía API.
+
+COMPRADOR:
+| Producto | Strike | Duración | Prima ($10K) | Payout |
+|----------|--------|----------|-------------|--------|
+| Flash BTC 24h | BTC -18% | 24h | $31-47 | $8,000 |
+| Flash BTC 48h | BTC -22% | 48h | $45-68 | $8,000 |
+| Flash ETH 24h | ETH -20% | 24h | $31-47 | $8,000 |
+| Flash ETH 48h | ETH -28% | 48h | $45-68 | $8,000 |
+
+Sin waiting period. Cobertura inmediata.
+Claims automáticos (oracle + relayer, sin intervención humana).
+Historial: 0 triggers en 1,095 días de datos.
+Fee: 3% del premium al comprar. Payout 100% al agente.
+
+LP (FLASHVAULT):
+Cooldown: 7 días.
+APY estimado: 27.8% (U=20%) / 73.9% (U=50%) / 132.4% (U=80%)
+Riesgo: si BTC o ETH crashean >18-28% en 24-48h, el vault paga claims.
+Aave yield base (~4%) sobre capital idle.
+Fee: 3% performance fee solo sobre ganancia al retirar.
+Correlation group FLASH_CRASH: max 60% del vault expuesto a claims.
+
+API para comprar:
+POST /api/v2/quote {"productId":"FLASH-BTC","durationSeconds":86400,"coverageAmount":10000000000,"asset":"BTC","buyer":"0x..."}
+POST /api/v2/purchase (con X-API-Key header)
+
+═══════════════════════════════════════════════════════════
+AGENTE 1 — "CONSERVATIVE BOT" (gestión de riesgo pura)
+═══════════════════════════════════════════════════════════
+
+Perfil:
+- Portfolio: $200K en BTC spot (sin leverage)
+- Objetivo: preservar capital, minimizar drawdowns
+- Tolerancia al riesgo: BAJA
+- Opera en: Coinbase, Binance (CEX)
+- Horizonte: largo plazo (hodler)
+- Budget para seguros: máximo 1% del portfolio/año ($2,000)
+
+ANÁLISIS A — ¿Debería COMPRAR Flash BTC?
+
+Evaluar:
+1. ¿Mi portfolio está en riesgo de un crash -18% en 24h? 
+   Soy holder spot sin leverage. Si BTC cae -18%, pierdo $36K en papel
+   pero no me liquidan. ¿Necesito seguro?
+2. ¿El costo justifica la protección?
+   $31/día × 365 = $11,315/año → 5.7% del portfolio → EXCEDE mi budget
+   ¿Y si solo compro en momentos de alta volatilidad? ¿20 días/año?
+   20 × $31 = $620/año → dentro del budget
+3. ¿El payout de $8K compensa la pérdida de $36K en un crash?
+   Coverage $10K → payout $8K. Pero mi pérdida sería $36K.
+   Necesitaría $45K de cobertura → $140/día → inviable.
+4. EV analysis:
+   P(trigger) ≈ 0.274%, payout $8K, prima $31
+   EV = 0.00274 × $8,000 - $31 = $21.92 - $31 = -$9.08 por día
+   EV negativo para mí → ¿vale la pena pagar por la paz mental?
+
+VEREDICTO A: ¿COMPRO? (SÍ/NO/A VECES + justificación)
+
+ANÁLISIS B — ¿Debería DEPOSITAR en el FlashVault?
+
+Evaluar:
+1. Tengo $200K en BTC. ¿Debería convertir parte a USDC y depositar?
+2. APY 73.9% a U=50% vs BTC que puede subir 50% en un año
+3. Si deposito $20K en FlashVault (10% del portfolio):
+   Ganancia esperada: $20K × 73.9% = $14,780/año
+   Riesgo: crash BTC -18% → vault paga claims → pierdo parte
+   Con correlation group 60%: max pérdida = $12K de mis $20K
+4. ¿El riesgo/retorno es mejor que Aave ($20K × 4% = $800/año)?
+
+VEREDICTO B: ¿DEPOSITO? (SÍ/NO/PARCIAL + justificación)
+
+═══════════════════════════════════════════════════════════
+AGENTE 2 — "LEVERAGE DEGEN" (trader agresivo)
+═══════════════════════════════════════════════════════════
+
+Perfil:
+- Portfolio: $50K en ETH con 3x leverage en Hyperliquid
+- Posición efectiva: $150K long ETH
+- Precio de liquidación: ETH -25% desde entry
+- Tolerancia al riesgo: ALTA (pero no quiere ser liquidado)
+- Horizonte: intraday/semanal
+- Budget para seguros: lo que sea necesario para evitar liquidación
+
+ANÁLISIS A — ¿Debería COMPRAR Flash ETH?
+
+Evaluar:
+1. Mi liquidación es a -25%. Flash ETH 24h cubre desde -20%.
+   Si ETH cae -20%, recibo $8K que puedo usar como margin.
+   ¿Me salva de la liquidación? (necesito calcular si $8K es suficiente)
+2. Costo: $31/día es 0.062% del nocional de $50K
+   Por semana: $217. ¿Aceptable como costo de operar con leverage?
+3. ¿Flash 24h o 48h?
+   Opero activamente → 24h es suficiente, renuevo cada día.
+   Si me voy de vacaciones → 48h para cubrir el fin de semana.
+4. ¿Flash es mejor que un stop loss?
+   Stop loss en ETH a -18%: gratis pero puede no ejecutarse en crash
+   Flash ETH 24h a -20%: $31/día pero pago garantizado si triggerea
+   En un flash crash, el slippage del stop loss puede ser -25% (me liquida)
+   Flash me paga en todos los casos.
+5. EV: P(trigger) 0.274%, payout $8K
+   Pero mi pérdida si NO tengo Flash y me liquidan: -$50K
+   $31/día es seguro contra evento de -$50K.
+   Insurance-adjusted EV: positivo si considero el tail risk.
+
+VEREDICTO A: ¿COMPRO? (SÍ/NO + cuánto coverage)
+
+ANÁLISIS B — ¿Debería DEPOSITAR en el FlashVault?
+
+Evaluar:
+1. Soy trader, no LP. ¿Tiene sentido para mí depositar?
+2. Si deposito $10K como "hedge" (gano yield si no hay crash, pierdo si hay):
+   Es lo OPUESTO a mi posición long ETH.
+   Si ETH crashea → mi posición long pierde PERO el vault paga claims
+   → mi yield también se reduce. No es hedge, es correlación.
+3. ¿O es diversificación? Gano yield en USDC independiente de ETH price.
+
+VEREDICTO B: ¿DEPOSITO?
+
+═══════════════════════════════════════════════════════════
+AGENTE 3 — "YIELD FARMER" (optimizador de rendimiento)
+═══════════════════════════════════════════════════════════
+
+Perfil:
+- Portfolio: $500K en stablecoins (USDC, USDT, DAI)
+- Objetivo: maximizar yield con riesgo controlado
+- Actualmente: $300K en Aave (4% APY), $200K en Morpho (6% APY)
+- Tolerancia al riesgo: MEDIA
+- Busca: >10% APY sin riesgo de IL
+
+ANÁLISIS A — ¿Debería COMPRAR Flash Insurance?
+
+Evaluar:
+1. Tengo stables, no BTC/ETH. ¿Por qué compraría Flash BTC/ETH?
+2. ¿Puedo ser un market maker de Flash? (comprar Flash + vender calls)
+3. No tiene sentido para mi perfil como buyer.
+
+VEREDICTO A: ¿COMPRO? (probablemente NO)
+
+ANÁLISIS B — ¿Debería DEPOSITAR en el FlashVault?
+
+Evaluar:
+1. FlashVault a U=50% = 73.9% APY vs mis 4-6% actuales
+   $100K en FlashVault = $73,900/año vs $4,000-6,000 en Aave
+2. Riesgo: crash BTC/ETH -18% en 24h → vault paga
+   P(evento) = 0.274% por día = ~1 vez cada 365 días
+   Pero nunca pasó en 3 años (1,095 días)
+3. Si deposito $100K y ocurre un trigger:
+   Correlation group 60% → max pago = $60K
+   Pierdo hasta $60K de mis $100K. Evento devastador.
+4. ¿Vale la pena $73.9K de ganancia esperada por riesgo de perder $60K?
+   EV = $73.9K × 99.7% - $60K × 0.3% = $73.7K - $180 = +$73.5K
+   El EV es brutalmente positivo. Pero el tail risk es catastrófico.
+5. ¿Y si deposito solo $50K (10% del portfolio)?
+   Ganancia esperada: $36.9K
+   Max pérdida: $30K (6% del portfolio total) → aceptable
+6. Cooldown 7 días → liquido en 1 semana si quiero salir
+7. ¿Es mejor que las alternativas?
+   - Aave 4%: $2K/año, riesgo casi 0
+   - Morpho 6%: $3K/año, riesgo bajo
+   - FlashVault 73.9%: $36.9K/año, riesgo de cola
+
+VEREDICTO B: ¿DEPOSITO? (SÍ/NO/CUÁNTO)
+
+═══════════════════════════════════════════════════════════
+AGENTE 4 — "ARBITRAGE BOT" (oportunista de mercado)
+═══════════════════════════════════════════════════════════
+
+Perfil:
+- Portfolio: $100K en mixed crypto
+- Estrategia: arbitraje entre exchanges
+- Exposición: temporalmente long BTC/ETH durante arbitrajes
+- Horizonte: minutos a horas
+- Riesgo: un crash durante un arbitraje puede dejar posición abierta
+
+ANÁLISIS A — ¿Debería COMPRAR Flash?
+
+Evaluar:
+1. Mis arbitrajes duran 5-30 minutos. ¿Necesito 24h de cobertura?
+2. No puedo comprar Flash cada 30 minutos (costo + overhead)
+3. ¿Puedo comprar Flash 24h al inicio del día y cubrir todos mis arbs?
+4. Costo: $31/día vs ganancia típica de arbitraje: $200-500/día
+   → $31 es el 6-15% de mi ganancia diaria. ¿Aceptable?
+5. ¿Mi exposición max a un crash es mayor a $10K?
+   Si manejo $100K en posiciones: sí, $31 es barato.
+
+VEREDICTO A: ¿COMPRO?
+
+ANÁLISIS B — ¿Debería DEPOSITAR en el FlashVault?
+
+Evaluar:
+1. Tengo capital idle entre arbitrajes
+2. ¿Puedo depositar y retirar cada 7 días (cooldown)?
+3. El cooldown bloquea mi capital → no puedo usarlo para arbs
+4. ¿Deposito capital que NO uso para arbs (reserva)?
+
+VEREDICTO B: ¿DEPOSITO?
+
+═══════════════════════════════════════════════════════════
+AGENTE 5 — "DAO TREASURY" (gestión institucional)
+═══════════════════════════════════════════════════════════
+
+Perfil:
+- Treasury: $2M en mixed (60% stables, 20% ETH, 20% BTC)
+- Objetivo: preservar treasury + generar yield modesto
+- Gobernanza: multisig 3/5, decisiones lentas
+- Tolerancia al riesgo: MUY BAJA (son fondos de la comunidad)
+- Compliance: necesita auditoría, transparencia on-chain
+
+ANÁLISIS A — ¿Debería COMPRAR Flash para proteger el ETH/BTC del treasury?
+
+Evaluar:
+1. $400K en ETH + $400K en BTC = $800K en riesgo
+2. Flash para cubrir $800K a $31/$10K = $2,480/día = $905K/año
+   → Imposible. Cuesta más que el portfolio.
+3. ¿Cubrir solo parcialmente? $100K coverage = $310/día = $113K/año
+   → 14% del exposure. ¿Vale la pena?
+4. ¿Solo en momentos de alta volatilidad?
+5. El multisig 3/5 no puede comprar Flash cada 24h → inviable operativamente
+
+VEREDICTO A: ¿COMPRO?
+
+ANÁLISIS B — ¿Debería DEPOSITAR stables del treasury en FlashVault?
+
+Evaluar:
+1. $1.2M en stables. ¿Cuánto a FlashVault?
+2. APY 73.9% sobre $200K = $147,800/año → atractivo
+3. Riesgo: crash → vault pierde hasta 60% → pierdo $120K de $200K
+4. ¿La comunidad aceptaría ese riesgo?
+5. ¿El protocolo Lumina está auditado? (CertiK pendiente)
+6. ¿Smart contract risk del vault mismo?
+7. ¿Necesita aprobación de governance para depositar?
+
+VEREDICTO B: ¿DEPOSITO?
+
+═══════════════════════════════════════════════════════════
+AGENTE 6 — "AI TRADING AGENT" (ElizaOS / Virtuals)
+═══════════════════════════════════════════════════════════
+
+Perfil:
+- Es un agente de IA autónomo corriendo en ElizaOS
+- Portfolio: $30K gestionados autónomamente
+- Estrategia: momentum + mean reversion en ETH/BTC
+- Posiciones: 1-5x leverage, rotación diaria
+- Decisiones: 100% automatizadas, sin intervención humana
+- Integración: REST API (perfecta para Lumina)
+
+ANÁLISIS A — ¿Debería COMPRAR Flash?
+
+Evaluar:
+1. SOY el target market exacto de Lumina. ¿Lo reconozco?
+2. Mi lógica de compra:
+   IF leverage > 2x AND volatility_24h > 3% THEN buy Flash
+   ELSE skip (ahorro en primas)
+3. Integración técnica:
+   POST /quote + POST /purchase → 2 API calls por día
+   ¿Puedo automatizar la renovación? (sí, loop cada 24h)
+4. Costo: $31/día × ~200 días de alta vol = $6,200/año
+   vs mi portfolio de $30K → 20.7% del portfolio en seguros
+   ¿Es mucho? ¿O es el costo de operar con leverage?
+5. ¿El payout de $8K me salva de liquidación?
+   Con $30K y 3x leverage → liquidación a -25%
+   Flash ETH 24h cubre -20% → recibo $8K antes de liquidación
+   $8K permite reducir leverage o agregar margin
+6. ¿Hay latencia? (block confirmation + oracle + relayer)
+   ¿En un crash real, cuánto tarda el payout en llegar?
+
+VEREDICTO A: ¿COMPRO? (SÍ/NO + lógica exacta)
+
+ANÁLISIS B — ¿Debería DEPOSITAR en el FlashVault?
+
+Evaluar:
+1. ¿Puedo ser LP Y trader al mismo tiempo?
+2. Si deposito en FlashVault, mi capital está bloqueado 7 días
+3. Como agente de trading, necesito liquidez → FlashVault no es para mí
+4. A MENOS que tenga capital de reserva que no uso para trading
+
+VEREDICTO B: ¿DEPOSITO?
+
+═══════════════════════════════════════════════════════════
+TABLA CONSOLIDADA DE VEREDICTOS
+═══════════════════════════════════════════════════════════
+
+| Agente | Perfil | ¿Compra Flash? | ¿Deposita en Vault? | Razonamiento clave |
+|--------|--------|---------------|---------------------|-------------------|
+| 1 | Conservative | ? | ? | ? |
+| 2 | Leverage Degen | ? | ? | ? |
+| 3 | Yield Farmer | ? | ? | ? |
+| 4 | Arbitrage Bot | ? | ? | ? |
+| 5 | DAO Treasury | ? | ? | ? |
+| 6 | AI Trading Agent | ? | ? | ? |
+
+CONCLUSIONES:
+
+1. ¿Para qué perfiles tiene sentido COMPRAR Flash?
+2. ¿Para qué perfiles tiene sentido ser LP del FlashVault?
+3. ¿Hay un perfil que NO debería usar Flash de ninguna forma?
+4. ¿Cuál es el mercado total estimado?
+   - ¿Cuántos agentes tipo 6 existen hoy?
+   - ¿Cuántos traders tipo 2?
+   - ¿Cuántos yield farmers tipo 3?
+5. ¿El producto sobrevive un análisis de product-market fit?
+6. ¿Qué cambiarían los agentes del producto?
+
+RECOMENDACIONES FINALES:
+Top 3 mejoras sugeridas por los agentes (consolidadas).
