@@ -32,12 +32,12 @@ function useAaveYield() {
           p.chain === 'Base' &&
           p.symbol === 'USDC'
         );
-        const rate = pool ? parseFloat(pool.apy.toFixed(2)) : 3.5;
+        const rate = pool ? parseFloat(pool.apy.toFixed(2)) : 2.7;
         setApy(rate);
         localStorage.setItem('aave_usdc_apy', rate.toString());
         localStorage.setItem('aave_usdc_apy_time', Date.now().toString());
       })
-      .catch(() => setApy(3.5));
+      .catch(() => setApy(2.7));
   }, []);
 
   return apy;

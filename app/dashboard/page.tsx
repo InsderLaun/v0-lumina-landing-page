@@ -258,11 +258,16 @@ const STATUS_LABELS: Record<number, { label: string; color: string; pulse?: bool
 // Blended pBase per vault type (weighted average of products — actuarial specs):
 //   VOLATILE vaults back BCS + EAS + IL -> avg pBase
 //   STABLE vaults back DEPEG + EXPLOIT -> avg pBase
-function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE"): number {
-  const aaveBaseYield = 0.04 // ~4% Aave V3 USDC lending yield (variable)
-  const volatileBlendedBps = (PRODUCTS_CONFIG.BCS.pBaseBps + PRODUCTS_CONFIG.EAS.pBaseBps + PRODUCTS_CONFIG.IL.pBaseBps) / 3
-  const stableBlendedBps = (PRODUCTS_CONFIG.DEPEG.pBaseBps + PRODUCTS_CONFIG.EXPLOIT.pBaseBps) / 2
-  const pBaseBps = riskType === "VOLATILE" ? volatileBlendedBps : stableBlendedBps
+function calculateAPY(utilization: number, riskType: "VOLATILE" | "STABLE", aaveAPY?: number): number {
+  const aaveBaseYield = aaveAPY !== undefined ? aaveAPY / 100 : 0.0266 // Real Aave rate from API, fallback 2.66%
+  let pBaseBps: number
+  if (riskType === "VOLATILE") {
+    const volatileBlendedBps = (PRODUCTS_CONFIG.BCS.pBaseBps + PRODUCTS_CONFIG.EAS.pBaseBps + PRODUCTS_CONFIG.IL.pBaseBps) / 3
+    pBaseBps = volatileBlendedBps
+  } else {
+    const stableBlendedBps = (PRODUCTS_CONFIG.DEPEG.pBaseBps + PRODUCTS_CONFIG.EXPLOIT.pBaseBps) / 2
+    pBaseBps = stableBlendedBps
+  }
   const pBaseRate = pBaseBps / 10000
 
   // M(U) from PremiumMath.sol — uses imported calcKinkMultiplier
@@ -289,6 +294,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>("Overview")
   const [vaultData, setVaultData] = useState<VaultData[]>([])
   const [vaultsLoading, setVaultsLoading] = useState(true)
+  const [aaveSupplyAPY, setAaveSupplyAPY] = useState<number | undefined>(undefined)
   const [policies, setPolicies] = useState<PolicyData[]>([])
   const [policiesLoading, setPoliciesLoading] = useState(true)
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now())
@@ -423,7 +429,7 @@ export default function DashboardPage() {
           ? Number((userShares * BigInt(totalAssets)) / totalSupply)
           : 0
         const utilization = totalAssets > 0 ? allocated / totalAssets : 0
-        const estimatedAPY = calculateAPY(utilization, vault.riskType)
+        const estimatedAPY = calculateAPY(utilization, vault.riskType, aaveSupplyAPY)
 
         vaultResults.push({
           address: vault.address, totalAssets, totalSupply, userShares, userValue,
@@ -520,6 +526,9 @@ export default function DashboardPage() {
       if (!res.ok) return false
       const data = await res.json()
 
+      // Extract Aave supply rate from API if available
+      if (data.aaveSupplyAPY !== undefined) setAaveSupplyAPY(data.aaveSupplyAPY)
+
       // Parse vaults from API (protocol-level data only)
       const vaults: VaultData[] = VAULT_CONFIG.map((vault) => {
         const apiVault = data.vaults?.find((v: { address: string }) => v.address.toLowerCase() === vault.address.toLowerCase())
@@ -533,7 +542,7 @@ export default function DashboardPage() {
         return {
           address: vault.address, totalAssets, totalSupply, userShares: 0n, userValue: 0,
           allocated, utilizationBps: apiVault.utilizationBps,
-          estimatedAPY: calculateAPY(utilization, vault.riskType),
+          estimatedAPY: apiVault.estimatedAPY || calculateAPY(utilization, vault.riskType, data.aaveSupplyAPY),
           withdrawalShares: 0n, cooldownEnd: 0, withdrawalQueueV2: [], loading: false,
         }
       })
