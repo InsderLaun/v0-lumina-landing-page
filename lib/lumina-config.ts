@@ -54,7 +54,7 @@ export const CONTRACTS = {
     VolatileLong: "0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" as `0x${string}`,
     StableShort: "0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" as `0x${string}`,
     StableLong: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" as `0x${string}`,
-    FlashVault: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+    FlashVault: "0x65D22E9BfE79306433Bf93Da9B0e5b626b8D021b" as `0x${string}`,
   },
   shields: {
     BCS: "0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21" as `0x${string}`,
