@@ -16,6 +16,7 @@ import { TransactionStatus, InsufficientFundsBanner, type TxStatus } from "./tx-
 interface DepositLPModalProps {
     open: boolean
     onClose: () => void
+    preselectedVault?: string // vault key e.g. "VolatileShort", "FlashVault"
 }
 
 // The four production vaults a LP can deposit into. Mirrors the
@@ -58,11 +59,20 @@ const VAULT_OPTIONS = [
         risk: "Very Low",
         products: "DEPEG, EXPLOIT",
     },
+    {
+        key: "FlashVault" as const,
+        address: CONTRACTS.vaults.FlashVault,
+        name: "Flash Vault",
+        description: "Backs Flash BTC + Flash ETH. 7-day cooldown.",
+        cooldownDays: 7,
+        risk: "Higher",
+        products: "Flash BTC, Flash ETH",
+    },
 ]
 
 const MIN_DEPOSIT_USDC = 100 // BaseVault.MIN_DEPOSIT = 100e6
 
-export function DepositLPModal({ open, onClose }: DepositLPModalProps) {
+export function DepositLPModal({ open, onClose, preselectedVault }: DepositLPModalProps) {
     // Unified wallet source. Uses wagmi if available, otherwise the
     // legacy localStorage. The first time the user clicks "Approve"
     // we lazily call bridgeWagmi() so wagmi can sign the tx without
@@ -77,8 +87,20 @@ export function DepositLPModal({ open, onClose }: DepositLPModalProps) {
                 .finally(() => setBridging(false))
         }
     }, [open, address, isWagmiConnected, bridging])
-    const [selectedVault, setSelectedVault] = useState<typeof VAULT_OPTIONS[number] | null>(null)
+
+    // If vault is preselected (from "Deposit into X" button), skip vault selection
+    const preVault = preselectedVault ? VAULT_OPTIONS.find(v => v.key === preselectedVault) : null
+    const [selectedVault, setSelectedVault] = useState<typeof VAULT_OPTIONS[number] | null>(preVault || null)
     const [step, setStep] = useState(1)
+
+    // Reset when modal opens with different vault
+    useEffect(() => {
+        if (open) {
+            const v = preselectedVault ? VAULT_OPTIONS.find(vv => vv.key === preselectedVault) : null
+            setSelectedVault(v || null)
+            setStep(1)
+        }
+    }, [open, preselectedVault])
     const [depositAmount, setDepositAmount] = useState(1000)
     const [error, setError] = useState("")
     const [approvalTxStatus, setApprovalTxStatus] = useState<TxStatus>("idle")
@@ -196,11 +218,18 @@ export function DepositLPModal({ open, onClose }: DepositLPModalProps) {
                                 <p className="text-sm text-lumina-purple mt-1">{usdcDisplay}</p>
                             </div>
                             <button
-                                onClick={() => setStep(2)}
+                                onClick={() => {
+                                    if (preVault) {
+                                        setSelectedVault(preVault)
+                                        setStep(3)
+                                    } else {
+                                        setStep(2)
+                                    }
+                                }}
                                 disabled={!address}
                                 className="w-full py-3 rounded-lg bg-lumina-purple text-white font-semibold text-sm hover:shadow-glow-purple transition-all disabled:opacity-50"
                             >
-                                Choose Vault →
+                                {preVault ? `Deposit into ${preVault.name} →` : "Choose Vault →"}
                             </button>
                         </div>
                     )}
@@ -306,7 +335,7 @@ export function DepositLPModal({ open, onClose }: DepositLPModalProps) {
 
                             <TransactionStatus status={approvalTxStatus} txHash={approveTxHash} errorMessage={error} />
 
-                            <button onClick={() => setStep(2)} className="w-full py-2 text-sm text-lumina-muted">← Back</button>
+                            <button onClick={() => setStep(preVault ? 1 : 2)} className="w-full py-2 text-sm text-lumina-muted">← Back</button>
                         </div>
                     )}
 

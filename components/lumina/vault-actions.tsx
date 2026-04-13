@@ -21,6 +21,7 @@ import { BASE_VAULT_ABI } from "@/lib/abis"
 import { useLuminaWallet } from "@/hooks/use-lumina-wallet"
 import { bridgeWagmi } from "@/lib/wallet-bridge"
 import { DepositLPModal } from "./deposit-lp-modal"
+import { CONTRACTS } from "@/lib/lumina-config"
 
 interface VaultActionsProps {
     vaultAddress: `0x${string}`
@@ -195,7 +196,13 @@ export function VaultActions({
                 )}
             </div>
 
-            <DepositLPModal open={showDeposit} onClose={() => setShowDeposit(false)} />
+            <DepositLPModal
+                open={showDeposit}
+                onClose={() => setShowDeposit(false)}
+                preselectedVault={
+                    Object.entries(CONTRACTS.vaults).find(([, addr]) => addr.toLowerCase() === vaultAddress.toLowerCase())?.[0]
+                }
+            />
         </>
     )
 }
