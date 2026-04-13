@@ -69,6 +69,16 @@ const VAULT_CONFIG = [
     riskBadge: "Very Low Risk",
     riskBadgeColor: "green",
   },
+  {
+    name: "Flash Vault",
+    address: CONTRACTS.vaults.FlashVault,
+    cooldown: "7 days",
+    riskType: "VOLATILE" as const,
+    products: "Flash BTC + Flash ETH",
+    color: "purple",
+    riskBadge: "Higher Risk",
+    riskBadgeColor: "amber",
+  },
 ]
 
 // ════════════════════════════════════════════
@@ -351,7 +361,7 @@ export default function DashboardPage() {
     const userAddr = userWallet || ZERO_ADDRESS
     const allCalls: { to: string; data: string }[] = []
 
-    // Vault calls (28): 7 per vault × 4 vaults
+    // Vault calls (35): 7 per vault × 5 vaults
     for (const vault of VAULT_CONFIG) {
       allCalls.push(
         { to: vault.address, data: SEL_TOTAL_ASSETS },
