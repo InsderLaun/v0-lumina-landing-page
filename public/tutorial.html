@@ -61,9 +61,22 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <table>
 <tr><th>Item</th><th>What It Is</th><th>Where to Get It</th></tr>
 <tr><td>Wallet</td><td>MetaMask, Coinbase Wallet, or Rainbow</td><td><a href="https://metamask.io">metamask.io</a></td></tr>
-<tr><td>USDC</td><td>USDC stablecoin by Circle</td><td><a href="https://coinbase.com">coinbase.com</a></td></tr>
+<tr><td>USDC</td><td>Minimum $100 USDC (for smallest policy). Recommended: $500+ for meaningful coverage.</td><td><a href="https://coinbase.com">coinbase.com</a></td></tr>
 <tr><td>ETH on Base</td><td>For one-time approval (~$0.01)</td><td>Bridge or buy on Base</td></tr>
 </table>
+
+<div class="info">
+<p><strong>How much does insurance cost?</strong> Premiums depend on the product and coverage amount. Examples for $10,000 coverage:</p>
+<table style="margin-top:8px;font-size:0.85rem">
+<tr><th>Product</th><th>Duration</th><th>Approx. Premium</th></tr>
+<tr><td>BTC Catastrophe Shield</td><td>14 days</td><td>$58 - $95</td></tr>
+<tr><td>ETH Apocalypse Shield</td><td>14 days</td><td>$77 - $127</td></tr>
+<tr><td>Flash BTC (24h)</td><td>24 hours</td><td>$31 - $47</td></tr>
+<tr><td>Flash ETH (48h)</td><td>48 hours</td><td>$45 - $68</td></tr>
+<tr><td>Depeg Shield (USDT)</td><td>30 days</td><td>$21 - $34</td></tr>
+</table>
+<p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:8px;margin-bottom:0">Prices vary with vault utilization. Lower utilization = lower premiums. Your agent gets an exact quote before buying.</p>
+</div>
 
 <h2>Step 1: Create Your API Key</h2>
 <div class="step">
@@ -392,7 +405,27 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This buys $100 BTC Catastrophe Shield for 7 days. Note: <code>"asset":"BTC"</code> is required for BCS/EAS. Use <code>"stablecoin":"USDT"</code> for DEPEG.</p>
 </details>
 
-<p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the Dashboard to see your active policy.</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the <a href="/dashboard" style="color:#22d3ee">Dashboard</a> to see your active policy.</p>
+
+<details style="margin-bottom:16px">
+<summary style="color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.8rem">&#x1F6E0; Troubleshooting — something went wrong?</summary>
+<div style="margin-top:12px;font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.7">
+<p><strong>&#x274C; "VAULT_EMPTY" error when buying</strong><br>
+The vault backing this product has no liquidity yet. This is temporary — LPs need to deposit USDC first. Try again later or choose a different product.</p>
+
+<p><strong>&#x274C; Transaction failed or stuck</strong><br>
+Check on <a href="https://basescan.org" target="_blank" style="color:#22d3ee">BaseScan</a> using your wallet address. Common causes: insufficient USDC balance, USDC not approved, or gas too low. The approval in Step 2 should cover this — if not, re-approve with a higher amount.</p>
+
+<p><strong>&#x274C; Policy doesn't appear in Dashboard</strong><br>
+Wait 1-2 minutes — the Dashboard polls the blockchain. If still missing, check BaseScan for the transaction. If the transaction is confirmed but the policy doesn't show, try refreshing with Ctrl+Shift+R.</p>
+
+<p><strong>&#x274C; Agent says "Wallet mismatch"</strong><br>
+The wallet that approved USDC must be the same wallet used to create the API key. If you used different wallets, create a new API key with the wallet that has the USDC approval.</p>
+
+<p><strong>&#x2753; Still stuck?</strong><br>
+Email <a href="mailto:support@lumina-org.com" style="color:#22d3ee">support@lumina-org.com</a> with your wallet address and the error message.</p>
+</div>
+</details>
 
 <button onclick="finishSetup()" style="display:block;width:100%;background:linear-gradient(135deg,#00e5ff,#7c4dff);color:white;border:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:16px">
 ✅ Setup Complete — Back to Lumina →
