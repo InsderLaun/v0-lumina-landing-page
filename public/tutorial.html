@@ -182,6 +182,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <input type="checkbox" class="vault-cb" data-vault="0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" data-name="Stable Short" checked style="accent-color:#22d3ee"> Stable Short (90d)</label>
 <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer">
 <input type="checkbox" class="vault-cb" data-vault="0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" data-name="Stable Long" checked style="accent-color:#22d3ee"> Stable Long (365d)</label>
+<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer">
+<input type="checkbox" class="vault-cb" data-vault="0x65D22E9BfE79306433Bf93Da9B0e5b626b8D021b" data-name="Flash Vault" checked style="accent-color:#22d3ee"> Flash Vault (7d)</label>
 </div>
 
 <button id="btn-approve" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:not-allowed;opacity:0.5" disabled>Approve with MetaMask</button>
@@ -538,7 +540,8 @@ function finishSetup() {
     { address: '0xbd44547581b92805aAECc40EB2809352b9b2880d', name: 'Volatile Short' },
     { address: '0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904', name: 'Volatile Long' },
     { address: '0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC', name: 'Stable Short' },
-    { address: '0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c', name: 'Stable Long' }
+    { address: '0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c', name: 'Stable Long' },
+    { address: '0x65D22E9BfE79306433Bf93Da9B0e5b626b8D021b', name: 'Flash Vault' }
   ];
 
   const TOOLTIP_INSURANCE = '\uD83D\uDCB3 Your limit, your control: This amount is the maximum \'allowance\' your AI Agent is permitted to use. If the Agent detects a risk and wants to buy $100 of insurance but you only approved $50, the purchase will be blocked. You own the money; the Agent is just the manager.';
