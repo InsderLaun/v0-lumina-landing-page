@@ -721,9 +721,9 @@ function PricingSection() {
 function TokenomicsSection() {
   const allocations = [
     { label: "Bond Reserve", pct: 82, color: "bg-cyan-500", desc: "Locked, immutable. Backs all ClaimBond payouts." },
-    { label: "Founder", pct: 10, color: "bg-purple-500", desc: "4-year vesting, 1-year cliff." },
+    { label: "Founder", pct: 10, color: "bg-purple-500", desc: "Locked until AltSeason (2-of-3 market conditions met for 7 days). Released in 3 monthly tranches. 4-year fallback if conditions never trigger." },
     { label: "LBP (Fjord)", pct: 5, color: "bg-green-500", desc: "Liquidity Bootstrapping Pool for fair price discovery." },
-    { label: "Treasury", pct: 3, color: "bg-amber-500", desc: "Protocol development, audits, operations." },
+    { label: "Treasury", pct: 3, color: "bg-amber-500", desc: "Locked 6 months. Then max 250,000 LUMINA/month. Used only for liquidity, audits, bug bounties, and emergencies. Controlled by multisig. Never sold on open market." },
   ]
 
   return (
