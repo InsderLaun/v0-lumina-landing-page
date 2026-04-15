@@ -213,7 +213,7 @@ export default function Home() {
               <ul className="space-y-2 text-white/60 text-sm">
                 <li>• ClaimBonds are <strong className="text-white/80">ERC-1155 tokens</strong> on Base L2 — not unique NFTs.</li>
                 <li>• All bonds maturing the same month are <strong className="text-white/80">identical and interchangeable</strong>.</li>
-                <li>• 1 bond token = 1 $LUMINA claimable at maturity.</li>
+                <li>• 1 bond token = <strong className="text-white/80">$1 USD claimable at maturity</strong>, settled in $LUMINA at market price.</li>
                 <li>• Your bond matures <strong className="text-white/80">24 months</strong> after issuance.</li>
                 <li>• Bonds come from the Bond Reserve — 82 million $LUMINA locked in an <strong className="text-white/80">immutable vault with no owner and no withdraw function</strong>.</li>
               </ul>
@@ -227,21 +227,21 @@ export default function Home() {
                 <h5 className="font-semibold text-green-400 mb-2">Option A — Hold until maturity</h5>
                 <p className="text-white/50 text-sm leading-relaxed">Wait 24 months. Redeem your bonds for $LUMINA from the Bond Reserve.</p>
                 <p className="text-white/50 text-sm mt-2">If $LUMINA price went up, your bonds are worth MORE than the original payout.</p>
-                <p className="text-xs text-white/30 mt-3 italic">Example: Receive 22,222 tokens at $0.036. 24 months later, $LUMINA = $0.20 → bonds worth $4,444 (was $800).</p>
+                <p className="text-xs text-white/30 mt-3 italic">Example: $800 bond redeemed when $LUMINA = $0.50 → you receive 1,600 LUMINA ($800 worth). The USD value is always $800.</p>
               </div>
               <div className="p-5 rounded-2xl bg-white/[0.02] border border-cyan-500/20">
                 <div className="text-2xl mb-2">💵</div>
                 <h5 className="font-semibold text-cyan-400 mb-2">Option B — Sell everything now</h5>
                 <p className="text-white/50 text-sm leading-relaxed">Sell all your bonds on the secondary market for USDC today.</p>
                 <p className="text-white/50 text-sm mt-2">Buyers pay a discounted price (typically 30-60% of face value).</p>
-                <p className="text-xs text-white/30 mt-3 italic">Example: 22,222 tokens. Sell all at $0.015/token → receive $333 USDC today.</p>
+                <p className="text-xs text-white/30 mt-3 italic">Example: $800 bond → sell for $300-500 USDC today. Buyer waits 24 months to collect $800 in $LUMINA.</p>
               </div>
               <div className="p-5 rounded-2xl bg-white/[0.02] border border-purple-500/20">
                 <div className="text-2xl mb-2">⚖️</div>
                 <h5 className="font-semibold text-purple-400 mb-2">Option C — Sell some, keep some</h5>
                 <p className="text-white/50 text-sm leading-relaxed">Bonds are fractional. Sell part of your position, hold the rest.</p>
                 <p className="text-white/50 text-sm mt-2">Best of both worlds: immediate cash + long-term upside.</p>
-                <p className="text-xs text-white/30 mt-3 italic">Example: 22,222 tokens → sell 15,000 ($225 USDC today) → hold 7,222 (redeem in 24 months).</p>
+                <p className="text-xs text-white/30 mt-3 italic">Example: $800 bond → sell $500 worth now for USDC → keep $300 for maturity redemption.</p>
               </div>
             </div>
 
@@ -254,27 +254,26 @@ export default function Home() {
                     <th className="py-3 px-4 text-left text-white/40 font-medium">Product</th>
                     <th className="py-3 px-4 text-left text-white/40 font-medium">Coverage</th>
                     <th className="py-3 px-4 text-left text-white/40 font-medium">Premium</th>
-                    <th className="py-3 px-4 text-left text-white/40 font-medium">Bond Tokens</th>
-                    <th className="py-3 px-4 text-left text-white/40 font-medium">Value at Issue</th>
-                    <th className="py-3 px-4 text-left text-white/40 font-medium">If LUMINA 5x</th>
+                    <th className="py-3 px-4 text-left text-white/40 font-medium">Bond Payout</th>
+                    <th className="py-3 px-4 text-left text-white/40 font-medium">Multiplier</th>
                   </tr>
                 </thead>
                 <tbody className="text-white/70">
-                  <tr className="border-b border-white/5"><td className="py-3 px-4">Flash BTC 1h</td><td className="px-4">$1,000</td><td className="px-4">$2.40</td><td className="px-4 text-cyan-400">22,222</td><td className="px-4">$800</td><td className="px-4 text-green-400">$4,000</td></tr>
-                  <tr className="border-b border-white/5"><td className="py-3 px-4">Flash BTC 24h</td><td className="px-4">$1,000</td><td className="px-4">$18.00</td><td className="px-4 text-cyan-400">22,222</td><td className="px-4">$800</td><td className="px-4 text-green-400">$4,000</td></tr>
-                  <tr className="border-b border-white/5"><td className="py-3 px-4">Flash BTC 1h</td><td className="px-4">$5,000</td><td className="px-4">$12.00</td><td className="px-4 text-cyan-400">111,111</td><td className="px-4">$4,000</td><td className="px-4 text-green-400">$20,000</td></tr>
-                  <tr className="border-b border-white/5"><td className="py-3 px-4">Micro Depeg</td><td className="px-4">$1,000</td><td className="px-4">$42.00</td><td className="px-4 text-cyan-400">22,222</td><td className="px-4">$800</td><td className="px-4 text-green-400">$4,000</td></tr>
-                  <tr className="border-b border-white/5"><td className="py-3 px-4">Flash BTC 1h</td><td className="px-4">$10,000</td><td className="px-4">$24.00</td><td className="px-4 text-cyan-400">222,222</td><td className="px-4">$8,000</td><td className="px-4 text-green-400">$40,000</td></tr>
+                  <tr className="border-b border-white/5"><td className="py-3 px-4">Flash BTC 1h</td><td className="px-4">$1,000</td><td className="px-4">$2.40</td><td className="px-4 text-cyan-400">$800 bond</td><td className="px-4 text-purple-400 font-bold">333x</td></tr>
+                  <tr className="border-b border-white/5"><td className="py-3 px-4">Flash BTC 24h</td><td className="px-4">$1,000</td><td className="px-4">$18.00</td><td className="px-4 text-cyan-400">$800 bond</td><td className="px-4 text-purple-400 font-bold">44x</td></tr>
+                  <tr className="border-b border-white/5"><td className="py-3 px-4">Flash BTC 1h</td><td className="px-4">$5,000</td><td className="px-4">$12.00</td><td className="px-4 text-cyan-400">$4,000 bond</td><td className="px-4 text-purple-400 font-bold">333x</td></tr>
+                  <tr className="border-b border-white/5"><td className="py-3 px-4">Micro Depeg</td><td className="px-4">$1,000</td><td className="px-4">$42.00</td><td className="px-4 text-cyan-400">$800 bond</td><td className="px-4 text-purple-400 font-bold">19x</td></tr>
+                  <tr className="border-b border-white/5"><td className="py-3 px-4">Flash BTC 1h</td><td className="px-4">$10,000</td><td className="px-4">$24.00</td><td className="px-4 text-cyan-400">$8,000 bond</td><td className="px-4 text-purple-400 font-bold">333x</td></tr>
                 </tbody>
               </table>
-              <p className="text-xs text-white/30 mt-3 text-center">Bond token count = payout / $LUMINA price at issuance. All examples assume $LUMINA = $0.036. Actual count varies with market price.</p>
+              <p className="text-xs text-white/30 mt-3 text-center">Bond payouts are fixed in USD. At redemption, you receive $LUMINA tokens at the current market price. Example: an $800 bond redeemed when $LUMINA = $0.50 pays 1,600 LUMINA ($800 worth).</p>
             </div>
 
             {/* Block 4: Who buys bonds */}
             <div className="p-6 rounded-2xl bg-white/[0.02] border border-amber-500/20">
               <h4 className="text-xl font-bold text-amber-400 mb-3">Who buys bonds on the secondary market?</h4>
               <p className="text-white/60 text-sm leading-relaxed mb-2">Yield seekers buy your bonds at a discount because they&apos;re willing to wait 24 months.</p>
-              <p className="text-white/60 text-sm leading-relaxed mb-2">A bond worth $800 in 24 months might sell for $300-500 today — that&apos;s 60-166% IRR for the buyer.</p>
+              <p className="text-white/60 text-sm leading-relaxed mb-2">An $800 bond might sell for $300-500 today — that&apos;s 60-166% IRR for the buyer. At maturity, the buyer redeems for $800 worth of $LUMINA regardless of price.</p>
               <p className="text-white/60 text-sm leading-relaxed mb-2">The deeper the discount, the higher the yield. Both sides win.</p>
               <p className="text-white/40 text-xs mt-3 italic">The secondary market is P2P — the protocol never buys bonds. Liquidity comes from real market demand.</p>
             </div>
