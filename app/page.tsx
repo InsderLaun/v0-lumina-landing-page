@@ -149,25 +149,48 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="min-h-[220px]"><HowCard step="01" icon="🎯" title="Choose Your Bet" description="Pick a product (Flash BTC 1h, Micro Depeg, Rate Shock, etc.) and select your coverage amount. Each product has a specific trigger condition and multiplier." note="9 products covering BTC, ETH, USDT, USDC rates." accent="cyan" /></div>
-            <div className="min-h-[220px]"><HowCard step="02" icon="🔥" title="Premium Burns $LUMINA" description="100% of your premium is used to buy $LUMINA on the open market and burn it forever. Nothing goes to the team. Every cent destroys tokens permanently." note="Deflationary pressure on every transaction." accent="cyan" /></div>
-            <div className="min-h-[220px]"><HowCard step="03" icon="🔮" title="Oracle Checks" description="Chainlink oracles monitor the parametric condition in real-time. No human judgment, no committees, no disputes. The trigger either happens or it doesn't. Pure math." note="Trustless verification, same-block resolution." accent="cyan" /></div>
-            <div className="space-y-4">
-              <div className="p-5 rounded-2xl bg-white/[0.02] border border-green-500/20 hover:border-green-500/40 transition-all duration-300">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">✅</span>
-                  <span className="text-sm font-mono text-green-500">04a</span>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">No Trigger</h3>
-                <p className="text-white/50 text-sm leading-relaxed">Bet lost. The $LUMINA burn is permanent. Supply shrinks forever.</p>
+            <div className="min-h-[260px] p-5 rounded-2xl bg-white/[0.02] border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300 flex flex-col items-start">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🎯</span>
+                <span className="text-sm font-mono text-cyan-500">01</span>
               </div>
-              <div className="p-5 rounded-2xl bg-white/[0.02] border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">🎉</span>
-                  <span className="text-sm font-mono text-purple-500">04b</span>
+              <h3 className="text-lg font-semibold mb-2">Choose Your Bet</h3>
+              <p className="text-white/50 text-sm leading-relaxed flex-1">Pick a product (Flash BTC 1h, Micro Depeg, Rate Shock, etc.) and select your coverage amount. Each product has a specific trigger condition and multiplier.</p>
+              <p className="text-xs text-cyan-400/50 mt-3">9 products covering BTC, ETH, USDT, USDC rates.</p>
+            </div>
+            <div className="min-h-[260px] p-5 rounded-2xl bg-white/[0.02] border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300 flex flex-col items-start">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🔥</span>
+                <span className="text-sm font-mono text-cyan-500">02</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Premium Burns $LUMINA</h3>
+              <p className="text-white/50 text-sm leading-relaxed flex-1">100% of your premium is used to buy $LUMINA on the open market and burn it forever. Nothing goes to the team. Every cent destroys tokens permanently.</p>
+              <p className="text-xs text-cyan-400/50 mt-3">Deflationary pressure on every transaction.</p>
+            </div>
+            <div className="min-h-[260px] p-5 rounded-2xl bg-white/[0.02] border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300 flex flex-col items-start">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🔮</span>
+                <span className="text-sm font-mono text-cyan-500">03</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Oracle Checks</h3>
+              <p className="text-white/50 text-sm leading-relaxed flex-1">Chainlink oracles monitor the parametric condition in real-time. No human judgment, no committees, no disputes. The trigger either happens or it doesn&apos;t. Pure math.</p>
+              <p className="text-xs text-cyan-400/50 mt-3">Trustless verification, same-block resolution.</p>
+            </div>
+            <div className="min-h-[260px] p-5 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all duration-300 flex flex-col items-start">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">⚡</span>
+                <span className="text-sm font-mono text-white/40">04</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-3">Result</h3>
+              <div className="flex-1 w-full space-y-0">
+                <div className="pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-2 mb-1"><span className="text-sm">✅</span><span className="text-sm font-mono text-green-500">04a</span><span className="text-sm font-semibold text-green-400">No Trigger</span></div>
+                  <p className="text-white/50 text-xs leading-relaxed">Bet lost. The $LUMINA burn is permanent. Supply shrinks forever.</p>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Trigger!</h3>
-                <p className="text-white/50 text-sm leading-relaxed">ClaimBond token (ERC-1155) issued. 24-month maturity. Partially sellable on secondary market.</p>
+                <div className="pt-3">
+                  <div className="flex items-center gap-2 mb-1"><span className="text-sm">🎉</span><span className="text-sm font-mono text-purple-500">04b</span><span className="text-sm font-semibold text-purple-400">Trigger!</span></div>
+                  <p className="text-white/50 text-xs leading-relaxed">ClaimBond token (ERC-1155) issued. 24-month maturity. Partially sellable on secondary market.</p>
+                </div>
               </div>
             </div>
           </div>
