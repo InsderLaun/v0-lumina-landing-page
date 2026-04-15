@@ -167,7 +167,7 @@ export default function Home() {
                   <span className="text-sm font-mono text-purple-500">04b</span>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Trigger!</h3>
-                <p className="text-white/50 text-sm leading-relaxed">ClaimBond NFT (ERC-1155) issued. 24-month maturity. Partially sellable on secondary market.</p>
+                <p className="text-white/50 text-sm leading-relaxed">ClaimBond token (ERC-1155) issued. 24-month maturity. Partially sellable on secondary market.</p>
               </div>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default function Home() {
           <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#3B82F6] rounded-xl p-5 hover:border-[#3B82F640] transition-all">
             <p className="text-white font-bold text-lg">Phase 3</p>
             <p className="text-[#3B82F6] text-xs font-semibold uppercase tracking-widest mb-3">Growth</p>
-            <p className="text-[#9CA3AF] text-sm leading-relaxed">500+ policies per day target. Secondary bond marketplace for ClaimBond NFTs. Agent framework integrations. Automated AI agent strategies.</p>
+            <p className="text-[#9CA3AF] text-sm leading-relaxed">500+ policies per day target. Secondary bond marketplace for ClaimBond tokens (ERC-1155). Agent framework integrations. Automated AI agent strategies.</p>
           </div>
           <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#8B5CF6] rounded-xl p-5 hover:border-[#8B5CF640] transition-all">
             <p className="text-white font-bold text-lg">Phase 4</p>
@@ -503,7 +503,7 @@ function ProductsSection() {
   const probNum = parseFloat(product.probability) / 100
   const exampleCoverage = 1000
   const examplePremium = exampleCoverage * 0.80 * probNum * 1.5
-  const examplePayout = exampleCoverage
+  const examplePayout = exampleCoverage * 0.80
 
   return (
     <section className="py-24 px-4">
@@ -690,7 +690,7 @@ function PricingSection() {
               <tbody>
                 {coverages.map((cov) => {
                   const premium = cov * 0.80 * probNum * 1.5
-                  const payout = cov
+                  const payout = cov * 0.80
                   const ret = premium > 0 ? (payout / premium).toFixed(0) : "0"
                   return (
                     <tr key={cov} className="border-b border-white/5 hover:bg-white/[0.02]">
@@ -706,7 +706,7 @@ function PricingSection() {
           </div>
 
           <p className="text-xs text-white/30 mt-4 text-center">
-            85% of every premium buys and burns $LUMINA. Bond payouts are ClaimBond NFTs with 24-month maturity.
+            85% of every premium buys and burns $LUMINA. Bond payouts are ClaimBond tokens (ERC-1155) with 24-month maturity.
           </p>
         </div>
       </div>
@@ -797,7 +797,7 @@ function TokenomicsSection() {
                 <span className="text-cyan-400 text-sm mt-1">&#9679;</span>
                 <div>
                   <p className="text-sm text-white/70 font-medium">ERC-1155 Tokens</p>
-                  <p className="text-xs text-white/40">Each ClaimBond is an ERC-1155 NFT representing a verified claim payout.</p>
+                  <p className="text-xs text-white/40">Each ClaimBond is an ERC-1155 token grouped by maturity month — fractional, sellable, holdable.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -831,7 +831,7 @@ function TokenomicsSection() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-xs font-bold text-cyan-400">2</div>
-                  <p className="text-sm text-white/60">ClaimBond NFT minted to winner&apos;s wallet</p>
+                  <p className="text-sm text-white/60">ClaimBond tokens minted to winner&apos;s wallet</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-xs font-bold text-cyan-400">3</div>
@@ -947,7 +947,7 @@ const COMPARISON_ROWS: { feature: string; lumina: string; traditional: string }[
   { feature: "Operator", lumina: "AI Agent (M2M)", traditional: "Human" },
   { feature: "Resolution", lumina: "Automatic (1 transaction)", traditional: "Jury vote or committee (up to 35 days)" },
   { feature: "Trigger", lumina: "Parametric (trustless math)", traditional: "Subjective (human judgment)" },
-  { feature: "Settlement", lumina: "ClaimBond NFT (24mo maturity)", traditional: "Days/weeks" },
+  { feature: "Settlement", lumina: "ClaimBond tokens (24mo maturity, fractional)", traditional: "Days/weeks" },
   { feature: "Burn Mechanism", lumina: "85% of premium burned", traditional: "None" },
   { feature: "Chain", lumina: "Base L2 (low fees)", traditional: "Ethereum L1 / Multi-chain" },
   { feature: "Agent-native", lumina: "\u2705 Built for M2M", traditional: "\u274C Human UI only" },
@@ -1094,7 +1094,7 @@ function SecuritySection() {
 /* ═══════════════════════════════════════════════════════════ */
 
 const FAQ_ITEMS = [
-  { q: "What is a ClaimBond?", a: "A ClaimBond is an ERC-1155 NFT issued when your bet's trigger condition is met. It represents your right to a payout, but with a 24-month linear maturity schedule. Each month, ~4.17% of the bond value becomes claimable. This maturity period protects the protocol's bond reserve from bank runs and ensures long-term solvency." },
+  { q: "What is a ClaimBond?", a: "A ClaimBond is an ERC-1155 token issued when your bet's trigger condition is met. It represents your right to a payout, but with a 24-month linear maturity schedule. Each month, ~4.17% of the bond value becomes claimable. This maturity period protects the protocol's bond reserve from bank runs and ensures long-term solvency." },
   { q: "Why 24 months maturity?", a: "The 24-month maturity protects the bond reserve (82% of all $LUMINA) from sudden drainage. If all payouts were instant, a cascade of triggers could bankrupt the reserve. Linear vesting ensures the protocol can always honor its obligations. If you need liquidity sooner, you can sell your ClaimBond on the secondary marketplace at a discount." },
   { q: "What happens to my premium?", a: "85% of your premium is used to buy $LUMINA on Uniswap V3 and burn it permanently (sent to 0x000...dead). The remaining 15% goes to the protocol treasury for development, audits, and operations. Every bet makes $LUMINA scarcer, whether you win or lose." },
   { q: "Can I sell my ClaimBond?", a: "Yes. ClaimBonds are ERC-1155 tokens, fully transferable and tradeable. Since all bonds issued in the same month share the same token ID, they are fungible within their epoch. This enables liquid secondary markets where you can sell your bond at a discount rather than waiting for full maturity." },
