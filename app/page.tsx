@@ -150,7 +150,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <HowCard step="01" icon="🎯" title="Choose Your Bet" description="Pick a product (Flash BTC 1h, Micro Depeg, Rate Shock, etc.) and select your coverage amount. Each product has a specific trigger condition and multiplier." note="9 products covering BTC, ETH, USDT, USDC rates." accent="cyan" />
-            <HowCard step="02" icon="🔥" title="Premium Burns $LUMINA" description="85% of your premium is used to buy $LUMINA on the open market and burn it forever. The remaining 15% goes to the protocol treasury. Every bet makes $LUMINA scarcer." note="Deflationary pressure on every transaction." accent="cyan" />
+            <HowCard step="02" icon="🔥" title="Premium Burns $LUMINA" description="100% of your premium is used to buy $LUMINA on the open market and burn it forever. Nothing goes to the team. Every cent destroys tokens permanently." note="Deflationary pressure on every transaction." accent="cyan" />
             <HowCard step="03" icon="🔮" title="Oracle Checks" description="Chainlink oracles monitor the parametric condition in real-time. No human judgment, no committees, no disputes. The trigger either happens or it doesn't. Pure math." note="Trustless verification, same-block resolution." accent="cyan" />
             <div className="space-y-4">
               <div className="p-5 rounded-2xl bg-white/[0.02] border border-green-500/20 hover:border-green-500/40 transition-all duration-300">
@@ -308,7 +308,7 @@ export default function Home() {
           </div>
           <div className="border-t border-white/5 pt-8">
             <p className="text-xs text-white/20 text-center">
-              &copy; 2026 Lumina Protocol. All rights reserved. &middot; Burn Ratio: 1.275 &middot; 9 Products &middot; Built on Base L2
+              &copy; 2026 Lumina Protocol. All rights reserved. &middot; Burn Ratio: 1.50 &middot; 9 Products &middot; Built on Base L2
             </p>
           </div>
         </div>
@@ -706,7 +706,7 @@ function PricingSection() {
           </div>
 
           <p className="text-xs text-white/30 mt-4 text-center">
-            85% of every premium buys and burns $LUMINA. Bond payouts are ClaimBond tokens (ERC-1155) with 24-month maturity.
+            100% of every premium buys and burns $LUMINA. Bond payouts are ClaimBond tokens (ERC-1155) with 24-month maturity.
           </p>
         </div>
       </div>
@@ -764,19 +764,19 @@ function TokenomicsSection() {
               <div className="rounded-xl bg-purple-500/5 border border-purple-500/10 p-4">
                 <div className="text-xs text-white/40 uppercase tracking-wider mb-2">How it works</div>
                 <p className="text-sm text-white/60 leading-relaxed">
-                  Every premium paid by a bettor is used to buy $LUMINA on Uniswap V3 and send it to the burn address (0x000...dead). 85% of the premium burns. 15% goes to treasury.
+                  Every premium paid by a bettor is used to buy $LUMINA on Uniswap V3 and send it to the burn address (0x000...dead). 100% of the premium burns. Nothing goes to treasury. The most aggressive deflationary mechanism in DeFi.
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4 text-center">
                   <div className="text-xs text-white/40 uppercase tracking-wider mb-1">Burn / Emission Ratio</div>
-                  <div className="text-3xl font-bold text-cyan-400">1.275</div>
+                  <div className="text-3xl font-bold text-cyan-400">1.50</div>
                   <p className="text-xs text-white/30 mt-1">Burns exceed emissions</p>
                 </div>
                 <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4 text-center">
                   <div className="text-xs text-white/40 uppercase tracking-wider mb-1">Premium Burn Rate</div>
-                  <div className="text-3xl font-bold text-purple-400">85%</div>
+                  <div className="text-3xl font-bold text-purple-400">100%</div>
                   <p className="text-xs text-white/30 mt-1">Of every premium burned</p>
                 </div>
               </div>
@@ -948,10 +948,10 @@ const COMPARISON_ROWS: { feature: string; lumina: string; traditional: string }[
   { feature: "Resolution", lumina: "Automatic (1 transaction)", traditional: "Jury vote or committee (up to 35 days)" },
   { feature: "Trigger", lumina: "Parametric (trustless math)", traditional: "Subjective (human judgment)" },
   { feature: "Settlement", lumina: "ClaimBond tokens (24mo maturity, fractional)", traditional: "Days/weeks" },
-  { feature: "Burn Mechanism", lumina: "85% of premium burned", traditional: "None" },
+  { feature: "Burn Mechanism", lumina: "100% of premium burned", traditional: "None" },
   { feature: "Chain", lumina: "Base L2 (low fees)", traditional: "Ethereum L1 / Multi-chain" },
   { feature: "Agent-native", lumina: "\u2705 Built for M2M", traditional: "\u274C Human UI only" },
-  { feature: "Token Deflationary", lumina: "\u2705 Burn ratio 1.275", traditional: "\u274C Inflationary governance tokens" },
+  { feature: "Token Deflationary", lumina: "\u2705 Burn ratio 1.50", traditional: "\u274C Inflationary governance tokens" },
   { feature: "Oracle", lumina: "Chainlink + EIP-712", traditional: "Proprietary or Chainlink" },
 ]
 
@@ -1037,7 +1037,7 @@ function SecuritySection() {
     "Parametric triggers verified by Chainlink oracles",
     "24-month ClaimBond maturity (anti bank-run)",
     "82% Bond Reserve locked and immutable",
-    "85% premium burn via Uniswap V3 buyback",
+    "100% premium burn via Uniswap V3 buyback",
     "ERC-1155 fungible bonds by epoch month",
   ]
 
@@ -1096,9 +1096,9 @@ function SecuritySection() {
 const FAQ_ITEMS = [
   { q: "What is a ClaimBond?", a: "A ClaimBond is an ERC-1155 token issued when your bet's trigger condition is met. It represents your right to a payout, but with a 24-month linear maturity schedule. Each month, ~4.17% of the bond value becomes claimable. This maturity period protects the protocol's bond reserve from bank runs and ensures long-term solvency." },
   { q: "Why 24 months maturity?", a: "The 24-month maturity protects the bond reserve (82% of all $LUMINA) from sudden drainage. If all payouts were instant, a cascade of triggers could bankrupt the reserve. Linear vesting ensures the protocol can always honor its obligations. If you need liquidity sooner, you can sell your ClaimBond on the secondary marketplace at a discount." },
-  { q: "What happens to my premium?", a: "85% of your premium is used to buy $LUMINA on Uniswap V3 and burn it permanently (sent to 0x000...dead). The remaining 15% goes to the protocol treasury for development, audits, and operations. Every bet makes $LUMINA scarcer, whether you win or lose." },
+  { q: "What happens to my premium?", a: "100% of your premium is used to buy $LUMINA on Uniswap V3 and burn it permanently (sent to 0x000...dead). Nothing goes to the team. Nothing goes to operations. Every cent destroys tokens permanently, whether you win or lose." },
   { q: "Can I sell my ClaimBond?", a: "Yes. ClaimBonds are ERC-1155 tokens, fully transferable and tradeable. Since all bonds issued in the same month share the same token ID, they are fungible within their epoch. This enables liquid secondary markets where you can sell your bond at a discount rather than waiting for full maturity." },
-  { q: "What is the burn/emission ratio?", a: "The current burn/emission ratio is 1.275, meaning more $LUMINA is burned than emitted. As protocol usage grows, this ratio increases further, making $LUMINA increasingly deflationary. The burn comes from premiums (85% of every bet), while emissions come from the founder vesting schedule and treasury allocations." },
+  { q: "What is the burn/emission ratio?", a: "The burn/emission ratio is 1.50, meaning 50% more $LUMINA is burned than emitted. For every 1 token released from a maturing bond, 1.50 tokens were burned from premiums. As protocol usage grows, this ratio increases further. 100% of every premium burns — the most aggressive deflationary mechanism in DeFi." },
   { q: "How are triggers verified?", a: "All triggers are parametric and verified by Chainlink oracles on-chain. There are no human judges, no committees, no disputes. The oracle checks the specific condition (e.g., 'BTC dropped 5% in 1 hour') and either it happened or it didn't. EIP-712 signed proofs ensure data integrity." },
   { q: "What is the Bond Reserve?", a: "82% of all $LUMINA tokens are locked in the Bond Reserve. This reserve is immutable and backs all ClaimBond payouts. It cannot be accessed by the team, governance, or any other mechanism. The reserve ensures the protocol can always pay its obligations." },
   { q: "How does the pricing formula work?", a: "Premium = Coverage x 80% x P(trigger) x 1.5x. The 80% factor is the payout ratio. P(trigger) is the actuarial probability of the event occurring. The 1.5x safety margin ensures the protocol remains solvent. This is a fixed formula with no dynamic adjustments based on demand." },
