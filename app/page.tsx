@@ -225,23 +225,26 @@ export default function Home() {
               <div className="p-5 rounded-2xl bg-white/[0.02] border border-green-500/20">
                 <div className="text-2xl mb-2">💎</div>
                 <h5 className="font-semibold text-green-400 mb-2">Option A — Hold until maturity</h5>
-                <p className="text-white/50 text-sm leading-relaxed">Wait 24 months. Redeem your bonds for $LUMINA from the Bond Reserve.</p>
-                <p className="text-white/50 text-sm mt-2">If $LUMINA price went up, your bonds are worth MORE than the original payout.</p>
-                <p className="text-xs text-white/30 mt-3 italic">Example: $800 bond redeemed when $LUMINA = $0.50 → you receive 1,600 LUMINA ($800 worth). The USD value is always $800.</p>
+                <p className="text-white/50 text-sm leading-relaxed">Wait 24 months. Redeem your bond for $LUMINA from the Bond Reserve.</p>
+                <p className="text-white/50 text-sm mt-2">Your bond pays a fixed USD value — always. An $800 bond always pays exactly $800 worth of $LUMINA, calculated at the market price when you redeem.</p>
+                <p className="text-xs text-white/30 mt-2 italic">Example: $800 bond, $LUMINA = $0.50 → you receive 1,600 LUMINA ($800 worth).</p>
+                <p className="text-xs text-white/30 italic">Example: $800 bond, $LUMINA = $2.00 → you receive 400 LUMINA ($800 worth).</p>
+                <p className="text-xs text-white/40 mt-2 font-medium">The dollar amount never changes. Only the token count adjusts.</p>
               </div>
               <div className="p-5 rounded-2xl bg-white/[0.02] border border-cyan-500/20">
                 <div className="text-2xl mb-2">💵</div>
                 <h5 className="font-semibold text-cyan-400 mb-2">Option B — Sell everything now</h5>
-                <p className="text-white/50 text-sm leading-relaxed">Sell all your bonds on the secondary market for USDC today.</p>
-                <p className="text-white/50 text-sm mt-2">Buyers pay a discounted price (typically 30-60% of face value).</p>
-                <p className="text-xs text-white/30 mt-3 italic">Example: $800 bond → sell for $300-500 USDC today. Buyer waits 24 months to collect $800 in $LUMINA.</p>
+                <p className="text-white/50 text-sm leading-relaxed">Don&apos;t want to wait 24 months? Sell your bonds on the secondary market for USDC today.</p>
+                <p className="text-white/50 text-sm mt-2">Buyers pay a discounted price (typically 40-60% of face value) because they have to wait.</p>
+                <p className="text-white/50 text-sm mt-2">You get less than $800 — but you get it now.</p>
+                <p className="text-xs text-white/30 mt-2 italic">Example: $800 bond → sell today for $400 USDC. The buyer waits 24 months and redeems $800 in $LUMINA.</p>
               </div>
               <div className="p-5 rounded-2xl bg-white/[0.02] border border-purple-500/20">
                 <div className="text-2xl mb-2">⚖️</div>
                 <h5 className="font-semibold text-purple-400 mb-2">Option C — Sell some, keep some</h5>
-                <p className="text-white/50 text-sm leading-relaxed">Bonds are fractional. Sell part of your position, hold the rest.</p>
-                <p className="text-white/50 text-sm mt-2">Best of both worlds: immediate cash + long-term upside.</p>
-                <p className="text-xs text-white/30 mt-3 italic">Example: $800 bond → sell $500 worth now for USDC → keep $300 for maturity redemption.</p>
+                <p className="text-white/50 text-sm leading-relaxed">Bonds are fractional (ERC-1155). Split your position however you want.</p>
+                <p className="text-white/50 text-sm mt-2">Sell part for immediate USDC. Hold the rest for full redemption at maturity.</p>
+                <p className="text-xs text-white/30 mt-2 italic">Example: $800 bond → sell $500 worth today for ~$250 USDC → keep $300 worth → redeem in 24 months for $300 in $LUMINA.</p>
               </div>
             </div>
 
