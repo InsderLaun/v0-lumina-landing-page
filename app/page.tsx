@@ -907,7 +907,7 @@ function TokenomicsSection() {
                 <span className="text-cyan-400 text-sm mt-1">&#9679;</span>
                 <div>
                   <p className="text-sm text-white/70 font-medium">24-Month Maturity</p>
-                  <p className="text-xs text-white/40">Bonds mature over 24 months, releasing principal linearly. This protects the reserve from bank runs.</p>
+                  <p className="text-xs text-white/40">Bonds mature completely at 24 months — no gradual release, no partial unlocks. Redeem 100% at once. This protects the reserve from bank runs.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -938,7 +938,7 @@ function TokenomicsSection() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-xs font-bold text-cyan-400">3</div>
-                  <p className="text-sm text-white/60">Linear vesting: ~4.17% released per month</p>
+                  <p className="text-sm text-white/60">Wait 24 months — bond matures 100% at once (no monthly release)</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-xs font-bold text-cyan-400">4</div>
@@ -1197,8 +1197,8 @@ function SecuritySection() {
 /* ═══════════════════════════════════════════════════════════ */
 
 const FAQ_ITEMS = [
-  { q: "What is a ClaimBond?", a: "A ClaimBond is an ERC-1155 token issued when your bet's trigger condition is met. It represents your right to a payout, but with a 24-month linear maturity schedule. Each month, ~4.17% of the bond value becomes claimable. This maturity period protects the protocol's bond reserve from bank runs and ensures long-term solvency." },
-  { q: "Why 24 months maturity?", a: "The 24-month maturity protects the bond reserve (82% of all $LUMINA) from sudden drainage. If all payouts were instant, a cascade of triggers could bankrupt the reserve. Linear vesting ensures the protocol can always honor its obligations. If you need liquidity sooner, you can sell your ClaimBond on the secondary marketplace at a discount." },
+  { q: "What is a ClaimBond?", a: "A ClaimBond is an ERC-1155 token issued when your bet's trigger condition is met. It represents your right to a fixed USD payout, settled in $LUMINA at the market price when you redeem. The bond matures completely after 24 months — there is no gradual release, no monthly vesting, no partial unlocks. You wait 24 months, then redeem 100% at once. Before maturity, you can sell your bond (or part of it) on the secondary market at a discount." },
+  { q: "Why 24 months maturity?", a: "The 24-month maturity protects the bond reserve (82% of all $LUMINA) from sudden drainage. If all payouts were instant, a cascade of triggers could bankrupt the reserve. Holding bonds to full maturity ensures the protocol can always honor its obligations. If you need liquidity sooner, you can sell your ClaimBond on the secondary marketplace at a discount." },
   { q: "What happens to my premium?", a: "100% of your premium is used to buy $LUMINA on Uniswap V3 and burn it permanently (sent to 0x000...dead). Nothing goes to the team. Nothing goes to operations. Every cent destroys tokens permanently, whether you win or lose." },
   { q: "Can I sell my ClaimBond?", a: "Yes. ClaimBonds are ERC-1155 tokens, fully transferable and tradeable. Since all bonds issued in the same month share the same token ID, they are fungible within their epoch. This enables liquid secondary markets where you can sell your bond at a discount rather than waiting for full maturity." },
   { q: "What is the burn/emission ratio?", a: "The burn/emission ratio is 1.50, meaning 50% more $LUMINA is burned than emitted. For every 1 token released from a maturing bond, 1.50 tokens were burned from premiums. As protocol usage grows, this ratio increases further. 100% of every premium burns — the most aggressive deflationary mechanism in DeFi." },
