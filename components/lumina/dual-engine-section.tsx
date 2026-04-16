@@ -239,7 +239,7 @@ function OnboardAgentCard({ onRegisterAgent }: { onRegisterAgent: () => void }) 
                                     <p className="text-base text-lumina-text/80">
                                         Read the documentation{" "}
                                         <a
-                                            href={`${GITHUB_URL}/tree/main/docs/SKILL-V4.0.md`}
+                                            href={`${GITHUB_URL}/tree/main/docs/SKILL-V4.1.md`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-lumina-cyan hover:underline font-medium"
@@ -276,7 +276,7 @@ function OnboardAgentCard({ onRegisterAgent }: { onRegisterAgent: () => void }) 
                 {/* Bottom links */}
                 <div className="flex flex-wrap gap-3 mt-6 pt-5 border-t border-white/5">
                     <a
-                        href={`${GITHUB_URL}/tree/main/docs/SKILL-V4.0.md`}
+                        href={`${GITHUB_URL}/tree/main/docs/SKILL-V4.1.md`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-medium text-lumina-text hover:border-lumina-cyan/20 hover:text-lumina-cyan transition-all"

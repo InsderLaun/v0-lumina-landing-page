@@ -248,6 +248,46 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Block 2.5: Secondary Marketplace — More Burn */}
+            <div className="mb-10">
+              <h3 className="text-2xl md:text-3xl font-bold text-center mb-2">Secondary Marketplace — More Burn</h3>
+              <p className="text-center text-white/50 text-sm mb-8">Every bond trade burns additional $LUMINA.</p>
+              <div className="grid md:grid-cols-3 gap-4 mb-6">
+                <div className="p-5 rounded-2xl bg-white/[0.02] border border-cyan-500/20">
+                  <div className="text-2xl mb-2">🔁</div>
+                  <h5 className="font-semibold text-cyan-400 mb-2">How it works</h5>
+                  <p className="text-white/60 text-sm leading-relaxed mb-1">Bond holders can sell their ERC-1155 tokens on the secondary marketplace.</p>
+                  <p className="text-white/60 text-sm leading-relaxed mb-1">Any amount, any time — sell all, sell part, or wait until maturity.</p>
+                  <p className="text-white/60 text-sm leading-relaxed">Payment is in USDC. Fast, atomic, trustless.</p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white/[0.02] border border-purple-500/20">
+                  <div className="text-2xl mb-2">💸</div>
+                  <h5 className="font-semibold text-purple-400 mb-2">The 3% fee</h5>
+                  <p className="text-white/60 text-sm leading-relaxed mb-1">Every trade has a total fee of 3% split between both sides:</p>
+                  <ul className="text-white/60 text-sm leading-relaxed ml-4 mb-1 list-disc">
+                    <li>1.5% paid by the seller (deducted from proceeds)</li>
+                    <li>1.5% paid by the buyer (added to purchase price)</li>
+                  </ul>
+                  <p className="text-white/60 text-sm leading-relaxed">All fees are in USDC.</p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white/[0.02] border border-amber-500/20">
+                  <div className="text-2xl mb-2">🔥</div>
+                  <h5 className="font-semibold text-amber-400 mb-2">100% burned</h5>
+                  <p className="text-white/60 text-sm leading-relaxed mb-1">Every dollar of fees → TWAPBurner → buys $LUMINA on Uniswap → burns forever.</p>
+                  <p className="text-white/60 text-sm leading-relaxed mb-1">Nothing to team. Nothing to treasury.</p>
+                  <p className="text-white/60 text-sm leading-relaxed">More marketplace activity = more $LUMINA burned.</p>
+                </div>
+              </div>
+              <div className="p-5 rounded-xl bg-white/[0.03] border border-white/10">
+                <p className="text-white/70 text-sm mb-2"><span className="font-semibold">Example:</span> Alice sells $400 worth of bonds to Bob.</p>
+                <div className="grid sm:grid-cols-3 gap-2 text-xs text-white/60 font-mono">
+                  <div><span className="text-white/40">Bob pays:</span> $406 USDC <span className="text-white/30">($400 + 1.5% fee)</span></div>
+                  <div><span className="text-white/40">Alice receives:</span> $394 USDC <span className="text-white/30">($400 − 1.5% fee)</span></div>
+                  <div><span className="text-white/40">Burned:</span> $12 USDC worth of $LUMINA <span className="text-white/30">(3% total)</span></div>
+                </div>
+              </div>
+            </div>
+
             {/* Block 3: Bond payout examples */}
             <h4 className="text-xl font-bold text-center mb-6">Bond Payout Examples</h4>
             <div className="overflow-x-auto mb-8">
@@ -338,7 +378,7 @@ export default function Home() {
           <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#3B82F6] rounded-xl p-5 hover:border-[#3B82F640] transition-all">
             <p className="text-white font-bold text-lg">Phase 3</p>
             <p className="text-[#3B82F6] text-xs font-semibold uppercase tracking-widest mb-3">Growth</p>
-            <p className="text-[#9CA3AF] text-sm leading-relaxed">500+ policies per day target. Secondary bond marketplace for ClaimBond tokens (ERC-1155). Agent framework integrations. Automated AI agent strategies.</p>
+            <p className="text-[#9CA3AF] text-sm leading-relaxed">500+ policies per day target. Secondary Bond Marketplace (LuminaBondMarketplace.sol) — 3% fee, all burned. Agent framework integrations. Automated AI agent strategies.</p>
           </div>
           <div className="bg-[#1F2937] border border-[#1F2937] border-t-[3px] border-t-[#8B5CF6] rounded-xl p-5 hover:border-[#8B5CF640] transition-all">
             <p className="text-white font-bold text-lg">Phase 4</p>
@@ -855,19 +895,26 @@ function TokenomicsSection() {
           {/* Burn Mechanics */}
           <div className="rounded-2xl bg-white/[0.02] border border-purple-500/20 p-6">
             <h3 className="text-lg font-bold text-purple-400 mb-6">Burn Mechanics</h3>
-            <div className="space-y-6">
+            <p className="text-sm text-white/70 mb-4">3 engines burn $LUMINA continuously:</p>
+            <div className="space-y-4">
               <div className="rounded-xl bg-purple-500/5 border border-purple-500/10 p-4">
-                <div className="text-xs text-white/40 uppercase tracking-wider mb-2">How it works</div>
-                <p className="text-sm text-white/60 leading-relaxed">
-                  Every premium paid by a bettor is used to buy $LUMINA on Uniswap V3 and send it to the burn address (0x000...dead). 100% of the premium burns. Nothing goes to treasury. The most aggressive deflationary mechanism in DeFi.
-                </p>
+                <div className="text-xs text-purple-300 uppercase tracking-wider mb-2">1. Premiums <span className="text-white/30 normal-case">(primary)</span></div>
+                <p className="text-sm text-white/60 leading-relaxed">Every premium paid → 100% buy &amp; burn on Uniswap V3. Happens at the moment of purchase. Trigger or not, burn is permanent.</p>
+              </div>
+              <div className="rounded-xl bg-purple-500/5 border border-purple-500/10 p-4">
+                <div className="text-xs text-purple-300 uppercase tracking-wider mb-2">2. Marketplace Fees <span className="text-white/30 normal-case">(secondary, post-launch)</span></div>
+                <p className="text-sm text-white/60 leading-relaxed">Every bond trade charges 3% total fee (1.5% buyer + 1.5% seller). 100% of fees → buy &amp; burn $LUMINA.</p>
+              </div>
+              <div className="rounded-xl bg-purple-500/5 border border-purple-500/10 p-4">
+                <div className="text-xs text-purple-300 uppercase tracking-wider mb-2">3. None</div>
+                <p className="text-sm text-white/60 leading-relaxed">No team fee. No treasury cut. No hidden taxes.</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4 text-center">
                   <div className="text-xs text-white/40 uppercase tracking-wider mb-1">Burn / Emission Ratio</div>
                   <div className="text-3xl font-bold text-cyan-400">1.50</div>
-                  <p className="text-xs text-white/30 mt-1">Burns exceed emissions</p>
+                  <p className="text-xs text-white/30 mt-1">Plus marketplace fees</p>
                 </div>
                 <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4 text-center">
                   <div className="text-xs text-white/40 uppercase tracking-wider mb-1">Premium Burn Rate</div>
@@ -876,9 +923,7 @@ function TokenomicsSection() {
                 </div>
               </div>
 
-              <div className="text-xs text-white/30 leading-relaxed">
-                The more bets placed, the more $LUMINA is burned. Losing bets = permanent burns. The protocol becomes more deflationary as usage grows.
-              </div>
+              <div className="text-xs text-white/30 leading-relaxed">Deflationary by mathematical construction. The more bets placed, the more $LUMINA is burned.</div>
             </div>
           </div>
         </div>
@@ -1193,6 +1238,8 @@ const FAQ_ITEMS = [
   { q: "Why 24 months maturity?", a: "The 24-month maturity protects the bond reserve (82% of all $LUMINA) from sudden drainage. If all payouts were instant, a cascade of triggers could bankrupt the reserve. Holding bonds to full maturity ensures the protocol can always honor its obligations. If you need liquidity sooner, you can sell your ClaimBond on the secondary marketplace at a discount." },
   { q: "What happens to my premium?", a: "100% of your premium is used to buy $LUMINA on Uniswap V3 and burn it permanently (sent to 0x000...dead). Nothing goes to the team. Nothing goes to operations. Every cent destroys tokens permanently, whether you win or lose." },
   { q: "Can I sell my ClaimBond?", a: "Yes. ClaimBonds are ERC-1155 tokens, fully transferable and tradeable. Since all bonds issued in the same month share the same token ID, they are fungible within their epoch. This enables liquid secondary markets where you can sell your bond at a discount rather than waiting for full maturity." },
+  { q: "Are there fees to buy or sell bonds?", a: "Yes — the secondary marketplace charges 3% total per trade, split 1.5% seller + 1.5% buyer. All fees are in USDC and 100% burned. No revenue sharing, no team cut." },
+  { q: "Can I sell my bonds in pieces?", a: "Yes. ClaimBond tokens are ERC-1155, which means they're fractional. If you have 800 tokens, you can sell 100 and keep 700 for later. Each piece is independent." },
   { q: "What is the burn/emission ratio?", a: "The burn/emission ratio is 1.50, meaning 50% more $LUMINA is burned than emitted. For every 1 token released from a maturing bond, 1.50 tokens were burned from premiums. As protocol usage grows, this ratio increases further. 100% of every premium burns — the most aggressive deflationary mechanism in DeFi." },
   { q: "How are triggers verified?", a: "All triggers are parametric and verified by Chainlink oracles on-chain. There are no human judges, no committees, no disputes. The oracle checks the specific condition (e.g., 'BTC dropped 5% in 1 hour') and either it happened or it didn't. EIP-712 signed proofs ensure data integrity." },
   { q: "What is the Bond Reserve?", a: "82% of all $LUMINA tokens are locked in the Bond Reserve. This reserve is immutable and backs all ClaimBond payouts. It cannot be accessed by the team, governance, or any other mechanism. The reserve ensures the protocol can always pay its obligations." },

@@ -218,7 +218,7 @@ export function DeveloperZone() {
                             🔧 Integration Guides <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                         <a
-                            href={`${GITHUB_URL}/tree/main/docs/SKILL-V4.0.md`}
+                            href={`${GITHUB_URL}/tree/main/docs/SKILL-V4.1.md`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-base text-lumina-cyan hover:underline"
