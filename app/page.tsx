@@ -519,8 +519,8 @@ export default function Home() {
                 >
                   <div>
                     <div className="text-3xl mb-3">📖</div>
-                    <h3 className="text-lg font-bold text-cyan-300 mb-2">For Humans</h3>
-                    <p className="text-sm text-white/70">Step-by-step guide to set up your wallet, get your API Key, and start placing bets.</p>
+                    <h3 className="text-lg font-bold text-cyan-300 mb-2">I&apos;m a Human Speculator</h3>
+                    <p className="text-sm text-white/70">Connect wallet → browse the 9 products → choose coverage → pay premium in USDC. If your bet&apos;s trigger fires, you receive ClaimBond ERC-1155 tokens that redeem at 24 months for the full USD amount in $LUMINA (or sell early on the secondary market).</p>
                   </div>
                   <div className="space-y-2 pt-6">
                     <a href="/tutorial.html" className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all">Read the Guide &rarr;</a>
@@ -535,8 +535,8 @@ export default function Home() {
                 >
                   <div>
                     <div className="text-3xl mb-3">🤖</div>
-                    <h3 className="text-lg font-bold text-purple-300 mb-2">For Your AI Agent</h3>
-                    <p className="text-sm text-white/70">Give this file to your ChatGPT, Claude, or custom agent. It contains all endpoints, products, and instructions to operate Lumina autonomously.</p>
+                    <h3 className="text-lg font-bold text-purple-300 mb-2">I&apos;m an AI Agent Developer</h3>
+                    <p className="text-sm text-white/70">Get an API key, load the SKILL file into your agent, then <code className="text-xs bg-white/5 px-1 py-0.5 rounded">POST /api/v2/purchase</code>. Same bond mechanics as humans: if trigger, ClaimBond ERC-1155 matures 100% at 24 months, USD-fixed, settled in $LUMINA at market price.</p>
                   </div>
                   <div className="space-y-2 pt-6">
                     <a href="/LUMINA-SKILL.txt" download className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 transition-all">Download SKILL File &darr;</a>
@@ -547,23 +547,15 @@ export default function Home() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-white/[0.03] border border-green-500/20 rounded-xl p-6 flex flex-col justify-between"
+                  className="bg-white/[0.03] border border-amber-500/20 rounded-xl p-6 flex flex-col justify-between"
                 >
                   <div>
-                    <div className="text-3xl mb-3">&#9889;</div>
-                    <h3 className="text-lg font-bold text-green-300 mb-2">Auto-Setup (Claude Code)</h3>
-                    <p className="text-sm text-white/70">Copy-paste a prompt into Claude Code to auto-setup your API Key and place a test bet.</p>
+                    <div className="text-3xl mb-3">💰</div>
+                    <h3 className="text-lg font-bold text-amber-300 mb-2">I&apos;m a Yield Seeker</h3>
+                    <p className="text-sm text-white/70">Buy discounted ClaimBonds on the secondary market (ERC-1155, fungible by maturity month, fractional). Wait 24 months, redeem the full USD face value in $LUMINA at market price. IRRs of 43–150% depending on discount.</p>
                   </div>
                   <div className="space-y-2 pt-6">
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText("Setup prompt for Lumina ClaimBond - see tutorial");
-                        alert("Prompt copied!");
-                      }}
-                      className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20 transition-all cursor-pointer"
-                    >
-                      Copy Setup Prompt 📋
-                    </button>
+                    <a href="#claimbonds" className="block w-full text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-all">How Bonds Work &rarr;</a>
                   </div>
                 </motion.div>
               </div>

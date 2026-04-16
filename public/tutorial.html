@@ -54,7 +54,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 </div>
 
 <div class="info">
-<p><strong>Think of it like this:</strong> You give your AI agent a credit card (API Key) with a spending limit (Approve). The agent decides when to buy insurance for protection, or when to deposit into Lumina vaults to generate yield — all based on rules you define.</p>
+<p><strong>Think of it like this:</strong> You give your AI agent a credit card (API Key) with a spending limit (Approve). The agent decides when to place parametric bets on one of the 9 Lumina products — all based on rules you define. If a bet's trigger fires, your agent receives ClaimBond ERC-1155 tokens that redeem at 24 months for their full USD face value in $LUMINA.</p>
 </div>
 
 <h2>What You Need</h2>
@@ -66,16 +66,20 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 </table>
 
 <div class="info">
-<p><strong>How much does insurance cost?</strong> Premiums depend on the product and coverage amount. Examples for $10,000 coverage:</p>
+<p><strong>How much does a bet cost?</strong> Premium formula is fixed: <code>Premium = Coverage × 0.80 × P(trigger) × 1.50</code>. Examples for $1,000 coverage (bond payout = $800):</p>
 <table style="margin-top:8px;font-size:0.85rem">
-<tr><th>Product</th><th>Duration</th><th>Approx. Premium</th></tr>
-<tr><td>BTC Catastrophe Shield</td><td>14 days</td><td>$58 - $95</td></tr>
-<tr><td>ETH Apocalypse Shield</td><td>14 days</td><td>$77 - $127</td></tr>
-<tr><td>Flash BTC (24h)</td><td>24 hours</td><td>$31 - $47</td></tr>
-<tr><td>Flash ETH (48h)</td><td>48 hours</td><td>$45 - $68</td></tr>
-<tr><td>Depeg Shield (USDT)</td><td>30 days</td><td>$21 - $34</td></tr>
+<tr><th>Product</th><th>Trigger</th><th>Approx. Premium</th></tr>
+<tr><td>Flash BTC 1h</td><td>BTC -5% in 1 hour</td><td>$2.40</td></tr>
+<tr><td>Flash BTC 4h</td><td>BTC -8% in 4 hours</td><td>$4.20</td></tr>
+<tr><td>Flash BTC 24h</td><td>BTC -10% in 24 hours</td><td>$18.00</td></tr>
+<tr><td>Flash BTC 48h</td><td>BTC -15% in 48 hours</td><td>$9.60</td></tr>
+<tr><td>Flash ETH 1h</td><td>ETH -7% in 1 hour</td><td>$3.00</td></tr>
+<tr><td>Flash ETH 24h</td><td>ETH -12% in 24 hours</td><td>$24.00</td></tr>
+<tr><td>Flash ETH 48h</td><td>ETH -18% in 48 hours</td><td>$10.80</td></tr>
+<tr><td>Micro Depeg</td><td>USDT below $0.995 for 7 days</td><td>$42.00</td></tr>
+<tr><td>Rate Shock</td><td>Aave USDC borrow &gt; 10% for 7 days</td><td>$48.00</td></tr>
 </table>
-<p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:8px;margin-bottom:0">Prices vary with vault utilization. Lower utilization = lower premiums. Your agent gets an exact quote before buying.</p>
+<p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:8px;margin-bottom:0">Fixed formula, no utilization curves. Your agent gets an exact quote before buying. Payout on trigger is a ClaimBond (ERC-1155) that matures 100% at 24 months.</p>
 </div>
 
 <h2>Step 1: Create Your API Key</h2>
@@ -163,13 +167,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <div id="approve-form" style="display:none">
 
-<div id="mode-toggle" style="display:flex;gap:0;margin-bottom:16px">
-<button id="mode-insurance" style="flex:1;padding:10px 16px;border:1px solid #22d3ee;border-radius:8px 0 0 8px;background:rgba(34,211,238,0.15);color:#22d3ee;font-weight:600;font-size:0.85rem;cursor:pointer">&#x1F6E1; Buy Insurance</button>
-<button id="mode-yield" style="flex:1;padding:10px 16px;border:1px solid rgba(255,255,255,0.2);border-left:none;border-radius:0 8px 8px 0;background:transparent;color:rgba(255,255,255,0.5);font-weight:600;font-size:0.85rem;cursor:pointer">&#x1F4B0; Earn Yield</button>
-</div>
-
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-<label id="approve-label" style="color:rgba(255,255,255,0.8);font-size:0.95rem;font-weight:500">What's the maximum your agent can spend on insurance?</label>
+<label id="approve-label" style="color:rgba(255,255,255,0.8);font-size:0.95rem;font-weight:500">What's the maximum your agent can spend on premiums?</label>
 <span id="tooltip-trigger" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.5);font-size:11px;cursor:help;position:relative;flex-shrink:0">i
 <span id="tooltip-box" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:12px;font-size:12px;color:rgba(255,255,255,0.7);width:300px;line-height:1.5;font-weight:400;z-index:10;pointer-events:none"></span>
 </span>
@@ -183,20 +182,6 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div style="margin-top:8px;margin-bottom:8px">
 <button id="btn-unlimited" style="background:transparent;border:1px solid rgba(234,179,8,0.5);color:#eab308;font-size:13px;padding:6px 16px;border-radius:8px;cursor:pointer">&#x26A1; No Limit (Unlimited)</button>
 <span id="unlimited-badge" style="display:none;margin-left:10px;color:#eab308;font-size:13px;font-weight:600">UNLIMITED MODE</span>
-</div>
-
-<div id="vault-checkboxes" style="display:none;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:14px">
-<p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:10px;font-weight:500">Select vaults to approve:</p>
-<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0xbd44547581b92805aAECc40EB2809352b9b2880d" data-name="Volatile Short" checked style="accent-color:#22d3ee"> Volatile Short (30d)</label>
-<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" data-name="Volatile Long" checked style="accent-color:#22d3ee"> Volatile Long (90d)</label>
-<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" data-name="Stable Short" checked style="accent-color:#22d3ee"> Stable Short (90d)</label>
-<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" data-name="Stable Long" checked style="accent-color:#22d3ee"> Stable Long (365d)</label>
-<label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:0.85rem;cursor:pointer">
-<input type="checkbox" class="vault-cb" data-vault="0x65D22E9BfE79306433Bf93Da9B0e5b626b8D021b" data-name="Flash Vault" checked style="accent-color:#22d3ee"> Flash Vault (7d)</label>
 </div>
 
 <button id="btn-approve" style="background:#22d3ee;color:#0a0a0f;border:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:0.95rem;cursor:not-allowed;opacity:0.5" disabled>Approve with MetaMask</button>
@@ -401,8 +386,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <pre style="margin-top:8px">curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
   -H "Content-Type: application/json" \
   -H "X-API-Key: lum_your_key_here" \
-  -d '{"productId":"BTCCAT-001","coverageAmount":100000000,"durationSeconds":604800,"asset":"BTC"}'</pre>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This buys $100 BTC Catastrophe Shield for 7 days. Note: <code>"asset":"BTC"</code> is required for BCS/EAS. Use <code>"stablecoin":"USDT"</code> for DEPEG.</p>
+  -d '{"productId":"FLASH-BTC-1H","coverageAmount":1000000000}'</pre>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This bets $1,000 coverage on Flash BTC 1h (BTC drops 5% in 1 hour). Premium ≈ $2.40. If trigger fires, you receive an $800 ClaimBond (ERC-1155) that matures 100% at 24 months, settled in $LUMINA at market price.</p>
 </details>
 
 <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the <a href="/dashboard" style="color:#22d3ee">Dashboard</a> to see your active policy.</p>
@@ -410,8 +395,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <details style="margin-bottom:16px">
 <summary style="color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.8rem">&#x1F6E0; Troubleshooting — something went wrong?</summary>
 <div style="margin-top:12px;font-size:0.85rem;color:rgba(255,255,255,0.6);line-height:1.7">
-<p><strong>&#x274C; "VAULT_EMPTY" error when buying</strong><br>
-The vault backing this product has no liquidity yet. This is temporary — LPs need to deposit USDC first. Try again later or choose a different product.</p>
+<p><strong>&#x274C; "BOND_RESERVE_INSUFFICIENT" error when buying</strong><br>
+The Bond Reserve can't cover the coverage you requested. Try a smaller coverage amount or a different product. The Bond Reserve is immutable (82M $LUMINA locked) — liquidity only moves out via matured bond redemptions.</p>
 
 <p><strong>&#x274C; Transaction failed or stuck</strong><br>
 Check on <a href="https://basescan.org" target="_blank" style="color:#22d3ee">BaseScan</a> using your wallet address. Common causes: insufficient USDC balance, USDC not approved, or gas too low. The approval in Step 2 should cover this — if not, re-approve with a higher amount.</p>
@@ -476,46 +461,29 @@ function finishSetup() {
 <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:0;margin-top:40px;box-shadow:0 -2px 20px rgba(0,212,255,0.05);overflow:hidden">
 <div style="height:3px;width:100%;background:linear-gradient(90deg,#00d4ff,transparent)"></div>
 <div style="padding:32px">
-<h2 style="margin-top:0;border:none;padding:0;color:#00d4ff">&#x1F6E1; Insurance Products</h2>
-<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Parametric coverage for your AI agent's portfolio. Your agent buys these policies via the API to protect against specific risks.</p>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:8px">Quick reference — <a href="https://www.lumina-org.com/#products" style="color:#22d3ee">view full details on the main page</a></p>
+<h2 style="margin-top:0;border:none;padding:0;color:#00d4ff">&#x26A1; The 9 Products</h2>
+<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Parametric bets on specific market events. Your agent bets via <code>POST /api/v2/purchase</code>. If the trigger fires, you receive a ClaimBond (ERC-1155) worth 80% of your coverage, USD-denominated, settled in $LUMINA at market price after 24 months.</p>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:8px">Premium formula (fixed): <code>Premium = Coverage × 0.80 × P(trigger) × 1.50</code> — no kink, no utilization curves. Quick reference — <a href="https://www.lumina-org.com/#products" style="color:#22d3ee">full details on the main page</a></p>
 <div style="overflow-x:auto">
 <table class="table-insurance" style="width:100%">
-<tr><th>Product</th><th>API productId</th><th>Required field</th><th>Protects Against</th><th>Duration</th><th>Deductible</th></tr>
-<tr><td>BTC Catastrophe Shield</td><td><code>BTCCAT-001</code></td><td><code>"asset":"BTC"</code></td><td>BTC crash &#x2265;50%</td><td>7-30d</td><td>20%</td></tr>
-<tr><td>ETH Apocalypse Shield</td><td><code>ETHAPOC-001</code></td><td><code>"asset":"ETH"</code></td><td>ETH crash &#x2265;60%</td><td>7-30d</td><td>20%</td></tr>
-<tr><td>Depeg Shield</td><td><code>DEPEG</code></td><td><code>"stablecoin":"USDT"</code></td><td>USDT or DAI loses peg</td><td>14-365d</td><td>USDT:15% / DAI:12%</td></tr>
-<tr><td>IL Index Cover</td><td><code>IL</code></td><td><code>"asset":"ETH"</code></td><td>Impermanent loss</td><td>14-90d</td><td>2%</td></tr>
-<tr><td>Exploit Shield</td><td><code>EXPLOIT</code></td><td><code>"asset":"ETH"</code></td><td>External protocol hacks (excl. Aave)</td><td>90-365d</td><td>10%</td></tr>
-<tr><td>Flash BTC</td><td><code>FLASH-BTC</code></td><td><code>"asset":"BTC"</code></td><td>BTC flash crash &#x2265;18% (24h) or &#x2265;22% (48h)</td><td>24-48h</td><td>20%</td></tr>
-<tr><td>Flash ETH</td><td><code>FLASH-ETH</code></td><td><code>"asset":"ETH"</code></td><td>ETH flash crash &#x2265;20% (24h) or &#x2265;28% (48h)</td><td>24-48h</td><td>20%</td></tr>
+<tr><th>Product</th><th>API productId</th><th>Trigger</th><th>P(trigger)</th><th>Multiplier</th></tr>
+<tr><td>Flash BTC 1h</td><td><code>FLASH-BTC-1H</code></td><td>BTC -5% in 1 hour</td><td>0.20%</td><td>333x</td></tr>
+<tr><td>Flash BTC 4h</td><td><code>FLASH-BTC-4H</code></td><td>BTC -8% in 4 hours</td><td>0.35%</td><td>190x</td></tr>
+<tr><td>Flash BTC 24h</td><td><code>FLASH-BTC-24H</code></td><td>BTC -10% in 24 hours</td><td>1.50%</td><td>44x</td></tr>
+<tr><td>Flash BTC 48h</td><td><code>FLASH-BTC-48H</code></td><td>BTC -15% in 48 hours</td><td>0.80%</td><td>83x</td></tr>
+<tr><td>Flash ETH 1h</td><td><code>FLASH-ETH-1H</code></td><td>ETH -7% in 1 hour</td><td>0.25%</td><td>266x</td></tr>
+<tr><td>Flash ETH 24h</td><td><code>FLASH-ETH-24H</code></td><td>ETH -12% in 24 hours</td><td>2.00%</td><td>33x</td></tr>
+<tr><td>Flash ETH 48h</td><td><code>FLASH-ETH-48H</code></td><td>ETH -18% in 48 hours</td><td>0.90%</td><td>74x</td></tr>
+<tr><td>Micro Depeg</td><td><code>MICRO-DEPEG</code></td><td>USDT below $0.995 for 7 days</td><td>3.50%</td><td>19x</td></tr>
+<tr><td>Rate Shock</td><td><code>RATE-SHOCK</code></td><td>Aave USDC borrow &gt; 10% for 7 days</td><td>4.00%</td><td>17x</td></tr>
 </table>
 </div>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Your agent decides when to buy based on market conditions. Policies are purchased and claimed automatically via the API. You only set the spending limit.</p>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">100% of every premium buys $LUMINA on Uniswap V3 and burns it. Nothing goes to treasury, LPs, or the team. Every bet you lose makes $LUMINA scarcer forever.</p>
 
 <div class="warning" style="margin-top:16px">
 <p class="warning-title">&#x26A0;&#xFE0F; Important for API calls</p>
-<p style="font-size:0.85rem">The wallet that approved USDC on-chain must be the EXACT same wallet registered with your API key. If they differ, purchases will fail with "Wallet mismatch". Always include the <code>"asset"</code> field in quote/purchase requests (see table above).</p>
+<p style="font-size:0.85rem">The wallet that approved USDC on-chain must be the EXACT same wallet registered with your API key. If they differ, purchases will fail with "Wallet mismatch".</p>
 </div>
-</div>
-</div>
-
-<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(139,92,246,0.2);border-radius:16px;padding:0;margin-top:24px;box-shadow:0 -2px 20px rgba(139,92,246,0.05);overflow:hidden">
-<div style="height:3px;width:100%;background:linear-gradient(90deg,#8b5cf6,transparent)"></div>
-<div style="padding:32px">
-<h2 style="margin-top:0;border:none;padding:0;color:#8b5cf6">&#x1F4B0; Yield Vaults</h2>
-<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Deposit USDC into vaults to earn yield from insurance premiums. Your agent manages deposits and withdrawals.</p>
-<div style="overflow-x:auto">
-<table class="table-vaults" style="width:100%">
-<tr><th>Vault</th><th>Lockup</th><th>Risk Profile</th><th>What it covers</th></tr>
-<tr><td><strong>Volatile Short</strong></td><td>37 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>BCS + EAS + IL claims</td></tr>
-<tr><td><strong>Volatile Long</strong></td><td>97 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>BCS + EAS + IL claims</td></tr>
-<tr><td><strong>Stable Short</strong></td><td>97 days</td><td><span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px">Lower risk/yield</span></td><td>DEPEG + EXPLOIT claims</td></tr>
-<tr><td><strong>Stable Long</strong></td><td>372 days</td><td><span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:2px 8px;border-radius:4px;font-size:11px">Lower risk/yield</span></td><td>DEPEG + EXPLOIT claims</td></tr>
-<tr><td><strong>Flash Vault</strong></td><td>7 days</td><td><span style="background:rgba(234,179,8,0.1);color:#eab308;padding:2px 8px;border-radius:4px;font-size:11px">Higher risk/yield</span></td><td>Flash BTC + Flash ETH claims</td></tr>
-</table>
-</div>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">Yield = Aave V3 lending APY (~3-5%, variable) + insurance premiums. Your USDC is deposited into Aave V3, the largest lending protocol in DeFi. Longer lockups generally offer higher yields. Your agent monitors APY and manages positions through the API.</p>
 </div>
 </div>
 
@@ -523,9 +491,6 @@ function finishSetup() {
 .table-insurance th{background:rgba(0,212,255,0.05);text-transform:uppercase;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.5);padding:12px 16px}
 .table-insurance td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.2s}
 .table-insurance tr:hover td{background:rgba(0,212,255,0.03)}
-.table-vaults th{background:rgba(139,92,246,0.05);text-transform:uppercase;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.5);padding:12px 16px}
-.table-vaults td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.2s}
-.table-vaults tr:hover td{background:rgba(139,92,246,0.03)}
 </style>
 
 <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;margin-top:24px">
@@ -537,12 +502,10 @@ function finishSetup() {
 <tr><td>PolicyManager</td><td><code><a href="https://basescan.org/address/0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" target="_blank" style="color:#22d3ee">0xCCA07e...0162a</a></code></td></tr>
 <tr><td>LuminaOracleV2</td><td><code><a href="https://basescan.org/address/0x87B576f688bE0E1d7d23A299f55b475658215105" target="_blank" style="color:#22d3ee">0x87B576...15105</a></code></td></tr>
 <tr><td>USDC</td><td><code><a href="https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" target="_blank" style="color:#22d3ee">0x833589...02913</a></code></td></tr>
-<tr><td colspan="2" style="color:rgba(255,255,255,0.3);padding-top:8px;font-style:italic">Shields V2</td></tr>
-<tr><td>BCS (BTCCatastropheShieldV2)</td><td><code style="font-size:0.75rem">0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21</code></td></tr>
-<tr><td>EAS (ETHApocalypseShieldV2)</td><td><code style="font-size:0.75rem">0x70f1c92EFcFe55e8d460aAa6d626779536b15128</code></td></tr>
-<tr><td>Depeg (DepegShieldV2)</td><td><code style="font-size:0.75rem">0x881f683291122c3A72bdD504F71ddCAf47d9AE0e</code></td></tr>
-<tr><td>IL (ILIndexCoverV2)</td><td><code style="font-size:0.75rem">0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a</code></td></tr>
-<tr><td>Exploit (ExploitShieldV2)</td><td><code style="font-size:0.75rem">0x63D340AE7229BB464bC801f225651341ebcD3693</code></td></tr>
+<tr><td colspan="2" style="color:rgba(255,255,255,0.3);padding-top:8px;font-style:italic">Core (see SKILL file for full list)</td></tr>
+<tr><td>BondVault (82M $LUMINA reserve)</td><td><code style="font-size:0.75rem">see SKILL file</code></td></tr>
+<tr><td>ClaimBond (ERC-1155 epochs)</td><td><code style="font-size:0.75rem">see SKILL file</code></td></tr>
+<tr><td>BurnEngine (100% burn)</td><td><code style="font-size:0.75rem">see SKILL file</code></td></tr>
 <tr><td colspan="2" style="color:rgba(255,255,255,0.3);padding-top:8px;font-style:italic">Governance</td></tr>
 <tr><td>TimelockController</td><td><code style="font-size:0.75rem">0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a</code></td></tr>
 <tr><td>Gnosis Safe (2/3)</td><td><code style="font-size:0.75rem">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</code></td></tr>
@@ -865,8 +828,9 @@ function finishSetup() {
     approveError.style.display = 'none';
   }
 
-  modeInsurance.addEventListener('click', () => updateMode('insurance'));
-  modeYield.addEventListener('click', () => updateMode('yield'));
+  // Mode toggle removed — tutorial is insurance-only (new deflationary model). currentMode stays 'insurance'.
+  if (modeInsurance) modeInsurance.addEventListener('click', () => updateMode('insurance'));
+  if (modeYield) modeYield.addEventListener('click', () => updateMode('yield'));
 
   // Vault checkboxes
   function getSelectedVaults() {
