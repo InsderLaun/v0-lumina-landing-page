@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, ExternalLink, Loader2, TrendingUp } from "lucide-react"
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi"
+import { useWriteContract, useWaitForTransactionReceipt, useSimulateContract } from "wagmi"
 import { parseUnits, formatUnits } from "viem"
 import { useUSDCBalance, useUSDCAllowance } from "@/hooks/use-web3"
 import { useLuminaWallet } from "@/hooks/use-lumina-wallet"
@@ -117,6 +117,31 @@ export function DepositLPModal({ open, onClose, preselectedVault }: DepositLPMod
     const { isSuccess: approveConfirmed } = useWaitForTransactionReceipt({ hash: approveTxHash })
     const { isSuccess: depositConfirmed } = useWaitForTransactionReceipt({ hash: depositTxHash })
 
+    // [Audit #35 SIM-1] Pre-simulate the approve and deposit calls so revert
+    // reasons surface in the UI BEFORE the user is asked to sign. The hook is
+    // only "armed" once the user reaches the relevant step + has a wallet
+    // connected; otherwise we leave the args undefined and let wagmi skip.
+    const parsedAmount = depositAmount > 0 ? parseUnits(String(depositAmount), 6) : 0n
+    const { error: approveSimError } = useSimulateContract({
+        address: LEGACY_CONTRACTS.USDC as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: "approve",
+        args: selectedVault
+            ? [selectedVault.address as `0x${string}`, parsedAmount]
+            : undefined,
+        query: { enabled: Boolean(selectedVault && address && parsedAmount > 0n) },
+    })
+    const { error: depositSimError } = useSimulateContract({
+        address: (selectedVault?.address ?? "0x0000000000000000000000000000000000000000") as `0x${string}`,
+        abi: BASE_VAULT_ABI,
+        functionName: "deposit",
+        args: address && parsedAmount > 0n ? [parsedAmount, address] : undefined,
+        // We do NOT gate on `hasEnoughAllowance` here — the whole point of the
+        // simulation is to surface the InsufficientAllowance revert in the UI
+        // before the user signs.
+        query: { enabled: Boolean(selectedVault && address && parsedAmount > 0n) },
+    })
+
     const hasEnoughUSDC = usdcBalance ? Number(formatUnits(usdcBalance, 6)) >= depositAmount : false
     const hasEnoughAllowance = allowance ? Number(formatUnits(allowance, 6)) >= depositAmount : false
     const meetsMinimum = depositAmount >= MIN_DEPOSIT_USDC
@@ -144,6 +169,16 @@ export function DepositLPModal({ open, onClose, preselectedVault }: DepositLPMod
 
     const handleApprove = () => {
         if (!selectedVault) return
+        // [Audit #35 SIM-1] Surface simulation errors before asking the wallet.
+        if (approveSimError) {
+            setApprovalTxStatus("error")
+            setError(
+                (approveSimError as { shortMessage?: string; message: string }).shortMessage ||
+                    approveSimError.message ||
+                    "Transaction would revert"
+            )
+            return
+        }
         setError("")
         setApprovalTxStatus("pending")
         try {
@@ -162,6 +197,16 @@ export function DepositLPModal({ open, onClose, preselectedVault }: DepositLPMod
 
     const handleDeposit = () => {
         if (!selectedVault || !address) return
+        // [Audit #35 SIM-1] Surface simulation errors before asking the wallet.
+        if (depositSimError) {
+            setDepositTxStatus("error")
+            setError(
+                (depositSimError as { shortMessage?: string; message: string }).shortMessage ||
+                    depositSimError.message ||
+                    "Transaction would revert"
+            )
+            return
+        }
         setError("")
         setDepositTxStatus("pending")
         try {

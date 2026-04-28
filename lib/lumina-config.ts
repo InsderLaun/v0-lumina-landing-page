@@ -5,72 +5,119 @@
 // ALL product parameters, addresses, and constants live HERE.
 // Every other file in the project MUST import from this file.
 // NEVER hardcode protocol data anywhere else.
+//
+// [Audit #35 CHAIN-1] Migrated from Base Mainnet (V1/V2) to
+// Base Sepolia (V5.1, deploy 2026-04-27). The protocol shape
+// also changed: V5.1 has a SINGLE BondVault (not 5 named vaults)
+// and 9 shield products (FlashBTC×4 + FlashETH×3 + MicroDepeg
+// + RateShock). The legacy 5-vault and 5-shield UI keys are
+// kept as aliases so existing components continue to compile;
+// they all point at the closest V5.1 equivalent (or BondVault
+// for vault-shaped UI). A future PR should redesign the
+// "My Vaults" UX around the V5.1 primitives.
 // ════════════════════════════════════════════════════════════
 
 export const CHAIN = {
-  id: 8453,
-  name: "Base Mainnet",
-  hexId: "0x2105",
-  rpc: "https://mainnet.base.org",
-  explorer: "https://basescan.org",
-  explorerApi: "https://api.basescan.org/api",
+  id: 84532,
+  name: "Base Sepolia",
+  hexId: "0x14a34",
+  rpc: "https://sepolia.base.org",
+  explorer: "https://sepolia.basescan.org",
+  explorerApi: "https://api-sepolia.basescan.org/api",
 } as const
 
 export const TOKENS = {
   USDC: {
-    // PRODUCTION - Real USDC on Base L2
-    address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as `0x${string}`,
+    // V5.1 testnet — MockUSDC deployed alongside the protocol
+    address: "0x63D340AE7229BB464bC801f225651341ebcD3693" as `0x${string}`,
     symbol: "USDC",
-    name: "USD Coin",
+    name: "USD Coin (mock)",
     decimals: 6,
-    issuer: "Circle",
+    issuer: "Lumina (mock for V5.1 testnet)",
   },
   aBasUSDC: {
-    address: "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB" as `0x${string}`,
+    // V5.1 testnet has no Aave integration; placeholder pointing at MockUSDC
+    // so any UI reading TOKENS.aBasUSDC still type-checks.
+    address: "0x63D340AE7229BB464bC801f225651341ebcD3693" as `0x${string}`,
     symbol: "aBasUSDC",
-    name: "Aave Base USDC",
+    name: "Aave Base USDC (mock)",
     decimals: 6,
   },
 } as const
 
 export const AAVE = {
-  pool: "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5" as `0x${string}`,
+  // V5.1 has no Aave integration. The pool field is set to the zero address
+  // sentinel; any UI relying on AAVE.pool should fall back to "not available".
+  pool: "0x0000000000000000000000000000000000000000" as `0x${string}`,
   aToken: TOKENS.aBasUSDC.address,
 } as const
 
 export const ORACLES = {
-  ETH_USD: "0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70" as `0x${string}`,
-  BTC_USD: "0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E" as `0x${string}`,
+  // V5.1 testnet uses MockChainlinkOracle for ETH and BTC feeds.
+  ETH_USD: "0x2a370A7dAE38aF7EECA20C9438Bd5154889cdc5e" as `0x${string}`,
+  BTC_USD: "0x2aDC8718F0b7Efb18a07aBc7595F1364730bb99E" as `0x${string}`,
 } as const
 
-// CONTRACTS — PRODUCTION on Base Mainnet (March 2026)
+// CONTRACTS — V5.1 on Base Sepolia (chainId 84532), deploy 2026-04-27.
+// Documented in org-lumina/LUMINA-PROTOCOL deployments/sepolia/V5.1-2026-04-27.json.
 export const CONTRACTS = {
-  CoverRouter: "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025" as `0x${string}`,
-  PolicyManager: "0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" as `0x${string}`,
-  Oracle: "0x87B576f688bE0E1d7d23A299f55b475658215105" as `0x${string}`,
-  Phala: "0x468b9D2E9043c80467B610bC290b698ae23adb9B" as `0x${string}`,
+  CoverRouter: "0x60447F880Fad94fe1E17DBe9A0Cb39923bC9f316" as `0x${string}`,
+  PolicyManager: "0x04f94Bc24aAA87aDFA643EE1e55a35C683f30804" as `0x${string}`,
+  Oracle: "0xe935806729Df8C95f3E8ab4e8D92FA29ad9B2867" as `0x${string}`, // CapacityOracle proxy
+  Phala: "0x0000000000000000000000000000000000000000" as `0x${string}`, // not deployed in V5.1 testnet
+  // V5.1-only top-level contracts (new shape).
+  LuminaToken: "0x17db45491561F7538e4E14449DCC34799758465D" as `0x${string}`,
+  ClaimBond: "0x5304f6732a51995651f1B666525CFeC5Af74A541" as `0x${string}`,
+  BondVault: "0x1747CDA7F84BEc4f2002ff0dcdb3c51c1C02cf6A" as `0x${string}`,
+  BuybackEngine: "0x5a74f8A6A11679b12aDAE479C686880CCf8720b3" as `0x${string}`,
+  Marketplace: "0x863A7fB4A676106db4b03449b01AC5615c6C9D51" as `0x${string}`,
+  ShieldKeeper: "0xB5dE54F34deC8309bD8C1B8c1eF854C88D386Bca" as `0x${string}`,
+  TWAPBurner: "0x357BAF511383be70d1F3A5de7D3b07561Eec7d99" as `0x${string}`,
+  TreasuryVesting: "0xC647E8D8daFeC1Ac1B8e039Cf78F27A023393354" as `0x${string}`,
+  // [Audit #35 CHAIN-1] V5.1 has a SINGLE BondVault, not 5 named vaults.
+  // The legacy keys below all point at BondVault so existing UI components
+  // compile; they will display identical data. The "My Vaults" tab needs a
+  // redesign to expose what V5.1 actually exposes (single vault, ClaimBond
+  // NFT issuance on policy trigger, redemption at maturity).
   vaults: {
-    VolatileShort: "0xbd44547581b92805aAECc40EB2809352b9b2880d" as `0x${string}`,
-    VolatileLong: "0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" as `0x${string}`,
-    StableShort: "0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" as `0x${string}`,
-    StableLong: "0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" as `0x${string}`,
-    FlashVault: "0x65D22E9BfE79306433Bf93Da9B0e5b626b8D021b" as `0x${string}`,
+    VolatileShort: "0x1747CDA7F84BEc4f2002ff0dcdb3c51c1C02cf6A" as `0x${string}`,
+    VolatileLong: "0x1747CDA7F84BEc4f2002ff0dcdb3c51c1C02cf6A" as `0x${string}`,
+    StableShort: "0x1747CDA7F84BEc4f2002ff0dcdb3c51c1C02cf6A" as `0x${string}`,
+    StableLong: "0x1747CDA7F84BEc4f2002ff0dcdb3c51c1C02cf6A" as `0x${string}`,
+    FlashVault: "0x1747CDA7F84BEc4f2002ff0dcdb3c51c1C02cf6A" as `0x${string}`,
   },
+  // [Audit #35 CHAIN-1] V5.1 shields. Legacy keys (BCS/EAS/Depeg/ILIndex/Exploit)
+  // are aliased to the closest V5.1 product so existing UI components still
+  // resolve. New V5.1-only keys (FlashBTC1H, FlashBTC4H, FlashETH1H) are added.
   shields: {
-    BCS: "0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21" as `0x${string}`,
-    EAS: "0x70f1c92EFcFe55e8d460aAa6d626779536b15128" as `0x${string}`,
-    Depeg: "0x881f683291122c3A72bdD504F71ddCAf47d9AE0e" as `0x${string}`,
-    ILIndex: "0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a" as `0x${string}`,
-    Exploit: "0x63D340AE7229BB464bC801f225651341ebcD3693" as `0x${string}`,
-    FlashBTC24h: "0x1A6b379dA1C5F804aa0D89e57ce05424219ce933" as `0x${string}`,
-    FlashBTC48h: "0xcEDe02A77F1708342a7225D41d2b18A70b5FDDc7" as `0x${string}`,
-    FlashETH24h: "0x5304f6732a51995651f1B666525CFeC5Af74A541" as `0x${string}`,
-    FlashETH48h: "0xA81FD43540679A39660960268585e876732ce19E" as `0x${string}`,
+    // Legacy aliases → V5.1 closest match
+    BCS: "0xf2D3Fe86Ad8BB96600bB5fdF21159bb6255e95f2" as `0x${string}`, // → FlashBTC48H
+    EAS: "0xcCbE9CCCD887D67f4bfD833c2431DD2B4e1f864D" as `0x${string}`, // → FlashETH48H
+    Depeg: "0x06DF0608c7256c8Df0723538574Babad1a7fd53d" as `0x${string}`, // → MicroDepeg
+    ILIndex: "0x7287E55380ee877279ef2e390e2528F772e7Da2f" as `0x${string}`, // → RateShock (closest semantic)
+    Exploit: "0x7287E55380ee877279ef2e390e2528F772e7Da2f" as `0x${string}`, // → RateShock
+    FlashBTC24h: "0xAc53Bf7Bb85Fcfb6d3c831F3AD9f6f79ebeeF99f" as `0x${string}`,
+    FlashBTC48h: "0xf2D3Fe86Ad8BB96600bB5fdF21159bb6255e95f2" as `0x${string}`,
+    FlashETH24h: "0x6D6E250bc936D92F64d70262d14D6b020107Ee26" as `0x${string}`,
+    FlashETH48h: "0xcCbE9CCCD887D67f4bfD833c2431DD2B4e1f864D" as `0x${string}`,
+    // V5.1-only additions — UI may surface these as new product cards.
+    FlashBTC1h: "0x77c2A7cA53ED5cbDe66cE220647d2c213133f2a9" as `0x${string}`,
+    FlashBTC4h: "0xb5b21f7c02C15B5D73e63538BC917825Ebcb8122" as `0x${string}`,
+    FlashETH1h: "0xa63237a0fd57443D73F9ED36CBE15E2792D4a170" as `0x${string}`,
+    MicroDepeg: "0x06DF0608c7256c8Df0723538574Babad1a7fd53d" as `0x${string}`,
+    RateShock: "0x7287E55380ee877279ef2e390e2528F772e7Da2f" as `0x${string}`,
   },
-  EmergencyPause: "0xc7ac8c19c3f10f820d7e42f07e6e257bacc22876" as `0x${string}`,
-  TimelockController: "0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a" as `0x${string}`,
-  GnosisSafe: "0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD" as `0x${string}`,
+  // EmergencyPause / TimelockController / GnosisSafe are not deployed in V5.1
+  // testnet per protocol policy ("NO TimelockController in any deploy" — see
+  // org-lumina/LUMINA-PROTOCOL fix/v5.1-relayer-payment-flow PR description).
+  // Set to zero address sentinels so UI references resolve without throwing.
+  EmergencyPause: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+  TimelockController: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+  GnosisSafe: "0xe585e76A0b8CbbC2d10b1110a9ac3F4c11dBfDa8" as `0x${string}`, // V5.1 testnet "multisig" is the deployer EOA
 } as const
+
+// V5.1 lumina-api endpoint (public read + agent-key write surface).
+export const LUMINA_API_URL = "https://lumina-api-production-ac85.up.railway.app" as const
 
 // KINK MODEL — mirror of PremiumMath.sol
 export const KINK_MODEL = {

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// [Audit #35 CHAIN-1] V5.1 lives on Base Sepolia. NEXT_PUBLIC_RPC_URL takes
+// precedence (so prod can use a paid Alchemy/Infura URL); public Sepolia
+// endpoints follow as fallbacks.
+const PRIMARY_RPC = process.env.NEXT_PUBLIC_RPC_URL
 const RPC_URLS = [
-  'https://1rpc.io/base',
-  'https://base.llamarpc.com',
-  'https://mainnet.base.org',
+  ...(PRIMARY_RPC ? [PRIMARY_RPC] : []),
+  'https://sepolia.base.org',
+  'https://base-sepolia-rpc.publicnode.com',
 ]
 
 // Only allow read-only RPC methods
