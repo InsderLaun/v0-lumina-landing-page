@@ -16,6 +16,8 @@
 
 import { useState, useEffect } from "react"
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi"
+import { simulateContract } from "wagmi/actions"
+import { config as wagmiConfig } from "@/components/lumina/web3-provider"
 import { Loader2 } from "lucide-react"
 import { BASE_VAULT_ABI } from "@/lib/abis"
 import { useLuminaWallet } from "@/hooks/use-lumina-wallet"
@@ -108,8 +110,23 @@ export function VaultActions({
         }
     }
 
+    // [Audit #35 SIM-1] Pre-simulate the call before asking the wallet so the
+    // user sees decoded reverts (cooldown not elapsed, insufficient shares,
+    // etc.) BEFORE the popup. Args are dynamic here, so we simulate
+    // imperatively rather than via the React hook.
     const handleRequest = (sharesToBurn: bigint) => {
-        ensureWagmiThen(() => {
+        ensureWagmiThen(async () => {
+            try {
+                await simulateContract(wagmiConfig, {
+                    address: vaultAddress,
+                    abi: BASE_VAULT_ABI,
+                    functionName: "requestWithdrawalV2",
+                    args: [sharesToBurn],
+                })
+            } catch (err: any) {
+                setError(err.shortMessage || err.message || "Request would revert.")
+                return
+            }
             try {
                 requestWithdrawal({
                     address: vaultAddress,
@@ -125,7 +142,18 @@ export function VaultActions({
 
     const handleComplete = () => {
         if (!address) return
-        ensureWagmiThen(() => {
+        ensureWagmiThen(async () => {
+            try {
+                await simulateContract(wagmiConfig, {
+                    address: vaultAddress,
+                    abi: BASE_VAULT_ABI,
+                    functionName: "completeWithdrawalV2",
+                    args: [address],
+                })
+            } catch (err: any) {
+                setError(err.shortMessage || err.message || "Withdrawal would revert.")
+                return
+            }
             try {
                 completeWithdrawal({
                     address: vaultAddress,
