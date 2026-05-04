@@ -191,7 +191,7 @@ export function AgentDashboardView() {
             ts: 0n,
             block: l.blockNumber,
             kind: 'TRIGGER',
-            msg: `Trigger fired on ${sName} · bond $${fmt(l.args.bondAmount as bigint, 6)}`,
+            msg: `Trigger fired on ${sName} · bond $${fmtInt(l.args.bondAmount as bigint)}`,
             txHash: l.transactionHash,
           })
         }
@@ -200,7 +200,7 @@ export function AgentDashboardView() {
             ts: 0n,
             block: l.blockNumber,
             kind: 'BOND',
-            msg: `Bond minted · epoch #${(l.args.epochId as bigint).toString()} · $${fmt(l.args.usdAmount as bigint, 6)}`,
+            msg: `Bond minted · epoch #${(l.args.epochId as bigint).toString()} · $${fmtInt(l.args.usdAmount as bigint)}`,
             txHash: l.transactionHash,
           })
         }
@@ -289,7 +289,7 @@ export function AgentDashboardView() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10, marginBottom: 20 }}>
             <Kpi label="Active policies" value={String(policies.length)} sub={`$${fmt(totalCover, 6, 0)} covered`} />
             <Kpi label="Premiums paid" value={`$${fmt(totalPremium, 6)}`} sub="lifetime" accent="var(--rd-warn)" />
-            <Kpi label="Bonds outstanding" value={String(bondsOutstanding.count)} sub={`$${fmt(bondsOutstanding.face, 6, 0)} face`} />
+            <Kpi label="Bonds outstanding" value={String(bondsOutstanding.count)} sub={`$${fmtInt(bondsOutstanding.face)} face`} />
             <Kpi label="Bonds redeemed" value={String(bondsRedeemed.count)} sub={`${fmt(bondsRedeemed.lumina, 18, 0)} LUMINA recv`} accent="var(--rd-pos)" />
             <Kpi label="USDC balance" value={`$${usdcLabel}`} sub="wallet" />
             <Kpi label="LUMINA balance" value={luminaLabel} sub="wallet" accent="var(--rd-accent)" />
@@ -414,4 +414,9 @@ function KindPill({ kind }: { kind: FeedKind }) {
 
 function fmt(v: bigint, decimals: number, max: number = 2): string {
   return Number(formatUnits(v, decimals)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: max })
+}
+
+/** ClaimBond / BondVault values are integer dollars (1 token = $1, no decimals). */
+function fmtInt(v: bigint): string {
+  return Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 })
 }

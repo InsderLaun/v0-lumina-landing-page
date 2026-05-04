@@ -167,7 +167,8 @@ export function MarketplaceView() {
     uniqueEpochs.forEach((e, i) => {
       const r = epochData[i]
       if (r?.status === 'success') {
-        const [maturityTs] = r.result as readonly [bigint, bigint, boolean]
+        // getEpochInfo returns (exists, maturity, totalSupply_, matured)
+        const [, maturityTs] = r.result as readonly [boolean, bigint, bigint, boolean]
         map[e.toString()] = maturityTs
       }
     })
@@ -289,7 +290,9 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
     })
   }
 
-  const face = Number(formatUnits(listing.faceValue ?? 0n, 6))
+  // ClaimBond is ERC1155 with 1 token = $1; `amount` (alias `faceValue`) is the
+  // raw token count = integer dollars. priceUSDC is 6-decimal USDC.
+  const face = Number(listing.faceValue ?? 0n)
   const ask = Number(formatUnits(listing.priceUSDC, 6))
   const discount = face > 0 ? Math.round(((face - ask) / face) * 100) : 0
   const daysLeft =

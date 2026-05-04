@@ -79,7 +79,7 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
           textAlign: 'center',
         }}
       >
-        ⚠ SEPOLIA TESTNET · CHAIN 84532 · NO REAL FUNDS · USE TEST USDC ONLY
+        ⚠ BASE SEPOLIA TESTNET · CHAIN 84532 · NO REAL FUNDS · USE TEST USDC ONLY
       </div>
 
       {/* Wrong-chain banner — only when connected to wrong chain */}

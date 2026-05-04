@@ -118,7 +118,10 @@ export function AgentBondsView() {
     () =>
       address
         ? aggregatedEpochs.flatMap((e) => [
-            { address: CONTRACTS.ClaimBond, abi: claimBondAbi, functionName: 'getHolderFaceValue' as const, args: [address, e.epochId] as const },
+            // Use balanceOf (= ERC1155 count = integer dollars), NOT
+            // getHolderFaceValue (which scales to 18-dec USD-wei). Keeps units
+            // aligned with `totalMinted` from BondsMinted event (also integer $).
+            { address: CONTRACTS.ClaimBond, abi: claimBondAbi, functionName: 'balanceOf' as const, args: [address, e.epochId] as const },
             { address: CONTRACTS.ClaimBond, abi: claimBondAbi, functionName: 'isMatured' as const, args: [e.epochId] as const },
             { address: CONTRACTS.ClaimBond, abi: claimBondAbi, functionName: 'getEpochInfo' as const, args: [e.epochId] as const },
           ])
@@ -135,8 +138,11 @@ export function AgentBondsView() {
     return aggregatedEpochs.map((e, i) => {
       const balance = readData[i * 3]?.status === 'success' ? (readData[i * 3].result as bigint) : 0n
       const matured = readData[i * 3 + 1]?.status === 'success' ? (readData[i * 3 + 1].result as boolean) : false
-      const epochInfo = readData[i * 3 + 2]?.status === 'success' ? (readData[i * 3 + 2].result as readonly [bigint, bigint, boolean]) : null
-      const maturityTs = epochInfo?.[0] ?? 0n
+      // getEpochInfo returns (exists, maturity, totalSupply_, matured)
+      const epochInfo = readData[i * 3 + 2]?.status === 'success'
+        ? (readData[i * 3 + 2].result as readonly [boolean, bigint, bigint, boolean])
+        : null
+      const maturityTs = epochInfo?.[1] ?? 0n
       const s: BondRow['status'] = balance === 0n ? 'redeemed' : matured ? 'matured' : 'holding'
       return {
         epochId: e.epochId,
@@ -171,8 +177,9 @@ export function AgentBondsView() {
       lines.push(
         [
           r.epochId.toString(),
-          formatUnits(r.totalMinted, 6),
-          formatUnits(r.currentBalance, 6),
+          // ClaimBond units are integer dollars (1 token = $1), no decimals.
+          r.totalMinted.toString(),
+          r.currentBalance.toString(),
           date,
           r.status,
           r.blockNumber.toString(),
@@ -290,8 +297,8 @@ export function AgentBondsView() {
           {!loading && !err && filtered.length > 0 && (
             <>
               <div style={{ marginBottom: 14, display: 'flex', gap: 24, fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11, color: 'var(--rd-text-3)' }}>
-                <span>Outstanding face: <span style={{ color: 'var(--rd-text)' }}>${fmt(totalFace, 6)}</span></span>
-                <span>Matured (redeemable): <span style={{ color: 'var(--rd-pos)' }}>${fmt(maturedFace, 6)}</span></span>
+                <span>Outstanding face: <span style={{ color: 'var(--rd-text)' }}>${fmtInt(totalFace)}</span></span>
+                <span>Matured (redeemable): <span style={{ color: 'var(--rd-pos)' }}>${fmtInt(maturedFace)}</span></span>
               </div>
               <Table rows={filtered} />
             </>
@@ -340,9 +347,9 @@ function Table({ rows }: { rows: BondRow[] }) {
         >
           <Mono color="var(--rd-accent)">#{r.epochId.toString()}</Mono>
           <StatusPill status={r.status} />
-          <Mono>${fmt(r.totalMinted, 6)}</Mono>
+          <Mono>${fmtInt(r.totalMinted)}</Mono>
           <Mono color={r.currentBalance > 0n ? 'var(--rd-text)' : 'var(--rd-text-3)'}>
-            ${fmt(r.currentBalance, 6)}
+            ${fmtInt(r.currentBalance)}
           </Mono>
           <Mono color="var(--rd-text-3)">
             {r.maturityTs > 0n ? new Date(Number(r.maturityTs) * 1000).toISOString().slice(0, 10) : '—'}
@@ -403,4 +410,9 @@ function Empty({ children }: { children: React.ReactNode }) {
 
 function fmt(v: bigint, decimals: number, max: number = 2): string {
   return Number(formatUnits(v, decimals)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: max })
+}
+
+/** ClaimBond / BondVault values are integer dollars (1 token = $1, no decimals). */
+function fmtInt(v: bigint): string {
+  return Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 })
 }

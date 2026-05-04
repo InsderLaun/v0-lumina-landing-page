@@ -32,7 +32,7 @@ export default function RoleSelectPage() {
           textAlign: 'center',
         }}
       >
-        ⚠ SEPOLIA TESTNET · NO REAL FUNDS
+        ⚠ BASE SEPOLIA TESTNET · NO REAL FUNDS
       </div>
 
       <header

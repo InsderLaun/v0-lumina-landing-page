@@ -136,7 +136,9 @@ export function PortfolioView() {
     }
   }, [address, publicClient])
 
-  // For each user epoch: balanceOf + isMatured + getEpochInfo
+  // For each user epoch read: balanceOf (= ERC1155 token count = integer dollars,
+  // because 1 bond token = $1), isMatured, getEpochInfo (4 outputs: exists,
+  // maturity, totalSupply_, matured).
   const bondReadContracts = useMemo(
     () =>
       address
@@ -144,7 +146,7 @@ export function PortfolioView() {
             {
               address: CONTRACTS.ClaimBond,
               abi: claimBondAbi,
-              functionName: 'getHolderFaceValue' as const,
+              functionName: 'balanceOf' as const,
               args: [address, epochId] as const,
             },
             {
@@ -172,14 +174,18 @@ export function PortfolioView() {
     if (!bondData) return []
     return userEpochs
       .map((epochId, i) => {
-        const face = bondData[i * 3]?.status === 'success' ? (bondData[i * 3].result as bigint) : 0n
+        const balance = bondData[i * 3]?.status === 'success' ? (bondData[i * 3].result as bigint) : 0n
         const matured = bondData[i * 3 + 1]?.status === 'success' ? (bondData[i * 3 + 1].result as boolean) : false
-        const epochInfo = bondData[i * 3 + 2]?.status === 'success' ? (bondData[i * 3 + 2].result as readonly [bigint, bigint, boolean]) : null
+        // getEpochInfo returns (exists, maturity, totalSupply_, matured)
+        const epochInfo = bondData[i * 3 + 2]?.status === 'success'
+          ? (bondData[i * 3 + 2].result as readonly [boolean, bigint, bigint, boolean])
+          : null
         return {
           epochId,
-          faceValue: face,
+          // faceValue is INTEGER DOLLARS (= ERC1155 balance, since 1 token = $1)
+          faceValue: balance,
           matured,
-          maturityTs: epochInfo?.[0] ?? 0n,
+          maturityTs: epochInfo?.[1] ?? 0n,
         }
       })
       .filter((b) => b.faceValue > 0n)
@@ -207,11 +213,11 @@ export function PortfolioView() {
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
             <Kpi label="Active policies" value={String(policies.length)} sub={`$${formatBaseUnits(policies.reduce((a, p) => a + p.cover, 0n), 6)} covered`} />
-            <Kpi label="Bonds outstanding" value={String(bonds.length)} sub={`$${formatBaseUnits(bonds.reduce((a, b) => a + b.faceValue, 0n), 6)} face`} />
+            <Kpi label="Bonds outstanding" value={String(bonds.length)} sub={`$${fmtIntDollars(bonds.reduce((a, b) => a + b.faceValue, 0n))} face`} />
             <Kpi
               label="Redeemable now"
               value={String(bonds.filter((b) => b.matured).length)}
-              sub={`$${formatBaseUnits(bonds.filter((b) => b.matured).reduce((a, b) => a + b.faceValue, 0n), 6)}`}
+              sub={`$${fmtIntDollars(bonds.filter((b) => b.matured).reduce((a, b) => a + b.faceValue, 0n))}`}
               accent="var(--rd-pos)"
             />
             <Kpi label="Premiums paid" value={`$${formatBaseUnits(policies.reduce((a, p) => a + p.premium, 0n), 6)}`} sub="lifetime" accent="var(--rd-warn)" />
@@ -322,7 +328,7 @@ function BondActionRow({ bond, last, onRedeemed }: { bond: BondRow; last: boolea
   return (
     <Row last={last} weights="1fr 1fr 1.2fr 1fr 1.4fr">
       <Mono color="var(--rd-accent)">#{bond.epochId.toString()}</Mono>
-      <Mono>${formatBaseUnits(bond.faceValue, 6)}</Mono>
+      <Mono>${fmtIntDollars(bond.faceValue)}</Mono>
       <Mono color="var(--rd-text-3)">{date}</Mono>
       <span style={{ color: bond.matured ? 'var(--rd-pos)' : 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11 }}>
         {bond.matured ? 'MATURED' : 'HOLDING'}
@@ -408,4 +414,10 @@ function Empty({ children }: { children: React.ReactNode }) {
 
 function formatBaseUnits(v: bigint, decimals: number): string {
   return Number(formatUnits(v, decimals)).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+}
+
+/** Format an INTEGER-DOLLAR bigint (no decimals — used for ClaimBond face/balance
+ *  and BondVault.availableCapacityUSD return values). */
+function fmtIntDollars(v: bigint): string {
+  return Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 })
 }

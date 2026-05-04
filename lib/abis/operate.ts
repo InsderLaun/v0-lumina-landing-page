@@ -137,15 +137,18 @@ export const claimBondAbi = [
     inputs: [{ name: 'epochId', type: 'uint256' }],
     outputs: [{ type: 'bool' }],
   },
-  // ClaimBond.sol:135
+  // ClaimBond.sol:135 — returns 4 fields (exists, maturity, totalSupply_, matured)
+  // [Fix #reverse-audit] Was missing leading `bool exists`; result[0] used to
+  // be read as maturity-timestamp but actually returned an existence flag.
   {
     type: 'function',
     name: 'getEpochInfo',
     stateMutability: 'view',
     inputs: [{ name: 'epochId', type: 'uint256' }],
     outputs: [
-      { name: 'maturityTimestamp', type: 'uint256' },
-      { name: 'totalSupply', type: 'uint256' },
+      { name: 'exists', type: 'bool' },
+      { name: 'maturity', type: 'uint256' },
+      { name: 'totalSupply_', type: 'uint256' },
       { name: 'matured', type: 'bool' },
     ],
   },

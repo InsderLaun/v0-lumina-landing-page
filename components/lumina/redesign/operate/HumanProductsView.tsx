@@ -50,10 +50,10 @@ export function HumanProductsView() {
     functionName: 'availableCapacityUSD',
   })
 
+  // BondVault.availableCapacityUSD returns INTEGER DOLLARS (no decimals).
+  // See /tmp/lp-s2/src/bonds/BondVault.sol:227 — `return (...) / 1e18`.
   const capacityUsd = capacityRaw
-    ? Number(formatUnits(capacityRaw as bigint, 18)).toLocaleString('en-US', {
-        maximumFractionDigits: 0,
-      })
+    ? Number(capacityRaw as bigint).toLocaleString('en-US', { maximumFractionDigits: 0 })
     : '—'
 
   const filtered = useMemo(() => {
