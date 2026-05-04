@@ -45,7 +45,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['read', 'catalog', 'public'],
     category: 'discover',
-    githubUrl: `${API}/src/routes/products.ts#L10`,
+    githubUrl: `${API}/docs/skills/browse-shields.md`,
     apiEndpoint: 'GET /products',
   },
   {
@@ -58,7 +58,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['read', 'onchain'],
     category: 'discover',
-    githubUrl: `${PROTO}/src/products/FlashBTCShield24h.sol`,
+    githubUrl: `${API}/docs/skills/read-shield-specs.md`,
     contractFn: 'BaseShield._minCoverage / _calculateMaxPayout',
   },
   {
@@ -71,7 +71,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['read', 'health'],
     category: 'discover',
-    githubUrl: `${PROTO}/src/core/CoverRouterV2.sol#L308`,
+    githubUrl: `${API}/docs/skills/check-protocol-status.md`,
     contractFn: 'CoverRouterV2.isProtocolAutoPaused / BondVault.availableCapacityUSD',
   },
 
@@ -86,7 +86,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['read', 'onchain', 'pricing'],
     category: 'quote',
-    githubUrl: `${PROTO}/src/core/CoverRouterV2.sol#L284`,
+    githubUrl: `${API}/docs/skills/quote-policy.md`,
     contractFn: 'CoverRouterV2.quotePremium(productId, coverageAmount)',
   },
   {
@@ -99,7 +99,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['read', 'api', 'public'],
     category: 'quote',
-    githubUrl: `${API}/src/routes/products.ts#L34`,
+    githubUrl: `${API}/docs/skills/quote-via-api.md`,
     apiEndpoint: 'GET /products/:productId/quote?cover=&duration=',
   },
 
@@ -114,7 +114,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['write', 'wallet', 'onchain'],
     category: 'buy',
-    githubUrl: `${PROTO}/src/core/CoverRouterV2.sol#L146`,
+    githubUrl: `${API}/docs/skills/buy-policy-human.md`,
     contractFn: 'CoverRouterV2.purchasePolicy(productId, coverageAmount, asset)',
   },
   {
@@ -127,7 +127,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['write', 'api', 'relayer'],
     category: 'buy',
-    githubUrl: `${API}/src/routes/policies.ts#L45`,
+    githubUrl: `${API}/docs/skills/buy-policy-agent.md`,
     apiEndpoint: 'POST /api/v1/policies (agent-key)',
   },
   {
@@ -155,7 +155,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['read', 'events', 'indexing'],
     category: 'monitor',
-    githubUrl: `${PROTO}/src/core/PolicyManagerV2.sol#L101`,
+    githubUrl: `${API}/docs/skills/track-policies.md`,
     contractFn: 'event PolicyCreated(productId, policyId, buyer, coverage, premium, payout)',
   },
   {
@@ -168,7 +168,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['read', 'events', 'realtime'],
     category: 'monitor',
-    githubUrl: `${PROTO}/src/core/PolicyManagerV2.sol#L109`,
+    githubUrl: `${API}/docs/skills/watch-triggers.md`,
     contractFn: 'event PolicyTriggered(productId, policyId, buyer, bondAmount, reason)',
   },
   {
@@ -181,7 +181,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['read', 'events', 'erc1155'],
     category: 'monitor',
-    githubUrl: `${PROTO}/src/bonds/ClaimBond.sol#L34`,
+    githubUrl: `${API}/docs/skills/get-bonds.md`,
     contractFn: 'event BondsMinted(epochId, to, usdAmount) + balanceOf(holder, epochId)',
   },
   {
@@ -194,7 +194,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['read', 'api', 'public'],
     category: 'monitor',
-    githubUrl: `${API}/src/routes/policies.ts#L23`,
+    githubUrl: `${API}/docs/skills/check-policy-detail.md`,
     apiEndpoint: 'GET /policies/:productId/:policyId',
   },
 
@@ -209,7 +209,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['write', 'system', 'auto'],
     category: 'claim',
-    githubUrl: `${PROTO}/src/bonds/BondVault.sol#L170`,
+    githubUrl: `${API}/docs/skills/receive-claimbond.md`,
     contractFn: 'BondVault.issueBond(to, usdPayout) — called by PolicyManager',
   },
   {
@@ -222,7 +222,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['write', 'wallet', 'onchain'],
     category: 'claim',
-    githubUrl: `${PROTO}/src/bonds/BondVault.sol#L198`,
+    githubUrl: `${API}/docs/skills/redeem-bond.md`,
     contractFn: 'BondVault.redeemBond(epochId, usdAmount)',
   },
 
@@ -237,7 +237,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['write', 'wallet', 'onchain'],
     category: 'marketplace',
-    githubUrl: `${PROTO}/src/marketplace/LuminaBondMarketplace.sol#L99`,
+    githubUrl: `${API}/docs/skills/list-bond.md`,
     contractFn: 'LuminaBondMarketplace.list(epochId, amount, priceUSDC)',
   },
   {
@@ -250,7 +250,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['write', 'wallet', 'onchain'],
     category: 'marketplace',
-    githubUrl: `${PROTO}/src/marketplace/LuminaBondMarketplace.sol#L135`,
+    githubUrl: `${API}/docs/skills/buy-listing.md`,
     contractFn: 'LuminaBondMarketplace.executeBuy(listingId)',
   },
   {
@@ -263,7 +263,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['write', 'wallet'],
     category: 'marketplace',
-    githubUrl: `${PROTO}/src/marketplace/LuminaBondMarketplace.sol#L125`,
+    githubUrl: `${API}/docs/skills/cancel-listing.md`,
     contractFn: 'LuminaBondMarketplace.cancel(listingId)',
   },
 
@@ -291,7 +291,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['api', 'auth'],
     category: 'integration',
-    githubUrl: `${API}/README.md`,
+    githubUrl: `${API}/docs/skills/configure-api-client.md`,
     apiEndpoint: 'Header: X-API-Key',
   },
   {
@@ -317,7 +317,7 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['write', 'api', 'relayer'],
     category: 'integration',
-    githubUrl: `${API}/src/routes/redeem.ts#L31`,
+    githubUrl: `${API}/docs/skills/redeem-via-api.md`,
     apiEndpoint: 'POST /api/v1/redeem (agent-key)',
   },
   {
@@ -330,7 +330,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['read', 'api', 'public', 'ops'],
     category: 'integration',
-    githubUrl: `${API}/src/routes/health.ts#L8`,
+    githubUrl: `${API}/docs/skills/health-check.md`,
     apiEndpoint: 'GET /health',
   },
 ]
