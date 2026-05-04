@@ -1,7 +1,11 @@
-import { OperateStub } from '@/components/lumina/redesign/operate/OperateStub'
+import { HumanProductsView } from '@/components/lumina/redesign/operate/HumanProductsView'
 
 export const dynamic = 'force-dynamic'
 
+export const metadata = {
+  title: 'Lumina · Products',
+}
+
 export default function HumanProductsPage() {
-  return <OperateStub title="Products" subtitle="9 shields · grid + filter (Phase 2)" />
+  return <HumanProductsView />
 }

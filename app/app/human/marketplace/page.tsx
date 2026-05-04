@@ -1,7 +1,9 @@
-import { OperateStub } from '@/components/lumina/redesign/operate/OperateStub'
+import { MarketplaceView } from '@/components/lumina/redesign/operate/MarketplaceView'
 
 export const dynamic = 'force-dynamic'
 
+export const metadata = { title: 'Lumina · Marketplace' }
+
 export default function HumanMarketplacePage() {
-  return <OperateStub title="Marketplace" subtitle="Browse listings + my listings (Phase 2)" />
+  return <MarketplaceView />
 }
