@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lumina Protocol — Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="public/lumina-brand.css" />
+<style>
+  /* ---------- Page-specific ---------- */
+  .docs-hero {
+    padding: 96px 0 64px;
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+    overflow: hidden;
+  }
+  .docs-hero::before {
+    content: '';
+    position: absolute;
+    top: -300px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(0, 212, 170, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .docs-hero h1 {
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+  .docs-hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .docs-hero p.lede {
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin-bottom: 40px;
+  }
+
+  .docs-meta {
+    display: flex; flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 32px;
+  }
+  .docs-meta .badge {
+    padding: 6px 14px;
+    border: 1px solid var(--accent-border);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-dim);
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  /* Whitepaper download cards */
+  .wp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 40px 0;
+  }
+  .wp-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+  }
+  .wp-card:hover {
+    border-color: var(--accent-border);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .wp-card-header {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .wp-card-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    display: grid; place-items: center;
+    font-family: var(--font-mono); font-weight: 600; font-size: 11px;
+  }
+  .wp-card-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .wp-card h4 {
+    font-size: 17px;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .wp-card .desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .wp-card .meta {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+  }
+  .wp-card .meta .open {
+    color: var(--accent);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  /* Section blocks */
+  .docs-section {
+    padding: 64px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  /* Stat row */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 32px 0 8px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-card);
+  }
+  .stat-cell {
+    padding: 24px;
+    border-right: 1px solid var(--border-subtle);
+  }
+  .stat-cell:last-child { border-right: 0; }
+  .stat-cell .label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .stat-cell .val {
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-cell .val.accent { color: var(--accent); }
+  .stat-cell .sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  @media (max-width: 720px) {
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .stat-cell:nth-child(2) { border-right: 0; }
+    .stat-cell:nth-child(1), .stat-cell:nth-child(2) { border-bottom: 1px solid var(--border-subtle); }
+  }
+
+  /* Product showcase grid */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .product-tile {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .product-tile::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--accent);
+  }
+  .product-tile.bcs::before { background: var(--color-bcs); }
+  .product-tile.eas::before { background: var(--color-eas); }
+  .product-tile.depeg::before { background: var(--color-depeg); }
+  .product-tile.il::before { background: var(--color-il); }
+  .product-tile.exploit::before { background: var(--color-exploit); }
+  .product-tile.flash::before { background: var(--color-flash); }
+
+  .product-tile-id {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .product-tile h4 {
+    font-size: 17px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .product-tile .trigger {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .product-tile .specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+    font-family: var(--font-mono); font-size: 11px;
+  }
+  .product-tile .specs div { color: var(--text-muted); }
+  .product-tile .specs b { color: var(--text-primary); font-weight: 500; }
+
+  /* Architecture diagram */
+  .arch-flow {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 32px 0;
+    overflow-x: auto;
+  }
+  .arch-flow-row {
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: var(--font-mono); font-size: 12px;
+  }
+  .arch-step {
+    padding: 10px 14px;
+    background: var(--bg-code);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+  .arch-step.accent {
+    background: var(--accent-dim);
+    border-color: var(--accent-border);
+    color: var(--accent);
+  }
+  .arch-arrow {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  /* Footer */
+  .docs-footer {
+    padding: 48px 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+  }
+  .docs-footer a { color: var(--text-secondary); }
+  .docs-footer a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ============== NAV ============== -->
+<nav class="lp-nav">
+  <div class="lp-nav-left">
+    <a class="lp-nav-logo" href="Lumina Home Redesign.html">
+      <span class="mark"></span>
+      LUMINA <span class="dim">PROTOCOL</span>
+    </a>
+    <div class="lp-nav-links">
+      <a href="docs.html" class="active">Docs</a>
+      <a href="skills.html">Skills</a>
+      <a href="tutorial.html">Tutorial</a>
+      <a href="whitepapers.html">Whitepaper</a>
+    </div>
+  </div>
+  <div class="lp-nav-right">
+    <span class="lp-nav-pulse"><span class="dot"></span> BASE L2 · 8453</span>
+  </div>
+</nav>
+
+<!-- ============== HERO ============== -->
+<section class="docs-hero">
+  <div class="lp-container">
+    <span class="lp-eyebrow">Documentation · v3.0</span>
+    <h1>On-Chain Parametric Insurance for <em>AI Agents</em></h1>
+    <p class="lede">
+      Lumina settles claims with mathematical triggers verified by oracles. No claim forms, no committees,
+      no waiting weeks for a payout. The protocol deploys on Base L2, settles in real USDC, and generates
+      yield through Aave V3.
+    </p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <a class="lp-btn lp-btn-primary" href="whitepapers.html">
+        Read Whitepaper V3
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <a class="lp-btn lp-btn-ghost" href="whitepaper-es.html">
+        Whitepaper ES
+      </a>
+    </div>
+
+    <div class="docs-meta">
+      <span class="badge">Base L2</span>
+      <span class="badge">USDC Circle</span>
+      <span class="badge">Aave V3 Yield</span>
+      <span class="badge">Parametric</span>
+      <span class="badge">EIP-712</span>
+      <span class="badge">UUPS Upgradeable</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============== WHITEPAPER VERSIONS ============== -->
+<section class="docs-section">
+  <div class="lp-container">
+    <span class="lp-eyebrow">Choose your reading</span>
+    <h2 class="lp-h2">Whitepapers & summaries</h2>
+    <p style="max-width:680px;">
+      Two languages, two depths. The full V3 whitepaper covers every contract address,
+      formula, and actuarial table. The summary is a 2-page brief for quick context.
+    </p>
+
+    <div class="wp-grid">
+      <a class="wp-card" href="whitepapers.html">
+        <div class="wp-card-header">
+          <div class="wp-card-icon">EN</div>
+          <span class="wp-card-tag">Full · V3.0</span>
+        </div>
+        <h4>Whitepaper · English</h4>
+        <p class="desc">Complete protocol specification: architecture, kink pricing, 5 products, 4 vaults, oracle, security audit.</p>
+        <div class="meta">
+          <span>~17 sections</span>
+          <span class="open">Open ↗</span>
+        </div>
+      </a>
+
+      <a class="wp-card" href="whitepaper-es.html">
+        <div class="wp-card-header">
+          <div class="wp-card-icon">ES</div>
+          <span class="wp-card-tag">Completo · V3.0</span>
+        </div>
+        <h4>Whitepaper · Español</h4>
+        <p class="desc">Especificación completa del protocolo: arquitectura, modelo de pricing, productos, vaults, oracle y seguridad.</p>
+        <div class="meta">
+          <span>~17 secciones</span>
+          <span class="open">Abrir ↗</span>
+        </div>
+      </a>
+
+      <a class="wp-card" href="https://github.com/org-lumina/v0-lumina-landing-page/blob/main/public/LUMINA-SUMMARY-EN.pdf" target="_blank">
+        <div class="wp-card-header">
+          <div class="wp-card-icon">EN</div>
+          <span class="wp-card-tag">Summary · PDF</span>
+        </div>
+        <h4>Executive Summary · EN</h4>
+        <p class="desc">2-page brief for investors, partners, and auditors. Core thesis, products at a glance, key metrics.</p>
+        <div class="meta">
+          <span>PDF · 6.7 KB</span>
+          <span class="open">Open ↗</span>
+        </div>
+      </a>
+
+      <a class="wp-card" href="https://github.com/org-lumina/v0-lumina-landing-page/blob/main/public/LUMINA-SUMMARY-ES.pdf" target="_blank">
+        <div class="wp-card-header">
+          <div class="wp-card-icon">ES</div>
+          <span class="wp-card-tag">Resumen · PDF</span>
+        </div>
+        <h4>Resumen Ejecutivo · ES</h4>
+        <p class="desc">Brief de 2 páginas para inversores, partners y auditores. Tesis central, productos y métricas clave.</p>
+        <div class="meta">
+          <span>PDF · 6.6 KB</span>
+          <span class="open">Abrir ↗</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============== AT A GLANCE ============== -->
+<section class="docs-section">
+  <div class="lp-container">
+    <span class="lp-eyebrow">At a glance</span>
+    <h2 class="lp-h2">Protocol metrics</h2>
+
+    <div class="stat-row">
+      <div class="stat-cell">
+        <div class="label">Network</div>
+        <div class="val">Base L2</div>
+        <div class="sub">Chain ID 8453</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Insurance products</div>
+        <div class="val accent">7</div>
+        <div class="sub">5 long-form + 2 flash</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Liquidity vaults</div>
+        <div class="val">4</div>
+        <div class="sub">Volatile + Stable, short/long</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Settlement asset</div>
+        <div class="val">USDC</div>
+        <div class="sub">Circle, deposited in Aave V3</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-cell">
+        <div class="label">Smart contracts</div>
+        <div class="val">13</div>
+        <div class="sub">UUPS proxies under Timelock</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Payout speed</div>
+        <div class="val accent">1 tx</div>
+        <div class="sub">Minutes, not weeks</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Collateralization</div>
+        <div class="val">1:1</div>
+        <div class="sub">Per-policy locked, not pooled</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Protocol fee</div>
+        <div class="val">3%</div>
+        <div class="sub">On premium, payout & yield</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== HOW IT WORKS ============== -->
+<section class="docs-section">
+  <div class="lp-container">
+    <span class="lp-eyebrow">Architecture</span>
+    <h2 class="lp-h2">How a policy is purchased</h2>
+    <p>
+      The human, through their AI agent, defines coverage parameters. The agent queries the API for a
+      quote based on the kink utilization model, then executes the on-chain transaction through
+      <code>CoverRouter</code>. Collateral is locked 1:1 in the vault. If the trigger fires, payout is
+      automatic; if the policy expires clean, collateral returns to the vault.
+    </p>
+
+    <div class="arch-flow">
+      <div class="arch-flow-row">
+        <span class="arch-step">Human</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-step">AI Agent</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-step accent">Lumina API</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-step accent">CoverRouter</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-step">Shield</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-step">PolicyManager</span>
+        <span class="arch-arrow">→</span>
+        <span class="arch-step accent">Vault locks 1:1</span>
+      </div>
+    </div>
+
+    <h3 class="lp-h3">Pricing — Kink utilization model</h3>
+    <p>
+      Inspired by Aave/Compound rate models. Below 80% utilization the multiplier grows linearly; above
+      80% it grows aggressively. At 95% the policy is rejected to protect LPs from overexposure.
+    </p>
+
+    <div class="lp-code-block"><span class="cm">// Premium formula (extracted from Solidity)</span>
+<span class="kw">Premium</span> = Coverage × P_base × RiskMult × DurationDiscount × <span class="vl">M(U)</span> × (Duration / 365)
+
+<span class="cm">// Utilization multiplier</span>
+<span class="kw">if</span> U &lt;= 0.80:  M(U) = 1 + (U / 0.80) × 0.5
+<span class="kw">if</span> U &gt;  0.80:  M(U) = 1.5 + ((U - 0.80) / 0.20) × 3.0
+<span class="kw">if</span> U &gt;= 0.95:  <span class="vl">REJECTED</span></div>
+
+    <div class="lp-table-wrap">
+      <table class="lp-table">
+        <thead>
+          <tr><th>Utilization</th><th>Multiplier</th><th>Effect on premium</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>0%</td><td>1.00×</td><td>Base</td></tr>
+          <tr><td>40%</td><td>1.25×</td><td>+25%</td></tr>
+          <tr><td>80% <span style="color:var(--accent);font-family:var(--font-mono);font-size:10px;">KINK</span></td><td>1.50×</td><td>+50%</td></tr>
+          <tr><td>90%</td><td>3.00×</td><td>+200% (aggressive zone)</td></tr>
+          <tr><td>95%</td><td>—</td><td><span style="color:var(--risk-high);">REJECTED</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============== PRODUCTS ============== -->
+<section class="docs-section">
+  <div class="lp-container">
+    <span class="lp-eyebrow">7 products in production</span>
+    <h2 class="lp-h2">Insurance products</h2>
+    <p>Every product is parametric: triggers are mathematical, payouts are binary or proportional, and verification is automatic via oracle.</p>
+
+    <div class="products-grid">
+      <div class="product-tile bcs">
+        <div class="product-tile-id">BTCCAT-001 · BCS</div>
+        <h4>BTC Catastrophe Shield</h4>
+        <p class="trigger">Drop &gt; 50% from purchase price. Covers black-swan events like COVID March 2020 (BTC −58%).</p>
+        <div class="specs">
+          <div>Trigger</div><b>−50%</b>
+          <div>Payout</div><b>80% binary</b>
+          <div>Duration</div><b>7–30 days</b>
+          <div>Base rate</div><b>15% APR</b>
+        </div>
+      </div>
+
+      <div class="product-tile eas">
+        <div class="product-tile-id">ETHAPOC-001 · EAS</div>
+        <h4>ETH Apocalypse Shield</h4>
+        <p class="trigger">Drop &gt; 60% from purchase price. Only one event of this magnitude in 8 years (COVID, ETH −65%).</p>
+        <div class="specs">
+          <div>Trigger</div><b>−60%</b>
+          <div>Payout</div><b>80% binary</b>
+          <div>Duration</div><b>7–30 days</b>
+          <div>Base rate</div><b>20% APR</b>
+        </div>
+      </div>
+
+      <div class="product-tile depeg">
+        <div class="product-tile-id">DEPEG-STABLE-001</div>
+        <h4>Depeg Shield</h4>
+        <p class="trigger">Stablecoin price &lt; $0.95. Covers USDT and DAI; USDC excluded (circular dependency).</p>
+        <div class="specs">
+          <div>Trigger</div><b>&lt; $0.95</b>
+          <div>Payout</div><b>85–88% binary</b>
+          <div>Duration</div><b>14–365 days</b>
+          <div>Base rate</div><b>2.5% APR</b>
+        </div>
+      </div>
+
+      <div class="product-tile il">
+        <div class="product-tile-id">IL-INDEX-001</div>
+        <h4>IL Index Cover</h4>
+        <p class="trigger">Impermanent loss &gt; 2% at expiry. European-style, Uniswap V2 50/50 formula on-chain.</p>
+        <div class="specs">
+          <div>Deductible</div><b>2%</b>
+          <div>Cap</div><b>11.7% of cov.</b>
+          <div>Duration</div><b>14–90 days</b>
+          <div>Base rate</div><b>8.5% APR</b>
+        </div>
+      </div>
+
+      <div class="product-tile exploit">
+        <div class="product-tile-id">EXPLOIT-SHIELD-001</div>
+        <h4>Exploit Shield</h4>
+        <p class="trigger">Dual trigger: governance token −25% in 24h AND receipt token −30% for 4h or contract paused.</p>
+        <div class="specs">
+          <div>Cap/wallet</div><b>$50K</b>
+          <div>Lifetime cap</div><b>$150K</b>
+          <div>Duration</div><b>90–365 days</b>
+          <div>Base rate</div><b>4% APR</b>
+        </div>
+      </div>
+
+      <div class="product-tile flash">
+        <div class="product-tile-id">FLASH-BTC / FLASH-ETH</div>
+        <h4>Flash Insurance</h4>
+        <p class="trigger">Ultra-short coverage: exactly 24h or 48h windows for BTC or ETH during volatility spikes.</p>
+        <div class="specs">
+          <div>Duration</div><b>24h or 48h</b>
+          <div>Assets</div><b>BTC · ETH</b>
+          <div>Vault</div><b>FlashVault</b>
+          <div>Status</div><b>Live since 04-13</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== VAULTS ============== -->
+<section class="docs-section">
+  <div class="lp-container">
+    <span class="lp-eyebrow">For LPs</span>
+    <h2 class="lp-h2">Liquidity vaults</h2>
+    <p>
+      Four specialized vaults. USDC deposits route into Aave V3 for base yield (3–5% APY) and earn
+      premiums on top. Shares are <strong>soulbound</strong> — non-transferable, no secondary market.
+    </p>
+
+    <div class="lp-table-wrap">
+      <table class="lp-table">
+        <thead>
+          <tr>
+            <th>Vault</th>
+            <th>Cooldown</th>
+            <th>Products assigned</th>
+            <th>Estimated APY</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--text-primary);">VolatileShort</strong></td>
+            <td>30 days</td>
+            <td>BCS · IL Index Cover</td>
+            <td><span style="color:var(--accent);">12 – 16%</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text-primary);">VolatileLong</strong></td>
+            <td>90 days</td>
+            <td>EAS · IL long · BCS overflow</td>
+            <td><span style="color:var(--accent);">15 – 19%</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text-primary);">StableShort</strong></td>
+            <td>90 days</td>
+            <td>Depeg short</td>
+            <td><span style="color:var(--accent);">11 – 15%</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text-primary);">StableLong</strong></td>
+            <td>365 days</td>
+            <td>Depeg long · Exploit Shield</td>
+            <td><span style="color:var(--accent);">18 – 27%</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="lp-callout">
+      <strong style="color:var(--accent);">Yield composition →</strong>
+      Aave V3 base rate (3–5% APY on aUSDC) plus 97% of every premium paid into the vault. The protocol
+      keeps a 3% fee on premium, payout, and on the positive yield at withdrawal.
+    </div>
+  </div>
+</section>
+
+<!-- ============== ORACLE & SECURITY ============== -->
+<section class="docs-section">
+  <div class="lp-container">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 48px;" class="grid-2">
+      <div>
+        <span class="lp-eyebrow">Oracle</span>
+        <h2 class="lp-h2">EIP-712 signed proofs</h2>
+        <p>
+          Every claim is settled against an EIP-712 typed-data proof signed by the relayer over Chainlink
+          spot data. The domain is fixed to <code>chainId 8453</code> + <code>verifyingContract</code> —
+          replays across chains or contracts are impossible.
+        </p>
+        <ul>
+          <li><strong>LuminaOracleV2</strong> — Ownable, NOT upgradeable. Replacement requires new deploy.</li>
+          <li><strong>Sequencer check</strong> — 1h grace period for Base L2 downtime.</li>
+          <li><strong>Staleness</strong> — 1,200s for ETH/BTC, 86,400s for stables.</li>
+          <li><strong>MAX_PROOF_AGE</strong> — 30 minutes per proof.</li>
+        </ul>
+      </div>
+
+      <div>
+        <span class="lp-eyebrow">Governance & Security</span>
+        <h2 class="lp-h2">Layered defenses</h2>
+        <p>
+          Core contracts run UUPS proxies under a 48h <code>TimelockController</code>, controlled by a
+          Gnosis Safe 2-of-3. The oracle and Phala verifier are immutable.
+        </p>
+        <ul>
+          <li><strong>Solidity 0.8.20</strong> — Native overflow checking.</li>
+          <li><strong>CEI pattern</strong> + <code>ReentrancyGuard</code> on every fund movement.</li>
+          <li><strong>119 tests</strong> — Unit + integration.</li>
+          <li><strong>Circuit breakers</strong> — <code>maxPayoutsPerDay</code>, large payout delays.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CONTRACTS ============== -->
+<section class="docs-section">
+  <div class="lp-container">
+    <span class="lp-eyebrow">Production addresses · Base L2</span>
+    <h2 class="lp-h2">Deployed contracts</h2>
+
+    <div class="lp-table-wrap">
+      <table class="lp-table">
+        <thead>
+          <tr><th>Contract</th><th>Type</th><th>Proxy</th><th>Address</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>CoverRouter</td><td>Core</td><td>UUPS</td><td><code>0xd5f8…a025</code></td></tr>
+          <tr><td>PolicyManager</td><td>Core</td><td>UUPS</td><td><code>0xCCA0…162a</code></td></tr>
+          <tr><td>LuminaOracleV2</td><td>Oracle</td><td>Immutable</td><td><code>0x87B5…5105</code></td></tr>
+          <tr><td>LuminaPhalaVerifier</td><td>Oracle</td><td>Immutable</td><td><code>0x468b…db9B</code></td></tr>
+          <tr><td>VolatileShort Vault</td><td>Vault</td><td>UUPS</td><td><code>0xbd44…880d</code></td></tr>
+          <tr><td>VolatileLong Vault</td><td>Vault</td><td>UUPS</td><td><code>0xFee5…f904</code></td></tr>
+          <tr><td>StableShort Vault</td><td>Vault</td><td>UUPS</td><td><code>0x429b…54fC</code></td></tr>
+          <tr><td>StableLong Vault</td><td>Vault</td><td>UUPS</td><td><code>0x1778…321c</code></td></tr>
+          <tr><td>DepegShield</td><td>Product</td><td>UUPS</td><td><code>0x881f…AE0e</code></td></tr>
+          <tr><td>ILIndexCover</td><td>Product</td><td>UUPS</td><td><code>0x01Df…9e5a</code></td></tr>
+          <tr><td>ExploitShield</td><td>Product</td><td>UUPS</td><td><code>0x63D3…3693</code></td></tr>
+          <tr><td>TimelockController</td><td>Governance</td><td>—</td><td><code>0xd0De…747a</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top:24px;">
+      Full addresses, ABIs, and verification on <a href="https://basescan.org" target="_blank">BaseScan</a>.
+      For the canonical reference, see the
+      <a href="whitepapers.html">Whitepaper V3 §3.4</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ============== CTA ============== -->
+<section class="docs-section" style="border-bottom:0;">
+  <div class="lp-container">
+    <div style="background:var(--bg-card); border:1px solid var(--accent-border); border-radius:16px; padding:48px; text-align:center;">
+      <span class="lp-eyebrow" style="justify-content:center; margin-bottom:24px;">Ready to integrate?</span>
+      <h2 style="font-size:32px; color:var(--text-primary); margin-bottom:16px; letter-spacing:-0.02em;">Build coverage into your agent</h2>
+      <p style="max-width:560px; margin:0 auto 32px;">
+        Read the full V3 whitepaper for every formula, address, and actuarial table — or jump
+        straight to the agent quick-start.
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a class="lp-btn lp-btn-primary" href="whitepapers.html">Whitepaper EN ↗</a>
+        <a class="lp-btn lp-btn-ghost" href="whitepaper-es.html">Whitepaper ES ↗</a>
+        <a class="lp-btn lp-btn-ghost" href="tutorial.html">Tutorial →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="docs-footer">
+  <div class="lp-container">
+    Lumina Protocol · Whitepaper V3 · March 2026 ·
+    <a href="mailto:hello@lumina-org.com">hello@lumina-org.com</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lumina Protocol — AI Agent Skills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="public/lumina-brand.css" />
+<style>
+  /* ---------- Page-specific ---------- */
+  .skills-hero {
+    padding: 96px 0 48px;
+    border-bottom: 1px solid var(--border-subtle);
+    position: relative;
+    overflow: hidden;
+  }
+  .skills-hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(0, 212, 170, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .skills-hero h1 {
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+  .skills-hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .skills-hero p.lede {
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    max-width: 680px;
+    margin-bottom: 40px;
+  }
+
+  /* Mode toggle — Human vs Agent */
+  .mode-toggle {
+    display: inline-flex;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 32px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .mode-toggle button {
+    padding: 8px 18px;
+    border-radius: 999px;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .mode-toggle button.active {
+    background: var(--accent);
+    color: #00121a;
+    font-weight: 600;
+  }
+
+  /* AI Agent banner */
+  .agent-banner {
+    background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(139,92,246,0.04));
+    border: 1px solid var(--accent-border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 32px 0 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: center;
+  }
+  .agent-banner .tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .agent-banner .tag::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  .agent-banner h3 {
+    font-size: 22px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .agent-banner p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0;
+  }
+  .agent-banner .actions {
+    display: flex; gap: 8px; flex-direction: column;
+  }
+  @media (max-width: 720px) {
+    .agent-banner { grid-template-columns: 1fr; }
+  }
+
+  /* Section block */
+  .skills-section {
+    padding: 64px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  /* Skill cards */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .skill-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 28px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .skill-card:hover {
+    border-color: var(--accent-border);
+    transform: translateY(-2px);
+  }
+  .skill-card.hidden { display: none; }
+  .skill-card-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .skill-card-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+  }
+  .skill-card .audience {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .audience.human {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-il);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+  }
+  .audience.agent {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+  }
+  .audience.both {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-depeg);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+  }
+  .skill-card h4 {
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .skill-card .skill-desc {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+  .skill-card .skill-meta {
+    display: flex; gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .skill-card .skill-meta b {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* Track tabs */
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .track-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .track-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+  }
+  .track-card.human::before { background: var(--color-il); }
+  .track-card.agent::before { background: var(--accent); }
+  .track-card.holder::before { background: var(--color-depeg); }
+
+  .track-card .track-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .track-card.human .track-tag { color: var(--color-il); }
+  .track-card.agent .track-tag { color: var(--accent); }
+  .track-card.holder .track-tag { color: var(--color-depeg); }
+
+  .track-card h3 {
+    font-size: 22px;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .track-card p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 20px;
+  }
+  .track-card ul {
+    padding: 0;
+    list-style: none;
+    margin: 0 0 24px;
+  }
+  .track-card ul li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .track-card ul li::before {
+    content: "→";
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+  .track-card.human ul li::before { color: var(--color-il); }
+  .track-card.holder ul li::before { color: var(--color-depeg); }
+
+  @media (max-width: 880px) {
+    .tracks-grid { grid-template-columns: 1fr; }
+  }
+
+  /* API endpoints */
+  .endpoints {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 32px;
+  }
+  .endpoint-row {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-subtle);
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .endpoint-row:last-child { border-bottom: 0; }
+  .endpoint-row .method {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-align: center;
+    width: fit-content;
+  }
+  .endpoint-row .method.get {
+    background: rgba(0, 212, 170, 0.15);
+    color: var(--accent);
+  }
+  .endpoint-row .method.post {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-il);
+  }
+  .endpoint-row .path {
+    color: var(--text-primary);
+  }
+  .endpoint-row .desc {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: var(--font-sans);
+    text-align: right;
+  }
+
+  /* Footer */
+  .skills-footer {
+    padding: 48px 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+  }
+  .skills-footer a { color: var(--text-secondary); }
+  .skills-footer a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ============== NAV ============== -->
+<nav class="lp-nav">
+  <div class="lp-nav-left">
+    <a class="lp-nav-logo" href="Lumina Home Redesign.html">
+      <span class="mark"></span>
+      LUMINA <span class="dim">PROTOCOL</span>
+    </a>
+    <div class="lp-nav-links">
+      <a href="docs.html">Docs</a>
+      <a href="skills.html" class="active">Skills</a>
+      <a href="tutorial.html">Tutorial</a>
+      <a href="whitepapers.html">Whitepaper</a>
+    </div>
+  </div>
+  <div class="lp-nav-right">
+    <span class="lp-nav-pulse"><span class="dot"></span> BASE L2 · 8453</span>
+  </div>
+</nav>
+
+<!-- ============== HERO ============== -->
+<section class="skills-hero">
+  <div class="lp-container">
+    <span class="lp-eyebrow">Skills · For humans & AI agents</span>
+    <h1>Pick your <em>track</em>.<br/>Both pay in USDC.</h1>
+    <p class="lede">
+      Lumina is a parametric insurance protocol with two distinct user tracks. Humans buy coverage
+      through the app and provide liquidity. AI agents call the API directly — same triggers, same
+      payouts, no GUI in the way.
+    </p>
+
+    <div class="agent-banner">
+      <div>
+        <span class="tag">For AI Agents</span>
+        <h3>Agent quick-start in 3 endpoints</h3>
+        <p>Get a quote → approve USDC → call <code>purchaseCover()</code>. The full agent skill spec
+          lives at <code>SKILL-V4.1.md</code>, with an OpenAPI schema for code generation.</p>
+      </div>
+      <div class="actions">
+        <a class="lp-btn lp-btn-primary" href="public/SKILL-V4.1.md" target="_blank">SKILL-V4.1.md ↗</a>
+        <a class="lp-btn lp-btn-ghost" href="public/openapi.yaml" target="_blank">openapi.yaml ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== TRACKS ============== -->
+<section class="skills-section">
+  <div class="lp-container">
+    <span class="lp-eyebrow">Three tracks</span>
+    <h2 class="lp-h2">How you'll use the protocol</h2>
+
+    <div class="tracks-grid">
+      <div class="track-card human">
+        <div class="track-tag">Track 01 · Human</div>
+        <h3>Web speculator</h3>
+        <p>Buy coverage through the Lumina app. Hedge a BTC or ETH position, pick a duration, sign once.</p>
+        <ul>
+          <li>Connect wallet</li>
+          <li>Pick product & duration</li>
+          <li>Approve USDC, sign tx</li>
+          <li>Auto-payout if trigger fires</li>
+        </ul>
+        <a class="lp-btn lp-btn-ghost" href="tutorial.html">Open tutorial →</a>
+      </div>
+
+      <div class="track-card agent">
+        <div class="track-tag">Track 02 · AI Agent</div>
+        <h3>Autonomous AI agent</h3>
+        <p>Hit the REST API directly. Same contracts, no GUI. Build coverage into your strategy loop.</p>
+        <ul>
+          <li>Read SKILL-V4.1.md spec</li>
+          <li>API key + nonce manager</li>
+          <li>Quote → approve → purchase</li>
+          <li>Listen for payout events</li>
+        </ul>
+        <a class="lp-btn lp-btn-ghost" href="public/AI-AGENT-QUICK-START.md" target="_blank">Quick-start ↗</a>
+      </div>
+
+      <div class="track-card holder">
+        <div class="track-tag">Track 03 · LP / Holder</div>
+        <h3>Liquidity provider</h3>
+        <p>Deposit USDC into a vault, earn Aave V3 base + premium yield. Soulbound shares, cooldown to withdraw.</p>
+        <ul>
+          <li>Pick a vault (Volatile / Stable)</li>
+          <li>Deposit, receive shares</li>
+          <li>Earn 11–27% APY estimated</li>
+          <li>Cooldown 30–365 days</li>
+        </ul>
+        <a class="lp-btn lp-btn-ghost" href="docs.html#vaults">See vault rates →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== SKILLS LIBRARY ============== -->
+<section class="skills-section">
+  <div class="lp-container">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px;">
+      <div>
+        <span class="lp-eyebrow">Library</span>
+        <h2 class="lp-h2">All skills</h2>
+        <p style="max-width:560px;">Filter by audience. Each skill maps to a specific protocol action — humans use the app, agents call the API.</p>
+      </div>
+      <div class="mode-toggle" role="tablist">
+        <button class="active" data-filter="all">All</button>
+        <button data-filter="human">Human</button>
+        <button data-filter="agent">Agent</button>
+        <button data-filter="both">Both</button>
+      </div>
+    </div>
+
+    <div class="skills-grid" id="skills-grid">
+
+      <div class="skill-card" data-aud="human">
+        <div class="skill-card-head">
+          <span class="skill-card-num">SKILL · 01</span>
+          <span class="audience human">Human</span>
+        </div>
+        <h4>Hedge a BTC position</h4>
+        <p class="skill-desc">Buy a BTC Catastrophe Shield through the app. Pick duration 7–30 days, get instant quote, sign once.</p>
+        <div class="skill-meta">
+          <span>Product · <b>BCS</b></span>
+          <span>Trigger · <b>−50%</b></span>
+        </div>
+      </div>
+
+      <div class="skill-card" data-aud="human">
+        <div class="skill-card-head">
+          <span class="skill-card-num">SKILL · 02</span>
+          <span class="audience human">Human</span>
+        </div>
+        <h4>Hedge an ETH position</h4>
+        <p class="skill-desc">ETH Apocalypse Shield for catastrophic drops. UI walks you through deductible, duration, and net payout preview.</p>
+        <div class="skill-meta">
+          <span>Product · <b>EAS</b></span>
+          <span>Trigger · <b>−60%</b></span>
+        </div>
+      </div>
+
+      <div class="skill-card" data-aud="agent">
+        <div class="skill-card-head">
+          <span class="skill-card-num">SKILL · 03</span>
+          <span class="audience agent">Agent</span>
+        </div>
+        <h4>Quote &amp; purchase via API</h4>
+        <p class="skill-desc">Single agent loop: <code>GET /quote</code> → <code>approve(USDC)</code> → <code>POST /purchase</code>. Returns policy ID.</p>
+        <div class="skill-meta">
+          <span>Endpoints · <b>3</b></span>
+          <span>Auth · <b>API key</b></span>
+        </div>
+      </div>
+
+      <div class="skill-card" data-aud="agent">
+        <div class="skill-card-head">
+          <span class="skill-card-num">SKILL · 04</span>
+          <span class="audience agent">Agent</span>
+        </div>
+        <h4>Flash coverage on volatility spike</h4>
+        <p class="skill-desc">Detect a macro event, buy <code>FLASH-BTC-24h</code> programmatically. Settles in 24h or 48h windows only.</p>
+        <div class="skill-meta">
+          <span>Product · <b>FLASH-BTC</b></span>
+          <span>Window · <b>86400s</b></span>
+        </div>
+      </div>
+
+      <div class="skill-card" data-aud="both">
+        <div class="skill-card-head">
+          <span class="skill-card-num">SKILL · 05</span>
+          <span class="audience both">Human + Agent</span>
+        </div>
+        <h4>Provide liquidity to a vault</h4>
+        <p class="skill-desc">Deposit USDC into VolatileShort, VolatileLong, StableShort, or StableLong. Earn Aave + premiums. Cooldown applies.</p>
+        <div class="skill-meta">
+          <span>Vaults · <b>4</b></span>
+          <span>APY · <b>11–27%</b></span>
+        </div>
+      </div>
+
+      <div class="skill-card" data-aud="both">
+        <div class="skill-card-head">
+          <span class="skill-card-num">SKILL · 06</span>
+          <span class="audience both">Human + Agent</span>
+        </div>
+        <h4>Verify a payout proof</h4>
+        <p class="skill-desc">Inspect the EIP-712 typed-data proof that triggered a claim. Validate signature against <code>LuminaOracleV2</code>.</p>
+        <div class="skill-meta">
+          <span>Domain · <b>chainId 8453</b></span>
+          <span>Standard · <b>EIP-712</b></span>
+        </div>
+      </div>
+
+      <div class="skill-card" data-aud="agent">
+        <div class="skill-card-head">
+          <span class="skill-card-num">SKILL · 07</span>
+          <span class="audience agent">Agent</span>
+        </div>
+        <h4>Watch policy expiry events</h4>
+        <p class="skill-desc">Subscribe to <code>PolicyManager</code> events. Auto-rebuy or release collateral when policies expire.</p>
+        <div class="skill-meta">
+          <span>Contract · <b>PolicyManager</b></span>
+          <span>Type · <b>WebSocket</b></span>
+        </div>
+      </div>
+
+      <div class="skill-card" data-aud="human">
+        <div class="skill-card-head">
+          <span class="skill-card-num">SKILL · 08</span>
+          <span class="audience human">Human</span>
+        </div>
+        <h4>Cover an LP position against IL</h4>
+        <p class="skill-desc">European-style IL Index Cover. Resolved at expiry against Uniswap V2 formula. 2% deductible, 11.7% cap.</p>
+        <div class="skill-meta">
+          <span>Product · <b>IL-INDEX</b></span>
+          <span>Style · <b>European</b></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============== API REFERENCE ============== -->
+<section class="skills-section">
+  <div class="lp-container">
+    <span class="lp-eyebrow">Agent reference · v2</span>
+    <h2 class="lp-h2">Core API endpoints</h2>
+    <p>10 endpoints cover the full lifecycle: quote, purchase, claim verification, vault deposits/withdrawals.
+      Full schema in <a href="public/openapi.yaml" target="_blank">openapi.yaml</a>.</p>
+
+    <div class="endpoints">
+      <div class="endpoint-row">
+        <span class="method get">GET</span>
+        <span class="path">/api/v2/quote</span>
+        <span class="desc">Get premium quote (kink-priced)</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method post">POST</span>
+        <span class="path">/api/v2/purchase</span>
+        <span class="desc">Purchase a policy</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method get">GET</span>
+        <span class="path">/api/v2/policies/:id</span>
+        <span class="desc">Read policy status</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method get">GET</span>
+        <span class="path">/api/v2/proof/:policyId</span>
+        <span class="desc">Fetch EIP-712 trigger proof</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method post">POST</span>
+        <span class="path">/api/v2/claim</span>
+        <span class="desc">Submit signed proof for payout</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method get">GET</span>
+        <span class="path">/api/v2/vaults</span>
+        <span class="desc">List vaults + utilization + APY</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method post">POST</span>
+        <span class="path">/api/v2/vault/deposit</span>
+        <span class="desc">Deposit USDC, mint shares</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method post">POST</span>
+        <span class="path">/api/v2/vault/cooldown</span>
+        <span class="desc">Initiate cooldown window</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method post">POST</span>
+        <span class="path">/api/v2/vault/withdraw</span>
+        <span class="desc">Withdraw post-cooldown</span>
+      </div>
+      <div class="endpoint-row">
+        <span class="method get">GET</span>
+        <span class="path">/api/v2/health</span>
+        <span class="desc">Sequencer + oracle status</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CTA ============== -->
+<section class="skills-section" style="border-bottom:0;">
+  <div class="lp-container">
+    <div style="background:var(--bg-card); border:1px solid var(--accent-border); border-radius:16px; padding:48px; text-align:center;">
+      <span class="lp-eyebrow" style="justify-content:center; margin-bottom:24px;">Read first, build second</span>
+      <h2 style="font-size:32px; color:var(--text-primary); margin-bottom:16px; letter-spacing:-0.02em;">The whitepaper has every formula</h2>
+      <p style="max-width:560px; margin:0 auto 32px;">
+        For agent skills, every parameter and trigger is canonically defined in the V3 whitepaper.
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a class="lp-btn lp-btn-primary" href="whitepapers.html">Whitepaper EN ↗</a>
+        <a class="lp-btn lp-btn-ghost" href="whitepaper-es.html">Whitepaper ES ↗</a>
+        <a class="lp-btn lp-btn-ghost" href="public/SKILL-V4.1.md" target="_blank">SKILL-V4.1.md ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="skills-footer">
+  <div class="lp-container">
+    Lumina Protocol · Whitepaper V3 · March 2026 ·
+    <a href="mailto:hello@lumina-org.com">hello@lumina-org.com</a>
+  </div>
+</footer>
+
+<script>
+  // Skill filter
+  const buttons = document.querySelectorAll('.mode-toggle button');
+  const cards = document.querySelectorAll('.skill-card');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      cards.forEach(c => {
+        const aud = c.dataset.aud;
+        if (f === 'all') c.classList.remove('hidden');
+        else if (f === aud) c.classList.remove('hidden');
+        else c.classList.add('hidden');
+      });
+    });
+  });
+</script>
+</body>
+</html>

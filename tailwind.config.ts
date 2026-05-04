@@ -57,6 +57,36 @@ const config: Config = {
           card: '#0d0d14',
           'card-border': '#1e1e2e',
         },
+        // Redesign palette (CYAN canonical) — used by components/redesign/*
+        // CSS vars defined in app/globals.css under --rd-*
+        rd: {
+          bg: 'var(--rd-bg)',
+          'bg-2': 'var(--rd-bg-2)',
+          surface: 'var(--rd-surface)',
+          'surface-2': 'var(--rd-surface-2)',
+          line: 'var(--rd-line)',
+          'line-strong': 'var(--rd-line-strong)',
+          text: 'var(--rd-text)',
+          'text-2': 'var(--rd-text-2)',
+          'text-3': 'var(--rd-text-3)',
+          'text-4': 'var(--rd-text-4)',
+          accent: 'var(--rd-accent)',
+          'accent-2': 'var(--rd-accent-2)',
+          'accent-dim': 'var(--rd-accent-dim)',
+          'accent-border': 'var(--rd-accent-border)',
+          pos: 'var(--rd-pos)',
+          warn: 'var(--rd-warn)',
+          neg: 'var(--rd-neg)',
+          'prod-bcs': 'var(--rd-prod-bcs)',
+          'prod-eas': 'var(--rd-prod-eas)',
+          'prod-depeg': 'var(--rd-prod-depeg)',
+          'prod-il': 'var(--rd-prod-il)',
+          'prod-exploit': 'var(--rd-prod-exploit)',
+          'prod-flash': 'var(--rd-prod-flash)',
+          'risk-low': 'var(--rd-risk-low)',
+          'risk-med': 'var(--rd-risk-med)',
+          'risk-high': 'var(--rd-risk-high)',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -66,6 +96,7 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-jetbrains)', 'monospace'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
       },
       keyframes: {
         'accordion-down': {
