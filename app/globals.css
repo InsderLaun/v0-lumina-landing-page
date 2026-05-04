@@ -55,6 +55,60 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   REDESIGN PALETTE (CYAN, prefixed --rd-* to avoid collisions)
+   Used by components/redesign/* and the new pages
+   (home, /whitepaper hub, /docs, /skills, /tutorial, /app).
+   The legacy HSL vars above stay intact for existing components.
+   ═══════════════════════════════════════════════════════════ */
+@layer base {
+  :root {
+    /* Backgrounds */
+    --rd-bg: #0a0a0c;
+    --rd-bg-2: #0e0e12;
+    --rd-surface: #111116;
+    --rd-surface-2: #14141a;
+
+    /* Lines / borders */
+    --rd-line: #1d1d24;
+    --rd-line-strong: #2a2a34;
+
+    /* Text scale */
+    --rd-text: #e8e8ec;
+    --rd-text-2: #a8a8b3;
+    --rd-text-3: #6b6b78;
+    --rd-text-4: #44444f;
+
+    /* Accents (canonical CYAN) */
+    --rd-accent: #00d4ff;
+    --rd-accent-2: #8b5cf6;
+    --rd-accent-dim: rgba(0, 212, 255, 0.12);
+    --rd-accent-border: rgba(0, 212, 255, 0.25);
+
+    /* Status */
+    --rd-pos: #00d48a;
+    --rd-warn: #f59e0b;
+    --rd-neg: #ef4444;
+
+    /* Product accents (re-skinned from TEAL brand-css) */
+    --rd-prod-bcs: #00d4ff;
+    --rd-prod-eas: #06b6d4;
+    --rd-prod-depeg: #8b5cf6;
+    --rd-prod-il: #f59e0b;
+    --rd-prod-exploit: #ef4444;
+    --rd-prod-flash: #f472b6;
+
+    /* Risk */
+    --rd-risk-low: #10b981;
+    --rd-risk-med: #f59e0b;
+    --rd-risk-high: #ef4444;
+
+    /* Radius */
+    --rd-radius: 4px;
+    --rd-radius-lg: 8px;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

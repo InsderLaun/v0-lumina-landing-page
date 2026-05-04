@@ -1,0 +1,54 @@
+import Link from 'next/link'
+
+const AUDIENCES = [
+  {
+    role: 'For humans',
+    title: 'Speculators',
+    body: 'Connect a wallet. Browse 9 products. Pay a premium in USDC. If the trigger fires, you receive a ClaimBond — sell early or hold to maturity.',
+    cta: 'Read the guide',
+    href: '/tutorial?mode=human',
+  },
+  {
+    role: 'For agents',
+    title: 'AI developers',
+    body: 'Drop the SKILL file into your agent. Authenticate. POST /api/v2/purchase. Same bond mechanics, same oracle resolution. No human-only paths.',
+    cta: 'Download SKILL',
+    href: '/skills',
+  },
+  {
+    role: 'For yield',
+    title: 'Bond buyers',
+    body: 'Buy ClaimBonds at a discount on the secondary marketplace. ERC-1155, fractional, fungible by maturity month. IRR 43–150% depending on discount.',
+    cta: 'Open marketplace',
+    href: '/app',
+  },
+] as const
+
+export function Audience() {
+  return (
+    <section className="rd-sec" id="audiences" style={{ paddingBottom: 0 }}>
+      <div className="wrap">
+        <div className="rd-sec-num">
+          05 / 06 · <span>Three Doors</span>
+        </div>
+        <h2>Built for humans, AI agents, and yield seekers — all using the same contracts.</h2>
+        <p className="rd-sec-lede">
+          No fast lane, no special access. The same primitives, exposed through three surfaces.
+        </p>
+      </div>
+      <div className="rd-audiences">
+        {AUDIENCES.map((x) => (
+          <Link className="rd-audience" key={x.role} href={x.href}>
+            <div className="rd-role">{x.role}</div>
+            <h4>{x.title}</h4>
+            <p>{x.body}</p>
+            <div className="rd-audience-cta">
+              <span>{x.cta}</span>
+              <span>→</span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  )
+}

@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lumina Protocol — Whitepaper V3 · ES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0c;
+    --bg-2: #0e0e12;
+    --surface: #111116;
+    --line: #1d1d24;
+    --line-strong: #2a2a34;
+    --text: #e8e8ec;
+    --text-2: #a8a8b3;
+    --text-3: #6b6b78;
+    --text-4: #44444f;
+    --accent: #00d4ff;
+    --accent-2: #8b5cf6;
+    --pos: #00d48a;
+    --warn: #f59e0b;
+    --neg: #ef4444;
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-display: 'Fraunces', Georgia, serif;
+    --radius: 4px;
+  }
+  html, body { background: var(--bg); color: var(--text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body { font-size: 14px; line-height: 1.7; color: var(--text-2); padding-top: 48px; }
+  ::selection { background: var(--accent); color: #000; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Top nav — matches home redesign */
+  .wp-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: color-mix(in oklab, var(--bg) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    height: 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; font-size: 13px;
+  }
+  .wp-nav-left { display: flex; align-items: center; gap: 32px; }
+  .wp-logo { display: inline-flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+  .wp-logo .mark { width: 18px; height: 18px; background: var(--accent); border-radius: 2px; position: relative; }
+  .wp-logo .mark::after { content:""; position:absolute; inset:4px; background: var(--bg); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 50%, 0 100%); }
+  .wp-logo .dim { color: var(--text-3); font-weight: 400; font-size: 12px; }
+  .wp-nav-links { display: flex; gap: 24px; }
+  .wp-nav-links a { color: var(--text-2); font-weight: 500; }
+  .wp-nav-links a:hover { color: var(--text); text-decoration: none; }
+  .wp-nav-links a.active { color: var(--accent); }
+  .wp-nav-right { display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 11px; color: var(--text-3); letter-spacing: 0.04em; }
+  .wp-pulse { display: inline-flex; align-items: center; gap: 6px; }
+  .wp-pulse .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pos); box-shadow: 0 0 0 0 color-mix(in oklab, var(--pos) 60%, transparent); animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 color-mix(in oklab, var(--pos) 60%, transparent);} 70%{box-shadow:0 0 0 8px transparent;} 100%{box-shadow:0 0 0 0 transparent;} }
+
+  /* Hero */
+  .wp-hero {
+    padding: 96px 32px 64px;
+    border-bottom: 1px solid var(--line);
+    position: relative; overflow: hidden;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .wp-hero::before {
+    content:""; position:absolute; top: -300px; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, color-mix(in oklab, var(--accent) 8%, transparent) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .wp-eyebrow {
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent);
+    display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  }
+  .wp-eyebrow::before { content:""; width: 24px; height: 1px; background: var(--accent); }
+  .wp-hero h1 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(48px, 7vw, 88px);
+    letter-spacing: -0.025em; line-height: 0.96;
+    color: var(--text);
+    margin-bottom: 24px; max-width: 900px;
+  }
+  .wp-hero h1 em { font-style: italic; color: var(--accent); }
+  .wp-hero .lede {
+    font-size: 18px; color: var(--text-2); max-width: 680px; line-height: 1.6;
+    text-wrap: pretty; margin-bottom: 32px;
+  }
+  .wp-meta {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.04em;
+  }
+  .wp-meta .pill {
+    padding: 6px 12px; border: 1px solid var(--line-strong);
+    border-radius: 999px;
+  }
+  .wp-meta .pill.accent { color: var(--accent); border-color: color-mix(in oklab, var(--accent) 30%, transparent); background: color-mix(in oklab, var(--accent) 8%, transparent); }
+
+  /* Container for whitepaper content */
+  .wp-shell {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 240px 1fr;
+    gap: 48px;
+    padding: 56px 32px 96px;
+  }
+  @media (max-width: 980px) { .wp-shell { grid-template-columns: 1fr; gap: 24px; } }
+
+  /* Sticky TOC sidebar */
+  .wp-toc {
+    position: sticky; top: 80px;
+    align-self: flex-start;
+    border-left: 1px solid var(--line);
+    padding: 4px 0;
+  }
+  .wp-toc-head {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-3); padding: 0 16px 12px;
+  }
+  .wp-toc ul { list-style: none; }
+  .wp-toc li a {
+    display: flex; gap: 10px; padding: 7px 16px;
+    color: var(--text-2); font-size: 12px;
+    border-left: 1px solid transparent; margin-left: -1px;
+    transition: color .15s, border-color .15s;
+  }
+  .wp-toc li a:hover { color: var(--text); text-decoration: none; }
+  .wp-toc li a.active { color: var(--accent); border-left-color: var(--accent); background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 8%, transparent), transparent); }
+  .wp-toc li a .num { font-family: var(--font-mono); color: var(--text-3); min-width: 18px; }
+  .wp-toc li a.active .num { color: var(--accent); }
+
+  /* Main content (apply to imported whitepaper body) */
+  .wp-main { max-width: 760px; }
+
+  /* Override imported whitepaper styles to match home aesthetic */
+  .wp-main .container { max-width: none; padding: 0; margin: 0; }
+  .wp-main .section { padding: 24px 0 8px; }
+  .wp-main .toc-page { display: none; } /* hide imported TOC, we have sidebar */
+  .wp-main .section-divider { display: none; } /* we handle our own dividers */
+  .wp-main .page-break { page-break-before: auto; }
+
+  .wp-main h2 {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(32px, 4vw, 52px);
+    letter-spacing: -0.02em; line-height: 1.0;
+    color: var(--text);
+    padding-left: 0; border-left: none;
+    margin: 56px 0 20px;
+    text-wrap: balance;
+  }
+  .wp-main h2::before {
+    content: attr(data-num);
+    display: block;
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); font-weight: 400;
+    margin-bottom: 16px;
+  }
+  .wp-main h3 {
+    font-family: var(--font-sans); font-weight: 600;
+    font-size: 22px; color: var(--text);
+    letter-spacing: -0.015em;
+    margin: 40px 0 16px;
+  }
+  .wp-main h4 {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    margin: 24px 0 12px;
+    font-family: var(--font-mono); letter-spacing: 0.02em;
+  }
+  .wp-main p, .wp-main li { color: var(--text-2); font-size: 15px; line-height: 1.65; text-wrap: pretty; }
+  .wp-main p { text-align: left; margin-bottom: 16px; }
+  .wp-main li { text-align: left; margin-bottom: 6px; }
+  .wp-main li strong, .wp-main p strong, .wp-main strong { color: var(--text); font-weight: 600; }
+  .wp-main ul, .wp-main ol { padding-left: 22px; margin-bottom: 16px; }
+
+  .wp-main code, .wp-main .code-block {
+    font-family: var(--font-mono);
+  }
+  .wp-main code {
+    background: color-mix(in oklab, var(--accent) 12%, transparent);
+    color: var(--accent);
+    padding: 2px 6px; border-radius: 4px; font-size: 12px;
+  }
+  .wp-main .code-block {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 18px 22px; margin: 20px 0;
+    font-size: 13px; line-height: 1.6;
+    color: var(--text-2); overflow-x: auto;
+    white-space: pre;
+  }
+  .wp-main .code-block .keyword { color: var(--accent); }
+  .wp-main .code-block .comment { color: var(--text-3); font-style: italic; }
+  .wp-main .code-block .value { color: var(--warn); }
+
+  /* Tables */
+  .wp-main .table-wrap {
+    border: 1px solid var(--line); border-radius: 8px;
+    overflow: hidden; margin: 24px 0;
+  }
+  .wp-main table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .wp-main thead th {
+    background: var(--bg-2); color: var(--text);
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 600; padding: 12px 16px; text-align: left;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0 !important;
+  }
+  .wp-main tbody td {
+    background: var(--surface);
+    padding: 12px 16px; border-bottom: 1px solid var(--line);
+    color: var(--text-2);
+    border-radius: 0 !important;
+  }
+  .wp-main tbody tr:last-child td { border-bottom: 0; }
+  .wp-main thead th code, .wp-main tbody td code {
+    background: color-mix(in oklab, var(--accent) 12%, transparent);
+    color: var(--accent); font-size: 11px;
+  }
+
+  /* Product cards */
+  .wp-main .product-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 28px 32px; margin: 24px 0;
+    position: relative;
+  }
+  .wp-main .product-card::before {
+    width: 3px; left: 0; top: 24px; bottom: 24px;
+    border-radius: 0;
+  }
+  .wp-main .product-card.bcs::before, .wp-main .product-card.bss::before { background: var(--accent); }
+  .wp-main .product-card.eas::before { background: #06b6d4; }
+  .wp-main .product-card.depeg::before { background: #8b5cf6; }
+  .wp-main .product-card.il::before { background: #f59e0b; }
+  .wp-main .product-card.exploit::before { background: #ef4444; }
+  .wp-main .product-card h3 { color: var(--text); margin-top: 0; }
+  .wp-main .product-card.bcs h3, .wp-main .product-card.bss h3 { color: var(--accent); }
+
+  /* Formula */
+  .wp-main .formula {
+    background: var(--surface);
+    border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+    border-radius: 8px; padding: 18px 24px; margin: 20px 0;
+    color: var(--accent); font-family: var(--font-mono); font-size: 14px;
+    text-align: center;
+  }
+  .wp-main .formula .var { color: var(--accent); font-weight: 600; }
+  .wp-main .formula .op { color: var(--text-3); }
+
+  /* Callout */
+  .wp-main .callout {
+    background: color-mix(in oklab, var(--accent) 6%, transparent);
+    border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+    border-radius: 8px; padding: 14px 18px; margin: 20px 0;
+    font-size: 13px; color: var(--text-2);
+  }
+  .wp-main .callout-warning {
+    background: color-mix(in oklab, var(--neg) 6%, transparent);
+    border-color: color-mix(in oklab, var(--neg) 25%, transparent);
+  }
+
+  /* Address */
+  .wp-main .address, .wp-main .address-link {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--accent); word-break: break-all;
+  }
+  .wp-main .address { background: color-mix(in oklab, var(--accent) 10%, transparent); padding: 2px 6px; border-radius: 4px; }
+
+  /* Roadmap */
+  .wp-main .roadmap-phase {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; padding: 24px 28px; margin: 16px 0;
+    position: relative; padding-left: 32px;
+  }
+  .wp-main .roadmap-phase::before {
+    content: ""; position: absolute; left: 0; top: 12px; bottom: 12px;
+    width: 3px; background: var(--accent);
+  }
+  .wp-main .roadmap-phase h3 { margin-top: 0; }
+
+  /* Risk colors */
+  .wp-main .risk-low { color: var(--pos); }
+  .wp-main .risk-medium { color: var(--warn); }
+  .wp-main .risk-high { color: var(--neg); }
+  .wp-main .risk-critical { color: var(--neg); font-weight: 600; }
+
+  /* Footer */
+  .wp-footer {
+    border-top: 1px solid var(--line);
+    padding: 48px 32px;
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.04em;
+    text-align: center;
+  }
+  .wp-footer a { color: var(--text-2); }
+  .wp-footer a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav class="wp-nav">
+  <div class="wp-nav-left">
+    <a class="wp-logo" href="Lumina Home Redesign.html">
+      <span class="mark"></span>
+      LUMINA <span class="dim">· PROTOCOL</span>
+    </a>
+    <div class="wp-nav-links">
+      <a href="docs.html">Docs</a>
+      <a href="skills.html">Skills</a>
+      <a href="tutorial.html">Tutorial</a>
+      <a href="whitepapers.html" class="active">Whitepaper</a>
+    </div>
+  </div>
+  <div class="wp-nav-right">
+    <a href="Lumina Home Redesign.html" style="display:inline-flex; align-items:center; gap:6px; color:var(--text-2); font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:6px 12px; border:1px solid var(--line-strong); border-radius:6px; transition:all .15s;" onmouseover="this.style.color='var(--text)'; this.style.borderColor='var(--accent)'; this.style.background='color-mix(in oklab, var(--accent) 6%, transparent)';" onmouseout="this.style.color='var(--text-2)'; this.style.borderColor='var(--line-strong)'; this.style.background='transparent';">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Inicio
+    </a>
+    <a href="whitepapers.html" style="color:var(--text-3); font-family:var(--font-mono); font-size:11px; letter-spacing:0.04em;">Todas las versiones ↗</a>
+    <span class="wp-pulse"><span class="dot"></span> BASE L2 · 8453</span>
+  </div>
+</nav>
+
+<header class="wp-hero">
+  <span class="wp-eyebrow">Whitepaper · V3.0 · Marzo 2026</span>
+  <h1>Seguros paramétricos on-chain para <em>agentes IA</em>.</h1>
+  <p class="lede">Resuelve siniestros con triggers matemáticos verificados por oráculos. Despliega en Base L2, liquida en USDC real, genera rendimiento a través de Aave V3. Sin formularios, sin comités, sin esperas de semanas.</p>
+  <div class="wp-meta">
+    <span class="pill accent">Base L2 · Chain 8453</span>
+    <span class="pill">USDC · Circle</span>
+    <span class="pill">Aave V3</span>
+    <span class="pill">Parametric</span>
+    <span class="pill">EIP-712</span>
+    <span class="pill">UUPS Upgradeable</span>
+  </div>
+</header>
+
+<div class="wp-shell">
+  <aside class="wp-toc">
+    <div class="wp-toc-head">Contenido · 17 secciones</div>
+    <ul id="wp-toc-list">
+      <li><a href="#sec-1"><span class="num">01</span><span>Resumen Ejecutivo</span></a></li>
+      <li><a href="#sec-2"><span class="num">02</span><span>Introduccion</span></a></li>
+      <li><a href="#sec-3"><span class="num">03</span><span>Arquitectura del Protocolo</span></a></li>
+      <li><a href="#sec-4"><span class="num">04</span><span>Productos de Seguro</span></a></li>
+      <li><a href="#sec-5"><span class="num">05</span><span>Modelo de Precios Dinamico (Kink Model)</span></a></li>
+      <li><a href="#sec-6"><span class="num">06</span><span>Vaults y Yield</span></a></li>
+      <li><a href="#sec-7"><span class="num">07</span><span>Oracle y Verificacion</span></a></li>
+      <li><a href="#sec-8"><span class="num">08</span><span>Modelo de Negocio</span></a></li>
+      <li><a href="#sec-9"><span class="num">09</span><span>Seguridad</span></a></li>
+      <li><a href="#sec-10"><span class="num">10</span><span>Datos Actuariales</span></a></li>
+      <li><a href="#sec-11"><span class="num">11</span><span>Riesgos</span></a></li>
+      <li><a href="#sec-12"><span class="num">12</span><span>Roadmap</span></a></li>
+      <li><a href="#sec-13"><span class="num">13</span><span>Marco Legal</span></a></li>
+      <li><a href="#sec-14"><span class="num">14</span><span>Direcciones de Produccion</span></a></li>
+      <li><a href="#sec-15"><span class="num">15</span><span>Grupos de Correlacion</span></a></li>
+      <li><a href="#sec-16"><span class="num">16</span><span>API y Agentes</span></a></li>
+      <li><a href="#sec-17"><span class="num">17</span><span>Conclusion</span></a></li>
+    </ul>
+  </aside>
+  <main class="wp-main">
+    
+
+    
+
+    <!-- ============================================================ -->
+    <!-- COVER PAGE -->
+    <!-- ============================================================ -->
+    <!-- ============================================================ -->
+    <!-- TABLE OF CONTENTS -->
+    <!-- ============================================================ -->
+    <div class="toc-page container page-break">
+        <h2 class="toc-title">Indice</h2>
+        <ul class="toc-list">
+            <li class="toc-item"><a href="#sec-1"><span class="toc-number">01</span><span class="toc-label">Resumen Ejecutivo</span></a></li>
+            <li class="toc-item"><a href="#sec-2"><span class="toc-number">02</span><span class="toc-label">Introduccion</span></a></li>
+            <li class="toc-item"><a href="#sec-3"><span class="toc-number">03</span><span class="toc-label">Arquitectura del Protocolo</span></a></li>
+            <li class="toc-item"><a href="#sec-4"><span class="toc-number">04</span><span class="toc-label">Productos de Seguro</span></a></li>
+            <li class="toc-item"><a href="#sec-5"><span class="toc-number">05</span><span class="toc-label">Modelo de Precios Dinamico (Kink Model)</span></a></li>
+            <li class="toc-item"><a href="#sec-6"><span class="toc-number">06</span><span class="toc-label">Vaults y Yield</span></a></li>
+            <li class="toc-item"><a href="#sec-7"><span class="toc-number">07</span><span class="toc-label">Oracle y Verificacion</span></a></li>
+            <li class="toc-item"><a href="#sec-8"><span class="toc-number">08</span><span class="toc-label">Modelo de Negocio</span></a></li>
+            <li class="toc-item"><a href="#sec-9"><span class="toc-number">09</span><span class="toc-label">Seguridad</span></a></li>
+            <li class="toc-item"><a href="#sec-10"><span class="toc-number">10</span><span class="toc-label">Datos Actuariales</span></a></li>
+            <li class="toc-item"><a href="#sec-11"><span class="toc-number">11</span><span class="toc-label">Riesgos</span></a></li>
+            <li class="toc-item"><a href="#sec-12"><span class="toc-number">12</span><span class="toc-label">Roadmap</span></a></li>
+            <li class="toc-item"><a href="#sec-13"><span class="toc-number">13</span><span class="toc-label">Marco Legal</span></a></li>
+            <li class="toc-item"><a href="#sec-14"><span class="toc-number">14</span><span class="toc-label">Direcciones de Produccion</span></a></li>
+            <li class="toc-item"><a href="#sec-15"><span class="toc-number">15</span><span class="toc-label">Grupos de Correlacion</span></a></li>
+            <li class="toc-item"><a href="#sec-16"><span class="toc-number">16</span><span class="toc-label">API y Agentes</span></a></li>
+            <li class="toc-item"><a href="#sec-17"><span class="toc-number">17</span><span class="toc-label">Conclusion</span></a></li>
+        </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 1: RESUMEN EJECUTIVO -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-1">1. Resumen Ejecutivo</h2>
+
+        <p>Lumina Protocol es la primera infraestructura de seguro parametrico descentralizado diseñada exclusivamente para agentes de inteligencia artificial que operan en DeFi. El protocolo despliega en Base L2, liquida en USDC real (Circle) y genera yield a traves de Aave V3.</p>
+
+        <p>A diferencia del seguro tradicional, que requiere que un humano presente un reclamo, un comite lo revise y semanas de espera para recibir el pago, Lumina utiliza triggers matematicos verificados por oracles. Si la condicion se cumple (por ejemplo, ETH cae un 30%), el pago es instantaneo y automatico. Sin reclamos. Sin disputas. Sin esperar a humanos.</p>
+
+        <p>El protocolo ofrece <strong>5 productos de seguro</strong> (BTC Catastrophe Shield, ETH Apocalypse Shield, Depeg Shield, IL Index Cover, Exploit Shield), <strong>4 vaults de liquidez</strong> (VolatileShort, VolatileLong, StableShort, StableLong) y opera a traves de <strong>13 contratos inteligentes</strong> desplegados en produccion. Los contratos Core (CoverRouter, PolicyManager), vaults y shields usan proxies UUPS actualizables bajo TimelockController; los contratos Oracle (LuminaOracleV2, LuminaPhalaVerifier) son <strong>NO actualizables</strong> (Ownable) y su reemplazo requiere re-despliegue.</p>
+
+        <p>Cada flujo de interaccion comienza de la misma forma: <strong>el humano, a traves de su agente de IA</strong>, instruye la operacion deseada. El agente ejecuta la transaccion on-chain de forma autonoma, interactuando con la API de Lumina y los contratos del protocolo sin intervencion manual.</p>
+
+        <p>El modelo de negocio es simple y transparente: una comision del 3% sobre la prima pagada por el asegurado, un 3% sobre el pago de siniestro, y un 3% de performance fee sobre el rendimiento positivo (ganancia) cuando los proveedores de liquidez retiran fondos de los vaults.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 2: INTRODUCCION -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-2">2. Introduccion</h2>
+
+        <h3>2.1 El Problema: DeFi sin Proteccion para Agentes Autonomos</h3>
+
+        <p>La economia agentica crece exponencialmente. Miles de agentes de IA gestionan posiciones DeFi, tesorerias, pools de liquidez y estrategias de yield farming. Sin embargo, estos agentes operan sin ningun tipo de cobertura frente a los riesgos mas criticos del ecosistema: caidas catastroficas del mercado, depegs de stablecoins, impermanent loss severo y exploits de protocolos.</p>
+
+        <p>Los protocolos de seguro DeFi existentes fueron diseñados para humanos. Requieren interfaces graficas, procesos de votacion comunitaria para validar reclamos y tiempos de resolucion incompatibles con la velocidad a la que operan los agentes autonomos. Lumina resuelve este problema con un enfoque puramente programatico y parametrico.</p>
+
+        <h3>2.2 Comparativa con Protocolos Existentes</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Caracteristica</th>
+                        <th>Nexus Mutual</th>
+                        <th>InsurAce</th>
+                        <th>Ensuro</th>
+                        <th>LUMINA PROTOCOL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Enfoque principal</td>
+                        <td>Seguro para humanos</td>
+                        <td>Seguro multi-chain</td>
+                        <td>Seguro parametrico</td>
+                        <td><strong>Seguro para agentes de IA</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Tipo de seguro</td>
+                        <td>Discretional</td>
+                        <td>Discretional</td>
+                        <td>Parametrico</td>
+                        <td><strong>Parametrico</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Proceso de reclamo</td>
+                        <td>Votacion comunitaria</td>
+                        <td>Comite de evaluacion</td>
+                        <td>Oracle automatico</td>
+                        <td><strong>Oracle automatico</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Tiempo de pago</td>
+                        <td>Semanas</td>
+                        <td>Dias</td>
+                        <td>Horas</td>
+                        <td><strong>Minutos (1 tx)</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Diseñado para agentes IA</td>
+                        <td>No</td>
+                        <td>No</td>
+                        <td>Parcial</td>
+                        <td><strong>Si, exclusivamente</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Yield para LPs</td>
+                        <td>Staking NXM</td>
+                        <td>Farming</td>
+                        <td>Primas</td>
+                        <td><strong>Aave V3 + Primas</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Colateralizacion</td>
+                        <td>Pool compartido</td>
+                        <td>Pool compartido</td>
+                        <td>Por riesgo</td>
+                        <td><strong>1:1 por poliza</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Red</td>
+                        <td>Ethereum L1</td>
+                        <td>Multi-chain</td>
+                        <td>Polygon</td>
+                        <td><strong>Base L2</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Liquidacion</td>
+                        <td>ETH/DAI</td>
+                        <td>Multi-token</td>
+                        <td>USDC</td>
+                        <td><strong>USDC</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Productos</td>
+                        <td>Smart Contract Cover</td>
+                        <td>Varios</td>
+                        <td>Clima/Parametrico</td>
+                        <td><strong>4 productos DeFi</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>2.3 Como Funciona Lumina</h3>
+
+        <p>El humano, a traves de su agente de IA, define los parametros de cobertura deseados: activo a cubrir, monto, duracion y producto. El agente consulta la API de Lumina para obtener una cotizacion precisa, incluyendo la prima calculada segun el modelo kink de utilizacion. Una vez aprobada la cotizacion, el agente ejecuta la transaccion on-chain a traves del CoverRouter.</p>
+
+        <p><strong>Flujo simplificado:</strong></p>
+
+        <div class="code-block">Humano &rarr; Agente IA &rarr; API Lumina &rarr; CoverRouter &rarr; Shield &rarr; PolicyManager &rarr; Vault (lock collateral) &rarr; USDC transfer</div>
+
+        <p>El colateral se bloquea 1:1 en el vault correspondiente. Si el trigger se activa durante la vigencia de la poliza, el pago se ejecuta automaticamente. Si la poliza expira sin que el trigger se active, el colateral se libera de vuelta al vault.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 3: ARQUITECTURA DEL PROTOCOLO -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-3">3. Arquitectura del Protocolo</h2>
+
+        <h3>3.1 Modelo Kink de Utilizacion</h3>
+
+        <p>El corazon del pricing de Lumina es un modelo de utilizacion no lineal inspirado en los modelos de tasa de interes de Aave y Compound. La prima se calcula con la siguiente formula completa extraida del codigo Solidity:</p>
+
+        <div class="formula">
+            <span class="var">Premium</span> <span class="op">=</span> Coverage <span class="op">x</span> P_base <span class="op">x</span> RiskMult <span class="op">x</span> DurationDiscount <span class="op">x</span> <span class="var">M(U)</span> <span class="op">x</span> (Duration / 365)
+        </div>
+
+        <p>Donde:</p>
+        <ul>
+            <li><strong>Coverage:</strong> monto asegurado en USDC</li>
+            <li><strong>P_base:</strong> tasa base anualizada del producto (ej: 15% para BCS, 20% para EAS, 2.5% para Depeg)</li>
+            <li><strong>RiskMult:</strong> multiplicador de riesgo por activo</li>
+            <li><strong>DurationDiscount:</strong> descuento por duracion larga</li>
+            <li><strong>M(U):</strong> multiplicador de utilizacion (modelo kink)</li>
+            <li><strong>Duration:</strong> duracion de la poliza en dias</li>
+        </ul>
+
+        <h4>Modelo Kink -- Multiplicador de Utilizacion M(U)</h4>
+
+        <p>El punto de inflexion (kink) se ubica en U_kink = 80%. Por debajo del kink, el multiplicador crece linealmente. Por encima, crece de forma agresiva para desincentivar la sobreutilizacion.</p>
+
+        <div class="code-block">
+<span class="keyword">Si</span> U &lt;= U_kink (80%):
+    <span class="var">M(U)</span> = 1 + (U / U_kink) x 0.5
+
+<span class="keyword">Si</span> U &gt; U_kink (80%):
+    <span class="var">M(U)</span> = 1 + 0.5 + ((U - 0.8) / (1 - 0.8)) x 3.0
+
+<span class="comment">// U_MAX = 95% &rarr; se rechaza la poliza (no se puede comprar cobertura)</span>
+        </div>
+
+        <h4>Tabla de Multiplicadores por Nivel de Utilizacion</h4>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Utilizacion (U)</th>
+                        <th>Multiplicador M(U)</th>
+                        <th>Efecto sobre la Prima</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>0%</td><td>1.00x</td><td>Prima base</td></tr>
+                    <tr><td>20%</td><td>1.13x</td><td>+13% sobre la prima base</td></tr>
+                    <tr><td>40%</td><td>1.25x</td><td>+25% sobre la prima base</td></tr>
+                    <tr><td>60%</td><td>1.38x</td><td>+38% sobre la prima base</td></tr>
+                    <tr><td>80%</td><td>1.50x</td><td>+50% (punto kink)</td></tr>
+                    <tr><td>85%</td><td>2.25x</td><td>+125% (zona agresiva)</td></tr>
+                    <tr><td>90%</td><td>2.25x</td><td>+125% (zona agresiva)</td></tr>
+                    <tr><td>95%</td><td>3.75x</td><td>RECHAZADO (U_MAX alcanzado)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Este modelo garantiza que cuando la capacidad del vault esta holgada, las primas son competitivas. A medida que la utilizacion se acerca al 80%, las primas suben gradualmente. Por encima del 80%, el crecimiento es exponencial, protegiendo a los LPs de sobreexposicion.</p>
+
+        <h4>Modelo de Inversion del Vault</h4>
+
+        <p>Los LPs depositan USDC en los vaults de Lumina. Este USDC se deposita automaticamente en Aave V3 para generar un rendimiento base (3-5% APY). Adicionalmente, las primas de seguro pagadas por los compradores de polizas fluyen hacia el vault, incrementando el valor de las shares de los LPs.</p>
+
+        <p>El rendimiento total para los LPs se compone de:</p>
+
+        <ul>
+            <li><strong>Yield base de Aave V3:</strong> 3-5% APY generado por el deposito de USDC en Aave V3</li>
+            <li><strong>Yield de primas de seguro:</strong> Las primas pagadas por los compradores de polizas (97% despues del fee del protocolo) se distribuyen al vault</li>
+            <li><strong>Total yield = Aave V3 base yield + insurance premium yield</strong></li>
+        </ul>
+
+        <p>El Modelo Kink tambien protege a los LPs: a mayor utilizacion del vault, mayores son las primas cobradas, lo que se traduce en mayor yield para los proveedores de liquidez. Esto crea un equilibrio natural donde los LPs son compensados proporcionalmente al riesgo que asumen.</p>
+
+        <h3>3.2 Flujo de Compra de Poliza</h3>
+
+        <p>El humano, a traves de su agente de IA, inicia la compra de cobertura. El flujo completo on-chain es:</p>
+
+        <ol>
+            <li><strong>Humano</strong> instruye a su agente de IA con los parametros deseados</li>
+            <li><strong>Agente IA</strong> llama a la API de Lumina para obtener cotizacion</li>
+            <li><strong>API</strong> calcula la prima usando el modelo kink y devuelve los parametros</li>
+            <li><strong>Agente</strong> aprueba USDC al CoverRouter y ejecuta <code>purchaseCover()</code></li>
+            <li><strong>CoverRouter</strong> (<code class="address">0xd5f8678A0F2149B6342F9014CCe6d743234Ca025</code>) valida parametros y rutea al Shield correcto</li>
+            <li><strong>Shield</strong> (BCS/EAS/Depeg/IL/Exploit) valida reglas especificas del producto</li>
+            <li><strong>PolicyManager</strong> (<code class="address">0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a</code>) registra la poliza on-chain</li>
+            <li><strong>Vault</strong> bloquea colateral 1:1 para respaldar la cobertura</li>
+            <li><strong>USDC</strong> se transfiere del agente al vault (prima) y se cobra el 3% de fee</li>
+        </ol>
+
+        <h3>3.3 Flujo del Proveedor de Liquidez (LP)</h3>
+
+        <p>El humano, a traves de su agente de IA, deposita USDC en uno de los cuatro vaults para ganar yield:</p>
+
+        <ol>
+            <li><strong>Humano</strong> decide depositar en un vault y lo comunica a su agente</li>
+            <li><strong>Agente</strong> aprueba USDC y llama a <code>deposit()</code> en el vault seleccionado</li>
+            <li><strong>Vault</strong> recibe el USDC y lo deposita en <strong>Aave V3</strong> (<code class="address">0xA238Dd80C259a72e81d7e4664a9801593F98d1c5</code>)</li>
+            <li>El LP recibe <strong>shares soulbound</strong> (no transferibles) proporcionales a su deposito</li>
+            <li>Las shares acumulan yield de dos fuentes: tasa base de Aave V3 (3-5% APY) + primas de seguro</li>
+            <li>Para retirar, el LP inicia un periodo de <strong>cooldown</strong> (37 a 372 dias segun el vault)</li>
+            <li>Tras el cooldown, el LP puede ejecutar <code>withdraw()</code> y recibir sus USDC + yield acumulado</li>
+            <li><strong>Se cobra un 3% de performance fee sobre el rendimiento positivo (ganancia) al retirar</strong></li>
+        </ol>
+
+        <h3>3.4 Tabla de Arquitectura de Contratos</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Contrato</th>
+                        <th>Tipo</th>
+                        <th>Proxy</th>
+                        <th>Dependencias</th>
+                        <th>Direccion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>CoverRouter</td>
+                        <td>Core</td>
+                        <td>UUPS</td>
+                        <td>Todos los Shields, PolicyManager</td>
+                        <td><code>0xd5f8...a025</code></td>
+                    </tr>
+                    <tr>
+                        <td>PolicyManager</td>
+                        <td>Core</td>
+                        <td>UUPS</td>
+                        <td>Vaults, Shields</td>
+                        <td><code>0xCCA0...162a</code></td>
+                    </tr>
+                    <tr>
+                        <td>LuminaOracleV2</td>
+                        <td>Oracle</td>
+                        <td>NO actualizable (Ownable)</td>
+                        <td>Chainlink feeds, Sequencer</td>
+                        <td><code>0x87B5...5105</code></td>
+                    </tr>
+                    <tr>
+                        <td>LuminaPhalaVerifier</td>
+                        <td>Oracle</td>
+                        <td>NO actualizable (Ownable, lista de workers EOA curada por admin)</td>
+                        <td>Red de workers Phala</td>
+                        <td><code>0x468b...9B</code></td>
+                    </tr>
+                    <tr>
+                        <td>VolatileShort Vault</td>
+                        <td>Vault</td>
+                        <td>UUPS</td>
+                        <td>Aave V3, USDC</td>
+                        <td><code>0xbd44...880d</code></td>
+                    </tr>
+                    <tr>
+                        <td>VolatileLong Vault</td>
+                        <td>Vault</td>
+                        <td>UUPS</td>
+                        <td>Aave V3, USDC</td>
+                        <td><code>0xFee5...f904</code></td>
+                    </tr>
+                    <tr>
+                        <td>StableShort Vault</td>
+                        <td>Vault</td>
+                        <td>UUPS</td>
+                        <td>Aave V3, USDC</td>
+                        <td><code>0x429b...54fC</code></td>
+                    </tr>
+                    <tr>
+                        <td>StableLong Vault</td>
+                        <td>Vault</td>
+                        <td>UUPS</td>
+                        <td>Aave V3, USDC</td>
+                        <td><code>0x1778...321c</code></td>
+                    </tr>
+                    <tr>
+                        <td>BTC Catastrophe Shield / ETH Apocalypse Shield</td>
+                        <td>Producto</td>
+                        <td>UUPS</td>
+                        <td>Oracle, PolicyManager, VolatileShort</td>
+                        <td><code>0x54CD...844e</code></td>
+                    </tr>
+                    <tr>
+                        <td>DepegShield</td>
+                        <td>Producto</td>
+                        <td>UUPS</td>
+                        <td>Oracle, PolicyManager, StableShort</td>
+                        <td><code>0x71DB...8306</code></td>
+                    </tr>
+                    <tr>
+                        <td>ILIndexCover</td>
+                        <td>Producto</td>
+                        <td>UUPS</td>
+                        <td>Oracle, PolicyManager, VolatileShort</td>
+                        <td><code>0x4196...4E0</code></td>
+                    </tr>
+                    <tr>
+                        <td>ExploitShield</td>
+                        <td>Producto</td>
+                        <td>UUPS</td>
+                        <td>Oracle, Phala worker ECDSA, PolicyManager</td>
+                        <td><code>0xaE29...b38C</code></td>
+                    </tr>
+                    <tr>
+                        <td>TimelockController</td>
+                        <td>Governance</td>
+                        <td>--</td>
+                        <td>Gnosis Safe</td>
+                        <td><code>0xd0De...747a</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>3.5 Colateralizacion Estricta 1:1</h3>
+
+        <p>Cada poliza emitida en Lumina esta respaldada por colateral bloqueado 1:1 en el vault correspondiente. Esto significa que si un agente compra $50,000 de cobertura BCS, el vault bloquea exactamente $50,000 en USDC (depositados en Aave V3 como aUSDC) para garantizar el pago en caso de siniestro.</p>
+
+        <p>Este modelo elimina el riesgo de subcapitalizacion que afecta a otros protocolos de seguro DeFi que operan con modelos de pool compartido. Si la utilizacion del vault alcanza el 95% (U_MAX), no se aceptan nuevas polizas hasta que se libere capacidad.</p>
+
+        <p>El colateral bloqueado 1:1 no permanece inactivo. Se deposita automaticamente en Aave V3 donde genera rendimiento base (3-5% APY) mientras permanece disponible para cubrir siniestros. Esto significa que incluso el capital comprometido para polizas activas esta generando yield para los LPs.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 4: PRODUCTOS DE SEGURO -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-4">4. Productos de Seguro</h2>
+
+        <!-- BCS -->
+        <div class="product-card bcs no-break">
+            <h3>4.1 BTC Catastrophe Shield (BCS)</h3>
+
+            <p>El humano, a traves de su agente de IA, puede proteger sus posiciones en BTC contra caidas catastroficas del mercado. BTC Catastrophe Shield cubre escenarios extremos: crasheos superiores al 50% como el vivido durante COVID (marzo 2020). Eventos como LUNA (mayo 2022, BTC -42%) o FTX (noviembre 2022, BTC -26%) NO activan este producto porque las caidas de BTC fueron menores al 50%.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Parametro</th><th>Valor</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Producto ID</td><td><code>BTCCAT-001</code></td></tr>
+                        <tr><td>Contrato</td><td><a class="address-link" href="https://basescan.org/address/0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21" target="_blank">0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21</a></td></tr>
+                        <tr><td>Trigger</td><td>Caida &gt; 50% desde el precio al momento de compra</td></tr>
+                        <tr><td>TRIGGER_DROP_BPS</td><td><code>5000</code> (50% en puntos base)</td></tr>
+                        <tr><td>Verificacion</td><td>Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2)</td></tr>
+                        <tr><td>Deducible</td><td>20%</td></tr>
+                        <tr><td>Payout</td><td>Binario: 80% del coverage</td></tr>
+                        <tr><td>Duracion</td><td>7 a 30 dias</td></tr>
+                        <tr><td>Waiting period</td><td>1 hora (anti-front-running)</td></tr>
+                        <tr><td>Assets cubiertos</td><td>BTC solamente</td></tr>
+                        <tr><td>MAX_PROOF_AGE</td><td>30 minutos</td></tr>
+                        <tr><td>Tasa base</td><td>15% anualizado (1500 BPS)</td></tr>
+                        <tr><td>Max allocation</td><td>30% del vault (3000 BPS)</td></tr>
+                        <tr><td>Vault</td><td>VolatileShort (37 dias cooldown)</td></tr>
+                        <tr><td>Frecuencia historica</td><td>~0.125 eventos/ano (1 en 8 anos)</td></tr>
+                        <tr><td>Evento de referencia</td><td>COVID marzo 2020: BTC $9,100 &rarr; $3,800 (-58%)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EAS -->
+        <div class="product-card eas no-break">
+            <h3>4.1b ETH Apocalypse Shield (EAS)</h3>
+
+            <p>El humano, a traves de su agente de IA, puede proteger sus posiciones en ETH contra caidas apocalipticas del mercado. ETH Apocalypse Shield cubre los escenarios mas extremos: crasheos superiores al 60%. Solo un evento de esta magnitud ha ocurrido en los ultimos 8 anos (COVID, marzo 2020), cuando ETH cayo de $230 a $80 en 2 dias. Eventos como China (mayo 2021, ETH -56%) o LUNA (junio 2022, ETH -51%) NO activan este producto.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Parametro</th><th>Valor</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Producto ID</td><td><code>ETHAPOC-001</code></td></tr>
+                        <tr><td>Contrato</td><td><a class="address-link" href="https://basescan.org/address/0x70f1c92EFcFe55e8d460aAa6d626779536b15128" target="_blank">0x70f1c92EFcFe55e8d460aAa6d626779536b15128</a></td></tr>
+                        <tr><td>Trigger</td><td>Caida &gt; 60% desde el precio al momento de compra</td></tr>
+                        <tr><td>TRIGGER_DROP_BPS</td><td><code>6000</code> (60% en puntos base)</td></tr>
+                        <tr><td>Verificacion</td><td>Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2)</td></tr>
+                        <tr><td>Deducible</td><td>20%</td></tr>
+                        <tr><td>Payout</td><td>Binario: 80% del coverage</td></tr>
+                        <tr><td>Duracion</td><td>7 a 30 dias</td></tr>
+                        <tr><td>Waiting period</td><td>1 hora (anti-front-running)</td></tr>
+                        <tr><td>Assets cubiertos</td><td>ETH solamente</td></tr>
+                        <tr><td>MAX_PROOF_AGE</td><td>30 minutos</td></tr>
+                        <tr><td>Tasa base</td><td>20% anualizado (2000 BPS)</td></tr>
+                        <tr><td>Max allocation</td><td>25% del vault (2500 BPS)</td></tr>
+                        <tr><td>Vault</td><td>VolatileLong (97 dias cooldown)</td></tr>
+                        <tr><td>Frecuencia historica</td><td>~0.125 eventos/ano (1 en 8 anos)</td></tr>
+                        <tr><td>Evento de referencia</td><td>COVID marzo 2020: ETH $230 &rarr; $80 (-65%)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>Circuit Breaker</h4>
+            <p>El contrato implementa un mecanismo de circuit breaker para proteger al protocolo durante periodos de extrema volatilidad:</p>
+            <ul>
+                <li>Caida &gt; 5% en 1 hora: la prima se multiplica por 1.5x</li>
+                <li>Caida &gt; 10% en 1 hora: se activa HALT -- no se aceptan nuevas polizas</li>
+            </ul>
+
+            <h4>Ejemplo de pago</h4>
+            <div class="code-block">
+Cobertura: $50,000 en ETH
+Precio al comprar: $2,000
+Precio trigger: $2,000 x 0.70 = $1,400
+ETH cae a $1,350 &rarr; Trigger activado
+Payout bruto: $50,000 x 80% = <span class="value">$40,000</span>
+Fee protocolo (3%): $1,200
+Payout neto al agente: <span class="value">$38,800</span>
+            </div>
+        </div>
+
+        <!-- DEPEG -->
+        <div class="product-card depeg no-break">
+            <h3>4.2 Depeg Shield</h3>
+
+            <p>El humano, a traves de su agente de IA, puede proteger sus posiciones en stablecoins contra la perdida del peg. Depeg Shield cubre el escenario en que una stablecoin cae por debajo de $0.95, como ocurrio con USDC durante la crisis de SVB (marzo 2023, llego a $0.87).</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Parametro</th><th>Valor</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Producto ID</td><td><code>DEPEG-STABLE-001</code></td></tr>
+                        <tr><td>Contrato</td><td><a class="address-link" href="https://basescan.org/address/0x881f683291122c3A72bdD504F71ddCAf47d9AE0e" target="_blank">0x881f683291122c3A72bdD504F71ddCAf47d9AE0e</a></td></tr>
+                        <tr><td>Trigger</td><td>Precio stablecoin &lt; $0.95</td></tr>
+                        <tr><td>TRIGGER_PRICE</td><td><code>95_000_000</code> (8 decimales Chainlink)</td></tr>
+                        <tr><td>Verificacion</td><td>Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2)</td></tr>
+                        <tr><td>Duracion</td><td>14 a 365 dias</td></tr>
+                        <tr><td>Waiting period</td><td>24 horas</td></tr>
+                        <tr><td>Tasa base</td><td>24% anualizado</td></tr>
+                        <tr><td>Vault (corto)</td><td>StableShort (<code>0x429b...54fC</code>)</td></tr>
+                        <tr><td>Vault (largo)</td><td>StableLong (<code>0x1778...321c</code>)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>Deducibles y Payouts por Stablecoin</h4>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Stablecoin</th><th>Deducible</th><th>Payout</th><th>Payout Neto (post fee 3%)</th><th>Notas</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>DAI</td><td>12%</td><td>88% binario</td><td>85.36% del coverage</td><td>MakerDAO, riesgo moderado</td></tr>
+                        <tr><td>USDT</td><td>15%</td><td>85% binario</td><td>82.45% del coverage</td><td>Tether, riesgo centralizado</td></tr>
+                        <tr><td>USDC</td><td>--</td><td>EXCLUIDO</td><td>--</td><td>Circular: Lumina liquida en USDC</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>USDC esta excluido de la cobertura porque generaria una dependencia circular: si USDC pierde el peg, los pagos de Lumina (que se realizan en USDC) tambien perderian valor.</p>
+
+            <h4>Descuento por Duracion</h4>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Rango de Duracion</th><th>Factor de Descuento</th><th>Efecto</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>14 - 90 dias</td><td>1.00x</td><td>Sin descuento</td></tr>
+                        <tr><td>91 - 180 dias</td><td>0.90x</td><td>10% descuento en la prima</td></tr>
+                        <tr><td>181 - 365 dias</td><td>0.80x</td><td>20% descuento en la prima</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>Los descuentos por duracion incentivan polizas de largo plazo, lo cual beneficia a los LPs al proporcionar flujos de primas mas predecibles.</p>
+        </div>
+
+        <!-- IL INDEX COVER -->
+        <div class="product-card il no-break">
+            <h3>4.3 IL Index Cover</h3>
+
+            <p>El humano, a traves de su agente de IA, puede proteger sus posiciones de liquidity provider contra el impermanent loss. IL Index Cover utiliza la formula estandar de Uniswap V2 (50/50 pool) para calcular el IL de forma precisa y on-chain, con pago proporcional al IL sufrido.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Parametro</th><th>Valor</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Producto ID</td><td><code>IL-INDEX-001</code></td></tr>
+                        <tr><td>Contrato</td><td><a class="address-link" href="https://basescan.org/address/0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a" target="_blank">0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a</a></td></tr>
+                        <tr><td>Trigger</td><td>IL &gt; 2% al vencimiento de la poliza</td></tr>
+                        <tr><td>Estilo</td><td>European-style (resolucion solo al vencimiento)</td></tr>
+                        <tr><td>Ventana de resolucion</td><td>48 horas post-vencimiento</td></tr>
+                        <tr><td>Deducible</td><td>2% (restable -- solo se cubre el IL por encima del 2%)</td></tr>
+                        <tr><td>Factor de payout</td><td>90%</td></tr>
+                        <tr><td>Cap de IL</td><td>13% (payout maximo = 11.7% del coverage)</td></tr>
+                        <tr><td>Duracion</td><td>14 a 90 dias</td></tr>
+                        <tr><td>Vault</td><td>VolatileShort (<code>0xbd44...880d</code>)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>Formula de Impermanent Loss (ILMath.sol)</h4>
+            <div class="code-block">
+<span class="comment">// r = precioExpiry / precioPurchase</span>
+<span class="comment">// IL = 1 - (2 * sqrt(r)) / (1 + r)</span>
+
+<span class="comment">// Calculo del payout:</span>
+<span class="var">ilNet</span> = max(0, IL% - 2%)                        <span class="comment">// Deducible restable</span>
+<span class="var">rawPayout</span> = coverage x ilNet x 0.90              <span class="comment">// Factor de payout 90%</span>
+<span class="var">maxPayout</span> = coverage x 13% x 0.90               <span class="comment">// = 11.7% del coverage</span>
+<span class="var">payout</span> = min(rawPayout, maxPayout)
+            </div>
+
+            <p>El payout es proporcional: cuanto mayor sea el IL neto (despues del deducible), mayor sera el pago, hasta alcanzar el cap del 11.7% del coverage.</p>
+
+            <h4>Tabla de Referencia de Impermanent Loss (ILMath.sol)</h4>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Cambio de Precio</th><th>Price Ratio</th><th>IL Bruto</th><th>IL Neto (2% ded)</th><th>Payout ($50K, 90%)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>+/-10%</td><td>0.90 / 1.10</td><td>0.14%</td><td>0%</td><td>$0</td></tr>
+                        <tr><td>+/-20%</td><td>0.80 / 1.20</td><td>0.56%</td><td>0%</td><td>$0</td></tr>
+                        <tr><td>+/-22%</td><td>0.78 / 1.22</td><td>0.68%</td><td>0%</td><td>$0</td></tr>
+                        <tr><td>+/-25%</td><td>0.75 / 1.25</td><td>1.03%</td><td>0%</td><td>$0</td></tr>
+                        <tr><td>+/-30%</td><td>0.70 / 1.30</td><td>1.57%</td><td>0%</td><td>$0</td></tr>
+                        <tr><td>+/-35%</td><td>0.65 / 1.35</td><td>2.22%</td><td>0.22%</td><td>$99</td></tr>
+                        <tr><td>+/-40%</td><td>0.60 / 1.40</td><td>3.02%</td><td>1.02%</td><td>$459</td></tr>
+                        <tr><td>+/-50%</td><td>0.50 / 1.50</td><td>5.72%</td><td>3.72%</td><td>$1,674</td></tr>
+                        <tr><td>+/-60%</td><td>0.40 / 1.60</td><td>9.27%</td><td>7.27%</td><td>$3,272</td></tr>
+                        <tr><td>+/-75%</td><td>0.25 / 1.75</td><td>18.35%</td><td>13%+ (capped)</td><td>$5,850 (max)</td></tr>
+                        <tr><td>+/-80%</td><td>0.20 / 1.80</td><td>22.54%</td><td>13%+ (capped)</td><td>$5,850 (max)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>El payout maximo absoluto es <strong>$5,850</strong> por cada <strong>$50,000</strong> de cobertura (11.7% del coverage). El IL es simetrico: una subida del 50% y una caida del 50% producen el mismo IL (5.72%).</p>
+        </div>
+
+        <!-- EXPLOIT SHIELD -->
+        <div class="product-card exploit no-break">
+            <h3>4.4 Exploit Shield</h3>
+
+            <p>El humano, a traves de su agente de IA, puede proteger sus depositos en protocolos DeFi contra exploits, hacks y vulnerabilidades de smart contracts. Exploit Shield utiliza un sistema de dual trigger para minimizar falsos positivos.</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Parametro</th><th>Valor</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Producto ID</td><td><code>EXPLOIT-SHIELD-001</code></td></tr>
+                        <tr><td>Contrato</td><td><a class="address-link" href="https://basescan.org/address/0x63D340AE7229BB464bC801f225651341ebcD3693" target="_blank">0x63D340AE7229BB464bC801f225651341ebcD3693</a></td></tr>
+                        <tr><td>Trigger dual</td><td>(1) Token de gobernanza -25% en 24h AND (2) Receipt token -30% por 4h O contrato pausado</td></tr>
+                        <tr><td>Verificacion</td><td>Oracle (Precio spot de Chainlink via prueba firmada EIP-712) + Verificacion ECDSA del worker de Phala (lista curada por admin — NO atestacion de hardware)</td></tr>
+                        <tr><td>Deducible</td><td>10%</td></tr>
+                        <tr><td>Payout</td><td>Binario: 90% del coverage</td></tr>
+                        <tr><td>Cap por wallet</td><td>$50,000</td></tr>
+                        <tr><td>Duracion</td><td>90 a 365 dias</td></tr>
+                        <tr><td>Waiting period</td><td>14 dias</td></tr>
+                        <tr><td>Vault</td><td>StableLong (<code>0x1778...321c</code>)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>Sistema de Dual Trigger</h4>
+            <p>El dual trigger requiere que <strong>ambas condiciones</strong> se cumplan simultaneamente:</p>
+
+            <ol>
+                <li><strong>Trigger primario (Oracle):</strong> El token de gobernanza del protocolo cubierto debe haber caido al menos un 25% en las ultimas 24 horas, verificado por Chainlink.</li>
+                <li><strong>Trigger secundario (worker Phala):</strong> Al menos una de estas condiciones: (a) el receipt token del protocolo ha caido un 30% o mas durante al menos 4 horas consecutivas, o (b) el contrato principal del protocolo ha sido pausado.</li>
+            </ol>
+
+            <p>La verificacion del trigger secundario la realiza el contrato <strong>LuminaPhalaVerifier</strong> en <code class="address">0x468b9D2E9043c80467B610bC290b698ae23adb9B</code> mediante verificacion ECDSA de una firma producida por un worker Phala autorizado. La lista de workers autorizados es curada manualmente por el admin (Gnosis Safe). <strong>Esto NO es atestacion de hardware SGX/TDX on-chain</strong> — es una lista curada por admin de EOAs que se asume firman desde entornos Phala legitimos.</p>
+
+            <h4>Protocolos Cubiertos</h4>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Protocolo</th><th>Tier</th><th>Tasa Base</th><th>Notas</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Compound III</td><td>Tier 1</td><td>Menor</td><td>Auditado extensamente, bajo riesgo</td></tr>
+                        <tr><td>Uniswap V3</td><td>Tier 1</td><td>Menor</td><td>Inmutable, bajo riesgo</td></tr>
+                        <tr><td>MakerDAO</td><td>Tier 1</td><td>Menor</td><td>Gobernanza robusta</td></tr>
+                        <tr><td>Curve</td><td>Tier 2</td><td>Mayor</td><td>Complejidad mayor, riesgo moderado</td></tr>
+                        <tr><td>Morpho</td><td>Tier 2</td><td>Mayor</td><td>Protocolo mas nuevo, riesgo moderado</td></tr>
+                        <tr><td>Aave V3</td><td>--</td><td>EXCLUIDO</td><td>Circular: Lumina deposita en Aave V3</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>Aave V3 esta excluido porque Lumina deposita los fondos de los vaults en Aave V3 para generar yield. Cubrir un exploit de Aave V3 crearia una dependencia circular: si Aave V3 es hackeado, los fondos para pagar el siniestro estarian comprometidos.</p>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 5: MODELO DE PRECIOS DINAMICO (KINK MODEL) -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-5">5. Modelo de Precios Dinamico (Kink Model)</h2>
+
+        <h3>5.1 Fundamentos</h3>
+
+        <p>El Modelo Kink es un sistema de pricing dinamico inspirado en los modelos de tasa de interes de Aave y Compound, adaptado para seguros parametricos. Su objetivo es doble: garantizar la solvencia permanente de los vaults y crear un mercado autoequilibrado donde la oferta (liquidez de los LPs) y la demanda (compra de polizas por agentes) encuentren su equilibrio naturalmente.</p>
+
+        <p>A diferencia de un precio fijo, el Modelo Kink ajusta el costo de las primas en tiempo real segun la disponibilidad de capital en cada vault. Cuando hay abundante liquidez, las primas son accesibles. Cuando el capital escasea, las primas se encarecen dramaticamente, protegiendo a los LPs y atrayendo nuevo capital.</p>
+
+        <h3>5.2 Formula de Calculo</h3>
+
+        <p>La formula completa, extraida del contrato PremiumMath.sol:</p>
+
+        <div class="code-block">
+Premium = Coverage x P_base x RiskMult x DurationDiscount x M(U) x (Duration / 365)
+        </div>
+
+        <p>Donde M(U) es el multiplicador de utilizacion:</p>
+
+        <div class="code-block">
+Si U &lt;= U_kink (80%):
+    M(U) = 1 + (U / U_kink) x R_slope1
+    M(U) = 1 + (U / 0.80) x 0.5
+
+Si U &gt; U_kink (80%):
+    M(U) = 1 + R_slope1 + ((U - U_kink) / (1 - U_kink)) x R_slope2
+    M(U) = 1 + 0.5 + ((U - 0.80) / 0.20) x 3.0
+
+Si U &gt; 95%: Se rechaza la poliza
+        </div>
+
+        <p>Parametros on-chain (PremiumMath.sol):</p>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Parametro</th><th>Valor</th><th>Variable Solidity</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Punto Kink</td><td>80%</td><td><code>U_KINK = 8000 bps</code></td></tr>
+                    <tr><td>Pendiente pre-kink</td><td>0.5</td><td><code>R_SLOPE1_WAD = 5e17</code></td></tr>
+                    <tr><td>Pendiente post-kink</td><td>3.0</td><td><code>R_SLOPE2_WAD = 3e18</code></td></tr>
+                    <tr><td>Utilizacion maxima</td><td>95%</td><td><code>U_MAX = 9500 bps</code></td></tr>
+                    <tr><td>Precision interna</td><td>1e18</td><td><code>WAD</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Tabla de multiplicadores:</p>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Utilizacion</th><th>M(U)</th><th>Efecto</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>0%</td><td>1.00x</td><td>Prima base</td></tr>
+                    <tr><td>20%</td><td>1.13x</td><td>+13%</td></tr>
+                    <tr><td>40%</td><td>1.25x</td><td>+25%</td></tr>
+                    <tr><td>60%</td><td>1.38x</td><td>+38%</td></tr>
+                    <tr><td>80%</td><td>1.50x</td><td>+50% (punto kink)</td></tr>
+                    <tr><td>85%</td><td>2.25x</td><td>+125% (zona agresiva)</td></tr>
+                    <tr><td>90%</td><td>2.25x</td><td>+125%</td></tr>
+                    <tr><td>95%</td><td>3.75x</td><td>RECHAZADO</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p><strong>Ejemplo numerico:</strong> Un agente compra BTC Catastrophe Shield por $50,000 de cobertura, 14 dias, con U=50%:</p>
+        <ul>
+            <li>P_base = 1500 bps (15% anualizado)</li>
+            <li>RiskMult = 1.0x (ETH base)</li>
+            <li>DurationDiscount = 1.0x</li>
+            <li>M(U) = 1 + (0.50/0.80) x 0.5 = 1.3125x</li>
+            <li>Premium = 50,000 x 0.15 x 1.0 x 1.0 x 1.3125 x (14/365) = <strong>$377.57</strong></li>
+        </ul>
+
+        <p>Mismo escenario con U=85%:</p>
+        <ul>
+            <li>M(U) = 1 + 0.5 + ((0.85-0.80)/0.20) x 3.0 = 2.25x</li>
+            <li>Premium = 50,000 x 0.15 x 1.0 x 1.0 x 2.25 x (14/365) = <strong>$647.26</strong></li>
+        </ul>
+
+        <h3>5.3 Utilizacion del Vault</h3>
+
+        <p>La utilizacion (U) se define como:</p>
+
+        <div class="code-block">
+U = Capital bloqueado en polizas activas / Activos totales del vault
+        </div>
+
+        <ul>
+            <li><strong>"Capital bloqueado"</strong> = USDC reservado 1:1 para cubrir polizas vigentes (<code>allocatedAssets</code> en BaseVault.sol)</li>
+            <li><strong>"Activos totales"</strong> = aToken balance en Aave V3 + USDC libre en el vault (<code>totalAssets()</code> en BaseVault.sol)</li>
+        </ul>
+
+        <p>Cuando un agente compra una poliza, el capital correspondiente se bloquea. Cuando la poliza expira o se ejecuta, el capital se libera.</p>
+
+        <h3>5.4 Mecanismo de Autoequilibrio</h3>
+
+        <p>El Modelo Kink crea un mercado que se autoequilibra mediante la escasez de capital:</p>
+
+        <p><strong>Cuando la demanda de seguros es alta</strong> y los vaults tienen poca liquidez disponible:</p>
+        <ul>
+            <li>Las primas suben, haciendo mas caro asegurar para los agentes</li>
+            <li>Los rendimientos de los LPs aumentan, recompensandolos por el mayor riesgo</li>
+            <li>Nuevos LPs son atraidos por los rendimientos altos, inyectando mas capital</li>
+            <li>La utilizacion baja, las primas se normalizan — el ciclo se repite</li>
+        </ul>
+
+        <p><strong>Cuando hay mucha liquidez y poca demanda:</strong></p>
+        <ul>
+            <li>Las primas son bajas, incentivando a los agentes a comprar cobertura</li>
+            <li>Los rendimientos LP son menores, lo que naturalmente limita el exceso de capital</li>
+        </ul>
+
+        <h3>5.5 Las Tres Zonas de Operacion</h3>
+
+        <p><strong>Zona Verde (0% a 60%):</strong> Capital abundante. Primas accesibles para agentes. Rendimiento LP moderado (Aave base + primas bajas). Condiciones ideales para comprar seguro.</p>
+
+        <p><strong>Zona Amarilla (60% a 80%):</strong> Demanda creciente. Las primas comienzan a subir gradualmente. Equilibrio entre cobertura accesible y rendimientos LP crecientes. El mercado se acerca al punto de inflexion.</p>
+
+        <p><strong>Zona Roja (80% a 95%):</strong> Capital escaso. Las primas se disparan exponencialmente. Alto rendimiento LP atrae nuevos depositantes. Desincentiva nuevas polizas hasta que vuelva la liquidez. El protocolo se protege activamente.</p>
+
+        <p><strong>Zona Bloqueada (&gt;95%):</strong> No se aceptan nuevas polizas. El vault se protege de insolvencia. Solo se pueden ejecutar polizas existentes y depositar nuevo capital.</p>
+
+        <h3>5.6 Garantia de Solvencia Matematica</h3>
+
+        <p>El modelo garantiza solvencia mediante tres mecanismos:</p>
+        <ol>
+            <li><strong>Colateralizacion 1:1:</strong> Cada poliza tiene su respaldo dedicado en USDC</li>
+            <li><strong>Curva exponencial:</strong> Las primas se vuelven prohibitivas antes de alcanzar el limite, desincentivando naturalmente la sobreemision</li>
+            <li><strong>Tope absoluto (95%):</strong> Rechazo automatico de nuevas polizas — es imposible que el vault acepte mas de lo que puede cubrir</li>
+        </ol>
+
+        <h3>5.7 Impacto en Cada Producto</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Producto</th><th>P_base</th><th>Vault</th><th>Duracion</th><th>Trigger</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>BTC Catastrophe Shield</td><td>1500 bps (15%)</td><td>Volatile Short/Long</td><td>7-30 dias</td><td>Caida BTC &gt;50%</td></tr>
+                    <tr><td>ETH Apocalypse Shield</td><td>2000 bps (20%)</td><td>Volatile Short/Long</td><td>7-30 dias</td><td>Caida ETH &gt;60%</td></tr>
+                    <tr><td>Depeg Shield</td><td>250 bps (2.5%)</td><td>Stable Short/Long</td><td>14-365 dias</td><td>Stablecoin &lt;$0.95</td></tr>
+                    <tr><td>IL Index Cover</td><td>850 bps (8.5%)</td><td>Volatile Short/Long</td><td>14-90 dias</td><td>IL &gt;2% al vencimiento</td></tr>
+                    <tr><td>Exploit Shield</td><td>400 bps (4.0%)</td><td>Stable Long</td><td>90-365 dias</td><td>Dual trigger (oracle + Phala worker ECDSA)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Todos los productos comparten el mismo Modelo Kink (misma curva M(U)), pero difieren en su P_base y factores de riesgo. Esto significa que un producto con P_base alto (como IL Index Cover al 8.5%) sera proporcionalmente mas caro que uno con P_base bajo (como Depeg al 2.5%), pero ambos se encarecen en la misma proporcion cuando la utilizacion sube.</p>
+
+        <h3>5.8 Estructura de Fees del Protocolo</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Evento</th><th>Fee</th><th>Calculo</th><th>Receptor</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Compra de poliza</td><td>3%</td><td>3% de la prima</td><td>Protocolo (97% al vault)</td></tr>
+                    <tr><td>Ejecucion de poliza</td><td>3%</td><td>3% del payout</td><td>Protocolo (97% al agente)</td></tr>
+                    <tr><td>Retiro de vault con ganancia</td><td>3%</td><td>3% de la ganancia</td><td>Protocolo</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p><strong>Ejemplo completo:</strong></p>
+        <ol>
+            <li><strong>Agente compra BCS $50,000, prima = $280.82</strong>
+                <ul>
+                    <li>Fee protocolo: $280.82 x 3% = $8.42</li>
+                    <li>Vault recibe: $280.82 - $8.42 = $272.40</li>
+                </ul>
+            </li>
+            <li><strong>Siniestro se ejecuta, payout = $40,000 (80% coverage)</strong>
+                <ul>
+                    <li>Fee protocolo: $40,000 x 3% = $1,200</li>
+                    <li>Agente recibe: $40,000 - $1,200 = $38,800</li>
+                </ul>
+            </li>
+            <li><strong>LP deposito $10,000, retira $10,500 (ganancia $500)</strong>
+                <ul>
+                    <li>Performance fee: $500 x 3% = $15</li>
+                    <li>LP recibe: $10,500 - $15 = $10,485</li>
+                    <li>Si LP retira $9,800 (perdida): fee = $0</li>
+                </ul>
+            </li>
+        </ol>
+
+        <p>Fee receiver: <code>0x2b4D825417f568231e809E31B9332ED146760337</code></p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 6: VAULTS Y YIELD -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-6">6. Vaults y Yield</h2>
+
+        <h3>6.1 Los Cuatro Vaults</h3>
+
+        <p>Lumina opera con cuatro vaults especializados, cada uno con un periodo de cooldown diferente y productos de seguro asignados:</p>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Vault</th><th>Cooldown</th><th>Productos Asignados</th><th>APY Estimado</th><th>Direccion</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>VolatileShort</strong></td>
+                        <td>37 dias</td>
+                        <td>BCS + EAS + IL Index Cover</td>
+                        <td>4 - 17%</td>
+                        <td><code>0xbd44...880d</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>VolatileLong</strong></td>
+                        <td>97 dias</td>
+                        <td>IL largo + BCS/EAS overflow</td>
+                        <td>4 - 21%</td>
+                        <td><code>0xFee5...f904</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>StableShort</strong></td>
+                        <td>97 dias</td>
+                        <td>Depeg corto</td>
+                        <td>3 - 9%</td>
+                        <td><code>0x429b...54fC</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>StableLong</strong></td>
+                        <td>372 dias</td>
+                        <td>Depeg largo + Exploit Shield</td>
+                        <td>3 - 10%</td>
+                        <td><code>0x1778...321c</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Los vaults con cooldowns mas largos ofrecen mayor APY estimado porque asumen mayor riesgo (polizas de mayor duracion, eventos menos frecuentes pero de mayor impacto).</p>
+
+        <h3>6.2 Composicion del Yield</h3>
+
+        <p>El yield que reciben los LPs proviene de dos fuentes:</p>
+
+        <ol>
+            <li><strong>Yield base de Aave V3 (3-5% APY):</strong> Los USDC depositados en los vaults se depositan automaticamente en Aave V3 Pool (<code class="address">0xA238Dd80C259a72e81d7e4664a9801593F98d1c5</code>), generando yield pasivo en forma de aUSDC (<code class="address">0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB</code>).</li>
+            <li><strong>Primas de seguro:</strong> Cuando un agente compra una poliza, el 97% de la prima (despues del 3% de fee del protocolo) se distribuye al vault correspondiente, incrementando el valor de las shares de los LPs.</li>
+        </ol>
+
+        <h3>6.3 Shares Soulbound (No Transferibles)</h3>
+
+        <p>Las shares de los vaults de Lumina son <strong>soulbound</strong>: no pueden transferirse, venderse ni utilizarse como colateral en otros protocolos. Esta decision de diseño previene:</p>
+
+        <ul>
+            <li>La creacion de mercados secundarios de shares que podrian desestabilizar los vaults</li>
+            <li>El uso de shares como colateral en protocolos de lending, creando riesgo sistemico</li>
+            <li>La fragmentacion de la liquidez entre multiples holders</li>
+        </ul>
+
+        <p>El LP solo puede interactuar con sus shares a traves de <code>deposit()</code> y <code>withdraw()</code> (tras el cooldown).</p>
+
+        <p>En futuras versiones del protocolo, se evaluara la implementacion de un mercado secundario exclusivo de Lumina donde los LPs podran negociar sus posiciones. Este mercado operaria bajo reglas controladas por el protocolo, manteniendo la estabilidad de los vaults mientras ofrece mayor flexibilidad a los participantes.</p>
+
+        <h3>6.4 Colateral Dedicado por Poliza</h3>
+
+        <p>Gracias a la colateralizacion 1:1, cada poliza tiene su propio respaldo dedicado en el vault. Incluso en el caso de multiples siniestros simultaneos, cada pago esta garantizado por colateral ya bloqueado. El sistema de prioridad por vault solo aplica para la asignacion de nuevas polizas, no para el pago de siniestros existentes.</p>
+
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 7: ORACLE Y VERIFICACION -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-7">7. Oracle y Verificacion</h2>
+
+        <h3>7.1 LuminaOracle</h3>
+
+        <p>El contrato LuminaOracleV2 (<code class="address">0x87B576f688bE0E1d7d23A299f55b475658215105</code>) es el componente central de verificacion de datos del protocolo. Es <strong>NO actualizable</strong> (Ownable, sin proxy UUPS). Opera con un esquema multisig N-of-M que puede expandirse segun las necesidades de descentralizacion.</p>
+
+        <p>Actualmente opera en modo 1-of-1 (expandible a N-of-M). El oracle verifica los feeds de Chainlink, implementa un chequeo de sequencer de 1 hora para Base L2, y valida la frescura de los datos antes de aceptarlos como input para triggers.</p>
+
+        <h3>7.2 Tabla de Feeds de Chainlink</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Feed</th><th>Direccion</th><th>Staleness</th><th>Productos que lo usan</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ETH/USD</td>
+                        <td><a class="address-link" href="https://basescan.org/address/0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70" target="_blank">0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70</a></td>
+                        <td>1,200s (20m)</td>
+                        <td>BCS, EAS, IL Index Cover</td>
+                    </tr>
+                    <tr>
+                        <td>BTC/USD</td>
+                        <td><a class="address-link" href="https://basescan.org/address/0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E" target="_blank">0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E</a></td>
+                        <td>1,200s (20m)</td>
+                        <td>BCS, EAS</td>
+                    </tr>
+                    <tr>
+                        <td>USDC/USD</td>
+                        <td><a class="address-link" href="https://basescan.org/address/0x7e860098F58bBFC8648a4311b374B1D669a2bc6B" target="_blank">0x7e860098F58bBFC8648a4311b374B1D669a2bc6B</a></td>
+                        <td>86,400s (24h)</td>
+                        <td>Referencia interna</td>
+                    </tr>
+                    <tr>
+                        <td>USDT/USD</td>
+                        <td><a class="address-link" href="https://basescan.org/address/0xf19d560eB8d2ADf07BD6D13ed03e1D11215721F9" target="_blank">0xf19d560eB8d2ADf07BD6D13ed03e1D11215721F9</a></td>
+                        <td>86,400s (24h)</td>
+                        <td>Depeg Shield</td>
+                    </tr>
+                    <tr>
+                        <td>DAI/USD</td>
+                        <td><a class="address-link" href="https://basescan.org/address/0x591e79239a7d679378eC8c847e5038150364C78F" target="_blank">0x591e79239a7d679378eC8c847e5038150364C78F</a></td>
+                        <td>86,400s (24h)</td>
+                        <td>Depeg Shield</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Los feeds de assets volatiles (ETH, BTC) tienen un staleness de 20 minutos, mientras que los feeds de stablecoins tienen un staleness de 24 horas, reflejando la menor volatilidad esperada.</p>
+
+        <h3>7.3 Verificacion Multisig: verifyPackedMultisig</h3>
+
+        <p>El sistema de verificacion de firmas utiliza un esquema de firmas concatenadas ordenadas por address. Cada firmante autorizado produce una firma ECDSA sobre los datos del oracle, y las firmas se concatenan en orden ascendente de address del firmante.</p>
+
+        <div class="code-block">
+Firmas = firma_signer1 ++ firma_signer2 ++ ... ++ firma_signerN
+<span class="comment">(donde address(signer1) &lt; address(signer2) &lt; ... &lt; address(signerN))</span>
+        </div>
+
+        <p>La funcion <code>verifyPackedMultisig</code> deserializa las firmas, verifica que cada una proviene de un firmante autorizado, que estan en orden correcto (para prevenir duplicados), y que se alcanza el umbral N-of-M requerido.</p>
+
+        <h3>7.4 LuminaPhalaVerifier para Exploit Shield</h3>
+
+        <p>El contrato LuminaPhalaVerifier (<code class="address">0x468b9D2E9043c80467B610bC290b698ae23adb9B</code>) verifica el trigger secundario de Exploit Shield mediante <strong>verificacion ECDSA de firmas producidas por workers Phala autorizados</strong> sobre una lista curada por admin. Es <strong>NO actualizable</strong> (Ownable, lista de workers EOA curada por admin). NO verifica atestaciones remotas SGX/TDX on-chain. NO verifica firmas de enclaves de hardware on-chain. Lo que SI hace: <code>ecrecover(dataHash, signature)</code> y verifica que el address recuperado esta en <code>_authorizedWorkers</code>, una lista mantenida por el owner (Gnosis Safe).</p>
+
+        <p>Esto es critico para Exploit Shield porque los exploits pueden involucrar manipulacion de oracles. Al usar un verificador independiente, Lumina agrega una segunda capa de confirmacion, aunque la suposicion de confianza es que el admin agrega unicamente workers cuyos keys fueron verificados off-chain como originados en enclaves Phala legitimos.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 8: MODELO DE NEGOCIO -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-8">8. Modelo de Negocio</h2>
+
+        <h3>8.1 Monetizacion</h3>
+
+        <p>Lumina Protocol genera ingresos a traves de un modelo de comision dual, simple y transparente:</p>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Evento</th><th>Fee</th><th>Descripcion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Compra de poliza (premium)</td><td>3%</td><td>El 3% de la prima va al protocolo, el 97% al vault</td></tr>
+                    <tr><td>Pago de siniestro (payout)</td><td>3%</td><td>El 3% del payout va al protocolo, el 97% al agente</td></tr>
+                    <tr><td>Retiro de vault (withdrawal)</td><td><strong>3% performance</strong></td><td>Sobre el rendimiento positivo (ganancia sobre el deposito original)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>8.2 Fee Receiver</h3>
+
+        <p>Todos los fees del protocolo se envian a la direccion:</p>
+
+        <div class="code-block">
+Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760337</span>
+        </div>
+
+        <p>Esta direccion es controlada por el TimelockController con un delay de 48 horas, lo que asegura transparencia y capacidad de auditoria.</p>
+
+        <h3>8.3 Performance Fee en Retiros de Vault</h3>
+
+        <p>Se cobra un 3% de performance fee unicamente sobre el rendimiento positivo (ganancia) al retirar fondos de los vaults. El fee se calcula sobre la diferencia entre el monto retirado y el cost basis (deposito original). Si no hay ganancia, no se cobra fee alguno.</p>
+
+        <p><strong>Ejemplo:</strong> Un LP deposita $10,000 USDC. Tras acumular yield, retira $10,500 USDC. La ganancia es $500 ($10,500 - $10,000). El performance fee es 3% &times; $500 = $15. El LP recibe neto $10,485.</p>
+
+        <p>Esta estructura alinea los incentivos del protocolo con los de los LPs: Lumina solo cobra cuando el LP efectivamente gana dinero.</p>
+
+        <h3>8.4 Escalabilidad del Modelo</h3>
+
+        <p>El modelo de negocio de Lumina es inherentemente escalable:</p>
+
+        <ul>
+            <li><strong>Mas LPs</strong> depositan en los vaults, aumentando la capacidad total de cobertura</li>
+            <li><strong>Mas capacidad</strong> permite emitir mas polizas y cubrir mas agentes</li>
+            <li><strong>Mas polizas</strong> generan mas primas, lo que incrementa el yield para los LPs</li>
+            <li><strong>Mayor yield</strong> atrae a mas LPs, cerrando el ciclo virtuoso</li>
+        </ul>
+
+        <p>Este flywheel se refuerza con cada nuevo participante, creando un efecto de red positivo.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 9: SEGURIDAD -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-9">9. Seguridad</h2>
+
+        <h3>9.1 Smart Contracts</h3>
+
+        <p>Los 13 contratos del protocolo han sido desarrollados con las mejores practicas de seguridad de Solidity:</p>
+
+        <ul>
+            <li><strong>Solidity 0.8.20:</strong> Overflow/underflow checking nativo</li>
+            <li><strong>Patron CEI (Checks-Effects-Interactions):</strong> Todas las funciones criticas siguen este patron</li>
+            <li><strong>SafeERC20:</strong> Todas las transferencias de USDC utilizan la libreria SafeERC20 de OpenZeppelin</li>
+            <li><strong>ReentrancyGuard:</strong> Proteccion contra ataques de reentrancia en todas las funciones que manejan fondos</li>
+            <li><strong>UUPS Proxies:</strong> Contratos upgradeables con patron UUPS de OpenZeppelin, controlados por TimelockController</li>
+            <li><strong>119 tests:</strong> Suite completa de tests unitarios y de integracion</li>
+        </ul>
+
+        <h3>9.2 Governance</h3>
+
+        <p>La gobernanza del protocolo implementa un modelo de seguridad en capas:</p>
+
+        <ul>
+            <li><strong>TimelockController</strong> (<code class="address">0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a</code>): Delay de 48 horas para todas las operaciones administrativas. Cualquier cambio en parametros criticos requiere un periodo de espera que permite a los LPs reaccionar.</li>
+            <li><strong>Gnosis Safe 1-of-1 (planned 2-of-3)</strong> (<code class="address">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</code>): Actualmente 1-of-1 signatario. Upgrade planificado para requerir al menos 2 de 3 signatarios autorizados.</li>
+        </ul>
+
+        <h3>9.3 API y Backend</h3>
+
+        <p>La API que conecta a los agentes de IA con los contratos implementa:</p>
+
+        <ul>
+            <li><strong>Rate limiting:</strong> Control de frecuencia de requests para prevenir abuso</li>
+            <li><strong>CORS:</strong> Configuracion estricta de origenes permitidos</li>
+            <li><strong>Helmet:</strong> Headers de seguridad HTTP</li>
+            <li><strong>NonceManager:</strong> Gestion de nonces para prevenir replay attacks y garantizar la secuencialidad de transacciones</li>
+        </ul>
+
+        <h3>9.4 Oracle</h3>
+
+        <p>La seguridad del oracle se basa en tres capas:</p>
+
+        <ul>
+            <li><strong>Multisig:</strong> Verificacion N-of-M de firmas para datos de oracle</li>
+            <li><strong>Precio spot de Chainlink verificado via prueba firmada EIP-712 (LuminaOracleV2):</strong> El relayer lee latestRoundData del feed de Chainlink y firma el resultado con signTypedData. NO hay computo de TWAP on-chain</li>
+            <li><strong>Sequencer check:</strong> Verificacion de que el sequencer de Base L2 ha estado activo durante al menos 1 hora antes de aceptar datos de oracle</li>
+        </ul>
+
+        <h3>9.5 Session Approval</h3>
+
+        <p>Para compras realizadas a traves de relayers, el protocolo requiere <strong>session approval</strong>: el comprador (buyer) debe firmar un consentimiento explicito que autoriza al relayer a ejecutar la compra en su nombre. Esto previene que un relayer compre polizas no autorizadas con fondos del usuario.</p>
+
+        <h3>9.6 Integracion OWS</h3>
+
+        <p>Lumina integra el estandar OWS (Open Wallet Standard) para facilitar la interaccion segura entre agentes de IA y wallets. Esta integracion permite que los agentes operen con permisos granulares y revocables, sin necesidad de exponer claves privadas.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 10: DATOS ACTUARIALES -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-10">10. Datos Actuariales</h2>
+
+        <h3>10.1 BTC Catastrophe Shield / ETH Apocalypse Shield -- Expected Value para LPs</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Metrica</th><th>Valor</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Primas estimadas anuales</td><td>~$54,000</td></tr>
+                    <tr><td>Siniestros estimados anuales</td><td>~$34,000</td></tr>
+                    <tr><td>Ganancia neta anual</td><td><strong>+$20,000</strong></td></tr>
+                    <tr><td>Margen</td><td><strong>38%</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>El margen del 38% refleja la naturaleza de cola gruesa del riesgo BCS/EAS: los eventos catastroficos son poco frecuentes pero severos. En años sin eventos, el margen es significativamente mayor. En años con multiples eventos, el margen puede ser negativo.</p>
+
+        <h3>10.2 Depeg Shield -- Expected Value para LPs</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Metrica</th><th>Valor</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Primas estimadas anuales</td><td>~$85,000</td></tr>
+                    <tr><td>Siniestros estimados anuales</td><td>~$32,000</td></tr>
+                    <tr><td>Ganancia neta anual</td><td><strong>+$52,000</strong></td></tr>
+                    <tr><td>Margen</td><td><strong>62%</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Depeg Shield presenta el mayor volumen de primas y un margen saludable del 62%. Los eventos de depeg son raros (1-2 veces por decada para stablecoins mayores) pero cuando ocurren son sistemicos.</p>
+
+        <h3>10.3 IL Index Cover -- Expected Value para LPs</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Metrica</th><th>Valor</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Primas estimadas anuales</td><td>Calculadas por modelo</td></tr>
+                    <tr><td>Ganancia neta anual</td><td><strong>+$37,000</strong></td></tr>
+                    <tr><td>Margen</td><td><strong>60%</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>El modelo de payout proporcional de IL Index Cover y el deducible del 2% crean un margen favorable. La mayoria de las polizas expiran con IL inferior al 2%, generando primas sin siniestro.</p>
+
+        <h3>10.4 Exploit Shield -- Expected Value para LPs</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Metrica</th><th>Valor</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Primas estimadas anuales</td><td>Calculadas por modelo</td></tr>
+                    <tr><td>Ganancia neta anual</td><td><strong>+$2,000</strong></td></tr>
+                    <tr><td>Margen</td><td><strong>65%</strong></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Exploit Shield tiene el menor volumen absoluto pero el mayor margen porcentual. El dual trigger, el waiting period de 14 dias y el cap de $50,000 por wallet limitan significativamente la exposicion.</p>
+
+        <h3>10.5 Peor Escenario Sistemico</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Metrica</th><th>Valor</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Perdida maxima estimada</td><td><strong>-$438,000</strong></td></tr>
+                    <tr><td>Porcentaje del TVL total ($2M)</td><td><strong>-21.9%</strong></td></tr>
+                    <tr><td>Tiempo estimado de recuperacion</td><td>10-12 meses</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p>Un escenario sistemico (crash de mercado + depeg + exploit simultaneos) podria generar una perdida del 21.9% del TVL. La recuperacion se proyecta en 10-12 meses a traves de la acumulacion de primas. Este escenario es extremadamente improbable dado los grupos de correlacion independientes entre productos.</p>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 11: RIESGOS -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-11">11. Riesgos</h2>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Riesgo</th><th>Probabilidad</th><th>Impacto</th><th>Mitigacion</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bug en smart contract</td>
+                        <td><span class="risk-low">Baja</span></td>
+                        <td><span class="risk-critical">Critico</span></td>
+                        <td>119 tests, CEI, ReentrancyGuard, Solidity 0.8.20, proxies UUPS para upgrades</td>
+                    </tr>
+                    <tr>
+                        <td>Manipulacion de oracle</td>
+                        <td><span class="risk-low">Baja</span></td>
+                        <td><span class="risk-high">Alto</span></td>
+                        <td>Pruebas firmadas EIP-712 (replay protection), multisig, sequencer check 1h, MAX_PROOF_AGE 30min</td>
+                    </tr>
+                    <tr>
+                        <td>Flash loan attack</td>
+                        <td><span class="risk-low">Baja</span></td>
+                        <td><span class="risk-high">Alto</span></td>
+                        <td>Waiting period 1h, colateral 1:1, staleness Chainlink 20 min</td>
+                    </tr>
+                    <tr>
+                        <td>Sequencer de Base L2 offline</td>
+                        <td><span class="risk-medium">Media</span></td>
+                        <td><span class="risk-medium">Medio</span></td>
+                        <td>Sequencer check de 1 hora, polizas no expiran durante downtime</td>
+                    </tr>
+                    <tr>
+                        <td>Precio stale en Chainlink</td>
+                        <td><span class="risk-medium">Media</span></td>
+                        <td><span class="risk-medium">Medio</span></td>
+                        <td>Staleness checks por feed (1200s volatiles, 86400s stables), rechazo automatico</td>
+                    </tr>
+                    <tr>
+                        <td>Subcapitalizacion del vault</td>
+                        <td><span class="risk-low">Muy Baja</span></td>
+                        <td><span class="risk-critical">Critico</span></td>
+                        <td>Colateral 1:1, U_MAX 95%, rechazo automatico de nuevas polizas al alcanzar limite</td>
+                    </tr>
+                    <tr>
+                        <td>Exploit de Aave V3</td>
+                        <td><span class="risk-low">Muy Baja</span></td>
+                        <td><span class="risk-critical">Critico</span></td>
+                        <td>Riesgo aceptado; Aave V3 es el protocolo DeFi mas auditado; no se cubre (circular)</td>
+                    </tr>
+                    <tr>
+                        <td>Depeg de USDC</td>
+                        <td><span class="risk-low">Muy Baja</span></td>
+                        <td><span class="risk-critical">Critico</span></td>
+                        <td>Riesgo de denominacion aceptado; no se cubre USDC (circular)</td>
+                    </tr>
+                    <tr>
+                        <td>Caida simultanea multiple</td>
+                        <td><span class="risk-low">Muy Baja</span></td>
+                        <td><span class="risk-high">Alto</span></td>
+                        <td>Vaults segregados por tipo de riesgo, waterfall de prioridad, grupos de correlacion</td>
+                    </tr>
+                    <tr>
+                        <td>Ataque de gobernanza</td>
+                        <td><span class="risk-low">Muy Baja</span></td>
+                        <td><span class="risk-critical">Critico</span></td>
+                        <td>TimelockController 48h + Gnosis Safe 1-of-1 (planned 2-of-3), delay permite reaccion de la comunidad</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 12: ROADMAP -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-12">12. Roadmap</h2>
+
+        <div class="roadmap-phase no-break">
+            <h3>Fase 1 -- Lanzamiento (Actual, Q1 2026)</h3>
+            <ul>
+                <li>5 productos de seguro operativos: BCS, EAS, Depeg, IL Index, Exploit</li>
+                <li>4 vaults de liquidez con yield Aave V3</li>
+                <li>Despliegue en Base L2 (Chain 8453)</li>
+                <li>13 contratos en produccion (core/vaults/shields con UUPS; oracle y PhalaVerifier NO actualizables)</li>
+                <li>Oracle con Chainlink feeds (precio spot verificado via EIP-712) y verificacion ECDSA de workers Phala</li>
+                <li>API para agentes de IA</li>
+                <li>Gobernanza via TimelockController + Gnosis Safe</li>
+            </ul>
+        </div>
+
+        <div class="roadmap-phase no-break">
+            <h3>Fase 2 -- Expansion de Productos (Q2-Q3 2026)</h3>
+            <ul>
+                <li><strong>Gas Spike Shield:</strong> Proteccion contra picos extremos de gas</li>
+                <li><strong>Slippage Shield:</strong> Cobertura contra slippage excesivo en trades</li>
+                <li><strong>Bridge Shield:</strong> Proteccion contra fallos de bridges cross-chain</li>
+                <li>Nuevos vaults dedicados para productos de Fase 2</li>
+                <li>Expansion de protocolos cubiertos en Exploit Shield</li>
+            </ul>
+        </div>
+
+        <div class="roadmap-phase no-break">
+            <h3>Fase 3 -- Mercado Secundario y Token (Q4 2026 - Q1 2027)</h3>
+            <ul>
+                <li><strong>Mercado secundario de polizas y depositos (NFT marketplace):</strong> Tanto las polizas activas como las posiciones de deposito en vaults podran tokenizarse como NFTs y negociarse en un marketplace dedicado de Lumina, permitiendo a los agentes transferir coberturas y a los LPs vender sus posiciones antes del vencimiento del cooldown.</li>
+                <li><strong>Token nativo:</strong> Lanzamiento de un token de utilidad y gobernanza para el protocolo, con funciones de staking, votacion y descuentos en primas.</li>
+            </ul>
+        </div>
+
+        <div class="roadmap-phase no-break">
+            <h3>Fase 4 -- DAO y Multi-Chain (Q2-Q4 2027)</h3>
+            <ul>
+                <li><strong>DAO governance:</strong> Transicion completa a gobernanza descentralizada por holders del token nativo, reemplazando el modelo Gnosis Safe.</li>
+                <li><strong>Cross-chain:</strong> Expansion a Arbitrum y Optimism, permitiendo cobertura de activos y protocolos en multiples L2s.</li>
+                <li>Integracion con protocolos de comunicacion cross-chain para settlement unificado.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 13: MARCO LEGAL -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-13">13. Marco Legal</h2>
+
+        <h3>13.1 Estructura del Protocolo</h3>
+
+        <p>Lumina Protocol opera como un protocolo descentralizado desplegado en Base L2 (Chain 8453). Los contratos inteligentes son inmutables en su logica core, con capacidad de upgrade a traves de proxies UUPS (para contratos core, vaults y shields) controlados por un TimelockController con delay de 48 horas y una Gnosis Safe 1-of-1 (planned 2-of-3). Los contratos Oracle (LuminaOracleV2, LuminaPhalaVerifier) son NO actualizables (Ownable).</p>
+
+        <p>El protocolo no custodia fondos de usuarios. Los depositos de LPs se mantienen en Aave V3, y los pagos de siniestros se ejecutan directamente desde los vaults a las wallets de los agentes. El protocolo solo cobra fees como intermediario.</p>
+
+        <h3>13.2 Naturaleza del Producto</h3>
+
+        <p>Lumina ofrece productos de proteccion parametrica basados en triggers matematicos verificables on-chain. Los productos de Lumina no constituyen seguros en el sentido regulatorio tradicional: no requieren licencia de aseguradora, no involucran evaluacion subjetiva de reclamos y no dependen de procesos judiciales para la resolucion de disputas.</p>
+
+        <p>Los pagos son automaticos, deterministas y verificables por cualquier tercero que inspeccione la blockchain.</p>
+
+        <h3>13.3 Riesgos Regulatorios</h3>
+
+        <p>El panorama regulatorio de DeFi continua evolucionando. Existen riesgos de que jurisdicciones futuras clasifiquen los productos parametricos on-chain como productos de seguros regulados, lo que podria requerir licencias, cumplimiento normativo adicional o restricciones geograficas.</p>
+
+        <p>El equipo monitorea activamente los desarrollos regulatorios en las principales jurisdicciones (EE.UU., UE, Reino Unido, Singapur) y esta preparado para adaptar la estructura del protocolo segun sea necesario.</p>
+
+        <h3>13.4 Disclaimer</h3>
+
+        <div class="callout callout-warning">
+            <p><strong>ESTE DOCUMENTO ES EXCLUSIVAMENTE INFORMATIVO Y NO CONSTITUYE ASESORAMIENTO FINANCIERO, LEGAL NI DE INVERSION.</strong> La participacion en Lumina Protocol, ya sea como comprador de cobertura o como proveedor de liquidez, implica riesgos significativos incluyendo pero no limitados a: perdida total del capital depositado, riesgos de smart contract, riesgos de oracle, riesgo regulatorio y riesgo de mercado.</p>
+
+            <p>Los rendimientos estimados (APY) son proyecciones basadas en modelos actuariales y condiciones de mercado historicas. No constituyen garantia de rendimiento futuro. Los participantes deben realizar su propia diligencia debida y consultar con asesores profesionales antes de interactuar con el protocolo.</p>
+
+            <p style="margin-bottom: 0;">Lumina Protocol se proporciona "tal cual" (AS-IS) sin garantias de ningun tipo, expresas o implicitas.</p>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 14: DIRECCIONES DE PRODUCCION -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-14">14. Direcciones de Produccion</h2>
+
+        <p><strong>Red:</strong> Base L2 (Chain 8453) &nbsp;|&nbsp; <strong>Fecha de despliegue:</strong> 29 de marzo de 2026</p>
+
+        <h3>Governance</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Contrato</th><th>Direccion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>TimelockController</td><td><a class="address-link" href="https://basescan.org/address/0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a" target="_blank">0xd0De5D53dCA2D96cdE7FAf540BA3f3a44fdB747a</a></td></tr>
+                    <tr><td>Gnosis Safe 1-of-1 (planned 2-of-3)</td><td><a class="address-link" href="https://basescan.org/address/0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD" target="_blank">0xa17e8b7f985022BC3c607e9c4858A1C264b33cFD</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Core</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Contrato</th><th>Direccion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>CoverRouter</td><td><a class="address-link" href="https://basescan.org/address/0xd5f8678A0F2149B6342F9014CCe6d743234Ca025" target="_blank">0xd5f8678A0F2149B6342F9014CCe6d743234Ca025</a></td></tr>
+                    <tr><td>PolicyManager</td><td><a class="address-link" href="https://basescan.org/address/0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" target="_blank">0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a</a></td></tr>
+                    <tr><td>LuminaOracleV2</td><td><a class="address-link" href="https://basescan.org/address/0x87B576f688bE0E1d7d23A299f55b475658215105" target="_blank">0x87B576f688bE0E1d7d23A299f55b475658215105</a></td></tr>
+                    <tr><td>LuminaPhalaVerifier</td><td><a class="address-link" href="https://basescan.org/address/0x468b9D2E9043c80467B610bC290b698ae23adb9B" target="_blank">0x468b9D2E9043c80467B610bC290b698ae23adb9B</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Vaults</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Vault</th><th>Cooldown</th><th>Direccion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>VolatileShort</td><td>37 dias</td><td><a class="address-link" href="https://basescan.org/address/0xbd44547581b92805aAECc40EB2809352b9b2880d" target="_blank">0xbd44547581b92805aAECc40EB2809352b9b2880d</a></td></tr>
+                    <tr><td>VolatileLong</td><td>97 dias</td><td><a class="address-link" href="https://basescan.org/address/0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904" target="_blank">0xFee5d6DAdA0A41407e9EA83d4F357DA6214Ff904</a></td></tr>
+                    <tr><td>StableShort</td><td>97 dias</td><td><a class="address-link" href="https://basescan.org/address/0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC" target="_blank">0x429b6d7d6a6d8A62F616598349Ef3C251e2d54fC</a></td></tr>
+                    <tr><td>StableLong</td><td>372 dias</td><td><a class="address-link" href="https://basescan.org/address/0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c" target="_blank">0x1778240E1d69BEBC8c0988BF1948336AA0Ea321c</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Shields (Productos)</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Shield</th><th>Direccion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>BTC Catastrophe Shield (BCS)</td><td><a class="address-link" href="https://basescan.org/address/0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21" target="_blank">0x6E0A46B268e4aD9648CdAbD9A4b2B20B79E5ab21</a></td></tr>
+                    <tr><td>ETH Apocalypse Shield (EAS)</td><td><a class="address-link" href="https://basescan.org/address/0x70f1c92EFcFe55e8d460aAa6d626779536b15128" target="_blank">0x70f1c92EFcFe55e8d460aAa6d626779536b15128</a></td></tr>
+                    <tr><td>DepegShield</td><td><a class="address-link" href="https://basescan.org/address/0x881f683291122c3A72bdD504F71ddCAf47d9AE0e" target="_blank">0x881f683291122c3A72bdD504F71ddCAf47d9AE0e</a></td></tr>
+                    <tr><td>ILIndexCover</td><td><a class="address-link" href="https://basescan.org/address/0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a" target="_blank">0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a</a></td></tr>
+                    <tr><td>ExploitShield</td><td><a class="address-link" href="https://basescan.org/address/0x63D340AE7229BB464bC801f225651341ebcD3693" target="_blank">0x63D340AE7229BB464bC801f225651341ebcD3693</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Contratos Externos</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Contrato</th><th>Direccion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>USDC (Circle)</td><td><a class="address-link" href="https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" target="_blank">0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</a></td></tr>
+                    <tr><td>Aave V3 Pool</td><td><a class="address-link" href="https://basescan.org/address/0xA238Dd80C259a72e81d7e4664a9801593F98d1c5" target="_blank">0xA238Dd80C259a72e81d7e4664a9801593F98d1c5</a></td></tr>
+                    <tr><td>aUSDC (Aave)</td><td><a class="address-link" href="https://basescan.org/address/0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB" target="_blank">0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB</a></td></tr>
+                    <tr><td>Protocol Fee Receiver</td><td><a class="address-link" href="https://basescan.org/address/0x2b4D825417f568231e809E31B9332ED146760337" target="_blank">0x2b4D825417f568231e809E31B9332ED146760337</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Claves Operativas</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Rol</th><th>Direccion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Deployer / Owner</td><td><a class="address-link" href="https://basescan.org/address/0xe585e76A0b8CbbC2d10b1110a9ac3F4c11dBfDa8" target="_blank">0xe585e76A0b8CbbC2d10b1110a9ac3F4c11dBfDa8</a></td></tr>
+                    <tr><td>Oracle Signer</td><td><a class="address-link" href="https://basescan.org/address/0x933b15dd4F42bd2EE2794C1D188882aBCCDa977E" target="_blank">0x933b15dd4F42bd2EE2794C1D188882aBCCDa977E</a></td></tr>
+                    <tr><td>Relayer</td><td><a class="address-link" href="https://basescan.org/address/0xEdA7774A071a8DDa0c8c98037Cb542A1ee6aC7Eb" target="_blank">0xEdA7774A071a8DDa0c8c98037Cb542A1ee6aC7Eb</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Chainlink Feeds</h3>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Feed</th><th>Direccion</th><th>Staleness</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>ETH/USD</td><td><a class="address-link" href="https://basescan.org/address/0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70" target="_blank">0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70</a></td><td>1,200s (20m)</td></tr>
+                    <tr><td>BTC/USD</td><td><a class="address-link" href="https://basescan.org/address/0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E" target="_blank">0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E</a></td><td>1,200s (20m)</td></tr>
+                    <tr><td>USDC/USD</td><td><a class="address-link" href="https://basescan.org/address/0x7e860098F58bBFC8648a4311b374B1D669a2bc6B" target="_blank">0x7e860098F58bBFC8648a4311b374B1D669a2bc6B</a></td><td>86,400s (24h)</td></tr>
+                    <tr><td>USDT/USD</td><td><a class="address-link" href="https://basescan.org/address/0xf19d560eB8d2ADf07BD6D13ed03e1D11215721F9" target="_blank">0xf19d560eB8d2ADf07BD6D13ed03e1D11215721F9</a></td><td>86,400s (24h)</td></tr>
+                    <tr><td>DAI/USD</td><td><a class="address-link" href="https://basescan.org/address/0x591e79239a7d679378eC8c847e5038150364C78F" target="_blank">0x591e79239a7d679378eC8c847e5038150364C78F</a></td><td>86,400s (24h)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 15: GRUPOS DE CORRELACION -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-15">15. Grupos de Correlacion</h2>
+
+        <p>Los productos de Lumina estan diseñados para cubrir riesgos con baja correlacion entre si, limitando la posibilidad de siniestros simultaneos:</p>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Grupo de Correlacion</th><th>Productos Afectados</th><th>Trigger</th><th>Probabilidad Conjunta</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Crash de ETH/BTC</strong></td>
+                        <td>BCS, EAS, IL Index Cover</td>
+                        <td>Caida &gt;30% en activos volatiles</td>
+                        <td><span class="risk-medium">Media</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Crisis de stablecoin</strong></td>
+                        <td>Depeg Shield</td>
+                        <td>Depeg de DAI o USDT por debajo de $0.95</td>
+                        <td><span class="risk-low">Baja</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Exploit de protocolo</strong></td>
+                        <td>Exploit Shield</td>
+                        <td>Hack o vulnerabilidad en protocolo cubierto</td>
+                        <td><span class="risk-low">Baja</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Evento sistemico</strong></td>
+                        <td>BCS + EAS + Depeg + IL + Exploit</td>
+                        <td>Colapso del ecosistema DeFi completo</td>
+                        <td><span class="risk-low">Muy Baja</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Analisis de correlacion</h3>
+
+        <ul>
+            <li><strong>BCS, EAS e IL Index Cover</strong> tienen correlacion alta: un crash de mercado activa BCS/EAS y simultaneamente genera IL significativo. Por esta razon, comparten el vault VolatileShort.</li>
+            <li><strong>Depeg Shield</strong> tiene correlacion baja con los productos de volatilidad. Un depeg de stablecoin puede ocurrir independientemente de la direccion del mercado (ej: crisis bancaria, riesgo regulatorio de Tether).</li>
+            <li><strong>Exploit Shield</strong> tiene correlacion baja con todos los demas productos. Los hacks de protocolos son eventos idiosincraticos que no dependen de condiciones de mercado.</li>
+            <li><strong>Evento sistemico</strong> (todos los triggers simultaneos) es el escenario de peor caso. La segregacion de vaults por tipo de riesgo y el sistema de waterfall mitigan parcialmente este riesgo. La perdida maxima estimada es de -21.9% del TVL ($438K de $2M).</li>
+        </ul>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 16: API Y AGENTES -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-16">16. API y Agentes</h2>
+
+        <h3>16.1 Descripcion General</h3>
+
+        <p>El humano, a traves de su agente de IA, interactua con Lumina Protocol a traves de una API REST que expone las funcionalidades core del protocolo. La API permite cotizar, comprar polizas, consultar estado y verificar triggers sin necesidad de interactuar directamente con los contratos.</p>
+
+        <p><strong>Endpoints principales:</strong></p>
+
+        <div class="table-wrap no-break">
+            <table>
+                <thead>
+                    <tr><th>Endpoint</th><th>Metodo</th><th>Descripcion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>/quote</code></td><td>POST</td><td>Obtener cotizacion para una poliza</td></tr>
+                    <tr><td><code>/purchase</code></td><td>POST</td><td>Ejecutar compra de poliza via relayer</td></tr>
+                    <tr><td><code>/policy/:id</code></td><td>GET</td><td>Consultar estado de una poliza</td></tr>
+                    <tr><td><code>/vault/:name/stats</code></td><td>GET</td><td>Obtener estadisticas del vault</td></tr>
+                    <tr><td><code>/vault/:name/deposit</code></td><td>POST</td><td>Depositar USDC en un vault</td></tr>
+                    <tr><td><code>/vault/:name/withdraw</code></td><td>POST</td><td>Iniciar retiro de un vault</td></tr>
+                    <tr><td><code>/oracle/price/:asset</code></td><td>GET</td><td>Consultar precio actual de un activo</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>16.2 Referencia SKILL</h3>
+
+        <p>La documentacion completa de la API y las instrucciones para configurar agentes se encuentran en el archivo SKILL del protocolo: <code>LUMINA-SKILL.txt</code> (Version 3.0, Marzo 2026).</p>
+
+        <p>El archivo SKILL contiene:</p>
+
+        <ul>
+            <li>Descripcion detallada de cada producto con parametros, ejemplos y tablas de pricing</li>
+            <li>Instrucciones paso a paso para que un agente compre cobertura</li>
+            <li>Instrucciones para depositar y retirar como LP</li>
+            <li>Parametros de cada vault y sus APYs estimados</li>
+            <li>Informacion de fees y como planificar coberturas considerando el fee del 3%</li>
+        </ul>
+
+        <h3>16.3 Flujo de Setup de un Agente</h3>
+
+        <ol>
+            <li>El humano configura su agente con la URL de la API de Lumina y las credenciales de su wallet</li>
+            <li>El agente consulta <code>/quote</code> con los parametros deseados (producto, activo, monto, duracion)</li>
+            <li>El agente evalua la cotizacion y decide si procede</li>
+            <li>El agente aprueba USDC al CoverRouter via <code>approve()</code></li>
+            <li>El agente ejecuta <code>/purchase</code> o llama directamente a <code>CoverRouter.purchaseCover()</code></li>
+            <li>La poliza queda registrada on-chain en el PolicyManager</li>
+            <li>El agente puede monitorear el estado de su poliza via <code>/policy/:id</code></li>
+        </ol>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ============================================================ -->
+    <!-- SECTION 17: CONCLUSION -->
+    <!-- ============================================================ -->
+    <div class="section container page-break">
+        <h2 id="sec-17">17. Conclusion</h2>
+
+        <p>Lumina Protocol representa la primera infraestructura de seguro parametrico diseñada exclusivamente para la economia agentica. Al combinar triggers matematicos verificables, oracles descentralizados, colateralizacion estricta 1:1 y yield generado a traves de Aave V3, el protocolo ofrece una solucion completa para los riesgos criticos que enfrentan los agentes de IA en DeFi.</p>
+
+        <h3>Fortalezas principales del protocolo</h3>
+
+        <ul>
+            <li><strong>Parametrico puro:</strong> Sin reclamos subjetivos, sin votaciones, sin esperas. El trigger se activa y el pago es inmediato.</li>
+            <li><strong>Diseñado para agentes:</strong> API programatica, session approval para relayers, integracion OWS, documentacion SKILL.</li>
+            <li><strong>Colateral 1:1:</strong> Cada poliza esta respaldada al 100% por USDC real bloqueado en el vault. Sin riesgo de subcapitalizacion.</li>
+            <li><strong>Yield real:</strong> Los LPs ganan yield compuesto de Aave V3 + primas de seguro, con APYs estimados del 3-21%.</li>
+            <li><strong>Seguridad en capas:</strong> Solidity 0.8.20, ReentrancyGuard, CEI, TimelockController 48h, Gnosis Safe 1-of-1 (planned 2-of-3), pruebas EIP-712, sequencer check.</li>
+            <li><strong>Modelo de negocio transparente:</strong> 3% premium + 3% payout. Sin fees ocultos. Performance fee del 3% sobre rendimiento positivo en retiros de vault.</li>
+        </ul>
+
+        <h3>Vision</h3>
+
+        <p>Lumina aspira a convertirse en la infraestructura de seguro estandar para la economia agentica. A medida que millones de agentes de IA gestionen billones de dolares en activos DeFi, la necesidad de cobertura programatica, instantanea y confiable sera tan fundamental como lo es hoy la infraestructura de lending y trading.</p>
+
+        <p>Con el roadmap hacia productos adicionales (Gas Spike, Slippage, Bridge Shield), un marketplace de polizas NFT, token nativo y gobernanza DAO, Lumina se posiciona como el protocolo de referencia en seguro descentralizado para la nueva generacion de participantes autonomos del ecosistema DeFi.</p>
+
+        <div style="text-align: center; margin-top: 60px; padding: 40px 0; border-top: 1px solid rgba(0, 212, 170, 0.15);">
+            <p style="color: var(--text-muted); font-size: 13px; font-style: italic; margin-bottom: 8px;">Lumina Protocol -- Seguro parametrico para la economia agentica</p>
+            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 0;">Base L2 | USDC | Aave V3 | 2026</p>
+        </div>
+    </div>
+
+    <!-- PRINT FOOTER -->
+    <div class="print-footer">Lumina Protocol - Whitepaper V3 - Marzo 2026</div>
+
+
+  </main>
+</div>
+
+<footer class="wp-footer">
+  Lumina Protocol · Whitepaper V3 · March 2026 · <a href="mailto:hello@lumina-org.com">hello@lumina-org.com</a>
+</footer>
+
+<script>
+  // Auto-prefix h2 with section number
+  const mains = document.querySelectorAll('.wp-main h2');
+  mains.forEach(h => {
+    const id = h.id || '';
+    const m = id.match(/sec-(\d+)/);
+    if (m) h.dataset.num = '§ ' + String(m[1]).padStart(2, '0');
+  });
+
+  // TOC active state on scroll
+  const tocLinks = document.querySelectorAll('.wp-toc a');
+  const headings = [...document.querySelectorAll('.wp-main h2[id]')];
+  const setActive = (id) => {
+    tocLinks.forEach(l => {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+    });
+  };
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+    }, { rootMargin: '-20% 0px -65% 0px' });
+    headings.forEach(h => obs.observe(h));
+  }
+</script>
+</body>
+</html>
