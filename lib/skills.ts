@@ -140,9 +140,8 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['write', 'wallet', 'erc20'],
     category: 'buy',
-    githubUrl: `${PROTO}/README.md`,
+    githubUrl: `${API}/docs/skills/approve-usdc.md`,
     contractFn: 'USDC.approve(spender, amount) — standard ERC-20',
-    todoNote: 'No per-skill doc — pattern is generic ERC-20',
   },
 
   // ─── MONITOR ───────────────────────────────────────────────────
@@ -279,7 +278,7 @@ export const SKILLS: Skill[] = [
     difficulty: 1,
     tags: ['ui', 'wallet'],
     category: 'integration',
-    githubUrl: 'https://github.com/org-lumina/v0-lumina-landing-page/blob/main/components/lumina/web3-provider.tsx',
+    githubUrl: `${API}/docs/skills/connect-wallet.md`,
     contractFn: 'wagmi createConfig + RainbowKit connectorsForWallets',
   },
   {
@@ -305,9 +304,8 @@ export const SKILLS: Skill[] = [
     difficulty: 2,
     tags: ['api', 'auth', 'admin'],
     category: 'integration',
-    githubUrl: `${API}/src/routes/keys.ts#L16`,
+    githubUrl: `${API}/docs/skills/generate-api-key.md`,
     apiEndpoint: 'POST /api/v1/keys/generate (admin-only)',
-    todoNote: 'Self-service endpoint not exposed yet — manual provisioning',
   },
   {
     id: 'redeem-via-api',
