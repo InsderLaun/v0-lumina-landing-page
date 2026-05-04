@@ -2,6 +2,24 @@ import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
 import { type ReactNode } from 'react'
 
+const BADGE_STYLE: Record<string, { color: string; bg: string; border: string }> = {
+  new: {
+    color: 'var(--rd-accent)',
+    bg: 'var(--rd-accent-dim)',
+    border: 'var(--rd-accent-border)',
+  },
+  deprecated: {
+    color: 'var(--rd-warn)',
+    bg: 'rgba(245,158,11,0.1)',
+    border: 'rgba(245,158,11,0.33)',
+  },
+  historical: {
+    color: 'var(--rd-text-3)',
+    bg: 'transparent',
+    border: 'var(--rd-line-strong)',
+  },
+}
+
 export interface DocCardProps {
   title: string
   description: string
@@ -11,6 +29,8 @@ export interface DocCardProps {
   icon?: ReactNode
   badge?: string
   cta?: string
+  /** Optional repo chip text shown in the footer (e.g., 'lumina-api'). */
+  repo?: string
 }
 
 export function DocCard({
@@ -21,7 +41,10 @@ export function DocCard({
   icon,
   badge,
   cta,
+  repo,
 }: DocCardProps) {
+  const badgeStyle = badge ? BADGE_STYLE[badge] ?? BADGE_STYLE.deprecated : null
+
   const content = (
     <>
       <div
@@ -49,7 +72,7 @@ export function DocCard({
             {icon}
           </span>
         )}
-        {badge && (
+        {badgeStyle && (
           <span
             style={{
               padding: '3px 8px',
@@ -57,9 +80,9 @@ export function DocCard({
               fontFamily: 'var(--font-jetbrains), monospace',
               fontSize: 10,
               letterSpacing: '0.06em',
-              color: 'var(--rd-warn)',
-              background: 'rgba(245,158,11,0.1)',
-              border: '1px solid rgba(245,158,11,0.33)',
+              color: badgeStyle.color,
+              background: badgeStyle.bg,
+              border: `1px solid ${badgeStyle.border}`,
               textTransform: 'uppercase',
             }}
           >
@@ -92,18 +115,47 @@ export function DocCard({
       </p>
       <div
         style={{
-          fontFamily: 'var(--font-jetbrains), monospace',
-          fontSize: 12,
-          color: 'var(--rd-accent)',
-          display: 'inline-flex',
+          display: 'flex',
           alignItems: 'center',
-          gap: 6,
+          justifyContent: 'space-between',
           paddingTop: 10,
           borderTop: '1px solid var(--rd-line)',
+          gap: 10,
         }}
       >
-        {cta ?? (external ? 'View on GitHub' : 'Open')}
-        {external ? <ExternalLink size={12} /> : <span>→</span>}
+        {repo && (
+          <span
+            style={{
+              fontFamily: 'var(--font-jetbrains), monospace',
+              fontSize: 10,
+              color: 'var(--rd-text-3)',
+              padding: '2px 6px',
+              border: '1px solid var(--rd-line)',
+              borderRadius: 3,
+              letterSpacing: '0.04em',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: 180,
+            }}
+          >
+            {repo}
+          </span>
+        )}
+        <span
+          style={{
+            fontFamily: 'var(--font-jetbrains), monospace',
+            fontSize: 12,
+            color: 'var(--rd-accent)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            marginLeft: 'auto',
+          }}
+        >
+          {cta ?? (external ? 'View on GitHub' : 'Open')}
+          {external ? <ExternalLink size={12} /> : <span>→</span>}
+        </span>
       </div>
     </>
   )

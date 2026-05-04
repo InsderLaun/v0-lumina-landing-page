@@ -8,14 +8,19 @@ import { SiteFooter } from '@/components/lumina/redesign/SiteFooter'
 import { DocCard } from '@/components/lumina/redesign/DocCard'
 import { RepoMegaCard } from '@/components/lumina/redesign/RepoMegaCard'
 import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
-import { CATEGORIES, DOCS, ORG_URL, buildDocUrl } from '@/lib/docs'
+import {
+  CATEGORIES,
+  DOCS,
+  ORG_GITHUB_URL,
+  REPO_CARDS,
+  buildDocUrl,
+  docsByCategory,
+} from '@/lib/docs'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata = { title: 'Lumina · Documentation' }
 
-// Read all 19 deployed addresses from lib/contracts.ts (re-export of lumina-config)
-// — never hardcoded. Order: 9 core/protocol + 1 token + 9 shields.
 const DEPLOYED = [
   { kind: 'core', name: 'LuminaTokenV2', address: CONTRACTS.LuminaToken },
   { kind: 'core', name: 'ClaimBond', address: CONTRACTS.ClaimBond },
@@ -45,29 +50,11 @@ export default function DocsPage() {
       <Nav />
 
       <main style={{ paddingBottom: 64 }}>
-        {/* Back to home */}
-        <div className="wrap" style={{ paddingTop: 24, paddingBottom: 8 }}>
-          <Link
-            href="/"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontFamily: 'var(--font-jetbrains), monospace',
-              fontSize: 11,
-              color: 'var(--rd-text-3)',
-              letterSpacing: '0.06em',
-              textDecoration: 'none',
-            }}
-          >
-            <ArrowLeft size={11} /> Back to home
-          </Link>
-        </div>
+        <BackToHome />
 
-        {/* Hero */}
         <header className="rd-wp-hero">
           <div className="wrap">
-            <span className="rd-eyebrow">Open source · public on GitHub</span>
+            <span className="rd-eyebrow">Open source · public on GitHub · V5.1</span>
             <h1>📚 Documentation</h1>
             <p className="rd-lede">
               Every contract, every endpoint, every audit — public on GitHub. Browse by category
@@ -76,22 +63,21 @@ export default function DocsPage() {
           </div>
         </header>
 
-        {/* Mega card: View all repos */}
         <section className="wrap" style={{ padding: '32px 32px 0' }}>
           <RepoMegaCard
             title="View all repos on GitHub"
             subtitle="3 repositories: smart contracts, REST API, and this frontend — all open source."
-            href={ORG_URL}
+            href={ORG_GITHUB_URL}
+            repos={REPO_CARDS}
           />
         </section>
 
-        {/* Categories */}
         {CATEGORIES.map((cat) => {
-          const docs = DOCS.filter((d) => d.category === cat.id)
+          const docs = docsByCategory(cat.id)
           if (docs.length === 0) return null
           return (
-            <section key={cat.id} className="wrap" style={{ padding: '32px 32px 0' }}>
-              <SectionHeader label={cat.label} count={`${docs.length} doc${docs.length === 1 ? '' : 's'}`} />
+            <section key={cat.id} className="wrap" style={{ padding: '40px 32px 0' }}>
+              <CategoryHeader emoji={cat.emoji} label={cat.label} description={cat.description} count={docs.length} />
               <div
                 style={{
                   display: 'grid',
@@ -107,7 +93,8 @@ export default function DocsPage() {
                     href={buildDocUrl(d)}
                     icon={<Github size={18} />}
                     cta="Open on GitHub"
-                    badge={d.repo}
+                    badge={d.badge}
+                    repo={d.repo}
                   />
                 ))}
               </div>
@@ -115,95 +102,18 @@ export default function DocsPage() {
           )
         })}
 
-        {/* Deployed Contracts table — kept from previous version */}
         <section className="wrap" style={{ padding: '48px 32px 0' }}>
-          <SectionHeader
-            label="📜 Deployed Contracts"
-            count={`Base Sepolia · ${DEPLOYED.length} addresses`}
+          <CategoryHeader
+            emoji="📜"
+            label="Deployed Contracts"
+            description="V5.1 on Base Sepolia (chainId 84532). Every address is read from `lib/contracts.ts` — never hardcoded here."
+            count={DEPLOYED.length}
           />
-          <div
-            style={{
-              background: 'var(--rd-surface)',
-              border: '1px solid var(--rd-line)',
-              borderRadius: 8,
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '120px 1fr 1fr 120px',
-                padding: '10px 16px',
-                borderBottom: '1px solid var(--rd-line)',
-                background: 'var(--rd-surface-2)',
-                fontFamily: 'var(--font-jetbrains), monospace',
-                fontSize: 10,
-                color: 'var(--rd-text-3)',
-                letterSpacing: '0.1em',
-              }}
-            >
-              <div>KIND</div>
-              <div>NAME</div>
-              <div>ADDRESS</div>
-              <div></div>
-            </div>
-            {DEPLOYED.map((d, i) => (
-              <div
-                key={d.address + d.name}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '120px 1fr 1fr 120px',
-                  padding: '11px 16px',
-                  borderBottom: i === DEPLOYED.length - 1 ? 'none' : '1px solid var(--rd-line)',
-                  fontSize: 12,
-                  alignItems: 'center',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-jetbrains), monospace',
-                    fontSize: 10,
-                    letterSpacing: '0.06em',
-                    color:
-                      d.kind === 'shield'
-                        ? 'var(--rd-accent)'
-                        : d.kind === 'token'
-                          ? 'var(--rd-warn)'
-                          : 'var(--rd-text-3)',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {d.kind}
-                </span>
-                <span style={{ color: 'var(--rd-text)' }}>{d.name}</span>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-jetbrains), monospace',
-                    fontSize: 11,
-                    color: 'var(--rd-text-3)',
-                  }}
-                >
-                  {d.address.slice(0, 6)}…{d.address.slice(-4)}
-                </span>
-                <a
-                  href={`https://sepolia.basescan.org/address/${d.address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    fontFamily: 'var(--font-jetbrains), monospace',
-                    fontSize: 11,
-                    color: 'var(--rd-accent)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    justifySelf: 'end',
-                  }}
-                >
-                  Basescan <ExternalLink size={11} />
-                </a>
-              </div>
-            ))}
-          </div>
+          <DeployedContractsTable />
+        </section>
+
+        <section className="wrap" style={{ padding: '48px 32px 0' }}>
+          <BackToHome />
         </section>
       </main>
 
@@ -212,40 +122,165 @@ export default function DocsPage() {
   )
 }
 
-function SectionHeader({ label, count }: { label: string; count: string }) {
+function BackToHome() {
+  return (
+    <div className="wrap" style={{ paddingTop: 24, paddingBottom: 8 }}>
+      <Link
+        href="/"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          fontFamily: 'var(--font-jetbrains), monospace',
+          fontSize: 11,
+          color: 'var(--rd-text-3)',
+          letterSpacing: '0.06em',
+          textDecoration: 'none',
+        }}
+      >
+        <ArrowLeft size={11} /> Back to home
+      </Link>
+    </div>
+  )
+}
+
+function CategoryHeader({
+  emoji,
+  label,
+  description,
+  count,
+}: {
+  emoji: string
+  label: string
+  description: string
+  count: number
+}) {
   return (
     <div
       style={{
         display: 'flex',
-        alignItems: 'baseline',
+        alignItems: 'flex-end',
         justifyContent: 'space-between',
         marginBottom: 16,
         paddingBottom: 12,
         borderBottom: '1px solid var(--rd-line)',
+        gap: 16,
       }}
     >
-      <h2
-        style={{
-          fontFamily: 'var(--font-display), Georgia, serif',
-          fontSize: 22,
-          fontWeight: 500,
-          letterSpacing: '-0.015em',
-          color: 'var(--rd-text)',
-          margin: 0,
-        }}
-      >
-        {label}
-      </h2>
+      <div>
+        <h2
+          style={{
+            fontFamily: 'var(--font-display), Georgia, serif',
+            fontSize: 24,
+            fontWeight: 500,
+            letterSpacing: '-0.015em',
+            color: 'var(--rd-text)',
+            margin: '0 0 4px',
+          }}
+        >
+          {emoji} {label}
+        </h2>
+        <div style={{ fontSize: 13, color: 'var(--rd-text-3)' }}>{description}</div>
+      </div>
       <span
         style={{
           fontFamily: 'var(--font-jetbrains), monospace',
           fontSize: 11,
           color: 'var(--rd-text-3)',
           letterSpacing: '0.04em',
+          flexShrink: 0,
         }}
       >
-        {count}
+        {count} doc{count === 1 ? '' : 's'}
       </span>
+    </div>
+  )
+}
+
+function DeployedContractsTable() {
+  return (
+    <div
+      style={{
+        background: 'var(--rd-surface)',
+        border: '1px solid var(--rd-line)',
+        borderRadius: 8,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '120px 1fr 1fr 120px',
+          padding: '10px 16px',
+          borderBottom: '1px solid var(--rd-line)',
+          background: 'var(--rd-surface-2)',
+          fontFamily: 'var(--font-jetbrains), monospace',
+          fontSize: 10,
+          color: 'var(--rd-text-3)',
+          letterSpacing: '0.1em',
+        }}
+      >
+        <div>KIND</div>
+        <div>NAME</div>
+        <div>ADDRESS</div>
+        <div></div>
+      </div>
+      {DEPLOYED.map((d, i) => (
+        <div
+          key={d.address + d.name}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '120px 1fr 1fr 120px',
+            padding: '11px 16px',
+            borderBottom: i === DEPLOYED.length - 1 ? 'none' : '1px solid var(--rd-line)',
+            fontSize: 12,
+            alignItems: 'center',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--font-jetbrains), monospace',
+              fontSize: 10,
+              letterSpacing: '0.06em',
+              color:
+                d.kind === 'shield'
+                  ? 'var(--rd-accent)'
+                  : d.kind === 'token'
+                    ? 'var(--rd-warn)'
+                    : 'var(--rd-text-3)',
+              textTransform: 'uppercase',
+            }}
+          >
+            {d.kind}
+          </span>
+          <span style={{ color: 'var(--rd-text)' }}>{d.name}</span>
+          <span
+            style={{
+              fontFamily: 'var(--font-jetbrains), monospace',
+              fontSize: 11,
+              color: 'var(--rd-text-3)',
+            }}
+          >
+            {d.address.slice(0, 6)}…{d.address.slice(-4)}
+          </span>
+          <a
+            href={`https://sepolia.basescan.org/address/${d.address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontFamily: 'var(--font-jetbrains), monospace',
+              fontSize: 11,
+              color: 'var(--rd-accent)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              justifySelf: 'end',
+            }}
+          >
+            Basescan <ExternalLink size={11} />
+          </a>
+        </div>
+      ))}
     </div>
   )
 }

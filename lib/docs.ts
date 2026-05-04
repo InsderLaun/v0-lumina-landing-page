@@ -1,18 +1,25 @@
 // Curated documentation catalog for /docs page.
-// Every path is a real .md file in the canonical repos. Verified at:
-//   /tmp/lp-s2 LUMINA-PROTOCOL @ 6a3ce42
-//   /tmp/lumina-api-bulk lumina-api with docs/skills/ from PR #7+8
-// Do NOT add a path that doesn't exist on `main` of its repo — the card
-// would 404 the user.
+// All paths verified against post-merge state of:
+//   - org-lumina/LUMINA-PROTOCOL  (PR #96 merged: SECURITY rewritten,
+//                                   AAVE-INTEGRATION added, file renames)
+//   - org-lumina/lumina-api        (PRs #7 + #8 merged: 22 skills under
+//                                   docs/skills/)
+// Whitepaper docs are intentionally excluded — they live on /whitepaper.
 
-export type DocRepo = 'lumina-api' | 'LUMINA-PROTOCOL' | 'v0-lumina-landing-page'
 export type DocCategory =
   | 'getting-started'
   | 'agents'
   | 'contracts'
   | 'security'
-  | 'development'
-  | 'tokenomics'
+  | 'deployment'
+  | 'governance'
+  | 'economics'
+  | 'roadmap'
+  | 'historical'
+
+export type DocRepo = 'lumina-api' | 'LUMINA-PROTOCOL' | 'v0-lumina-landing-page'
+
+export type DocBadge = 'new' | 'deprecated' | 'historical'
 
 export interface DocEntry {
   title: string
@@ -20,6 +27,7 @@ export interface DocEntry {
   repo: DocRepo
   path: string
   category: DocCategory
+  badge?: DocBadge
 }
 
 export const REPO_URLS: Record<DocRepo, string> = {
@@ -28,26 +36,56 @@ export const REPO_URLS: Record<DocRepo, string> = {
   'v0-lumina-landing-page': 'https://github.com/org-lumina/v0-lumina-landing-page',
 }
 
-export const ORG_URL = 'https://github.com/org-lumina'
+export const ORG_GITHUB_URL = 'https://github.com/org-lumina'
 
-export const CATEGORIES = [
-  { id: 'getting-started', label: '🚀 Getting Started' },
-  { id: 'agents', label: '🤖 For AI Agents' },
-  { id: 'contracts', label: '🔐 Smart Contracts' },
-  { id: 'security', label: '🛡️ Security & Audits' },
-  { id: 'development', label: '🔧 Development' },
-  { id: 'tokenomics', label: '📊 Tokenomics & Economics' },
+export const REPO_CARDS = [
+  {
+    name: 'LUMINA-PROTOCOL',
+    description: 'Smart contracts (Foundry / Solidity)',
+    url: REPO_URLS['LUMINA-PROTOCOL'],
+  },
+  {
+    name: 'lumina-api',
+    description: 'Backend API (Node.js / Express)',
+    url: REPO_URLS['lumina-api'],
+  },
+  {
+    name: 'v0-lumina-landing-page',
+    description: 'Frontend (Next.js)',
+    url: REPO_URLS['v0-lumina-landing-page'],
+  },
 ] as const
+
+export const CATEGORIES: {
+  id: DocCategory
+  label: string
+  emoji: string
+  description: string
+}[] = [
+  { id: 'getting-started', label: 'Getting Started', emoji: '🚀', description: 'First steps and quick guides for users, developers, and AI agents' },
+  { id: 'agents', label: 'For AI Agents', emoji: '🤖', description: 'Integration guides and skill files for autonomous agents' },
+  { id: 'contracts', label: 'Smart Contracts', emoji: '🔐', description: 'Architecture, integrations, and cross-contract maps' },
+  { id: 'security', label: 'Security & Audits', emoji: '🛡️', description: 'Security model, audit reports, threat analysis' },
+  { id: 'deployment', label: 'Deployment', emoji: '🚢', description: 'Deploy checklists, env config, mainnet runbooks' },
+  { id: 'governance', label: 'Governance & Operations', emoji: '⚖️', description: 'Roles, access control, multisig policies, incident response' },
+  { id: 'economics', label: 'Tokenomics & Economics', emoji: '📊', description: 'Token distribution, burn mechanics, premium math, vesting' },
+  { id: 'roadmap', label: 'Roadmap', emoji: '🗺️', description: 'Future plans and milestones' },
+  { id: 'historical', label: 'Historical', emoji: '📜', description: 'Changelog and deprecated references — clearly marked' },
+]
 
 export function buildDocUrl(entry: DocEntry): string {
   return `${REPO_URLS[entry.repo]}/blob/main/${entry.path}`
+}
+
+export function docsByCategory(category: DocCategory): DocEntry[] {
+  return DOCS.filter((d) => d.category === category)
 }
 
 export const DOCS: DocEntry[] = [
   // ─── 🚀 GETTING STARTED ──────────────────────────────────────
   {
     title: 'Protocol README',
-    description: 'High-level overview of the Lumina parametric insurance protocol and how the contracts fit together.',
+    description: 'High-level overview of the Lumina parametric insurance protocol and how the V5.1 contracts fit together.',
     repo: 'LUMINA-PROTOCOL',
     path: 'README.md',
     category: 'getting-started',
@@ -69,6 +107,13 @@ export const DOCS: DocEntry[] = [
 
   // ─── 🤖 FOR AI AGENTS ────────────────────────────────────────
   {
+    title: 'SKILL spec (canonical)',
+    description: 'The full canonical skill specification consumed by AI agents. Lists every operation an agent can perform.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/SKILL.md',
+    category: 'agents',
+  },
+  {
     title: 'Configure API client',
     description: 'Env vars, base URL, x-api-key header, retry strategy. The setup any agent needs before calling other endpoints.',
     repo: 'lumina-api',
@@ -84,7 +129,7 @@ export const DOCS: DocEntry[] = [
   },
   {
     title: 'Buy policy as Agent',
-    description: 'Relayer pattern. Agent posts an authenticated request; the API pays gas and calls purchasePolicyFor on-chain.',
+    description: 'Relayer pattern: agent posts an authenticated request; the API pays gas and calls purchasePolicyFor on-chain.',
     repo: 'lumina-api',
     path: 'docs/skills/buy-policy-agent.md',
     category: 'agents',
@@ -97,61 +142,56 @@ export const DOCS: DocEntry[] = [
     category: 'agents',
   },
   {
-    title: 'SKILL spec V4.1 (canonical)',
-    description: 'The full canonical skill specification consumed by AI agents. Lists every operation an agent can perform.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'docs/SKILL-V4.1.md',
+    title: 'Health check',
+    description: 'Public unauthenticated endpoint for monitors and uptime probes. Use it on startup before issuing real calls.',
+    repo: 'lumina-api',
+    path: 'docs/skills/health-check.md',
     category: 'agents',
   },
 
   // ─── 🔐 SMART CONTRACTS ──────────────────────────────────────
   {
-    title: 'Deploy V5 checklist',
-    description: 'Pre-deploy invariants, dependency order, and post-deploy verification for the V5.x family of contracts.',
+    title: 'Aave V3 integration',
+    description: 'How V5.1 uses Aave V3 read-only as price oracle (RateShockShield + FounderVesting Condition C). NOT for yield.',
     repo: 'LUMINA-PROTOCOL',
-    path: 'docs/deployment/DEPLOY-V5-CHECKLIST.md',
+    path: 'docs/architecture/AAVE-INTEGRATION.md',
+    category: 'contracts',
+    badge: 'new',
+  },
+  {
+    title: 'Cross-contract integration map',
+    description: 'How the 9 shields, BondVault, ClaimBond, and CoverRouterV2 connect. Auditor reference.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/audit/v5.1-uups/30-cross-contract/01-INTEGRATION-MAP.md',
     category: 'contracts',
   },
   {
-    title: 'Deploy V5 order',
-    description: 'Exact deployment sequence (token → vault → router → shields) with rationale for ordering and constructor args.',
+    title: 'Aave audit chapter',
+    description: 'Audit deep-dive on the Aave V3 integration. Covers manipulation surfaces and 2-of-3 mitigation in FounderVesting.',
     repo: 'LUMINA-PROTOCOL',
-    path: 'docs/deployment/DEPLOY-V5-ORDER.md',
-    category: 'contracts',
-  },
-  {
-    title: 'Deploy environment variables',
-    description: 'Reference of all env vars needed for deploy + post-deploy scripts. Source values for production-ready configs.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'docs/deployment/ENV-VARIABLES.md',
-    category: 'contracts',
-  },
-  {
-    title: 'V1 deprecated contracts',
-    description: 'Inventory of legacy V1/V2 contracts no longer in scope, with migration notes to V5.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'docs/V1-DEPRECATED-CONTRACTS.md',
+    path: 'docs/audit/v5.1-uups/12-aave-integration/REPORT.md',
     category: 'contracts',
   },
 
   // ─── 🛡️ SECURITY & AUDITS ────────────────────────────────────
   {
-    title: 'SECURITY policy',
-    description: 'Vulnerability reporting process, scope, and bounty information for the protocol.',
+    title: 'Security policy',
+    description: 'Reporting process, scope, bug bounty, V5.1 contracts in scope (single BondVault + 9 shields), Aave dependency.',
     repo: 'LUMINA-PROTOCOL',
     path: 'SECURITY.md',
     category: 'security',
+    badge: 'new',
   },
   {
-    title: 'Security audit V4 (latest)',
-    description: 'Most recent full audit of the V5.x contract suite. Findings, severity ratings, remediation status.',
+    title: 'Security audit V5',
+    description: 'Latest internal audit report covering V5.1 architecture (renamed from SECURITY-AUDIT-V4 — content was already V5.1).',
     repo: 'LUMINA-PROTOCOL',
-    path: 'docs/SECURITY-AUDIT-V4.md',
+    path: 'docs/SECURITY-AUDIT-V5.md',
     category: 'security',
   },
   {
     title: 'Phase 4 audit report',
-    description: 'Phase 4 internal audit covering the bond + marketplace flow. Cross-checks against contract source.',
+    description: 'Phase 4 internal audit covering the bond + marketplace flow.',
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/audit/PHASE4-AUDIT-REPORT.md',
     category: 'security',
@@ -171,49 +211,133 @@ export const DOCS: DocEntry[] = [
     category: 'security',
   },
 
-  // ─── 🔧 DEVELOPMENT ──────────────────────────────────────────
+  // ─── 🚢 DEPLOYMENT ───────────────────────────────────────────
+  {
+    title: 'Deploy V5 checklist',
+    description: 'Pre-deploy invariants and post-deploy verification for the V5.x family of contracts.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/deployment/DEPLOY-V5-CHECKLIST.md',
+    category: 'deployment',
+  },
+  {
+    title: 'Deploy V5 order',
+    description: 'Exact deployment sequence (token → vault → router → shields) with rationale for ordering.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/deployment/DEPLOY-V5-ORDER.md',
+    category: 'deployment',
+  },
+  {
+    title: 'Environment variables',
+    description: 'All env vars needed for deploy + post-deploy. Includes the Aave V3 oracle address (read-only).',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/deployment/ENV-VARIABLES.md',
+    category: 'deployment',
+  },
+  {
+    title: 'Mainnet deploy runbook',
+    description: 'Step-by-step runbook for the production mainnet deployment, including go/no-go gates.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/runbooks/DEPLOY-MAINNET-RUNBOOK.md',
+    category: 'deployment',
+  },
+
+  // ─── ⚖️ GOVERNANCE & OPERATIONS ──────────────────────────────
   {
     title: 'Access control matrix',
     description: 'Every privileged role across the protocol — who can call what, who holds the keys, with rotation policies.',
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/ACCESS-CONTROL-MATRIX.md',
-    category: 'development',
-  },
-  {
-    title: 'Daily operations runbook',
-    description: 'Day-to-day operator tasks: monitoring, periodic verifications, alerts triage.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'docs/runbooks/DAILY-OPERATIONS-RUNBOOK.md',
-    category: 'development',
-  },
-  {
-    title: 'Incident response runbook',
-    description: 'Step-by-step guide for triaging and recovering from production incidents (RPC down, oracle stale, contract pause).',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'docs/runbooks/INCIDENT-RESPONSE-RUNBOOK.md',
-    category: 'development',
+    category: 'governance',
   },
   {
     title: 'Roles and responsibilities',
     description: 'Governance + operational roles defined: who signs what, decision frameworks, escalation paths.',
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/governance/ROLES-AND-RESPONSIBILITIES.md',
-    category: 'development',
+    category: 'governance',
+  },
+  {
+    title: 'Multisig policies',
+    description: 'Signing thresholds, quorum, timelocks, and key rotation for the governance multisig.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/governance/MULTISIG-POLICIES.md',
+    category: 'governance',
+  },
+  {
+    title: 'Daily operations runbook',
+    description: 'Day-to-day operator tasks: monitoring, periodic verifications, alerts triage.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/runbooks/DAILY-OPERATIONS-RUNBOOK.md',
+    category: 'governance',
+  },
+  {
+    title: 'Incident response runbook',
+    description: 'Step-by-step guide for triaging and recovering from production incidents (RPC down, oracle stale, contract pause).',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/runbooks/INCIDENT-RESPONSE-RUNBOOK.md',
+    category: 'governance',
   },
 
   // ─── 📊 TOKENOMICS & ECONOMICS ───────────────────────────────
+  // No standalone TOKENOMICS.md exists upstream yet; the canonical content
+  // lives inside README (Token Distribution table) + ROADMAP-V5 (vesting +
+  // burn mechanics) + the audit chapter on premium math. Both README and
+  // ROADMAP-V5 are dual-purpose files — they appear in two categories with
+  // different framings. This is intentional, not a bug.
+  {
+    title: 'Token distribution (100M LUMINA)',
+    description: 'The full breakdown of the 100M fixed supply: Founder (8% / AltSeasonVesting), Treasury, Community, etc. Anchor links straight to the README section.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'README.md#token-distribution-100m-lumina',
+    category: 'economics',
+  },
+  {
+    title: 'Vesting + burn mechanics (in roadmap)',
+    description: 'ROADMAP-V5 doubles as the canonical record for vesting schedules (FounderVesting 2-of-3, TreasuryVesting), TWAPBurner distribution, BuybackEngine, and the Double Burn proposal.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/ROADMAP-V5.md',
+    category: 'economics',
+  },
+  {
+    title: 'Premium math + edge cases',
+    description: 'Audit chapter on the premium formula (cover × payoutRatioBps × triggerProbBps × marginBps) and rounding edge cases. Reference for actuaries and integrators.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/audit/v5.1-uups/05-math-edge-cases/REPORT.md',
+    category: 'economics',
+  },
+
+  // ─── 🗺️ ROADMAP ──────────────────────────────────────────────
   {
     title: 'Roadmap V5',
     description: 'Forward-looking roadmap for the V5 family: token launch, marketplace, automation, cross-chain.',
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/ROADMAP-V5.md',
-    category: 'tokenomics',
+    category: 'roadmap',
   },
+
+  // ─── 📜 HISTORICAL ───────────────────────────────────────────
   {
-    title: 'Protocol changelog',
-    description: 'Version-by-version change log. What shipped when, contract upgrades, breaking changes.',
+    title: 'Changelog',
+    description: 'Version-by-version change log. Older entries reference V1/V2/V4 by design — current architecture is V5.1.',
     repo: 'LUMINA-PROTOCOL',
     path: 'CHANGELOG.md',
-    category: 'tokenomics',
+    category: 'historical',
+    badge: 'historical',
+  },
+  {
+    title: 'V1 deprecated contracts',
+    description: 'Inventory of legacy V1/V2/V4 contracts no longer in scope. Kept to prevent re-deployment of stale addresses.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/V1-DEPRECATED-CONTRACTS.md',
+    category: 'historical',
+    badge: 'deprecated',
+  },
+  {
+    title: 'Security audit V3 (final)',
+    description: 'Historical V3 audit for reference. Most findings rolled forward into V4 and V5; check SECURITY-AUDIT-V5 for current.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/SECURITY-AUDIT-V3-FINAL.md',
+    category: 'historical',
+    badge: 'historical',
   },
 ]
