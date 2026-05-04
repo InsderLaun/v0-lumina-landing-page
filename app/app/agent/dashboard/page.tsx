@@ -1,7 +1,9 @@
-import { OperateStub } from '@/components/lumina/redesign/operate/OperateStub'
+import { AgentDashboardView } from '@/components/lumina/redesign/operate/AgentDashboardView'
 
 export const dynamic = 'force-dynamic'
 
+export const metadata = { title: 'Lumina · Agent Dashboard' }
+
 export default function AgentDashboardPage() {
-  return <OperateStub title="Dashboard" subtitle="6 KPIs + activity feed + distribution chart (Phase 3)" />
+  return <AgentDashboardView />
 }

@@ -1,7 +1,9 @@
-import { OperateStub } from '@/components/lumina/redesign/operate/OperateStub'
+import { AgentPoliciesView } from '@/components/lumina/redesign/operate/AgentPoliciesView'
 
 export const dynamic = 'force-dynamic'
 
+export const metadata = { title: 'Lumina · Agent Policies' }
+
 export default function AgentPoliciesPage() {
-  return <OperateStub title="Policies" subtitle="Filterable read-only list + CSV export (Phase 3)" />
+  return <AgentPoliciesView />
 }

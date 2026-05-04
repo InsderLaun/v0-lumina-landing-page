@@ -1,7 +1,9 @@
-import { OperateStub } from '@/components/lumina/redesign/operate/OperateStub'
+import { AgentBondsView } from '@/components/lumina/redesign/operate/AgentBondsView'
 
 export const dynamic = 'force-dynamic'
 
+export const metadata = { title: 'Lumina · Agent Bonds' }
+
 export default function AgentBondsPage() {
-  return <OperateStub title="Bonds" subtitle="Filterable read-only list + CSV export (Phase 3)" />
+  return <AgentBondsView />
 }
