@@ -63,7 +63,7 @@ export function BondCard({ epochId, faceValue, maturityTs, matured, onRedeemed }
       return
     }
     try {
-      await (window as any).ethereum.request({
+      const result = await (window as any).ethereum.request({
         method: 'wallet_watchAsset',
         params: {
           type: 'ERC1155',
@@ -73,7 +73,18 @@ export function BondCard({ epochId, faceValue, maturityTs, matured, onRedeemed }
           },
         },
       })
-    } catch {
+      // Some wallets (older MetaMask, partial 1155 support) silently
+      // return false instead of opening a prompt or throwing — treat
+      // it the same as "feature unavailable" and offer the manual
+      // fallback. `true` means the asset was added.
+      if (result !== true) setShowFallback(true)
+    } catch (err: unknown) {
+      // EIP-1193 4001 = user explicitly rejected. No fallback in that
+      // case — they made a clear choice. Any other error (unsupported
+      // method, type rejection, internal wallet error) means we fall
+      // back to the copy-paste modal so the user can still import.
+      const code = (err as { code?: number })?.code
+      if (code === 4001) return
       setShowFallback(true)
     }
   }
