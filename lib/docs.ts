@@ -499,28 +499,69 @@ export const DOCS: DocEntry[] = [
   },
 
   // ─── 📊 TOKENOMICS & ECONOMICS ───────────────────────────────
-  // No standalone TOKENOMICS.md exists upstream yet; the canonical content
-  // lives inside README (Token Distribution table) + ROADMAP-V5 (vesting +
-  // burn mechanics) + the audit chapter on premium math. Both README and
-  // ROADMAP-V5 are dual-purpose files — they appear in two categories with
-  // different framings. This is intentional, not a bug.
+  // Every entry here links to the canonical V5.1 source: contract code
+  // for things that are code, audit chapters for things that are
+  // analysis. No README anchors, no ROADMAP detours. If a number on the
+  // /docs page disagrees with these source files, the source wins.
   {
     title: 'Token distribution (100M LUMINA)',
-    description: 'Links straight to the contract source — the five _mint calls in LuminaTokenV2.initialize() that hardcode the 70 / 14 / 8 / 5 / 3 split. This is the canonical distribution.',
+    description: 'The five _mint() calls in LuminaTokenV2.initialize() that hardcode the 70 / 14 / 8 / 5 / 3 split (BondVault / CEX / Founder / LBP / Treasury).',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/token/LuminaTokenV2.sol#L71-L75',
     category: 'economics',
   },
   {
-    title: 'Vesting + burn mechanics (in roadmap)',
-    description: 'ROADMAP-V5 doubles as the canonical record for vesting schedules (FounderVesting 2-of-3, TreasuryVesting), TWAPBurner distribution, BuybackEngine, and the Double Burn proposal.',
+    title: 'Max supply + burn role',
+    description: 'MAX_SUPPLY constant (100M × 1e18, fixed, no mint function) and the BURNER_ROLE granted only to the TWAPBurner contract.',
     repo: 'LUMINA-PROTOCOL',
-    path: 'docs/ROADMAP-V5.md',
+    path: 'src/token/LuminaTokenV2.sol#L31-L32',
     category: 'economics',
   },
   {
-    title: 'Premium math + edge cases',
-    description: 'Audit chapter on the premium formula (cover × payoutRatioBps × triggerProbBps × marginBps) and rounding edge cases. Reference for actuaries and integrators.',
+    title: 'Burn engine — fallback distribution',
+    description: 'TWAPBurner default 4-bucket split when adaptive mode is off: 85% burn, 8% buyback, 5% maintenance, 2% ops (in BPS, sums to 10000).',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/core/TWAPBurner.sol#L61-L64',
+    category: 'economics',
+  },
+  {
+    title: 'Premium formula',
+    description: 'CoverRouterV2.purchasePolicy: premium = coverage × payoutRatioBps × triggerProbBps × marginBps / 10000³, with a 1-unit USDC ($0.000001) floor.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/core/CoverRouterV2.sol#L200-L203',
+    category: 'economics',
+  },
+  {
+    title: 'Founder vesting (8M LUMINA)',
+    description: 'All FounderVesting constants: 8M total, 3 tranches every 31 days, 2-of-3 oracle conditions sustained 7 days (ETH/BTC > 0.050, ETH > $4k, Aave borrow > 7%), 1460-day fallback.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/token/FounderVesting.sol#L43-L51',
+    category: 'economics',
+  },
+  {
+    title: 'Treasury vesting (3M LUMINA)',
+    description: 'TreasuryVesting constants: 3M total, 180-day initial lock, then max 250k/month drip release. Math floor is 18 months until fully drawn.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/token/TreasuryVesting.sol#L17-L20',
+    category: 'economics',
+  },
+  {
+    title: 'Bond face value + maturity',
+    description: 'ClaimBond NatSpec: 1 ERC-1155 token = $1 USD at maturity (integer dollars, not 6-dec USDC). Bonds vest 100% at maturity — no partial unlock.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/bonds/ClaimBond.sol#L14-L19',
+    category: 'economics',
+  },
+  {
+    title: 'Bond maturity period (730 days)',
+    description: 'BondVault.BOND_MATURITY_SECONDS — every newly issued bond matures exactly 730 days (24 months) after issuance.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/bonds/BondVault.sol#L54',
+    category: 'economics',
+  },
+  {
+    title: 'Premium math — edge cases (audit)',
+    description: 'Audit deep-dive on the premium formula: rounding behavior, integer overflow surfaces, BPS-cube precision loss. Companion analysis to the on-chain formula above.',
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/audit/v5.1-uups/05-math-edge-cases/REPORT.md',
     category: 'economics',
