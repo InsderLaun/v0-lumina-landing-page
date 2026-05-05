@@ -19,6 +19,10 @@ interface PolicyRow {
   premium: bigint
   payout: bigint
   txHash: Hex
+  /** Block timestamp the PolicyCreated event was mined at (= shield's startTimestamp). */
+  createdAt: bigint
+  /** createdAt + shield.durationSeconds — pre-computed at fetch time. */
+  expiresAt: bigint
 }
 
 interface BondRow {
@@ -75,20 +79,39 @@ export function PortfolioView() {
           toBlock: head,
         })
         if (cancelled) return
-        const rows: PolicyRow[] = (logs as any[])
-          .filter((l) => (l.args.buyer as Hex)?.toLowerCase() === address.toLowerCase())
-          .map((l) => {
-            const pid = l.args.productId as Hex
-            return {
-              productId: pid,
-              policyId: l.args.policyId as bigint,
-              shieldName: SHIELD_BY_PRODUCT_ID[pid]?.name ?? `Unknown (${pid.slice(0, 10)})`,
-              cover: l.args.coverage as bigint,
-              premium: l.args.premium as bigint,
-              payout: l.args.payout as bigint,
-              txHash: l.transactionHash,
-            }
-          })
+        const ours = (logs as any[]).filter(
+          (l) => (l.args.buyer as Hex)?.toLowerCase() === address.toLowerCase(),
+        )
+
+        // Batch-fetch block timestamps. PolicyCreated does not include a
+        // timestamp field, so we ask each unique block once and reuse.
+        const uniqueBlocks = Array.from(new Set(ours.map((l) => l.blockNumber as bigint)))
+        const blockEntries = await Promise.all(
+          uniqueBlocks.map(async (bn) => {
+            const b = await publicClient.getBlock({ blockNumber: bn })
+            return [bn.toString(), b.timestamp] as const
+          }),
+        )
+        if (cancelled) return
+        const tsByBlock = new Map<string, bigint>(blockEntries)
+
+        const rows: PolicyRow[] = ours.map((l) => {
+          const pid = l.args.productId as Hex
+          const shield = SHIELD_BY_PRODUCT_ID[pid]
+          const createdAt = tsByBlock.get((l.blockNumber as bigint).toString()) ?? 0n
+          const expiresAt = createdAt + BigInt(shield?.durationSeconds ?? 0)
+          return {
+            productId: pid,
+            policyId: l.args.policyId as bigint,
+            shieldName: shield?.name ?? `Unknown (${pid.slice(0, 10)})`,
+            cover: l.args.coverage as bigint,
+            premium: l.args.premium as bigint,
+            payout: l.args.payout as bigint,
+            txHash: l.transactionHash,
+            createdAt,
+            expiresAt,
+          }
+        })
         setPolicies(rows)
       } catch (err) {
         console.error('PortfolioView policies getLogs error:', err)
@@ -205,6 +228,14 @@ export function PortfolioView() {
       .sort((a, b) => Number(a.maturityTs - b.maturityTs))
   }, [bondData, userEpochs])
 
+  // Active = block.timestamp < createdAt + duration. Re-derived on each render
+  // so stale rows fall off without needing a refetch — the component re-renders
+  // on every state change anyway.
+  const activePolicies = useMemo(() => {
+    const now = BigInt(Math.floor(Date.now() / 1000))
+    return policies.filter((p) => p.expiresAt > 0n && now < p.expiresAt)
+  }, [policies])
+
   return (
     <div style={{ padding: '28px 32px' }}>
       <div style={{ marginBottom: 20 }}>
@@ -225,7 +256,7 @@ export function PortfolioView() {
       {isConnected && (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
-            <Kpi label="Active policies" value={String(policies.length)} sub={`$${formatBaseUnits(policies.reduce((a, p) => a + p.cover, 0n), 6)} covered`} />
+            <Kpi label="Active policies" value={String(activePolicies.length)} sub={`$${formatBaseUnits(activePolicies.reduce((a, p) => a + p.cover, 0n), 6)} covered`} />
             <Kpi label="Bonds outstanding" value={String(bonds.length)} sub={`$${fmtIntDollars(bonds.reduce((a, b) => a + b.faceValue, 0n))} face`} />
             <Kpi
               label="Redeemable now"
@@ -239,7 +270,7 @@ export function PortfolioView() {
           <div style={{ display: 'flex', borderBottom: '1px solid var(--rd-line)', marginBottom: 16 }}>
             {(
               [
-                { id: 'policies' as Tab, label: 'Active Policies', count: policies.length },
+                { id: 'policies' as Tab, label: 'Active Policies', count: activePolicies.length },
                 { id: 'bonds' as Tab, label: 'My Bonds', count: bonds.length },
               ]
             ).map((t) => (
@@ -264,7 +295,7 @@ export function PortfolioView() {
           </div>
 
           {tab === 'policies' && (
-            <PoliciesTable rows={policies} loading={policiesLoading} err={policiesErr} onRetry={retry} />
+            <PoliciesTable rows={activePolicies} loading={policiesLoading} err={policiesErr} onRetry={retry} />
           )}
           {tab === 'bonds' && <BondsTable rows={bonds} err={bondsErr} onRetry={retry} onRedeemed={() => refetchBonds()} />}
         </>
