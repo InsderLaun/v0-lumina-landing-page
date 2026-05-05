@@ -1,0 +1,21 @@
+{
+  "name": "Lumina Protocol",
+  "short_name": "Lumina",
+  "description": "Parametric DeFi insurance for humans and AI agents.",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#00d4ff",
+  "background_color": "#0a0a0c",
+  "display": "standalone",
+  "start_url": "/"
+}

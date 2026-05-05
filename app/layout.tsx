@@ -40,6 +40,15 @@ export const metadata: Metadata = {
     "on-chain insurance",
   ],
   authors: [{ name: "Lumina Protocol" }],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
   openGraph: {
     title: "Lumina Protocol — The Safety Net for Autonomous AI Agents",
     description:
@@ -48,12 +57,14 @@ export const metadata: Metadata = {
     siteName: "Lumina Protocol",
     type: "website",
     locale: "en_US",
+    images: ["/og-image.png"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Lumina Protocol — AI Agent Insurance on Base L2",
     description:
       "Parametric insurance for autonomous AI agents. Powered by Chainlink. 100% automated.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
