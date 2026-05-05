@@ -7,6 +7,7 @@ import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { claimBondAbi, bondVaultAbi, policyManagerV2Abi } from '@/lib/abis/operate'
 import { SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { LoadError } from './LoadError'
 
 type Tab = 'policies' | 'bonds'
 
@@ -39,6 +40,9 @@ export function PortfolioView() {
   const [userEpochs, setUserEpochs] = useState<bigint[]>([])
   const [bondsErr, setBondsErr] = useState<string | null>(null)
 
+  const [retryToken, setRetryToken] = useState(0)
+  const retry = () => setRetryToken((t) => t + 1)
+
   // ─── Load policies (PolicyCreated events; buyer NOT indexed → filter client-side) ───
   useEffect(() => {
     if (!address || !publicClient) {
@@ -49,10 +53,10 @@ export function PortfolioView() {
     setPoliciesLoading(true)
     setPoliciesErr(null)
 
-    publicClient
-      .getBlockNumber()
-      .then((head) =>
-        getLogsChunked({
+    ;(async () => {
+      try {
+        const head = await publicClient.getBlockNumber()
+        const logs = await getLogsChunked({
           client: publicClient,
           address: CONTRACTS.PolicyManager,
           event: {
@@ -69,11 +73,9 @@ export function PortfolioView() {
           },
           fromBlock: DEPLOY_BLOCK_SEPOLIA,
           toBlock: head,
-        }),
-      )
-      .then((logs: any) => {
+        })
         if (cancelled) return
-        const rows: PolicyRow[] = logs
+        const rows: PolicyRow[] = (logs as any[])
           .filter((l) => (l.args.buyer as Hex)?.toLowerCase() === address.toLowerCase())
           .map((l) => {
             const pid = l.args.productId as Hex
@@ -88,18 +90,19 @@ export function PortfolioView() {
             }
           })
         setPolicies(rows)
-        setPoliciesLoading(false)
-      })
-      .catch((e) => {
+      } catch (err) {
+        console.error('PortfolioView policies getLogs error:', err)
         if (cancelled) return
-        setPoliciesErr(e?.message?.slice(0, 200) ?? 'Failed to load policies')
-        setPoliciesLoading(false)
-      })
+        setPoliciesErr(err instanceof Error ? err.message.slice(0, 200) : 'Failed to load policies')
+      } finally {
+        if (!cancelled) setPoliciesLoading(false)
+      }
+    })()
 
     return () => {
       cancelled = true
     }
-  }, [address, publicClient])
+  }, [address, publicClient, retryToken])
 
   // ─── Load user's bond epochs (BondsMinted with `to` indexed) ───
   useEffect(() => {
@@ -110,10 +113,10 @@ export function PortfolioView() {
     let cancelled = false
     setBondsErr(null)
 
-    publicClient
-      .getBlockNumber()
-      .then((head) =>
-        getLogsChunked({
+    ;(async () => {
+      try {
+        const head = await publicClient.getBlockNumber()
+        const logs = await getLogsChunked({
           client: publicClient,
           address: CONTRACTS.ClaimBond,
           event: {
@@ -128,22 +131,23 @@ export function PortfolioView() {
           args: { to: address },
           fromBlock: DEPLOY_BLOCK_SEPOLIA,
           toBlock: head,
-        }),
-      )
-      .then((logs: any) => {
+        })
         if (cancelled) return
-        const epochs = Array.from(new Set(logs.map((l) => (l.args.epochId as bigint).toString()))).map(BigInt)
+        const epochs = Array.from(
+          new Set((logs as any[]).map((l) => (l.args.epochId as bigint).toString())),
+        ).map(BigInt)
         setUserEpochs(epochs)
-      })
-      .catch((e) => {
+      } catch (err) {
+        console.error('PortfolioView bonds getLogs error:', err)
         if (cancelled) return
-        setBondsErr(e?.message?.slice(0, 200) ?? 'Failed to load bonds')
-      })
+        setBondsErr(err instanceof Error ? err.message.slice(0, 200) : 'Failed to load bonds')
+      }
+    })()
 
     return () => {
       cancelled = true
     }
-  }, [address, publicClient])
+  }, [address, publicClient, retryToken])
 
   // For each user epoch read: balanceOf (= ERC1155 token count = integer dollars,
   // because 1 bond token = $1), isMatured, getEpochInfo (4 outputs: exists,
@@ -260,9 +264,9 @@ export function PortfolioView() {
           </div>
 
           {tab === 'policies' && (
-            <PoliciesTable rows={policies} loading={policiesLoading} err={policiesErr} />
+            <PoliciesTable rows={policies} loading={policiesLoading} err={policiesErr} onRetry={retry} />
           )}
-          {tab === 'bonds' && <BondsTable rows={bonds} err={bondsErr} onRedeemed={() => refetchBonds()} />}
+          {tab === 'bonds' && <BondsTable rows={bonds} err={bondsErr} onRetry={retry} onRedeemed={() => refetchBonds()} />}
         </>
       )}
     </div>
@@ -279,9 +283,9 @@ function Kpi({ label, value, sub, accent }: { label: string; value: string; sub:
   )
 }
 
-function PoliciesTable({ rows, loading, err }: { rows: PolicyRow[]; loading: boolean; err: string | null }) {
+function PoliciesTable({ rows, loading, err, onRetry }: { rows: PolicyRow[]; loading: boolean; err: string | null; onRetry: () => void }) {
+  if (err) return <LoadError message={err} onRetry={onRetry} />
   if (loading) return <Empty>⏳ Loading on-chain policies…</Empty>
-  if (err) return <Empty>⚠ {err}</Empty>
   if (rows.length === 0) return <Empty>No active policies. <a href="/app/human/products" style={{ color: 'var(--rd-accent)' }}>Browse shields →</a></Empty>
   return (
     <div style={{ background: 'var(--rd-surface)', border: '1px solid var(--rd-line)', borderRadius: 8, overflow: 'hidden' }}>
@@ -301,8 +305,8 @@ function PoliciesTable({ rows, loading, err }: { rows: PolicyRow[]; loading: boo
   )
 }
 
-function BondsTable({ rows, err, onRedeemed }: { rows: BondRow[]; err: string | null; onRedeemed: () => void }) {
-  if (err) return <Empty>⚠ {err}</Empty>
+function BondsTable({ rows, err, onRetry, onRedeemed }: { rows: BondRow[]; err: string | null; onRetry: () => void; onRedeemed: () => void }) {
+  if (err) return <LoadError message={err} onRetry={onRetry} />
   if (rows.length === 0) return <Empty>No bonds yet. Bonds are minted when a policy trigger fires.</Empty>
   return (
     <div style={{ background: 'var(--rd-surface)', border: '1px solid var(--rd-line)', borderRadius: 8, overflow: 'hidden' }}>

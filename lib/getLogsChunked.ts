@@ -8,6 +8,17 @@ import type { Address, Log, PublicClient } from 'viem'
 
 const DEFAULT_CHUNK_SIZE = 5_000n
 const RETRY_CHUNK_SIZE = 1_000n
+const PER_CHUNK_TIMEOUT_MS = 30_000
+
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+  })
+  return Promise.race([p, timeout]).finally(() => {
+    if (timer) clearTimeout(timer)
+  }) as Promise<T>
+}
 
 export interface GetLogsChunkedParams<TEvent = unknown, TArgs = unknown> {
   client: PublicClient
@@ -65,14 +76,18 @@ export async function getLogsChunked<TEvent, TArgs>(
     const chunkEnd = proposedEnd > toBlock ? toBlock : proposedEnd
 
     try {
-      const logs = await client.getLogs({
-        address,
-        fromBlock: cursor,
-        toBlock: chunkEnd,
-        ...(event ? { event } : {}),
-        ...(events ? { events } : {}),
-        ...(args ? { args } : {}),
-      } as Parameters<PublicClient['getLogs']>[0])
+      const logs = await withTimeout(
+        client.getLogs({
+          address,
+          fromBlock: cursor,
+          toBlock: chunkEnd,
+          ...(event ? { event } : {}),
+          ...(events ? { events } : {}),
+          ...(args ? { args } : {}),
+        } as Parameters<PublicClient['getLogs']>[0]),
+        PER_CHUNK_TIMEOUT_MS,
+        `eth_getLogs ${cursor}-${chunkEnd}`,
+      )
       allLogs.push(...(logs as Log[]))
     } catch (err) {
       if (isPayloadTooLarge(err) && chunkSize > RETRY_CHUNK_SIZE) {
