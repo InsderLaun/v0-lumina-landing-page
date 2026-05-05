@@ -26,6 +26,13 @@ export interface ShieldDescriptor {
   asset: AssetSymbol
   /** Duration label (e.g., '1h', '24h', '7d'). */
   duration: string
+  /**
+   * On-chain coverage duration in seconds. Mirrors the value the deployer
+   * passed to `CoverRouterV2.configureProduct(... durationSeconds, ...)` —
+   * see LUMINA-PROTOCOL/script/deploy/DeployLuminaV5Sepolia.s.sol.
+   * A policy is considered active iff `block.timestamp < createdAt + durationSeconds`.
+   */
+  durationSeconds: number
   /** Trigger description (English, plain-language). */
   trigger: string
   /** Estimated probability label. */
@@ -67,6 +74,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Flash BTC 1h',
     asset: 'BTC',
     duration: '1h',
+    durationSeconds: 3600,
     trigger: 'BTC price drops ≥5% in any rolling 1-hour window',
     probLabel: '0.20%',
     multLabel: '333x',
@@ -80,6 +88,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Flash BTC 4h',
     asset: 'BTC',
     duration: '4h',
+    durationSeconds: 14400,
     trigger: 'BTC price drops ≥8% in any rolling 4-hour window',
     probLabel: '0.35%',
     multLabel: '190x',
@@ -93,6 +102,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Flash BTC 24h',
     asset: 'BTC',
     duration: '24h',
+    durationSeconds: 86400,
     trigger: 'BTC price drops ≥10% in any rolling 24-hour window',
     probLabel: '1.50%',
     multLabel: '44x',
@@ -106,6 +116,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Flash BTC 48h',
     asset: 'BTC',
     duration: '48h',
+    durationSeconds: 172800,
     trigger: 'BTC price drops ≥15% in any rolling 48-hour window',
     probLabel: '0.80%',
     multLabel: '83x',
@@ -119,6 +130,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Flash ETH 1h',
     asset: 'ETH',
     duration: '1h',
+    durationSeconds: 3600,
     trigger: 'ETH price drops ≥7% in any rolling 1-hour window',
     probLabel: '0.25%',
     multLabel: '266x',
@@ -132,6 +144,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Flash ETH 24h',
     asset: 'ETH',
     duration: '24h',
+    durationSeconds: 86400,
     trigger: 'ETH price drops ≥12% in any rolling 24-hour window',
     probLabel: '2.00%',
     multLabel: '33x',
@@ -145,6 +158,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Flash ETH 48h',
     asset: 'ETH',
     duration: '48h',
+    durationSeconds: 172800,
     trigger: 'ETH price drops ≥18% in any rolling 48-hour window',
     probLabel: '0.90%',
     multLabel: '74x',
@@ -158,6 +172,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Micro Depeg USDT',
     asset: 'USDT',
     duration: '7d',
+    durationSeconds: 604800,
     trigger: 'USDT trades below $0.995 for 7 consecutive days',
     probLabel: '3.50%',
     multLabel: '19x',
@@ -171,6 +186,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     name: 'Rate Shock',
     asset: 'USDC',
     duration: '7d',
+    durationSeconds: 604800,
     trigger: 'Aave V3 USDC borrow APR exceeds 10% for 7 consecutive days',
     probLabel: '4.00%',
     multLabel: '17x',
