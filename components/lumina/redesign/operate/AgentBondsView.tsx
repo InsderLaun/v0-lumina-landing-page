@@ -7,6 +7,7 @@ import { formatUnits, type Hex } from 'viem'
 import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { LoadError } from './LoadError'
 
 type RangeFilter = '24h' | '7d' | '30d' | 'all'
 type StatusFilter = 'all' | 'holding' | 'matured' | 'redeemed'
@@ -46,6 +47,8 @@ export function AgentBondsView() {
   const [range, setRange] = useState<RangeFilter>('all')
   const [status, setStatus] = useState<StatusFilter>('all')
   const [latestBlock, setLatestBlock] = useState<bigint>(0n)
+  const [retryToken, setRetryToken] = useState(0)
+  const retry = () => setRetryToken((t) => t + 1)
 
   useEffect(() => {
     if (!address || !publicClient) return
@@ -85,17 +88,18 @@ export function AgentBondsView() {
             }))
             .sort((a, b) => Number(b.blockNumber - a.blockNumber)),
         )
-        setLoading(false)
-      } catch (e) {
+      } catch (err) {
+        console.error('AgentBondsView getLogs error:', err)
         if (cancelled) return
-        setErr((e as Error).message?.slice(0, 200) ?? 'Failed to load')
-        setLoading(false)
+        setErr(err instanceof Error ? err.message.slice(0, 200) : 'Failed to load')
+      } finally {
+        if (!cancelled) setLoading(false)
       }
     })()
     return () => {
       cancelled = true
     }
-  }, [address, publicClient])
+  }, [address, publicClient, retryToken])
 
   // Aggregate per-epoch mint totals (one row per epoch)
   const aggregatedEpochs = useMemo(() => {
@@ -293,8 +297,8 @@ export function AgentBondsView() {
             </select>
           </div>
 
-          {loading && <Empty>⏳ Loading bonds from ClaimBond events…</Empty>}
-          {err && <Empty>⚠ {err}</Empty>}
+          {err && <LoadError message={err} onRetry={retry} />}
+          {loading && !err && <Empty>⏳ Loading bonds from ClaimBond events…</Empty>}
           {!loading && !err && filtered.length === 0 && <Empty>No bonds match these filters.</Empty>}
 
           {!loading && !err && filtered.length > 0 && (

@@ -15,6 +15,7 @@ import { erc20Abi, formatUnits, type Hex } from 'viem'
 import { CONTRACTS, TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { marketplaceAbi, claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { LoadError } from './LoadError'
 
 type Tab = 'browse' | 'mine'
 
@@ -36,6 +37,8 @@ export function MarketplaceView() {
   const [activeIds, setActiveIds] = useState<bigint[]>([])
   const [logsErr, setLogsErr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [retryToken, setRetryToken] = useState(0)
+  const retry = () => setRetryToken((t) => t + 1)
 
   // ─── Index marketplace events: Listed - Cancelled - Bought = active ───
   useEffect(() => {
@@ -44,10 +47,10 @@ export function MarketplaceView() {
     setLoading(true)
     setLogsErr(null)
 
-    publicClient
-      .getBlockNumber()
-      .then((head) =>
-        Promise.all([
+    ;(async () => {
+      try {
+        const head = await publicClient.getBlockNumber()
+        const [listed, cancelledLogs, bought] = await Promise.all([
           getLogsChunked({
             client: publicClient,
             address: CONTRACTS.Marketplace,
@@ -95,30 +98,29 @@ export function MarketplaceView() {
             fromBlock: DEPLOY_BLOCK_SEPOLIA,
             toBlock: head,
           }),
-        ]),
-      )
-      .then(([listed, cancelledLogs, bought]: any) => {
+        ])
         if (cancelled) return
         const removed = new Set([
-          ...cancelledLogs.map((l) => (l.args.listingId as bigint).toString()),
-          ...bought.map((l) => (l.args.listingId as bigint).toString()),
+          ...(cancelledLogs as any[]).map((l) => (l.args.listingId as bigint).toString()),
+          ...(bought as any[]).map((l) => (l.args.listingId as bigint).toString()),
         ])
-        const ids = listed
+        const ids = (listed as any[])
           .map((l) => l.args.listingId as bigint)
           .filter((id) => !removed.has(id.toString()))
         setActiveIds(ids)
-        setLoading(false)
-      })
-      .catch((e) => {
+      } catch (err) {
+        console.error('MarketplaceView getLogs error:', err)
         if (cancelled) return
-        setLogsErr(e?.message?.slice(0, 200) ?? 'Failed to load marketplace events')
-        setLoading(false)
-      })
+        setLogsErr(err instanceof Error ? err.message.slice(0, 200) : 'Failed to load marketplace events')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
 
     return () => {
       cancelled = true
     }
-  }, [publicClient])
+  }, [publicClient, retryToken])
 
   // Read fresh state for each active listing (active flag may have changed)
   const listingReads = useMemo(
@@ -233,8 +235,8 @@ export function MarketplaceView() {
         ))}
       </div>
 
-      {loading && <Empty>⏳ Indexing marketplace events…</Empty>}
-      {logsErr && <Empty>⚠ {logsErr}</Empty>}
+      {logsErr && <LoadError message={logsErr} onRetry={retry} />}
+      {loading && !logsErr && <Empty>⏳ Indexing marketplace events…</Empty>}
       {!loading && !logsErr && (tab === 'browse' ? browseList : myList).length === 0 && (
         <Empty>
           {tab === 'browse'

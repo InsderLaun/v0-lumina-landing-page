@@ -7,6 +7,7 @@ import { formatUnits, type Hex } from 'viem'
 import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { SHIELDS, SHIELD_BY_PRODUCT_ID } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { LoadError } from './LoadError'
 
 type RangeFilter = '24h' | '7d' | '30d' | 'all'
 
@@ -40,6 +41,8 @@ export function AgentPoliciesView() {
   const [range, setRange] = useState<RangeFilter>('all')
   const [shieldFilter, setShieldFilter] = useState<string>('all')
   const [latestBlock, setLatestBlock] = useState<bigint>(0n)
+  const [retryToken, setRetryToken] = useState(0)
+  const retry = () => setRetryToken((t) => t + 1)
 
   useEffect(() => {
     if (!address || !publicClient) return
@@ -47,7 +50,7 @@ export function AgentPoliciesView() {
     setLoading(true)
     setErr(null)
 
-    const load = async () => {
+    ;(async () => {
       try {
         const block = await publicClient.getBlockNumber()
         if (cancelled) return
@@ -90,19 +93,19 @@ export function AgentPoliciesView() {
           })
           .sort((a, b) => Number(b.blockNumber - a.blockNumber))
         setRows(ours)
-        setLoading(false)
-      } catch (e) {
+      } catch (err) {
+        console.error('AgentPoliciesView getLogs error:', err)
         if (cancelled) return
-        setErr((e as Error).message?.slice(0, 200) ?? 'Failed to load')
-        setLoading(false)
+        setErr(err instanceof Error ? err.message.slice(0, 200) : 'Failed to load')
+      } finally {
+        if (!cancelled) setLoading(false)
       }
-    }
-    load()
+    })()
 
     return () => {
       cancelled = true
     }
-  }, [address, publicClient])
+  }, [address, publicClient, retryToken])
 
   const filtered = useMemo(() => {
     let out = rows
@@ -190,8 +193,8 @@ export function AgentPoliciesView() {
             countTotal={rows.length}
           />
 
-          {loading && <Empty>⏳ Loading policies from PolicyManagerV2 events…</Empty>}
-          {err && <Empty>⚠ {err}</Empty>}
+          {err && <LoadError message={err} onRetry={retry} />}
+          {loading && !err && <Empty>⏳ Loading policies from PolicyManagerV2 events…</Empty>}
 
           {!loading && !err && filtered.length === 0 && <Empty>No policies match these filters.</Empty>}
 

@@ -1,6 +1,10 @@
-// Frontend mapping: 9 V5.1 shields. The on-chain `productId` is keccak256
-// of the canonical name (e.g., keccak256("FLASH-BTC-1H")). Addresses come
-// from CONTRACTS.shields in lib/lumina-config.ts.
+// Frontend mapping: 9 V5.1 shields. The on-chain `productId` is
+// keccak256 of the canonical deploy-time name. Verified against
+// LUMINA-PROTOCOL/script/deploy/DeployLuminaV5Sepolia.s.sol — these
+// strings are NOT the slugs, they are the literal bytes the deployer
+// hashed at registration. Verified live on Base Sepolia: every id
+// here resolves to active=true via CoverRouterV2.getProductConfig.
+// Addresses come from CONTRACTS.shields in lib/lumina-config.ts.
 //
 // IShield does NOT expose a `name()` function — names live here, not
 // on-chain. Premium / cover limits / paused state come from CoverRouterV2
@@ -58,7 +62,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '0.20%',
     multLabel: '333x',
     tier: 1,
-    productId: pid('FLASH-BTC-1H'),
+    productId: pid('FLASHBTC1H-001'),
   },
   {
     slug: 'flash-btc-4h',
@@ -70,7 +74,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '0.35%',
     multLabel: '190x',
     tier: 1,
-    productId: pid('FLASH-BTC-4H'),
+    productId: pid('FLASHBTC4H-001'),
   },
   {
     slug: 'flash-btc-24h',
@@ -82,7 +86,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '1.50%',
     multLabel: '44x',
     tier: 1,
-    productId: pid('FLASH-BTC-24H'),
+    productId: pid('FLASHBTC24-001'),
   },
   {
     slug: 'flash-btc-48h',
@@ -94,7 +98,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '0.80%',
     multLabel: '83x',
     tier: 1,
-    productId: pid('FLASH-BTC-48H'),
+    productId: pid('FLASHBTC48-001'),
   },
   {
     slug: 'flash-eth-1h',
@@ -106,7 +110,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '0.25%',
     multLabel: '266x',
     tier: 1,
-    productId: pid('FLASH-ETH-1H'),
+    productId: pid('FLASHETH1H-001'),
   },
   {
     slug: 'flash-eth-24h',
@@ -118,7 +122,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '2.00%',
     multLabel: '33x',
     tier: 1,
-    productId: pid('FLASH-ETH-24H'),
+    productId: pid('FLASHETH24-001'),
   },
   {
     slug: 'flash-eth-48h',
@@ -130,7 +134,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '0.90%',
     multLabel: '74x',
     tier: 1,
-    productId: pid('FLASH-ETH-48H'),
+    productId: pid('FLASHETH48-001'),
   },
   {
     slug: 'micro-depeg-usdt',
@@ -142,7 +146,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '3.50%',
     multLabel: '19x',
     tier: 2,
-    productId: pid('MICRO-DEPEG-USDT'),
+    productId: pid('MICRODEPEG-001'),
   },
   {
     slug: 'rate-shock',
@@ -154,7 +158,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     probLabel: '4.00%',
     multLabel: '17x',
     tier: 2,
-    productId: pid('RATE-SHOCK'),
+    productId: pid('RATESHOCK-001'),
   },
 ]
 

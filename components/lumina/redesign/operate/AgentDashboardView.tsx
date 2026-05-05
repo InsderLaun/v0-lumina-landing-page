@@ -7,6 +7,7 @@ import { erc20Abi, formatUnits, type Hex } from 'viem'
 import { CONTRACTS, TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { ASSET_COLORS, SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { LoadError } from './LoadError'
 
 type FeedKind = 'POLICY' | 'TRIGGER' | 'BOND' | 'REDEEM' | 'LIST' | 'BOUGHT' | 'CANCEL'
 
@@ -81,10 +82,10 @@ export function AgentDashboardView() {
     setLoading(true)
     setErr(null)
 
-    publicClient
-      .getBlockNumber()
-      .then((head) =>
-        Promise.all([
+    ;(async () => {
+      try {
+        const head = await publicClient.getBlockNumber()
+        const [pCreated, pTriggered, bMinted, bRedeemed] = await Promise.all([
           // PolicyCreated — buyer NOT indexed → pull all + filter
           getLogsChunked({
             client: publicClient,
@@ -157,14 +158,12 @@ export function AgentDashboardView() {
             fromBlock: DEPLOY_BLOCK_SEPOLIA,
             toBlock: head,
           }),
-        ]),
-      )
-      .then(([pCreated, pTriggered, bMinted, bRedeemed]: any) => {
+        ])
         if (cancelled) return
 
         // Active policies (we treat PolicyCreated as "issued"; status filtering would
         // need PolicyTriggered/Expired matching — out of scope for KPI count)
-        const myPolicies = pCreated
+        const myPolicies = (pCreated as any[])
           .filter((l) => (l.args.buyer as Hex)?.toLowerCase() === address.toLowerCase())
           .map((l) => ({
             productId: l.args.productId as Hex,
@@ -178,13 +177,15 @@ export function AgentDashboardView() {
         setPolicies(myPolicies)
 
         // Bonds outstanding: BondsMinted - BondRedeemed (USD)
-        const mintedUsd = bMinted.reduce((a, l) => a + (l.args.usdAmount as bigint), 0n)
-        const redeemedUsd = bRedeemed.reduce((a, l) => a + (l.args.usdAmount as bigint), 0n)
-        const redeemedLumina = bRedeemed.reduce((a, l) => a + (l.args.luminaAmount as bigint), 0n)
+        const bMintedArr = bMinted as any[]
+        const bRedeemedArr = bRedeemed as any[]
+        const mintedUsd = bMintedArr.reduce((a, l) => a + (l.args.usdAmount as bigint), 0n)
+        const redeemedUsd = bRedeemedArr.reduce((a, l) => a + (l.args.usdAmount as bigint), 0n)
+        const redeemedLumina = bRedeemedArr.reduce((a, l) => a + (l.args.luminaAmount as bigint), 0n)
         const outstandingFace = mintedUsd > redeemedUsd ? mintedUsd - redeemedUsd : 0n
-        const outstandingCount = bMinted.length - bRedeemed.length
+        const outstandingCount = bMintedArr.length - bRedeemedArr.length
         setBondsOutstanding({ count: Math.max(0, outstandingCount), face: outstandingFace })
-        setBondsRedeemed({ usd: redeemedUsd, lumina: redeemedLumina, count: bRedeemed.length })
+        setBondsRedeemed({ usd: redeemedUsd, lumina: redeemedLumina, count: bRedeemedArr.length })
 
         // Activity feed: last 20 events across all sources, sorted by blockNumber desc
         const items: (FeedItem & { block: bigint })[] = []
@@ -198,7 +199,7 @@ export function AgentDashboardView() {
             txHash: l.txHash,
           })
         }
-        for (const l of pTriggered.filter((l) => (l.args.buyer as Hex)?.toLowerCase() === address.toLowerCase())) {
+        for (const l of (pTriggered as any[]).filter((l) => (l.args.buyer as Hex)?.toLowerCase() === address.toLowerCase())) {
           const sName = SHIELD_BY_PRODUCT_ID[l.args.productId as Hex]?.name ?? 'Unknown'
           items.push({
             ts: 0n,
@@ -208,7 +209,7 @@ export function AgentDashboardView() {
             txHash: l.transactionHash,
           })
         }
-        for (const l of bMinted) {
+        for (const l of bMintedArr) {
           items.push({
             ts: 0n,
             block: l.blockNumber,
@@ -217,7 +218,7 @@ export function AgentDashboardView() {
             txHash: l.transactionHash,
           })
         }
-        for (const l of bRedeemed) {
+        for (const l of bRedeemedArr) {
           items.push({
             ts: 0n,
             block: l.blockNumber,
@@ -228,13 +229,14 @@ export function AgentDashboardView() {
         }
         items.sort((a, b) => Number(b.block - a.block))
         setFeed(items.slice(0, 20).map((i) => ({ ts: i.block, kind: i.kind, msg: i.msg, txHash: i.txHash })))
-        setLoading(false)
-      })
-      .catch((e) => {
+      } catch (err) {
+        console.error('AgentDashboardView getLogs error:', err)
         if (cancelled) return
-        setErr(e?.message?.slice(0, 200) ?? 'Failed to load activity')
-        setLoading(false)
-      })
+        setErr(err instanceof Error ? err.message.slice(0, 200) : 'Failed to load activity')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
 
     return () => {
       cancelled = true
@@ -319,7 +321,12 @@ export function AgentDashboardView() {
                   {loading ? '⏳ refreshing…' : err ? `⚠ ${err.slice(0, 40)}` : `block ↓ from ${feed[0]?.ts.toString().slice(-6) ?? '—'}`}
                 </span>
               </div>
-              {feed.length === 0 && !loading && (
+              {err && feed.length === 0 && (
+                <div style={{ padding: 16 }}>
+                  <LoadError message={err} onRetry={() => setTick((t) => t + 1)} />
+                </div>
+              )}
+              {feed.length === 0 && !loading && !err && (
                 <div style={{ padding: 32, textAlign: 'center', color: 'var(--rd-text-3)' }}>
                   No on-chain activity yet for this wallet.
                 </div>
