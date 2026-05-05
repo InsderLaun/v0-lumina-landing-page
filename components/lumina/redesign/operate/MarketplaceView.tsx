@@ -16,6 +16,13 @@ import { CONTRACTS, TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { marketplaceAbi, claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { LoadError } from './LoadError'
+import {
+  MarketplaceFilters,
+  applyFilters,
+  DEFAULT_FILTERS,
+  type FilterState,
+  type FilterableListing,
+} from './MarketplaceFilters'
 
 type Tab = 'browse' | 'mine'
 
@@ -192,10 +199,53 @@ export function MarketplaceView() {
     [listings, maturityByEpoch],
   )
 
-  const browseList = listingsWithMaturity
+  // Browse / My-Listings split. My Listings is always filtered by seller —
+  // filters from the Browse tab don't apply (they would just hide the user's
+  // own listings, which is the opposite of what they want here).
+  const browseUnfiltered = listingsWithMaturity
   const myList = address
     ? listingsWithMaturity.filter((l) => l.seller.toLowerCase() === address.toLowerCase())
     : []
+
+  // ─── Browse filter state ───
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS)
+
+  // Adapt each listing into the lightweight shape MarketplaceFilters
+  // sorts/filters on. Computed once per listing change.
+  const filterableBrowse = useMemo(
+    () =>
+      browseUnfiltered.map((l) => {
+        const face = Number(l.faceValue ?? 0n)
+        const ask = Number(formatUnits(l.priceUSDC, 6))
+        const discountPct = face > 0 ? ((face - ask) / face) * 100 : 0
+        const matTs = l.maturityTs ? Number(l.maturityTs) : 0
+        const daysLeft = matTs > 0 ? Math.max(0, (matTs * 1000 - Date.now()) / 86_400_000) : 0
+        const yieldPct = daysLeft > 0 && discountPct > 0 ? (discountPct * 365) / daysLeft : 0
+        return {
+          ...l,
+          askUsdc: ask,
+          faceValue: face,
+          discountPct,
+          yieldPct,
+          maturityTs: matTs,
+          // No on-chain "listedAt" exposed in the current event scan; use
+          // listingId as a monotonic proxy (newer listings have higher ids).
+          listedAt: Number(l.listingId),
+        }
+      }),
+    [browseUnfiltered],
+  )
+
+  const priceMaxBound = useMemo(() => {
+    let max = 0
+    for (const l of filterableBrowse) if (l.askUsdc > max) max = l.askUsdc
+    return Math.ceil(max)
+  }, [filterableBrowse])
+
+  const browseList = useMemo(
+    () => applyFilters(filterableBrowse, filters),
+    [filterableBrowse, filters],
+  )
 
   return (
     <div style={{ padding: '28px 32px' }}>
@@ -237,13 +287,57 @@ export function MarketplaceView() {
 
       {logsErr && <LoadError message={logsErr} onRetry={retry} />}
       {loading && !logsErr && <Empty>⏳ Indexing marketplace events…</Empty>}
-      {!loading && !logsErr && (tab === 'browse' ? browseList : myList).length === 0 && (
+
+      {tab === 'browse' && !loading && !logsErr && filterableBrowse.length > 0 && (
+        <MarketplaceFilters
+          filters={filters}
+          onChange={setFilters}
+          priceMaxBound={priceMaxBound}
+          total={filterableBrowse.length}
+          visible={browseList.length}
+        />
+      )}
+
+      {!loading && !logsErr && tab === 'browse' && filterableBrowse.length === 0 && (
         <Empty>
-          {tab === 'browse'
-            ? 'No active listings.'
-            : isConnected
-              ? 'You have no active listings.'
-              : 'Connect a wallet to see your listings.'}
+          No bonds for sale yet.{' '}
+          <a href="/app/human/portfolio" style={{ color: 'var(--rd-accent)' }}>
+            Got bonds? List one →
+          </a>
+        </Empty>
+      )}
+      {!loading && !logsErr && tab === 'browse' && filterableBrowse.length > 0 && browseList.length === 0 && (
+        <Empty>
+          No listings match your filters.{' '}
+          <button
+            onClick={() => setFilters({ ...DEFAULT_FILTERS, priceMax: priceMaxBound })}
+            style={{
+              background: 'transparent',
+              border: 0,
+              color: 'var(--rd-accent)',
+              cursor: 'pointer',
+              padding: 0,
+              textDecoration: 'underline',
+              font: 'inherit',
+            }}
+          >
+            Clear all
+          </button>
+          .
+        </Empty>
+      )}
+      {!loading && !logsErr && tab === 'mine' && myList.length === 0 && (
+        <Empty>
+          {isConnected ? (
+            <>
+              You have no active listings.{' '}
+              <a href="/app/human/portfolio" style={{ color: 'var(--rd-accent)' }}>
+                List a bond →
+              </a>
+            </>
+          ) : (
+            'Connect a wallet to see your listings.'
+          )}
         </Empty>
       )}
 
@@ -316,26 +410,51 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
   const yieldPct = daysLeft && daysLeft > 0 ? Math.round((discount * 365) / daysLeft) : null
 
   const busy = isPending || confirming
-  const needsApproval = !mine && (allowance === undefined || (allowance as bigint) < listing.priceUSDC)
+  // Prevent self-buy: marketplace doesn't enforce this on-chain (the
+  // founder reproduced it on Sepolia), so the only protection is here.
+  // Cancel works just fine for own listings; the gating below applies
+  // only to the Buy path.
+  const isOwnListing = !!address && listing.seller.toLowerCase() === address.toLowerCase()
+  const needsApproval =
+    !mine && !isOwnListing && (allowance === undefined || (allowance as bigint) < listing.priceUSDC)
 
   return (
     <div style={{ background: 'var(--rd-surface)', border: '1px solid var(--rd-line)', borderRadius: 8, padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
         <span style={{ fontFamily: 'var(--font-jetbrains), monospace', color: 'var(--rd-accent)', fontSize: 13, fontWeight: 600 }}>#{listing.listingId.toString()}</span>
-        <span
-          style={{
-            padding: '3px 8px',
-            borderRadius: 4,
-            fontFamily: 'var(--font-jetbrains), monospace',
-            fontSize: 10,
-            color: 'var(--rd-warn)',
-            background: 'rgba(245,158,11,0.1)',
-            border: '1px solid rgba(245,158,11,0.33)',
-            letterSpacing: '0.04em',
-          }}
-        >
-          −{discount}% DISCOUNT
-        </span>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {isOwnListing && (
+            <span
+              style={{
+                padding: '3px 8px',
+                borderRadius: 4,
+                fontFamily: 'var(--font-jetbrains), monospace',
+                fontSize: 10,
+                color: 'var(--rd-text)',
+                background: 'var(--rd-accent-dim)',
+                border: '1px solid var(--rd-accent-border)',
+                letterSpacing: '0.04em',
+              }}
+              title="You created this listing"
+            >
+              YOUR LISTING
+            </span>
+          )}
+          <span
+            style={{
+              padding: '3px 8px',
+              borderRadius: 4,
+              fontFamily: 'var(--font-jetbrains), monospace',
+              fontSize: 10,
+              color: 'var(--rd-warn)',
+              background: 'rgba(245,158,11,0.1)',
+              border: '1px solid rgba(245,158,11,0.33)',
+              letterSpacing: '0.04em',
+            }}
+          >
+            −{discount}% DISCOUNT
+          </span>
+        </div>
       </div>
       <div style={{ fontSize: 12, color: 'var(--rd-text-2)' }}>Epoch #{listing.epochId.toString()}</div>
 
@@ -393,22 +512,58 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
       )}
 
       {mine ? (
+        // Defensive: only render Cancel for listings the connected
+        // wallet actually owns. The "My Listings" tab is already
+        // filtered by seller==address upstream, but this guard
+        // prevents a misrouted listing from getting a working Cancel
+        // button that would revert on-chain.
+        isOwnListing ? (
+          <button
+            onClick={handleCancel}
+            disabled={wrongChain || busy || isSuccess}
+            style={{
+              padding: '8px 12px',
+              background: 'transparent',
+              color: 'var(--rd-text-2)',
+              border: '1px solid var(--rd-line-strong)',
+              borderRadius: 4,
+              fontWeight: 500,
+              fontSize: 12,
+              cursor: busy || isSuccess ? 'default' : 'pointer',
+              opacity: busy ? 0.6 : 1,
+            }}
+          >
+            {isSuccess ? '✓ Cancelled' : busy ? 'Cancelling…' : 'Cancel listing'}
+          </button>
+        ) : (
+          <span
+            style={{
+              padding: '8px 12px',
+              fontSize: 11,
+              color: 'var(--rd-text-3)',
+              fontFamily: 'var(--font-jetbrains), monospace',
+              textAlign: 'center',
+            }}
+          >
+            — not your listing —
+          </span>
+        )
+      ) : isOwnListing ? (
         <button
-          onClick={handleCancel}
-          disabled={wrongChain || busy || isSuccess}
+          disabled
+          title="You can't buy your own listing. Cancel it from My Listings if you want it back."
           style={{
             padding: '8px 12px',
-            background: 'transparent',
-            color: 'var(--rd-text-2)',
+            background: 'var(--rd-surface-2)',
+            color: 'var(--rd-text-3)',
             border: '1px solid var(--rd-line-strong)',
             borderRadius: 4,
             fontWeight: 500,
             fontSize: 12,
-            cursor: busy || isSuccess ? 'default' : 'pointer',
-            opacity: busy ? 0.6 : 1,
+            cursor: 'not-allowed',
           }}
         >
-          {isSuccess ? '✓ Cancelled' : busy ? 'Cancelling…' : 'Cancel listing'}
+          — Your listing —
         </button>
       ) : (
         <button
