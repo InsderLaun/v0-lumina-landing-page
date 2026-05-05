@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useChainId, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { baseSepolia } from 'wagmi/chains'
 import { erc20Abi, formatUnits, parseUnits } from 'viem'
 import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
 import { coverRouterV2Abi } from '@/lib/abis/operate'
@@ -22,6 +23,8 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
   const [step, setStep] = useState<Step>('idle')
   const [errMsg, setErrMsg] = useState<string | null>(null)
   const { address, isConnected } = useAccount()
+  const chainId = useChainId()
+  const wrongChain = isConnected && chainId !== baseSepolia.id
 
   const coverWei = parseUnits(coverUsdc.toString(), 6)
 
@@ -126,6 +129,7 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
 
   const buyDisabled =
     !isConnected ||
+    wrongChain ||
     paused ||
     !balanceOk ||
     !allowanceOk ||
@@ -327,7 +331,7 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
               <button
                 onClick={handleApprove}
-                disabled={!isConnected || allowanceOk || approvePending || approveConfirming || step === 'success'}
+                disabled={!isConnected || wrongChain || allowanceOk || approvePending || approveConfirming || step === 'success'}
                 style={btnStyle(allowanceOk ? 'done' : 'ghost')}
               >
                 {allowanceOk ? '✓ ALLOWANCE OK' : approvePending || approveConfirming ? 'Approving…' : `① Approve USDC · ${premiumLabel}`}
