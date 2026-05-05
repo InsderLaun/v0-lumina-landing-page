@@ -9,6 +9,7 @@
 export type DocCategory =
   | 'getting-started'
   | 'agents'
+  | 'source'
   | 'contracts'
   | 'security'
   | 'deployment'
@@ -64,7 +65,8 @@ export const CATEGORIES: {
 }[] = [
   { id: 'getting-started', label: 'Getting Started', emoji: '🚀', description: 'First steps and quick guides for users, developers, and AI agents' },
   { id: 'agents', label: 'For AI Agents', emoji: '🤖', description: 'Integration guides and skill files for autonomous agents' },
-  { id: 'contracts', label: 'Smart Contracts', emoji: '🔐', description: 'Architecture, integrations, and cross-contract maps' },
+  { id: 'source', label: 'Smart Contracts (source)', emoji: '📜', description: 'Every deployed Solidity file on GitHub — token, bonds, shields, oracles, marketplace' },
+  { id: 'contracts', label: 'Architecture & Integrations', emoji: '🔐', description: 'How the contracts connect — integration maps, Aave dependency, audit deep-dives' },
   { id: 'security', label: 'Security & Audits', emoji: '🛡️', description: 'Security model, audit reports, threat analysis' },
   { id: 'deployment', label: 'Deployment', emoji: '🚢', description: 'Deploy checklists, env config, mainnet runbooks' },
   { id: 'governance', label: 'Governance & Operations', emoji: '⚖️', description: 'Roles, access control, multisig policies, incident response' },
@@ -149,7 +151,225 @@ export const DOCS: DocEntry[] = [
     category: 'agents',
   },
 
-  // ─── 🔐 SMART CONTRACTS ──────────────────────────────────────
+  // ─── 📜 SMART CONTRACTS (SOURCE) ─────────────────────────────
+  // One entry per deployed .sol file on main. Interfaces are intentionally
+  // omitted — they live under src/interfaces/ for compile-time only.
+
+  // Token (3)
+  {
+    title: 'LuminaTokenV2.sol',
+    description: 'ERC-20 + ERC-20Burnable + UUPS proxy. 100M fixed supply, no mint, BURNER_ROLE for TWAPBurner.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/token/LuminaTokenV2.sol',
+    category: 'source',
+  },
+  {
+    title: 'FounderVesting.sol',
+    description: '8M LUMINA locked behind 2-of-3 AltSeason conditions sustained 7 days, then 3 tranches every 31 days. 4-year fallback.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/token/FounderVesting.sol',
+    category: 'source',
+  },
+  {
+    title: 'TreasuryVesting.sol',
+    description: '3M LUMINA, 180-day lock then max 250k/month drip release. UUPS upgradeable.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/token/TreasuryVesting.sol',
+    category: 'source',
+  },
+
+  // Bonds (2)
+  {
+    title: 'BondVault.sol',
+    description: 'Single ERC-1155 vault holding the 70M LUMINA reserve. Backs every claim payout in the protocol.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/bonds/BondVault.sol',
+    category: 'source',
+  },
+  {
+    title: 'ClaimBond.sol',
+    description: 'ERC-1155 bond representation. 1 token = $1 face value (integer dollars, not 6-dec USDC).',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/bonds/ClaimBond.sol',
+    category: 'source',
+  },
+
+  // Core protocol (4)
+  {
+    title: 'PolicyManagerV2.sol',
+    description: 'Buy / redeem / cancel policies. Computes premium = cover × payoutRatio × triggerProb × margin.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/core/PolicyManagerV2.sol',
+    category: 'source',
+  },
+  {
+    title: 'CoverRouterV2.sol',
+    description: 'Routes premium USDC into the TWAPBurner and updates capacity counters atomically.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/core/CoverRouterV2.sol',
+    category: 'source',
+  },
+  {
+    title: 'TWAPBurner.sol',
+    description: 'Receives USDC from premiums + marketplace fees, executes multi-DEX buy & burn of LUMINA. Adaptive distribution.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/core/TWAPBurner.sol',
+    category: 'source',
+  },
+  {
+    title: 'AdaptiveFeeDistributor.sol',
+    description: 'Dynamic 4-bucket distribution (burn / buyback / ops / maintenance) consumed by TWAPBurner when adaptive mode is on.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/core/AdaptiveFeeDistributor.sol',
+    category: 'source',
+  },
+
+  // Marketplace (2)
+  {
+    title: 'LuminaBondMarketplace.sol',
+    description: 'Secondary marketplace for bonds. 3% fee on every trade routes back through TWAPBurner.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/marketplace/LuminaBondMarketplace.sol',
+    category: 'source',
+  },
+  {
+    title: 'BuybackEngine.sol',
+    description: 'Commit-reveal MEV-protected buyback executor. Pulls from buybackReserve when conditions trigger.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/marketplace/BuybackEngine.sol',
+    category: 'source',
+  },
+
+  // Oracles (2)
+  {
+    title: 'CapacityOracle.sol',
+    description: 'Reads available BondVault capacity in USD using a 1h TWAP of LUMINA price (not spot — anti-MEV).',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/oracles/CapacityOracle.sol',
+    category: 'source',
+  },
+  {
+    title: 'SolvencyOracle.sol',
+    description: 'Monitors the BondVault solvency floor (125%). Used by burnFromReserves to block insolvent burns.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/oracles/SolvencyOracle.sol',
+    category: 'source',
+  },
+
+  // Automation (1)
+  {
+    title: 'ShieldKeeper.sol',
+    description: 'Chainlink Automation keeper that expires policies and triggers payouts when oracle conditions are met.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/automation/ShieldKeeper.sol',
+    category: 'source',
+  },
+
+  // DEX adapters (2)
+  {
+    title: 'UniswapV3Adapter.sol',
+    description: 'IDexRouter implementation for Uniswap V3. Used by TWAPBurner for the primary buy & burn route.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/dex/UniswapV3Adapter.sol',
+    category: 'source',
+  },
+  {
+    title: 'AerodromeAdapter.sol',
+    description: 'IDexRouter implementation for Aerodrome (Base-native DEX). Sequential fallback if Uniswap leg fails.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/dex/AerodromeAdapter.sol',
+    category: 'source',
+  },
+
+  // Products / Shields (10)
+  {
+    title: 'BaseShield.sol',
+    description: 'Abstract base for every shield product. Holds shared payout, pause, and replay-protection logic.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/BaseShield.sol',
+    category: 'source',
+  },
+  {
+    title: 'FlashBTCShield1h.sol',
+    description: 'Flash crash protection for BTC over a 1-hour window. Triggers on % drop vs reference price.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/FlashBTCShield1h.sol',
+    category: 'source',
+  },
+  {
+    title: 'FlashBTCShield4h.sol',
+    description: 'Flash crash protection for BTC over a 4-hour window.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/FlashBTCShield4h.sol',
+    category: 'source',
+  },
+  {
+    title: 'FlashBTCShield24h.sol',
+    description: 'Flash crash protection for BTC over a 24-hour window.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/FlashBTCShield24h.sol',
+    category: 'source',
+  },
+  {
+    title: 'FlashBTCShield48h.sol',
+    description: 'Flash crash protection for BTC over a 48-hour window.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/FlashBTCShield48h.sol',
+    category: 'source',
+  },
+  {
+    title: 'FlashETHShield1h.sol',
+    description: 'Flash crash protection for ETH over a 1-hour window.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/FlashETHShield1h.sol',
+    category: 'source',
+  },
+  {
+    title: 'FlashETHShield24h.sol',
+    description: 'Flash crash protection for ETH over a 24-hour window.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/FlashETHShield24h.sol',
+    category: 'source',
+  },
+  {
+    title: 'FlashETHShield48h.sol',
+    description: 'Flash crash protection for ETH over a 48-hour window.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/FlashETHShield48h.sol',
+    category: 'source',
+  },
+  {
+    title: 'MicroDepegShield.sol',
+    description: 'Micro-depeg protection for USDT (and similar). Triggers on small but sustained price deviation.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/MicroDepegShield.sol',
+    category: 'source',
+  },
+  {
+    title: 'RateShockShield.sol',
+    description: 'Rate-shock protection — triggers when Aave V3 USDC borrow rate exceeds 10% APY.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/RateShockShield.sol',
+    category: 'source',
+  },
+
+  // Treasury reserves (2)
+  {
+    title: 'CEXLiquidityReserve.sol',
+    description: 'Holds the 14M LUMINA earmarked for CEX/DEX liquidity provisioning at launch.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/treasury/CEXLiquidityReserve.sol',
+    category: 'source',
+  },
+  {
+    title: 'MaintenanceReserve.sol',
+    description: 'Receives the maintenance bucket from TWAPBurner adaptive distribution. Funds operational upkeep.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/treasury/MaintenanceReserve.sol',
+    category: 'source',
+  },
+
+  // ─── 🔐 ARCHITECTURE & INTEGRATIONS ──────────────────────────
   {
     title: 'Aave V3 integration',
     description: 'How V5.1 uses Aave V3 read-only as price oracle (RateShockShield + FounderVesting Condition C). NOT for yield.',
