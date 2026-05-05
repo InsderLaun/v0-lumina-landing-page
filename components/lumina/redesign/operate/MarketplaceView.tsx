@@ -372,6 +372,26 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
         </div>
       )}
 
+      {!mine && listing.maturityTs && listing.maturityTs > 0n && (
+        <div
+          style={{
+            background: 'var(--rd-accent-dim)',
+            border: '1px solid var(--rd-accent-border)',
+            borderRadius: 5,
+            padding: '8px 10px',
+            fontSize: 11,
+            color: 'var(--rd-text-2)',
+            lineHeight: 1.45,
+          }}
+        >
+          ⓘ Bond matures on{' '}
+          <strong style={{ color: 'var(--rd-text)', fontFamily: 'var(--font-jetbrains), monospace' }}>
+            {new Date(Number(listing.maturityTs) * 1000).toISOString().slice(0, 10)}
+          </strong>
+          {' '}— you redeem for <strong style={{ color: 'var(--rd-pos)' }}>${face.toLocaleString('en-US')}</strong> at that date. Maturity is fixed at issuance.
+        </div>
+      )}
+
       {mine ? (
         <button
           onClick={handleCancel}

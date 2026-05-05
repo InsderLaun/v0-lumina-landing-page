@@ -96,6 +96,38 @@ export const policyManagerV2Abi = [
       { name: 'policyId', type: 'uint256', indexed: true },
     ],
   },
+  // PolicyManagerV2.sol:338 — returns the full PolicyRecord struct
+  // (productId, shield, buyer, coverageAmount, payoutAmount, premiumPaid,
+  //  createdAt, expiresAt, triggered, expired). Used to learn whether a
+  //  policy fired its trigger (so we hide it from the Active list) and
+  //  to read createdAt/expiresAt directly without a getBlock(blockNumber)
+  //  round-trip per row.
+  {
+    type: 'function',
+    name: 'getPolicy',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'productId', type: 'bytes32' },
+      { name: 'policyId', type: 'uint256' },
+    ],
+    outputs: [
+      {
+        type: 'tuple',
+        components: [
+          { name: 'productId', type: 'bytes32' },
+          { name: 'shield', type: 'address' },
+          { name: 'buyer', type: 'address' },
+          { name: 'coverageAmount', type: 'uint256' },
+          { name: 'payoutAmount', type: 'uint256' },
+          { name: 'premiumPaid', type: 'uint256' },
+          { name: 'createdAt', type: 'uint256' },
+          { name: 'expiresAt', type: 'uint256' },
+          { name: 'triggered', type: 'bool' },
+          { name: 'expired', type: 'bool' },
+        ],
+      },
+    ],
+  },
 ] as const
 
 export const claimBondAbi = [
@@ -161,6 +193,37 @@ export const claimBondAbi = [
       { name: 'to', type: 'address', indexed: true },
       { name: 'usdAmount', type: 'uint256', indexed: false },
     ],
+  },
+  // ERC-1155 standard — used to authorise the marketplace to move a
+  // holder's bonds when listing. Marketplace is the only authorised
+  // operator (bonds are non-transferable peer-to-peer per FIX-#18).
+  {
+    type: 'function',
+    name: 'isApprovedForAll',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'account', type: 'address' },
+      { name: 'operator', type: 'address' },
+    ],
+    outputs: [{ type: 'bool' }],
+  },
+  {
+    type: 'function',
+    name: 'setApprovalForAll',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'operator', type: 'address' },
+      { name: 'approved', type: 'bool' },
+    ],
+    outputs: [],
+  },
+  // ERC-1155 metadata URI — best-effort for wallet-side rendering.
+  {
+    type: 'function',
+    name: 'uri',
+    stateMutability: 'view',
+    inputs: [{ name: 'id', type: 'uint256' }],
+    outputs: [{ type: 'string' }],
   },
 ] as const
 
