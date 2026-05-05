@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useAccount, usePublicClient } from 'wagmi'
 import { formatUnits, type Hex } from 'viem'
-import { CONTRACTS } from '@/lib/lumina-config'
+import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { SHIELDS, SHIELD_BY_PRODUCT_ID } from '@/lib/operate/products'
+import { getLogsChunked } from '@/lib/getLogsChunked'
 
 type RangeFilter = '24h' | '7d' | '30d' | 'all'
 
@@ -52,7 +53,8 @@ export function AgentPoliciesView() {
         if (cancelled) return
         setLatestBlock(block)
 
-        const logs = await publicClient.getLogs({
+        const logs = await getLogsChunked({
+          client: publicClient,
           address: CONTRACTS.PolicyManager,
           event: {
             type: 'event',
@@ -66,11 +68,12 @@ export function AgentPoliciesView() {
               { name: 'payout', type: 'uint256', indexed: false },
             ],
           },
-          fromBlock: 'earliest',
+          fromBlock: DEPLOY_BLOCK_SEPOLIA,
+          toBlock: block,
         })
         if (cancelled) return
 
-        const ours: PolicyRow[] = logs
+        const ours: PolicyRow[] = (logs as any[])
           .filter((l) => (l.args.buyer as Hex)?.toLowerCase() === address.toLowerCase())
           .map((l) => {
             const pid = l.args.productId as Hex

@@ -12,8 +12,9 @@ import {
 } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { erc20Abi, formatUnits, type Hex } from 'viem'
-import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
+import { CONTRACTS, TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { marketplaceAbi, claimBondAbi } from '@/lib/abis/operate'
+import { getLogsChunked } from '@/lib/getLogsChunked'
 
 type Tab = 'browse' | 'mine'
 
@@ -43,53 +44,60 @@ export function MarketplaceView() {
     setLoading(true)
     setLogsErr(null)
 
-    Promise.all([
-      publicClient.getLogs({
-        address: CONTRACTS.Marketplace,
-        event: {
-          type: 'event',
-          name: 'Listed',
-          inputs: [
-            { name: 'listingId', type: 'uint256', indexed: true },
-            { name: 'seller', type: 'address', indexed: true },
-            { name: 'epochId', type: 'uint256', indexed: true },
-            { name: 'amount', type: 'uint256', indexed: false },
-            { name: 'priceUSDC', type: 'uint256', indexed: false },
-          ],
-        },
-        fromBlock: 'earliest',
-        toBlock: 'latest',
-      }),
-      publicClient.getLogs({
-        address: CONTRACTS.Marketplace,
-        event: {
-          type: 'event',
-          name: 'Cancelled',
-          inputs: [
-            { name: 'listingId', type: 'uint256', indexed: true },
-            { name: 'seller', type: 'address', indexed: true },
-          ],
-        },
-        fromBlock: 'earliest',
-        toBlock: 'latest',
-      }),
-      publicClient.getLogs({
-        address: CONTRACTS.Marketplace,
-        event: {
-          type: 'event',
-          name: 'Bought',
-          inputs: [
-            { name: 'listingId', type: 'uint256', indexed: true },
-            { name: 'buyer', type: 'address', indexed: true },
-            { name: 'seller', type: 'address', indexed: true },
-            { name: 'priceUSDC', type: 'uint256', indexed: false },
-          ],
-        },
-        fromBlock: 'earliest',
-        toBlock: 'latest',
-      }),
-    ])
-      .then(([listed, cancelledLogs, bought]) => {
+    publicClient
+      .getBlockNumber()
+      .then((head) =>
+        Promise.all([
+          getLogsChunked({
+            client: publicClient,
+            address: CONTRACTS.Marketplace,
+            event: {
+              type: 'event',
+              name: 'Listed',
+              inputs: [
+                { name: 'listingId', type: 'uint256', indexed: true },
+                { name: 'seller', type: 'address', indexed: true },
+                { name: 'epochId', type: 'uint256', indexed: true },
+                { name: 'amount', type: 'uint256', indexed: false },
+                { name: 'priceUSDC', type: 'uint256', indexed: false },
+              ],
+            },
+            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            toBlock: head,
+          }),
+          getLogsChunked({
+            client: publicClient,
+            address: CONTRACTS.Marketplace,
+            event: {
+              type: 'event',
+              name: 'Cancelled',
+              inputs: [
+                { name: 'listingId', type: 'uint256', indexed: true },
+                { name: 'seller', type: 'address', indexed: true },
+              ],
+            },
+            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            toBlock: head,
+          }),
+          getLogsChunked({
+            client: publicClient,
+            address: CONTRACTS.Marketplace,
+            event: {
+              type: 'event',
+              name: 'Bought',
+              inputs: [
+                { name: 'listingId', type: 'uint256', indexed: true },
+                { name: 'buyer', type: 'address', indexed: true },
+                { name: 'seller', type: 'address', indexed: true },
+                { name: 'priceUSDC', type: 'uint256', indexed: false },
+              ],
+            },
+            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            toBlock: head,
+          }),
+        ]),
+      )
+      .then(([listed, cancelledLogs, bought]: any) => {
         if (cancelled) return
         const removed = new Set([
           ...cancelledLogs.map((l) => (l.args.listingId as bigint).toString()),

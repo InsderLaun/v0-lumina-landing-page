@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAccount, usePublicClient, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { erc20Abi, formatUnits, parseUnits, type Hex } from 'viem'
-import { CONTRACTS } from '@/lib/lumina-config'
+import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { claimBondAbi, bondVaultAbi, policyManagerV2Abi } from '@/lib/abis/operate'
 import { SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
+import { getLogsChunked } from '@/lib/getLogsChunked'
 
 type Tab = 'policies' | 'bonds'
 
@@ -49,24 +50,28 @@ export function PortfolioView() {
     setPoliciesErr(null)
 
     publicClient
-      .getLogs({
-        address: CONTRACTS.PolicyManager,
-        event: {
-          type: 'event',
-          name: 'PolicyCreated',
-          inputs: [
-            { name: 'productId', type: 'bytes32', indexed: true },
-            { name: 'policyId', type: 'uint256', indexed: true },
-            { name: 'buyer', type: 'address', indexed: false },
-            { name: 'coverage', type: 'uint256', indexed: false },
-            { name: 'premium', type: 'uint256', indexed: false },
-            { name: 'payout', type: 'uint256', indexed: false },
-          ],
-        },
-        fromBlock: 'earliest',
-        toBlock: 'latest',
-      })
-      .then((logs) => {
+      .getBlockNumber()
+      .then((head) =>
+        getLogsChunked({
+          client: publicClient,
+          address: CONTRACTS.PolicyManager,
+          event: {
+            type: 'event',
+            name: 'PolicyCreated',
+            inputs: [
+              { name: 'productId', type: 'bytes32', indexed: true },
+              { name: 'policyId', type: 'uint256', indexed: true },
+              { name: 'buyer', type: 'address', indexed: false },
+              { name: 'coverage', type: 'uint256', indexed: false },
+              { name: 'premium', type: 'uint256', indexed: false },
+              { name: 'payout', type: 'uint256', indexed: false },
+            ],
+          },
+          fromBlock: DEPLOY_BLOCK_SEPOLIA,
+          toBlock: head,
+        }),
+      )
+      .then((logs: any) => {
         if (cancelled) return
         const rows: PolicyRow[] = logs
           .filter((l) => (l.args.buyer as Hex)?.toLowerCase() === address.toLowerCase())
@@ -106,22 +111,26 @@ export function PortfolioView() {
     setBondsErr(null)
 
     publicClient
-      .getLogs({
-        address: CONTRACTS.ClaimBond,
-        event: {
-          type: 'event',
-          name: 'BondsMinted',
-          inputs: [
-            { name: 'epochId', type: 'uint256', indexed: true },
-            { name: 'to', type: 'address', indexed: true },
-            { name: 'usdAmount', type: 'uint256', indexed: false },
-          ],
-        },
-        args: { to: address },
-        fromBlock: 'earliest',
-        toBlock: 'latest',
-      })
-      .then((logs) => {
+      .getBlockNumber()
+      .then((head) =>
+        getLogsChunked({
+          client: publicClient,
+          address: CONTRACTS.ClaimBond,
+          event: {
+            type: 'event',
+            name: 'BondsMinted',
+            inputs: [
+              { name: 'epochId', type: 'uint256', indexed: true },
+              { name: 'to', type: 'address', indexed: true },
+              { name: 'usdAmount', type: 'uint256', indexed: false },
+            ],
+          },
+          args: { to: address },
+          fromBlock: DEPLOY_BLOCK_SEPOLIA,
+          toBlock: head,
+        }),
+      )
+      .then((logs: any) => {
         if (cancelled) return
         const epochs = Array.from(new Set(logs.map((l) => (l.args.epochId as bigint).toString()))).map(BigInt)
         setUserEpochs(epochs)

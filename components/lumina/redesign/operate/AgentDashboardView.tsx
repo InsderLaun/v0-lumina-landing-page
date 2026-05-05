@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useAccount, usePublicClient, useReadContract } from 'wagmi'
 import { erc20Abi, formatUnits, type Hex } from 'viem'
-import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
+import { CONTRACTS, TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { ASSET_COLORS, SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
+import { getLogsChunked } from '@/lib/getLogsChunked'
 
 type FeedKind = 'POLICY' | 'TRIGGER' | 'BOND' | 'REDEEM' | 'LIST' | 'BOUGHT' | 'CANCEL'
 
@@ -80,73 +81,85 @@ export function AgentDashboardView() {
     setLoading(true)
     setErr(null)
 
-    Promise.all([
-      // PolicyCreated — buyer NOT indexed → pull all + filter
-      publicClient.getLogs({
-        address: CONTRACTS.PolicyManager,
-        event: {
-          type: 'event',
-          name: 'PolicyCreated',
-          inputs: [
-            { name: 'productId', type: 'bytes32', indexed: true },
-            { name: 'policyId', type: 'uint256', indexed: true },
-            { name: 'buyer', type: 'address', indexed: false },
-            { name: 'coverage', type: 'uint256', indexed: false },
-            { name: 'premium', type: 'uint256', indexed: false },
-            { name: 'payout', type: 'uint256', indexed: false },
-          ],
-        },
-        fromBlock: 'earliest',
-      }),
-      publicClient.getLogs({
-        address: CONTRACTS.PolicyManager,
-        event: {
-          type: 'event',
-          name: 'PolicyTriggered',
-          inputs: [
-            { name: 'productId', type: 'bytes32', indexed: true },
-            { name: 'policyId', type: 'uint256', indexed: true },
-            { name: 'buyer', type: 'address', indexed: false },
-            { name: 'bondAmount', type: 'uint256', indexed: false },
-            { name: 'reason', type: 'bytes32', indexed: false },
-          ],
-        },
-        fromBlock: 'earliest',
-      }),
-      // BondsMinted — to IS indexed → use args filter
-      publicClient.getLogs({
-        address: CONTRACTS.ClaimBond,
-        event: {
-          type: 'event',
-          name: 'BondsMinted',
-          inputs: [
-            { name: 'epochId', type: 'uint256', indexed: true },
-            { name: 'to', type: 'address', indexed: true },
-            { name: 'usdAmount', type: 'uint256', indexed: false },
-          ],
-        },
-        args: { to: address },
-        fromBlock: 'earliest',
-      }),
-      // BondRedeemed — holder IS indexed
-      publicClient.getLogs({
-        address: CONTRACTS.BondVault,
-        event: {
-          type: 'event',
-          name: 'BondRedeemed',
-          inputs: [
-            { name: 'holder', type: 'address', indexed: true },
-            { name: 'epochId', type: 'uint256', indexed: true },
-            { name: 'usdAmount', type: 'uint256', indexed: false },
-            { name: 'luminaAmount', type: 'uint256', indexed: false },
-            { name: 'price', type: 'uint256', indexed: false },
-          ],
-        },
-        args: { holder: address },
-        fromBlock: 'earliest',
-      }),
-    ])
-      .then(([pCreated, pTriggered, bMinted, bRedeemed]) => {
+    publicClient
+      .getBlockNumber()
+      .then((head) =>
+        Promise.all([
+          // PolicyCreated — buyer NOT indexed → pull all + filter
+          getLogsChunked({
+            client: publicClient,
+            address: CONTRACTS.PolicyManager,
+            event: {
+              type: 'event',
+              name: 'PolicyCreated',
+              inputs: [
+                { name: 'productId', type: 'bytes32', indexed: true },
+                { name: 'policyId', type: 'uint256', indexed: true },
+                { name: 'buyer', type: 'address', indexed: false },
+                { name: 'coverage', type: 'uint256', indexed: false },
+                { name: 'premium', type: 'uint256', indexed: false },
+                { name: 'payout', type: 'uint256', indexed: false },
+              ],
+            },
+            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            toBlock: head,
+          }),
+          getLogsChunked({
+            client: publicClient,
+            address: CONTRACTS.PolicyManager,
+            event: {
+              type: 'event',
+              name: 'PolicyTriggered',
+              inputs: [
+                { name: 'productId', type: 'bytes32', indexed: true },
+                { name: 'policyId', type: 'uint256', indexed: true },
+                { name: 'buyer', type: 'address', indexed: false },
+                { name: 'bondAmount', type: 'uint256', indexed: false },
+                { name: 'reason', type: 'bytes32', indexed: false },
+              ],
+            },
+            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            toBlock: head,
+          }),
+          // BondsMinted — to IS indexed → use args filter
+          getLogsChunked({
+            client: publicClient,
+            address: CONTRACTS.ClaimBond,
+            event: {
+              type: 'event',
+              name: 'BondsMinted',
+              inputs: [
+                { name: 'epochId', type: 'uint256', indexed: true },
+                { name: 'to', type: 'address', indexed: true },
+                { name: 'usdAmount', type: 'uint256', indexed: false },
+              ],
+            },
+            args: { to: address },
+            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            toBlock: head,
+          }),
+          // BondRedeemed — holder IS indexed
+          getLogsChunked({
+            client: publicClient,
+            address: CONTRACTS.BondVault,
+            event: {
+              type: 'event',
+              name: 'BondRedeemed',
+              inputs: [
+                { name: 'holder', type: 'address', indexed: true },
+                { name: 'epochId', type: 'uint256', indexed: true },
+                { name: 'usdAmount', type: 'uint256', indexed: false },
+                { name: 'luminaAmount', type: 'uint256', indexed: false },
+                { name: 'price', type: 'uint256', indexed: false },
+              ],
+            },
+            args: { holder: address },
+            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            toBlock: head,
+          }),
+        ]),
+      )
+      .then(([pCreated, pTriggered, bMinted, bRedeemed]: any) => {
         if (cancelled) return
 
         // Active policies (we treat PolicyCreated as "issued"; status filtering would
