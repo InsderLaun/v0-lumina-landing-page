@@ -506,9 +506,9 @@ export const DOCS: DocEntry[] = [
   // different framings. This is intentional, not a bug.
   {
     title: 'Token distribution (100M LUMINA)',
-    description: 'The full breakdown of the 100M fixed supply: Founder (8% / AltSeasonVesting), Treasury, Community, etc. Anchor links straight to the README section.',
+    description: 'Links straight to the contract source — the five _mint calls in LuminaTokenV2.initialize() that hardcode the 70 / 14 / 8 / 5 / 3 split. This is the canonical distribution.',
     repo: 'LUMINA-PROTOCOL',
-    path: 'README.md#token-distribution-100m-lumina',
+    path: 'src/token/LuminaTokenV2.sol#L71-L75',
     category: 'economics',
   },
   {
