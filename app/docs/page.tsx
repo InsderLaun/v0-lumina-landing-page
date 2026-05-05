@@ -31,6 +31,7 @@ const DEPLOYED = [
   { kind: 'core', name: 'BuybackEngine', address: CONTRACTS.BuybackEngine },
   { kind: 'core', name: 'ShieldKeeper', address: CONTRACTS.ShieldKeeper },
   { kind: 'core', name: 'TWAPBurner', address: CONTRACTS.TWAPBurner },
+  { kind: 'oracle', name: 'LuminaOracleV2', address: CONTRACTS.LuminaOracleV2 },
   { kind: 'token', name: 'USDC (MockUSDC)', address: TOKENS.USDC.address },
   { kind: 'shield', name: 'Flash BTC 1h', address: CONTRACTS.shields.FlashBTC1h },
   { kind: 'shield', name: 'Flash BTC 4h', address: CONTRACTS.shields.FlashBTC4h },
