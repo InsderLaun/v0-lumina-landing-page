@@ -10,7 +10,6 @@ import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
 import { coverRouterV2Abi } from '@/lib/abis/operate'
 import {
   ASSET_COLORS,
-  ASSET_USDC,
   COVER_MIN_USDC,
   COVER_MAX_USDC,
   type ShieldDescriptor,
@@ -116,7 +115,7 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
       address: CONTRACTS.CoverRouter,
       abi: coverRouterV2Abi,
       functionName: 'purchasePolicy',
-      args: [shield.productId, coverWei, ASSET_USDC],
+      args: [shield.productId, coverWei, shield.assetBytes],
     })
   }
 
