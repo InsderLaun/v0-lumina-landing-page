@@ -40,16 +40,25 @@ export interface ShieldDescriptor {
    * we derive them here. The configureProduct() call sets the same hash.
    */
   productId: Hex
+  /**
+   * `asset` arg for `purchasePolicy(productId, coverageAmount, asset)` —
+   * the bytes32 underlying-asset literal each shield's `_doCreatePolicy`
+   * compares against. NOT the payment currency: USDC is always the payment.
+   * Verified per shield against /tmp/lp-conn/src/products/*.sol:
+   *   FlashBTC ×4 → "BTC"     FlashETH ×3 → "ETH"
+   *   MicroDepeg → "USDT"     RateShock   → "USDC"
+   */
+  assetBytes: Hex
 }
 
 function pid(canonical: string): Hex {
   return keccak256(toBytes(canonical))
 }
 
-/** Asset constant for `purchasePolicy(productId, cov, asset)` — V5.1 uses
- *  bytes32 padded asset symbol. USDC is the only payment asset accepted on
- *  Sepolia testnet. */
-export const ASSET_USDC: Hex = padHex(toHex('USDC'), { size: 32, dir: 'right' })
+/** Bytes32 right-padded literal expected by each shield's _doCreatePolicy. */
+function assetBytesFor(symbol: AssetSymbol): Hex {
+  return padHex(toHex(symbol), { size: 32, dir: 'right' })
+}
 
 export const SHIELDS: ShieldDescriptor[] = [
   {
@@ -63,6 +72,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '333x',
     tier: 1,
     productId: pid('FLASHBTC1H-001'),
+    assetBytes: assetBytesFor('BTC'),
   },
   {
     slug: 'flash-btc-4h',
@@ -75,6 +85,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '190x',
     tier: 1,
     productId: pid('FLASHBTC4H-001'),
+    assetBytes: assetBytesFor('BTC'),
   },
   {
     slug: 'flash-btc-24h',
@@ -87,6 +98,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '44x',
     tier: 1,
     productId: pid('FLASHBTC24-001'),
+    assetBytes: assetBytesFor('BTC'),
   },
   {
     slug: 'flash-btc-48h',
@@ -99,6 +111,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '83x',
     tier: 1,
     productId: pid('FLASHBTC48-001'),
+    assetBytes: assetBytesFor('BTC'),
   },
   {
     slug: 'flash-eth-1h',
@@ -111,6 +124,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '266x',
     tier: 1,
     productId: pid('FLASHETH1H-001'),
+    assetBytes: assetBytesFor('ETH'),
   },
   {
     slug: 'flash-eth-24h',
@@ -123,6 +137,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '33x',
     tier: 1,
     productId: pid('FLASHETH24-001'),
+    assetBytes: assetBytesFor('ETH'),
   },
   {
     slug: 'flash-eth-48h',
@@ -135,6 +150,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '74x',
     tier: 1,
     productId: pid('FLASHETH48-001'),
+    assetBytes: assetBytesFor('ETH'),
   },
   {
     slug: 'micro-depeg-usdt',
@@ -147,6 +163,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '19x',
     tier: 2,
     productId: pid('MICRODEPEG-001'),
+    assetBytes: assetBytesFor('USDT'),
   },
   {
     slug: 'rate-shock',
@@ -159,6 +176,7 @@ export const SHIELDS: ShieldDescriptor[] = [
     multLabel: '17x',
     tier: 2,
     productId: pid('RATESHOCK-001'),
+    assetBytes: assetBytesFor('USDC'),
   },
 ]
 
