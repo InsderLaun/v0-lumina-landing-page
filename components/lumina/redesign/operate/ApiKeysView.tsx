@@ -1,235 +1,692 @@
 'use client'
 
-import { Key, AlertTriangle, Mail, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useAccount } from 'wagmi'
+import { useCallback, useEffect, useState } from 'react'
+import { useAccount, useSignMessage } from 'wagmi'
+import { AlertTriangle, Copy, Key, Loader2, Trash2 } from 'lucide-react'
+import { LUMINA_API_URL } from '@/lib/lumina-config'
 
-// API key listing endpoint does NOT exist in lumina-api @ 575a4d0:
-//   - POST /api/v1/keys/generate (admin-only — issues key)
-//   - DELETE /api/v1/keys/:id    (admin-only — revokes by id)
-//
-// There is no GET /api/v1/keys for end users to list their own keys, no
-// webhook endpoint, and the admin-only routes can't be exposed to end-user
-// wallets without leaking admin auth.
-//
-// Per founder decision (CHECKPOINT 0): show a placeholder with the path
-// to provision keys today (contact support / read docs) and disabled
-// preview of the future webhook surface.
+interface KeyRecord {
+  id: number
+  agent_id: number
+  label: string | null
+  created_at: number
+  revoked_at: number | null
+  hash_prefix: string
+  tier: string
+}
 
+type GenerateState =
+  | { kind: 'idle' }
+  | { kind: 'signing' }
+  | { kind: 'submitting' }
+  | { kind: 'reveal'; apiKey: string; label: string; createdAt: number }
+  | { kind: 'error'; message: string }
+
+const ONBOARD_PATH = '/api/v1/agent/onboard'
+const KEYS_PATH = '/api/v1/agent/keys'
+
+/**
+ * Self-service API key supervisor for the agent role.
+ *
+ * Flow
+ *   1. User connects wallet (handled upstream by AppShell).
+ *   2. Optional label.
+ *   3. Click "Generate key" — frontend asks the wallet to sign
+ *        "Lumina onboarding for {address} at {timestamp}"
+ *   4. POST /api/v1/agent/onboard — backend recovers the signer and
+ *      mints a fresh `lk_…` key. Key is shown ONCE in a reveal panel
+ *      with a copy button and explicit "I saved it" confirmation.
+ *   5. After confirm, a fresh GET /api/v1/agent/keys re-renders the
+ *      list (the new key is visible only by hash prefix from now on).
+ *
+ * Constraints (mirrored from the API)
+ *   - Max 3 active keys per wallet.
+ *   - Timestamp must be within ±5 min of server time.
+ *   - Per-IP rate limit: 10 onboard attempts/hour.
+ */
 export function ApiKeysView() {
   const { address, isConnected } = useAccount()
-  const truncAddr = address ? `${address.slice(0, 6)}…${address.slice(-4)}` : ''
+  const { signMessageAsync } = useSignMessage()
+
+  const [label, setLabel] = useState('')
+  const [gen, setGen] = useState<GenerateState>({ kind: 'idle' })
+
+  const [keys, setKeys] = useState<KeyRecord[]>([])
+  const [keysLoading, setKeysLoading] = useState(false)
+  const [keysErr, setKeysErr] = useState<string | null>(null)
+  // The plaintext key is needed to authenticate GET/DELETE — chicken-and-egg
+  // until the user generates one or pastes an existing one.
+  const [activeApiKey, setActiveApiKey] = useState<string | null>(null)
+
+  const refreshKeys = useCallback(async (apiKey: string) => {
+    setKeysLoading(true)
+    setKeysErr(null)
+    try {
+      const res = await fetch(`${LUMINA_API_URL}${KEYS_PATH}`, {
+        headers: { 'x-api-key': apiKey },
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body?.error ?? `GET keys failed (${res.status})`)
+      }
+      const data = (await res.json()) as { keys: KeyRecord[] }
+      setKeys(data.keys ?? [])
+    } catch (err) {
+      setKeysErr(err instanceof Error ? err.message : 'Failed to load keys')
+    } finally {
+      setKeysLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activeApiKey) refreshKeys(activeApiKey)
+  }, [activeApiKey, refreshKeys])
+
+  const handleGenerate = async () => {
+    if (!address) return
+    setGen({ kind: 'signing' })
+    const timestamp = Math.floor(Date.now() / 1000)
+    const message = `Lumina onboarding for ${address} at ${timestamp}`
+    let signature: string
+    try {
+      signature = await signMessageAsync({ message })
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Signature rejected'
+      setGen({ kind: 'error', message: msg })
+      return
+    }
+
+    setGen({ kind: 'submitting' })
+    try {
+      const res = await fetch(`${LUMINA_API_URL}${ONBOARD_PATH}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: address,
+          label: label.trim() || undefined,
+          signature,
+          timestamp,
+        }),
+      })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(body?.error ?? `Onboard failed (${res.status})`)
+      }
+      const apiKey = body.apiKey as string
+      const lbl = body.label as string
+      const createdAt = body.createdAt as number
+      setGen({ kind: 'reveal', apiKey, label: lbl, createdAt })
+      setActiveApiKey(apiKey)
+      setLabel('')
+    } catch (err) {
+      setGen({ kind: 'error', message: err instanceof Error ? err.message : 'Onboard failed' })
+    }
+  }
+
+  const handleRevoke = async (keyId: number) => {
+    if (!activeApiKey) {
+      setKeysErr('Provide an API key first to revoke. Paste it below.')
+      return
+    }
+    if (!window.confirm(`Revoke key #${keyId}? This cannot be undone.`)) return
+    try {
+      const res = await fetch(`${LUMINA_API_URL}${KEYS_PATH}/${keyId}`, {
+        method: 'DELETE',
+        headers: { 'x-api-key': activeApiKey },
+      })
+      if (!res.ok && res.status !== 204) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body?.error ?? `Revoke failed (${res.status})`)
+      }
+      await refreshKeys(activeApiKey)
+    } catch (err) {
+      setKeysErr(err instanceof Error ? err.message : 'Revoke failed')
+    }
+  }
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 880 }}>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11, color: 'var(--rd-text-3)', letterSpacing: '0.1em', marginBottom: 6 }}>
-          /APP/AGENT/API-KEYS
-        </div>
-        <h1 style={{ fontFamily: 'var(--font-display), Georgia, serif', fontSize: 32, fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--rd-text)', margin: 0 }}>
-          Keys your bot uses to call Lumina.
-        </h1>
-      </div>
-
-      {/* Coming-soon placeholder card */}
-      <div
-        style={{
-          background: 'var(--rd-surface)',
-          border: '1px solid var(--rd-line)',
-          borderRadius: 10,
-          padding: 28,
-          marginBottom: 18,
-        }}
-      >
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '4px 10px',
-            borderRadius: 4,
-            fontFamily: 'var(--font-jetbrains), monospace',
-            fontSize: 10,
-            letterSpacing: '0.08em',
-            color: 'var(--rd-warn)',
-            background: 'rgba(245,158,11,0.1)',
-            border: '1px solid rgba(245,158,11,0.33)',
-            marginBottom: 16,
-            textTransform: 'uppercase',
-          }}
-        >
-          <AlertTriangle size={12} /> Self-service · coming soon
-        </div>
-        <h2
-          style={{
-            fontFamily: 'var(--font-display), Georgia, serif',
-            fontWeight: 500,
-            fontSize: 22,
-            color: 'var(--rd-text)',
-            margin: '0 0 12px',
-            letterSpacing: '-0.01em',
-          }}
-        >
-          Self-service key issuance is not live yet on V5.1 testnet.
-        </h2>
-        <p style={{ color: 'var(--rd-text-2)', fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
-          The lumina-api currently exposes <code style={{ background: 'var(--rd-accent-dim)', color: 'var(--rd-accent)', padding: '2px 6px', borderRadius: 4, fontFamily: 'var(--font-jetbrains), monospace', fontSize: 12 }}>POST /api/v1/keys/generate</code>
-          {' '}and <code style={{ background: 'var(--rd-accent-dim)', color: 'var(--rd-accent)', padding: '2px 6px', borderRadius: 4, fontFamily: 'var(--font-jetbrains), monospace', fontSize: 12 }}>DELETE /api/v1/keys/:id</code> only behind admin auth, so there
-          is no safe path from this UI to issue keys to your wallet directly.
-        </p>
-        <p style={{ color: 'var(--rd-text-2)', fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-          To get a key for your bot today, email{' '}
-          <a href="mailto:labs@lumina-org.com" style={{ color: 'var(--rd-accent)' }}>
-            labs@lumina-org.com
-          </a>{' '}
-          with your wallet address {isConnected && (<span style={{ fontFamily: 'var(--font-jetbrains), monospace', color: 'var(--rd-accent)' }}>({truncAddr})</span>)}.
-          Keys are bound to one wallet, max 3 per address.
-        </p>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <a
-            href="mailto:labs@lumina-org.com?subject=Lumina%20agent%20API%20key%20request"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '10px 18px',
-              background: 'var(--rd-accent)',
-              color: '#001018',
-              border: '1px solid var(--rd-accent)',
-              borderRadius: 6,
-              fontWeight: 600,
-              fontSize: 13,
-              textDecoration: 'none',
-            }}
-          >
-            <Mail size={14} /> Request key
-          </a>
-          <Link
-            href="/docs"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '10px 18px',
-              background: 'transparent',
-              color: 'var(--rd-text-2)',
-              border: '1px solid var(--rd-line-strong)',
-              borderRadius: 6,
-              fontWeight: 500,
-              fontSize: 13,
-              textDecoration: 'none',
-            }}
-          >
-            <Key size={14} /> Read agent docs
-          </Link>
-        </div>
-      </div>
-
-      {/* Future shape preview — disabled */}
-      <div
-        style={{
-          background: 'var(--rd-surface-2)',
-          border: '1px dashed var(--rd-line-strong)',
-          borderRadius: 8,
-          padding: 20,
-          opacity: 0.6,
-        }}
-      >
+    <div style={{ padding: '28px 32px', maxWidth: 920 }}>
+      <header style={{ marginBottom: 24 }}>
         <div
           style={{
             fontFamily: 'var(--font-jetbrains), monospace',
-            fontSize: 10,
+            fontSize: 11,
             color: 'var(--rd-text-3)',
             letterSpacing: '0.1em',
-            marginBottom: 12,
+            marginBottom: 6,
           }}
         >
-          PREVIEW · WHEN SELF-SERVICE LANDS
+          /APP/AGENT/API-KEYS
         </div>
+        <h1
+          style={{
+            fontFamily: 'var(--font-display), Georgia, serif',
+            fontSize: 32,
+            fontWeight: 300,
+            letterSpacing: '-0.02em',
+            margin: 0,
+          }}
+        >
+          Keys your bot uses to call Lumina.
+        </h1>
+        <p style={{ color: 'var(--rd-text-3)', fontSize: 13, marginTop: 8, lineHeight: 1.5 }}>
+          Self-service. Sign a one-line message with your wallet to mint a key. Up to 3 active per
+          wallet. The plaintext is shown <strong>once</strong> — copy it before you close the modal.
+        </p>
+      </header>
+
+      {!isConnected && (
+        <Card>
+          <div style={{ padding: 24, color: 'var(--rd-text-2)', fontSize: 13 }}>
+            ⓘ Connect a wallet to mint or list API keys.
+          </div>
+        </Card>
+      )}
+
+      {isConnected && (
+        <>
+          <Card>
+            <div style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <Field label="Label (optional)">
+                <input
+                  type="text"
+                  value={label}
+                  maxLength={50}
+                  onChange={(e) => setLabel(e.target.value)}
+                  placeholder="e.g. prod-bot · trading-agent · backup"
+                  disabled={gen.kind === 'signing' || gen.kind === 'submitting'}
+                  style={inputStyle}
+                />
+              </Field>
+              <button
+                onClick={handleGenerate}
+                disabled={gen.kind === 'signing' || gen.kind === 'submitting'}
+                style={{
+                  alignSelf: 'flex-start',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '10px 16px',
+                  background: 'var(--rd-accent)',
+                  color: '#00121a',
+                  border: 0,
+                  borderRadius: 6,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor:
+                    gen.kind === 'signing' || gen.kind === 'submitting' ? 'not-allowed' : 'pointer',
+                  opacity: gen.kind === 'signing' || gen.kind === 'submitting' ? 0.7 : 1,
+                  fontFamily: 'inherit',
+                }}
+              >
+                {gen.kind === 'signing' ? (
+                  <>
+                    <Loader2 size={14} className="spin" /> Sign in your wallet…
+                  </>
+                ) : gen.kind === 'submitting' ? (
+                  <>
+                    <Loader2 size={14} className="spin" /> Submitting onboard…
+                  </>
+                ) : (
+                  <>
+                    <Key size={14} /> Generate key
+                  </>
+                )}
+              </button>
+              {gen.kind === 'error' && (
+                <div
+                  style={{
+                    padding: '10px 12px',
+                    background: 'rgba(239,68,68,0.1)',
+                    border: '1px solid rgba(239,68,68,0.3)',
+                    borderRadius: 6,
+                    color: 'var(--rd-neg)',
+                    fontSize: 12,
+                  }}
+                >
+                  ⚠ {gen.message}
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {gen.kind === 'reveal' && (
+            <RevealModal
+              apiKey={gen.apiKey}
+              label={gen.label}
+              createdAt={gen.createdAt}
+              onClose={() => setGen({ kind: 'idle' })}
+            />
+          )}
+
+          <section style={{ marginTop: 24 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 10,
+              }}
+            >
+              <h2
+                style={{
+                  fontFamily: 'var(--font-jetbrains), monospace',
+                  fontSize: 11,
+                  letterSpacing: '0.12em',
+                  color: 'var(--rd-text-3)',
+                  margin: 0,
+                  textTransform: 'uppercase',
+                }}
+              >
+                Your keys
+              </h2>
+              {!activeApiKey && (
+                <span style={{ fontSize: 11, color: 'var(--rd-text-3)' }}>
+                  Paste a key below to load + revoke
+                </span>
+              )}
+            </div>
+
+            {!activeApiKey && (
+              <Card>
+                <div style={{ padding: 18, display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <input
+                    type="password"
+                    placeholder="lk_…  (your existing API key, used to fetch your key list)"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const v = (e.target as HTMLInputElement).value.trim()
+                        if (v) setActiveApiKey(v)
+                      }
+                    }}
+                    style={{ ...inputStyle, flex: 1 }}
+                  />
+                  <span style={{ fontSize: 10, color: 'var(--rd-text-4)' }}>press enter</span>
+                </div>
+              </Card>
+            )}
+
+            {keysErr && (
+              <div
+                style={{
+                  padding: '10px 12px',
+                  background: 'rgba(239,68,68,0.1)',
+                  border: '1px solid rgba(239,68,68,0.3)',
+                  borderRadius: 6,
+                  color: 'var(--rd-neg)',
+                  fontSize: 12,
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
+              >
+                ⚠ {keysErr}
+              </div>
+            )}
+
+            {activeApiKey && (
+              <Card>
+                {keysLoading ? (
+                  <div style={{ padding: 22, color: 'var(--rd-text-3)', fontSize: 12 }}>
+                    Loading…
+                  </div>
+                ) : keys.length === 0 ? (
+                  <div style={{ padding: 22, color: 'var(--rd-text-3)', fontSize: 12 }}>
+                    No keys yet for this wallet.
+                  </div>
+                ) : (
+                  <div>
+                    <KeyHeader />
+                    {keys.map((k, i) => (
+                      <KeyRow key={k.id} k={k} last={i === keys.length - 1} onRevoke={handleRevoke} />
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )}
+          </section>
+        </>
+      )}
+
+      <style jsx>{`
+        .spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        background: 'var(--rd-surface)',
+        border: '1px solid var(--rd-line)',
+        borderRadius: 10,
+        marginTop: 12,
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label
+        style={{
+          fontFamily: 'var(--font-jetbrains), monospace',
+          fontSize: 10,
+          letterSpacing: '0.08em',
+          color: 'var(--rd-text-3)',
+          textTransform: 'uppercase',
+          marginBottom: 6,
+          display: 'block',
+        }}
+      >
+        {label}
+      </label>
+      {children}
+    </div>
+  )
+}
+
+function KeyHeader() {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1.6fr 1fr 0.6fr 0.5fr 0.5fr',
+        gap: 12,
+        padding: '10px 16px',
+        borderBottom: '1px solid var(--rd-line)',
+        fontFamily: 'var(--font-jetbrains), monospace',
+        fontSize: 10,
+        letterSpacing: '0.08em',
+        color: 'var(--rd-text-3)',
+        textTransform: 'uppercase',
+      }}
+    >
+      <div>LABEL</div>
+      <div>HASH PREFIX</div>
+      <div>CREATED</div>
+      <div>TIER</div>
+      <div>STATUS</div>
+      <div></div>
+    </div>
+  )
+}
+
+function KeyRow({
+  k,
+  last,
+  onRevoke,
+}: {
+  k: KeyRecord
+  last: boolean
+  onRevoke: (id: number) => void
+}) {
+  const created = new Date(k.created_at).toISOString().slice(0, 10)
+  const revoked = !!k.revoked_at
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1.6fr 1fr 0.6fr 0.5fr 0.5fr',
+        gap: 12,
+        padding: '12px 16px',
+        borderBottom: last ? 'none' : '1px solid var(--rd-line)',
+        fontSize: 12,
+        alignItems: 'center',
+      }}
+    >
+      <span style={{ color: 'var(--rd-text)' }}>
+        {k.label ?? <em style={{ color: 'var(--rd-text-4)' }}>—</em>}
+      </span>
+      <code
+        style={{
+          fontFamily: 'var(--font-jetbrains), monospace',
+          fontSize: 11,
+          color: 'var(--rd-text-3)',
+        }}
+      >
+        sha256:{k.hash_prefix}…
+      </code>
+      <span style={{ fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11, color: 'var(--rd-text-3)' }}>
+        {created}
+      </span>
+      <span
+        style={{
+          fontFamily: 'var(--font-jetbrains), monospace',
+          fontSize: 10,
+          color: k.tier === 'paid' ? 'var(--rd-pos)' : 'var(--rd-text-3)',
+          textTransform: 'uppercase',
+        }}
+      >
+        {k.tier}
+      </span>
+      <span
+        style={{
+          fontFamily: 'var(--font-jetbrains), monospace',
+          fontSize: 10,
+          color: revoked ? 'var(--rd-text-4)' : 'var(--rd-pos)',
+          textTransform: 'uppercase',
+        }}
+      >
+        {revoked ? 'revoked' : 'active'}
+      </span>
+      <button
+        onClick={() => onRevoke(k.id)}
+        disabled={revoked}
+        title={revoked ? 'Already revoked' : 'Revoke this key'}
+        aria-label="Revoke key"
+        style={{
+          background: 'transparent',
+          border: 0,
+          color: revoked ? 'var(--rd-text-4)' : 'var(--rd-neg)',
+          cursor: revoked ? 'not-allowed' : 'pointer',
+          justifySelf: 'end',
+        }}
+      >
+        <Trash2 size={14} />
+      </button>
+    </div>
+  )
+}
+
+function RevealModal({
+  apiKey,
+  label,
+  createdAt,
+  onClose,
+}: {
+  apiKey: string
+  label: string
+  createdAt: number
+  onClose: () => void
+}) {
+  const [copied, setCopied] = useState(false)
+  const [confirmed, setConfirmed] = useState(false)
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(apiKey)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.7)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'var(--rd-surface)',
+          border: '1px solid var(--rd-accent-border)',
+          borderRadius: 10,
+          padding: '24px 28px',
+          width: 'min(560px, 92vw)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <span
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: 'rgba(245,158,11,0.15)',
+              color: 'var(--rd-warn)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <AlertTriangle size={18} />
+          </span>
+          <h3
+            style={{
+              fontFamily: 'var(--font-display), Georgia, serif',
+              fontSize: 22,
+              fontWeight: 500,
+              margin: 0,
+            }}
+          >
+            Save your key now
+          </h3>
+        </div>
+        <p style={{ color: 'var(--rd-text-2)', fontSize: 13, lineHeight: 1.55, marginBottom: 14 }}>
+          The full plaintext is shown only this once. Lumina stores only the SHA-256 hash. If you
+          close this window without copying it, you&apos;ll need to revoke + regenerate.
+        </p>
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1fr 1fr',
-            gap: 14,
-            padding: 14,
-            background: 'var(--rd-surface)',
+            background: 'var(--rd-bg-2)',
             border: '1px solid var(--rd-line)',
             borderRadius: 6,
+            padding: '12px 14px',
+            display: 'flex',
             alignItems: 'center',
-            marginBottom: 10,
+            gap: 10,
+            marginBottom: 14,
           }}
         >
-          <div>
-            <div style={{ fontWeight: 500, color: 'var(--rd-text)' }}>production-bot-001</div>
-            <div style={{ fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11, color: 'var(--rd-text-3)' }}>lum_pk_••••••••</div>
-          </div>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--rd-text-3)', letterSpacing: '0.06em' }}>CREATED</div>
-            <div style={{ fontFamily: 'var(--font-jetbrains), monospace', fontSize: 12 }}>—</div>
-          </div>
-          <div>
-            <div style={{ fontSize: 10, color: 'var(--rd-text-3)', letterSpacing: '0.06em' }}>LAST USED</div>
-            <div style={{ fontFamily: 'var(--font-jetbrains), monospace', fontSize: 12 }}>—</div>
-          </div>
-          <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-            <button disabled className="rd-btn rd-btn-ghost" style={{ height: 28, padding: '0 10px', fontSize: 11, opacity: 0.5, cursor: 'not-allowed' }}>
-              View usage
-            </button>
-            <button disabled className="rd-btn rd-btn-ghost" style={{ height: 28, padding: '0 10px', fontSize: 11, opacity: 0.5, cursor: 'not-allowed' }}>
-              Revoke
-            </button>
-          </div>
+          <code
+            style={{
+              flex: 1,
+              fontFamily: 'var(--font-jetbrains), monospace',
+              fontSize: 12,
+              color: 'var(--rd-text)',
+              wordBreak: 'break-all',
+            }}
+          >
+            {apiKey}
+          </code>
+          <button
+            onClick={copy}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '6px 10px',
+              background: copied ? 'var(--rd-pos)' : 'var(--rd-accent)',
+              color: '#00121a',
+              border: 0,
+              borderRadius: 4,
+              fontFamily: 'var(--font-jetbrains), monospace',
+              fontSize: 11,
+              fontWeight: 600,
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+              flexShrink: 0,
+            }}
+          >
+            <Copy size={11} /> {copied ? 'copied' : 'copy'}
+          </button>
         </div>
-
-        {/* Webhook section — preview only */}
         <div
           style={{
-            marginTop: 18,
-            paddingTop: 18,
-            borderTop: '1px solid var(--rd-line)',
+            fontFamily: 'var(--font-jetbrains), monospace',
+            fontSize: 11,
+            color: 'var(--rd-text-3)',
+            marginBottom: 16,
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr',
+            gap: '4px 12px',
           }}
         >
-          <div style={{ fontFamily: 'var(--font-jetbrains), monospace', fontSize: 10, color: 'var(--rd-text-3)', letterSpacing: '0.1em', marginBottom: 8 }}>
-            WEBHOOK · NOT YET IMPLEMENTED
-          </div>
-          <p style={{ fontSize: 12, color: 'var(--rd-text-3)', marginBottom: 10 }}>
-            Receive notifications when triggers fire, bonds mature, or listings sell.
-          </p>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input
-              placeholder="https://your-bot.com/webhook"
-              disabled
-              style={{
-                flex: 1,
-                padding: '10px 12px',
-                background: 'var(--rd-surface)',
-                border: '1px solid var(--rd-line)',
-                borderRadius: 6,
-                color: 'var(--rd-text-3)',
-                fontFamily: 'var(--font-jetbrains), monospace',
-                fontSize: 12,
-                opacity: 0.5,
-                cursor: 'not-allowed',
-              }}
-            />
-            <button disabled className="rd-btn rd-btn-ghost" style={{ height: 38, opacity: 0.5, cursor: 'not-allowed' }}>
-              Save
-            </button>
-          </div>
+          <span style={{ color: 'var(--rd-text-4)' }}>label</span>
+          <span>{label}</span>
+          <span style={{ color: 'var(--rd-text-4)' }}>created</span>
+          <span>{new Date(createdAt).toISOString()}</span>
         </div>
-      </div>
-
-      <div style={{ marginTop: 18, fontSize: 11, color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
-        <ExternalLink size={11} /> Track this:{' '}
-        <a
-          href="https://github.com/org-lumina/lumina-api/issues"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: 'var(--rd-accent)' }}
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 12,
+            color: 'var(--rd-text-2)',
+            marginBottom: 14,
+            cursor: 'pointer',
+          }}
         >
-          org-lumina/lumina-api/issues
-        </a>
+          <input
+            type="checkbox"
+            checked={confirmed}
+            onChange={(e) => setConfirmed(e.target.checked)}
+          />
+          I&apos;ve saved this key in my password manager / .env file.
+        </label>
+        <button
+          onClick={onClose}
+          disabled={!confirmed}
+          style={{
+            width: '100%',
+            padding: '10px 14px',
+            background: confirmed ? 'var(--rd-accent)' : 'var(--rd-surface-2)',
+            color: confirmed ? '#00121a' : 'var(--rd-text-3)',
+            border: 0,
+            borderRadius: 6,
+            fontWeight: 600,
+            fontSize: 13,
+            cursor: confirmed ? 'pointer' : 'not-allowed',
+            fontFamily: 'inherit',
+          }}
+        >
+          Close — I have it
+        </button>
       </div>
     </div>
   )
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '8px 10px',
+  background: 'var(--rd-surface-2)',
+  border: '1px solid var(--rd-line)',
+  borderRadius: 5,
+  color: 'var(--rd-text)',
+  fontFamily: 'var(--font-jetbrains), monospace',
+  fontSize: 13,
 }
