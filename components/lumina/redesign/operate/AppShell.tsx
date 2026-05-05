@@ -22,7 +22,11 @@ const AGENT_LINKS = [
   { href: '/app/agent/dashboard', label: 'Dashboard', glyph: '◇' },
   { href: '/app/agent/policies', label: 'Policies', glyph: '◆' },
   { href: '/app/agent/bonds', label: 'Bonds', glyph: '◈' },
-  { href: '/app/agent/api-keys', label: 'API Keys', glyph: '◉' },
+  { href: '/app/agent/marketplace', label: 'Marketplace', glyph: '◉' },
+  { href: '/app/agent/earnings', label: 'Earnings', glyph: '$' },
+  { href: '/app/agent/activity', label: 'Activity', glyph: '~' },
+  { href: '/app/agent/webhooks', label: 'Webhooks', glyph: '→' },
+  { href: '/app/agent/api-keys', label: 'API Keys', glyph: '◍' },
 ] as const
 
 export function AppShell({ role, children }: { role: Role; children: ReactNode }) {
