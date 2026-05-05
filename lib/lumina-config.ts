@@ -26,6 +26,12 @@ export const CHAIN = {
   explorerApi: "https://api-sepolia.basescan.org/api",
 } as const
 
+// Earliest block we ever need to scan for V5.1 events. Set to a few days
+// before the 2026-04-27 deploy as a safety margin. eth_getLogs from this
+// block forward via getLogsChunked is well within Base Sepolia public-RPC
+// limits when chunked at 5k blocks. Update if contracts are redeployed.
+export const DEPLOY_BLOCK_SEPOLIA = 24_000_000n
+
 export const TOKENS = {
   USDC: {
     // V5.1 testnet — MockUSDC deployed alongside the protocol

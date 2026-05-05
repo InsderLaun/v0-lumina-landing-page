@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useAccount, usePublicClient, useReadContracts } from 'wagmi'
 import { formatUnits, type Hex } from 'viem'
-import { CONTRACTS } from '@/lib/lumina-config'
+import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { claimBondAbi } from '@/lib/abis/operate'
+import { getLogsChunked } from '@/lib/getLogsChunked'
 
 type RangeFilter = '24h' | '7d' | '30d' | 'all'
 type StatusFilter = 'all' | 'holding' | 'matured' | 'redeemed'
@@ -57,7 +58,8 @@ export function AgentBondsView() {
         if (cancelled) return
         setLatestBlock(block)
 
-        const logs = await publicClient.getLogs({
+        const logs = await getLogsChunked({
+          client: publicClient,
           address: CONTRACTS.ClaimBond,
           event: {
             type: 'event',
@@ -69,11 +71,12 @@ export function AgentBondsView() {
             ],
           },
           args: { to: address },
-          fromBlock: 'earliest',
+          fromBlock: DEPLOY_BLOCK_SEPOLIA,
+          toBlock: block,
         })
         if (cancelled) return
         setMints(
-          logs
+          (logs as any[])
             .map((l) => ({
               epochId: l.args.epochId as bigint,
               usdAmount: l.args.usdAmount as bigint,

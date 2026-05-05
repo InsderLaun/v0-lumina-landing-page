@@ -7,6 +7,7 @@ import { useAccount, useChainId, useDisconnect, useReadContract, useSwitchChain 
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { baseSepolia } from 'wagmi/chains'
 import { erc20Abi, formatUnits } from 'viem'
+import { LogOut } from 'lucide-react'
 import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
 
 type Role = 'human' | 'agent'
@@ -183,33 +184,67 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
           )}
 
           {isConnected ? (
-            <button
-              onClick={() => disconnect()}
-              title="Click to disconnect"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '6px 12px',
-                background: 'var(--rd-surface)',
-                border: '1px solid var(--rd-line-strong)',
-                borderRadius: 6,
-                fontFamily: 'var(--font-jetbrains), monospace',
-                fontSize: 11,
-                color: 'var(--rd-text)',
-                cursor: 'pointer',
-              }}
-            >
-              <span
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div
+                title={address ?? ''}
                 style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #00d4ff, #f472b6)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '6px 12px',
+                  background: 'var(--rd-surface)',
+                  border: '1px solid var(--rd-line-strong)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--font-jetbrains), monospace',
+                  fontSize: 11,
+                  color: 'var(--rd-text)',
+                  cursor: 'default',
+                  userSelect: 'all',
                 }}
-              />
-              {truncAddr}
-            </button>
+              >
+                <span
+                  style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #00d4ff, #f472b6)',
+                  }}
+                />
+                {truncAddr}
+              </div>
+              <button
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.confirm('Disconnect wallet?')) {
+                    disconnect()
+                  }
+                }}
+                title="Disconnect wallet"
+                aria-label="Disconnect wallet"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 30,
+                  height: 30,
+                  background: 'var(--rd-surface)',
+                  border: '1px solid var(--rd-line-strong)',
+                  borderRadius: 6,
+                  color: 'var(--rd-text-3)',
+                  cursor: 'pointer',
+                  transition: 'color .15s, border-color .15s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--rd-neg)'
+                  e.currentTarget.style.borderColor = 'color-mix(in oklab, var(--rd-neg) 50%, transparent)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--rd-text-3)'
+                  e.currentTarget.style.borderColor = 'var(--rd-line-strong)'
+                }}
+              >
+                <LogOut size={14} />
+              </button>
+            </div>
           ) : (
             <button
               onClick={() => openConnectModal?.()}
