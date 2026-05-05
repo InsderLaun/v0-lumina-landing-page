@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   useAccount,
+  useChainId,
   usePublicClient,
   useReadContract,
   useReadContracts,
   useWriteContract,
   useWaitForTransactionReceipt,
 } from 'wagmi'
+import { baseSepolia } from 'wagmi/chains'
 import { erc20Abi, formatUnits, type Hex } from 'viem'
 import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
 import { marketplaceAbi, claimBondAbi } from '@/lib/abis/operate'
@@ -248,6 +250,8 @@ export function MarketplaceView() {
 
 function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) {
   const { address, isConnected } = useAccount()
+  const chainId = useChainId()
+  const wrongChain = isConnected && chainId !== baseSepolia.id
   const { writeContract, data: tx, isPending, error: writeErr, reset } = useWriteContract()
   const { isLoading: confirming, isSuccess } = useWaitForTransactionReceipt({ hash: tx })
 
@@ -361,7 +365,7 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
       {mine ? (
         <button
           onClick={handleCancel}
-          disabled={busy || isSuccess}
+          disabled={wrongChain || busy || isSuccess}
           style={{
             padding: '8px 12px',
             background: 'transparent',
@@ -379,7 +383,7 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
       ) : (
         <button
           onClick={handleBuy}
-          disabled={!isConnected || busy || isSuccess}
+          disabled={!isConnected || wrongChain || busy || isSuccess}
           style={{
             padding: '8px 12px',
             background: isSuccess ? 'transparent' : 'var(--rd-accent)',
