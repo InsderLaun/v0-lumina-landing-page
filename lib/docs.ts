@@ -16,11 +16,10 @@ export type DocCategory =
   | 'governance'
   | 'economics'
   | 'roadmap'
-  | 'historical'
 
 export type DocRepo = 'lumina-api' | 'LUMINA-PROTOCOL' | 'v0-lumina-landing-page'
 
-export type DocBadge = 'new' | 'deprecated' | 'historical'
+export type DocBadge = 'new' | 'deprecated'
 
 export interface DocEntry {
   title: string
@@ -72,7 +71,6 @@ export const CATEGORIES: {
   { id: 'governance', label: 'Governance & Operations', emoji: '⚖️', description: 'Roles, access control, multisig policies, incident response' },
   { id: 'economics', label: 'Tokenomics & Economics', emoji: '📊', description: 'Token distribution, burn mechanics, premium math, vesting' },
   { id: 'roadmap', label: 'Roadmap', emoji: '🗺️', description: 'Future plans and milestones' },
-  { id: 'historical', label: 'Historical', emoji: '📜', description: 'Changelog and deprecated references — clearly marked' },
 ]
 
 export function buildDocUrl(entry: DocEntry): string {
@@ -574,31 +572,5 @@ export const DOCS: DocEntry[] = [
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/ROADMAP-V5.md',
     category: 'roadmap',
-  },
-
-  // ─── 📜 HISTORICAL ───────────────────────────────────────────
-  {
-    title: 'Changelog',
-    description: 'Version-by-version change log. Older entries reference V1/V2/V4 by design — current architecture is V5.1.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'CHANGELOG.md',
-    category: 'historical',
-    badge: 'historical',
-  },
-  {
-    title: 'V1 deprecated contracts',
-    description: 'Inventory of legacy V1/V2/V4 contracts no longer in scope. Kept to prevent re-deployment of stale addresses.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'docs/V1-DEPRECATED-CONTRACTS.md',
-    category: 'historical',
-    badge: 'deprecated',
-  },
-  {
-    title: 'Security audit V3 (final)',
-    description: 'Historical V3 audit for reference. Most findings rolled forward into V4 and V5; check SECURITY-AUDIT-V5 for current.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'docs/SECURITY-AUDIT-V3-FINAL.md',
-    category: 'historical',
-    badge: 'historical',
   },
 ]
