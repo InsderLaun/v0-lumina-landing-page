@@ -26,11 +26,13 @@ export const CHAIN = {
   explorerApi: "https://api-sepolia.basescan.org/api",
 } as const
 
-// Earliest block we ever need to scan for V5.1 events. Set to a few days
-// before the 2026-04-27 deploy as a safety margin. eth_getLogs from this
-// block forward via getLogsChunked is well within Base Sepolia public-RPC
-// limits when chunked at 5k blocks. Update if contracts are redeployed.
-export const DEPLOY_BLOCK_SEPOLIA = 24_000_000n
+// Earliest block we need to scan for V5.1 events. Tightened to the actual
+// deploy on 2026-04-27 — ClaimBond was the first of the five core contracts,
+// minted at block 40_775_247 (creation tx
+// 0x6b4eac4d3d083432699c511897b21c2e49a6d3b8c6dc16f934db6add375c0616).
+// Floored to 40_775_000 to leave a small margin for any contract redeployed
+// in the same window. Bound by getLogsChunked so size is not a concern.
+export const DEPLOY_BLOCK_SEPOLIA = 40_775_000n
 
 export const TOKENS = {
   USDC: {
