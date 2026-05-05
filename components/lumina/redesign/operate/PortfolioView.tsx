@@ -8,6 +8,7 @@ import { claimBondAbi, bondVaultAbi, policyManagerV2Abi } from '@/lib/abis/opera
 import { SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { LoadError } from './LoadError'
+import { BondCard } from './BondCard'
 
 type Tab = 'policies' | 'bonds'
 
@@ -228,13 +229,45 @@ export function PortfolioView() {
       .sort((a, b) => Number(a.maturityTs - b.maturityTs))
   }, [bondData, userEpochs])
 
-  // Active = block.timestamp < createdAt + duration. Re-derived on each render
-  // so stale rows fall off without needing a refetch — the component re-renders
-  // on every state change anyway.
+  // ─── Per-policy on-chain `triggered` flag ───
+  // PolicyManagerV2.policies[productId][policyId].triggered flips true
+  // when submitTrigger fires. We must hide those from "Active Policies"
+  // (the bond mint replaces the policy as the user's position).
+  const policyReadContracts = useMemo(
+    () =>
+      policies.map((p) => ({
+        address: CONTRACTS.PolicyManager,
+        abi: policyManagerV2Abi,
+        functionName: 'getPolicy' as const,
+        args: [p.productId, p.policyId] as const,
+      })),
+    [policies],
+  )
+  const { data: policyOnChain } = useReadContracts({
+    contracts: policyReadContracts,
+    query: { enabled: policyReadContracts.length > 0 },
+  })
+
+  const triggeredKeys = useMemo(() => {
+    const set = new Set<string>()
+    if (!policyOnChain) return set
+    policies.forEach((p, i) => {
+      const r = policyOnChain[i]
+      if (r?.status !== 'success') return
+      const rec = r.result as { triggered: boolean }
+      if (rec.triggered) set.add(`${p.productId.toLowerCase()}-${p.policyId.toString()}`)
+    })
+    return set
+  }, [policyOnChain, policies])
+
+  // Active = not yet expired AND not triggered. Re-derived on each render.
   const activePolicies = useMemo(() => {
     const now = BigInt(Math.floor(Date.now() / 1000))
-    return policies.filter((p) => p.expiresAt > 0n && now < p.expiresAt)
-  }, [policies])
+    return policies.filter((p) => {
+      if (p.expiresAt === 0n || now >= p.expiresAt) return false
+      return !triggeredKeys.has(`${p.productId.toLowerCase()}-${p.policyId.toString()}`)
+    })
+  }, [policies, triggeredKeys])
 
   return (
     <div style={{ padding: '28px 32px' }}>
@@ -340,10 +373,22 @@ function BondsTable({ rows, err, onRetry, onRedeemed }: { rows: BondRow[]; err: 
   if (err) return <LoadError message={err} onRetry={onRetry} />
   if (rows.length === 0) return <Empty>No bonds yet. Bonds are minted when a policy trigger fires.</Empty>
   return (
-    <div style={{ background: 'var(--rd-surface)', border: '1px solid var(--rd-line)', borderRadius: 8, overflow: 'hidden' }}>
-      <Header cols={['Epoch', 'Face value', 'Maturity', 'Status', 'Action']} weights="1fr 1fr 1.2fr 1fr 1.4fr" />
-      {rows.map((b, i) => (
-        <BondActionRow key={b.epochId.toString()} bond={b} last={i === rows.length - 1} onRedeemed={onRedeemed} />
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: 14,
+      }}
+    >
+      {rows.map((b) => (
+        <BondCard
+          key={b.epochId.toString()}
+          epochId={b.epochId}
+          faceValue={b.faceValue}
+          maturityTs={b.maturityTs}
+          matured={b.matured}
+          onRedeemed={onRedeemed}
+        />
       ))}
     </div>
   )
