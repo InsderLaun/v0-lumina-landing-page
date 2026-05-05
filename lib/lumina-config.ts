@@ -72,6 +72,12 @@ export const CONTRACTS = {
   CoverRouter: "0x60447F880Fad94fe1E17DBe9A0Cb39923bC9f316" as `0x${string}`,
   PolicyManager: "0x04f94Bc24aAA87aDFA643EE1e55a35C683f30804" as `0x${string}`,
   Oracle: "0xe935806729Df8C95f3E8ab4e8D92FA29ad9B2867" as `0x${string}`, // CapacityOracle proxy
+  // LuminaOracleV2 — real EIP-712 shield oracle, deployed 2026-05-04.
+  // Replaces the deprecated MockShieldOracle (0xaB7F63d1F10168880F36Ec8b7D2d74f30ccC800c)
+  // which lacked verifyPriceProofEIP712. The 9 V5.1 shields were rebound to
+  // this address via UUPS upgrade in PR org-lumina/LUMINA-PROTOCOL#101.
+  // See docs/architecture/ORACLE-V2.md in the protocol repo.
+  LuminaOracleV2: "0x8cAbC4645a3981FF59d39328f9F65FdFD19Bd194" as `0x${string}`,
   Phala: "0x0000000000000000000000000000000000000000" as `0x${string}`, // not deployed in V5.1 testnet
   // V5.1-only top-level contracts (new shape).
   LuminaToken: "0x17db45491561F7538e4E14449DCC34799758465D" as `0x${string}`,

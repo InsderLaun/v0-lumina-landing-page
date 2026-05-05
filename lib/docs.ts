@@ -240,7 +240,15 @@ export const DOCS: DocEntry[] = [
     category: 'source',
   },
 
-  // Oracles (2)
+  // Oracles (3)
+  {
+    title: 'LuminaOracleV2.sol',
+    description: 'EIP-712 signed price proofs from the off-chain signer. Verifies signatures against the trusted oracleKey. The 9 V5.1 shields call verifyPriceProofEIP712 here in their _doVerifyAndCalculate path. Replaces the pre-launch MockShieldOracle.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/oracles/LuminaOracleV2.sol',
+    category: 'source',
+    badge: 'new',
+  },
   {
     title: 'CapacityOracle.sol',
     description: 'Reads available BondVault capacity in USD using a 1h TWAP of LUMINA price (not spot — anti-MEV).',
