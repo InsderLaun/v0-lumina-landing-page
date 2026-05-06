@@ -30,6 +30,15 @@ const API = LUMINA_API_URL
 export type Audience = 'human' | 'agent'
 export type AnyStep = Omit<TutorialStepProps, 'audience'> & { audience: Audience }
 
+// One-shot reminder rendered above the step list. The on-chain ABI uses one
+// `asset` argument to identify the covered asset (BTC / ETH / USDT / AAVE_RATE
+// — encoded as bytes32). Premium is always pulled in USDC, regardless of the
+// covered asset. Keep this in sync with components/lumina/redesign/Products.tsx.
+export const PURCHASE_ASSET_NOTICE = {
+  title: 'Premium is always paid in USDC',
+  body: 'The on-chain `asset` field identifies the COVERED asset (e.g. BTC for FlashBTC, USDT for MicroDepeg). It is not the payment currency. CoverRouterV2.purchasePolicy pulls the premium in USDC from your wallet (or the relayer wallet for agents) for every product in the V5.1 catalogue.',
+} as const
+
 // ════════════════════════════════════════════════════════════════
 // HUMAN FLOW — wallet + on-chain calls via the Operate App
 // ════════════════════════════════════════════════════════════════

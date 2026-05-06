@@ -95,15 +95,19 @@ Verifiable on BaseScan. The code is the law.
   Payout is FIXED IN USD. Settled in $LUMINA at market price at redemption.
 
 ### Product table:
-  FLASH-BTC-1H    BTC drops 5%                     1 hour    0.20%   333x
-  FLASH-BTC-4H    BTC drops 8%                     4 hours   0.35%   190x
-  FLASH-BTC-24H   BTC drops 10%                    24 hours  1.50%    44x
-  FLASH-BTC-48H   BTC drops 15%                    48 hours  0.80%    83x
-  FLASH-ETH-1H    ETH drops 7%                     1 hour    0.25%   266x
-  FLASH-ETH-24H   ETH drops 12%                    24 hours  2.00%    33x
-  FLASH-ETH-48H   ETH drops 18%                    48 hours  0.90%    74x
-  MICRO-DEPEG     USDT trades below $0.995         7 days    3.50%    19x
-  RATE-SHOCK      Aave USDC borrow rate above 10%  7 days    4.00%    17x
+All products: premium paid in USDC. The "Covers" column is the asset whose
+price (or rate) the oracle observes for the trigger.
+
+  Symbol           Covers  Trigger                          Window    P(trig)  Mult
+  FLASHBTC1H-001   BTC     BTC drops 5%                     1 hour    0.20%    333x
+  FLASHBTC4H-001   BTC     BTC drops 8%                     4 hours   0.35%    190x
+  FLASHBTC24-001   BTC     BTC drops 10%                    24 hours  1.50%     44x
+  FLASHBTC48-001   BTC     BTC drops 15%                    48 hours  0.80%     83x
+  FLASHETH1H-001   ETH     ETH drops 7%                     1 hour    0.25%    266x
+  FLASHETH24-001   ETH     ETH drops 12%                    24 hours  2.00%     33x
+  FLASHETH48-001   ETH     ETH drops 18%                    48 hours  0.90%     74x
+  MICRODEPEG-001   USDT    USDT trades below $0.995         7 days    3.50%     19x
+  RATESHOCK-001    USDC    Aave USDC borrow rate above 10%  7 days    4.00%     17x
 
 ### Example at $1,000 coverage:
   Flash BTC 1h:  Premium $2.40 → Bond of $800 (333x)

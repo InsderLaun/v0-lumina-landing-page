@@ -92,7 +92,7 @@ export function BurnEngine() {
     <section className="rd-sec rd-sec-alt" id="burn">
       <div className="wrap">
         <div className="rd-sec-num">
-          04 / 06 · <span>Deflationary Flow</span>
+          05 / 07 · <span>Deflationary Flow</span>
         </div>
         <div className="rd-flow">
           <div>

@@ -15,7 +15,12 @@ import {
   type TutorialSidebarItem,
 } from '@/components/lumina/redesign/TutorialSidebar'
 import { CompareSection } from '@/components/lumina/redesign/CompareSection'
-import { HUMAN_STEPS, AGENT_STEPS, type Audience } from './tutorial-data'
+import {
+  HUMAN_STEPS,
+  AGENT_STEPS,
+  PURCHASE_ASSET_NOTICE,
+  type Audience,
+} from './tutorial-data'
 
 export default function TutorialPage() {
   return (
@@ -104,6 +109,39 @@ function TutorialBody() {
       <main className="rd-tut-layout">
         <TutorialSidebar items={sidebarItems} mode={mode} />
         <div className="rd-tut-content">
+          <aside
+            role="note"
+            style={{
+              marginBottom: 32,
+              padding: '16px 20px',
+              border: '1px solid var(--rd-line-strong)',
+              borderRadius: 'var(--rd-radius)',
+              background: 'var(--rd-bg-2)',
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'var(--font-jetbrains), monospace',
+                fontSize: 11,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--rd-accent)',
+                marginBottom: 6,
+              }}
+            >
+              {PURCHASE_ASSET_NOTICE.title}
+            </div>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 13,
+                lineHeight: 1.6,
+                color: 'var(--rd-text-2)',
+              }}
+            >
+              {PURCHASE_ASSET_NOTICE.body}
+            </p>
+          </aside>
           {steps.map((s) => (
             <TutorialStep key={s.id} {...s} />
           ))}

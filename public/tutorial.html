@@ -57,6 +57,10 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <p><strong>Think of it like this:</strong> You give your AI agent a credit card (API Key) with a spending limit (Approve). The agent decides when to place parametric bets on one of the 9 Lumina products — all based on rules you define. If a bet's trigger fires, your agent receives ClaimBond ERC-1155 tokens that redeem at 24 months for their full USD face value in $LUMINA.</p>
 </div>
 
+<div class="info" style="border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.08)">
+<p style="margin-bottom:0"><strong style="color:#a78bfa">Premium is always paid in USDC.</strong> The on-chain <code>asset</code> field on <code>purchasePolicy</code> identifies the <em>covered</em> asset (BTC, ETH, USDT, or AAVE_RATE — encoded as bytes32). It is not the payment currency. USDC is debited from your wallet for every product in the V5.1 catalogue.</p>
+</div>
+
 <h2>What You Need</h2>
 <table>
 <tr><th>Item</th><th>What It Is</th><th>Where to Get It</th></tr>
@@ -373,7 +377,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <div style="margin-top:16px;margin-bottom:12px;padding:14px;background:rgba(34,211,238,0.05);border:1px solid rgba(34,211,238,0.15);border-radius:8px">
 <p style="color:#22d3ee;font-size:0.85rem;font-weight:600;margin-bottom:6px">💬 Using ChatGPT or Claude?</p>
-<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Tell your agent: <em>"Buy a BTC Catastrophe Shield (BTCCAT-001) for $100, 7 days duration, asset BTC."</em> Your agent will call the Lumina API and respond with a confirmation including the policy ID.</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.8rem;line-height:1.6;margin:0">Tell your agent: <em>"Buy a Flash BTC 24h policy (FLASHBTC24-001) for $1,000 coverage."</em> Your agent will call the Lumina API and respond with a confirmation including the policy ID. Premium is paid in USDC; the covered asset is BTC.</p>
 </div>
 
 <div style="margin-bottom:12px;padding:14px;background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:8px">
@@ -386,8 +390,8 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <pre style="margin-top:8px">curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
   -H "Content-Type: application/json" \
   -H "X-API-Key: lum_your_key_here" \
-  -d '{"productId":"FLASH-BTC-1H","coverageAmount":1000000000}'</pre>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This bets $1,000 coverage on Flash BTC 1h (BTC drops 5% in 1 hour). Premium ≈ $2.40. If trigger fires, you receive an $800 ClaimBond (ERC-1155) that matures 100% at 24 months, settled in $LUMINA at market price.</p>
+  -d '{"productId":"FLASHBTC1H-001","coverageAmount":1000000000,"asset":"BTC"}'</pre>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem">This bets $1,000 coverage on Flash BTC 1h (BTC drops 5% in 1 hour). Premium ≈ $2.40, paid in USDC. The covered asset is BTC. If the trigger fires, you receive an $800 ClaimBond (ERC-1155) that matures 100% at 24 months, settled in $LUMINA at market price.</p>
 </details>
 
 <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:12px">After your first purchase, check the <a href="/dashboard" style="color:#22d3ee">Dashboard</a> to see your active policy.</p>
@@ -466,17 +470,18 @@ function finishSetup() {
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:8px">Premium formula (fixed): <code>Premium = Coverage × 0.80 × P(trigger) × 1.50</code> — no kink, no utilization curves. Quick reference — <a href="https://www.lumina-org.com/#products" style="color:#22d3ee">full details on the main page</a></p>
 <div style="overflow-x:auto">
 <table class="table-insurance" style="width:100%">
-<tr><th>Product</th><th>API productId</th><th>Trigger</th><th>P(trigger)</th><th>Multiplier</th></tr>
-<tr><td>Flash BTC 1h</td><td><code>FLASH-BTC-1H</code></td><td>BTC -5% in 1 hour</td><td>0.20%</td><td>333x</td></tr>
-<tr><td>Flash BTC 4h</td><td><code>FLASH-BTC-4H</code></td><td>BTC -8% in 4 hours</td><td>0.35%</td><td>190x</td></tr>
-<tr><td>Flash BTC 24h</td><td><code>FLASH-BTC-24H</code></td><td>BTC -10% in 24 hours</td><td>1.50%</td><td>44x</td></tr>
-<tr><td>Flash BTC 48h</td><td><code>FLASH-BTC-48H</code></td><td>BTC -15% in 48 hours</td><td>0.80%</td><td>83x</td></tr>
-<tr><td>Flash ETH 1h</td><td><code>FLASH-ETH-1H</code></td><td>ETH -7% in 1 hour</td><td>0.25%</td><td>266x</td></tr>
-<tr><td>Flash ETH 24h</td><td><code>FLASH-ETH-24H</code></td><td>ETH -12% in 24 hours</td><td>2.00%</td><td>33x</td></tr>
-<tr><td>Flash ETH 48h</td><td><code>FLASH-ETH-48H</code></td><td>ETH -18% in 48 hours</td><td>0.90%</td><td>74x</td></tr>
-<tr><td>Micro Depeg</td><td><code>MICRO-DEPEG</code></td><td>USDT below $0.995 for 7 days</td><td>3.50%</td><td>19x</td></tr>
-<tr><td>Rate Shock</td><td><code>RATE-SHOCK</code></td><td>Aave USDC borrow &gt; 10% for 7 days</td><td>4.00%</td><td>17x</td></tr>
+<tr><th>Product</th><th>API productId</th><th>Covers</th><th>Trigger</th><th>P(trigger)</th><th>Multiplier</th></tr>
+<tr><td>Flash BTC 1h</td><td><code>FLASHBTC1H-001</code></td><td>BTC</td><td>BTC -5% in 1 hour</td><td>0.20%</td><td>333x</td></tr>
+<tr><td>Flash BTC 4h</td><td><code>FLASHBTC4H-001</code></td><td>BTC</td><td>BTC -8% in 4 hours</td><td>0.35%</td><td>190x</td></tr>
+<tr><td>Flash BTC 24h</td><td><code>FLASHBTC24-001</code></td><td>BTC</td><td>BTC -10% in 24 hours</td><td>1.50%</td><td>44x</td></tr>
+<tr><td>Flash BTC 48h</td><td><code>FLASHBTC48-001</code></td><td>BTC</td><td>BTC -15% in 48 hours</td><td>0.80%</td><td>83x</td></tr>
+<tr><td>Flash ETH 1h</td><td><code>FLASHETH1H-001</code></td><td>ETH</td><td>ETH -7% in 1 hour</td><td>0.25%</td><td>266x</td></tr>
+<tr><td>Flash ETH 24h</td><td><code>FLASHETH24-001</code></td><td>ETH</td><td>ETH -12% in 24 hours</td><td>2.00%</td><td>33x</td></tr>
+<tr><td>Flash ETH 48h</td><td><code>FLASHETH48-001</code></td><td>ETH</td><td>ETH -18% in 48 hours</td><td>0.90%</td><td>74x</td></tr>
+<tr><td>Micro Depeg</td><td><code>MICRODEPEG-001</code></td><td>USDT</td><td>USDT below $0.995 for 7 days</td><td>3.50%</td><td>19x</td></tr>
+<tr><td>Rate Shock</td><td><code>RATESHOCK-001</code></td><td>USDC</td><td>Aave USDC borrow &gt; 10% for 7 days</td><td>4.00%</td><td>17x</td></tr>
 </table>
+<p style="color:rgba(167,139,250,0.7);font-size:0.8rem;margin-top:8px;margin-bottom:0">All products: <strong>premium paid in USDC</strong>. The "Covers" column is the asset whose price (or rate) the oracle observes for the trigger.</p>
 </div>
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-top:12px;margin-bottom:0">100% of every premium buys $LUMINA on Uniswap V3 and burns it. Nothing goes to treasury, LPs, or the team. Every bet you lose makes $LUMINA scarcer forever.</p>
 
