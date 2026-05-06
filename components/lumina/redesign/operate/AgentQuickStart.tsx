@@ -5,7 +5,7 @@ import { useState } from 'react'
 const COVER_USDC_DEFAULT = '100000000' // $100 — on-chain minimum
 
 const SNIPPETS = {
-  ts: `// npm i @lumina-org/sdk ethers
+  ts: `// npm i @lumina-org/sdk@^0.3.0 ethers
 import { LuminaClient } from '@lumina-org/sdk'
 import { Wallet, JsonRpcProvider } from 'ethers'
 
@@ -16,48 +16,46 @@ const buyer = new Wallet(process.env.BUYER_PRIVATE_KEY!, provider)
 // One-time: approve CoverRouter to spend USDC
 await lumina.policies.ensureAllowance(buyer)
 
-// Buy a $100 FLASHBTC1H policy
+// Buy a $100 FLASHBTC1H policy.
+// SDK 0.3.0+ resolves productId hash + per-shield asset literal from productName.
 const receipt = await lumina.policies.purchase({
-  productId: '0xe87625ef7415a58c92f2639b16d176521429aac002386dddf1e47e419dfeaddd',
+  productName: 'FLASHBTC1H-001',
   buyer: await buyer.getAddress(),
   coverageAmount: '${COVER_USDC_DEFAULT}', // $100, the on-chain minimum
-  asset: 'USDC',
 })
 console.log('policyId =', receipt.policyId)`,
 
-  python: `# pip install requests web3
+  python: `# pip install requests
 import os, requests
-from web3 import Web3
 
 API   = "https://lumina-api-production-ac85.up.railway.app"
 KEY   = os.environ["LUMINA_API_KEY"]
 BUYER = os.environ["BUYER_ADDRESS"]
 
-# Buy a $100 FLASHBTC1H policy (buyer must have already approved CoverRouter)
+# Buy a $100 FLASHBTC1H policy (buyer must have already approved CoverRouter).
+# Pass productName — the API auto-resolves the productId hash AND the per-shield asset literal.
 resp = requests.post(
     f"{API}/api/v1/policies",
     headers={"x-api-key": KEY, "content-type": "application/json"},
     json={
-        "productId": "0xe87625ef7415a58c92f2639b16d176521429aac002386dddf1e47e419dfeaddd",
+        "productName": "FLASHBTC1H-001",
         "buyer": BUYER,
         "coverageAmount": "${COVER_USDC_DEFAULT}",  # $100
-        "asset": Web3.to_bytes(text="USDC").rjust(32, b"\\0").hex(),
     },
     timeout=20,
 )
 print(resp.json())`,
 
-  curl: `# Replace LUMINA_API_KEY and BUYER_ADDRESS with your values
-ASSET_USDC=0x5553444300000000000000000000000000000000000000000000000000000000
+  curl: `# Replace LUMINA_API_KEY and BUYER_ADDRESS with your values.
+# Pass productName — the API auto-resolves the productId hash AND the per-shield asset literal.
 
 curl -X POST https://lumina-api-production-ac85.up.railway.app/api/v1/policies \\
   -H "x-api-key: $LUMINA_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d "{
-    \\"productId\\": \\"0xe87625ef7415a58c92f2639b16d176521429aac002386dddf1e47e419dfeaddd\\",
+    \\"productName\\": \\"FLASHBTC1H-001\\",
     \\"buyer\\": \\"$BUYER_ADDRESS\\",
-    \\"coverageAmount\\": \\"${COVER_USDC_DEFAULT}\\",
-    \\"asset\\": \\"$ASSET_USDC\\"
+    \\"coverageAmount\\": \\"${COVER_USDC_DEFAULT}\\"
   }"`,
 } as const
 
