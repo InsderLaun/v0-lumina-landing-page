@@ -11,68 +11,50 @@ const SNIPPET = `import { LuminaClient } from '@lumina-org/sdk';
 const lumina = new LuminaClient({ apiKey });
 const listings = await lumina.marketplace.listings();`
 
-type Stats = {
-  floor: string
-  volume24h: string
-  activeListings: string
+export function toNum(v: string | number | null | undefined): number {
+  if (v === null || v === undefined) return 0
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0
+  const parsed = Number(v)
+  return Number.isFinite(parsed) ? parsed : 0
 }
 
-const INITIAL_STATS: Stats = {
-  floor: '—',
-  volume24h: '—',
-  activeListings: '—',
+export function formatUsdc(rawString: string | number | null | undefined): string {
+  const raw = toNum(rawString)
+  const human = raw / 1_000_000 // USDC has 6 decimals
+  return `$${human.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-function formatUsd(n: unknown): string {
-  if (typeof n !== 'number' || !Number.isFinite(n)) return '—'
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`
-  return n.toFixed(2)
+export function formatCount(n: string | number | null | undefined): string {
+  return toNum(n).toLocaleString('en-US')
 }
 
-function formatInt(n: unknown): string {
-  if (typeof n !== 'number' || !Number.isFinite(n)) return '—'
-  return Math.round(n).toLocaleString('en-US')
+type StatsRaw = {
+  floor: string | number | null
+  volume24h: string | number | null
+  totalListings: string | number | null
+  totalVolume?: string | number | null
 }
 
 export function MarketplaceSection() {
-  const [stats, setStats] = useState<Stats>(INITIAL_STATS)
+  const [stats, setStats] = useState<StatsRaw | null>(null)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
         const res = await fetch(STATS_URL, { method: 'GET' })
-        if (!res.ok) return
+        if (!res.ok) throw new Error('non-2xx')
         const data = (await res.json()) as Record<string, unknown>
         if (cancelled) return
-        const floor =
-          typeof data.floor === 'number'
-            ? data.floor
-            : typeof data.floorPrice === 'number'
-              ? data.floorPrice
-              : undefined
-        const vol =
-          typeof data.volume24h === 'number'
-            ? data.volume24h
-            : typeof data.volume_24h === 'number'
-              ? data.volume_24h
-              : undefined
-        const active =
-          typeof data.activeListings === 'number'
-            ? data.activeListings
-            : typeof data.active_listings === 'number'
-              ? data.active_listings
-              : typeof data.listings === 'number'
-                ? data.listings
-                : undefined
         setStats({
-          floor: floor !== undefined ? `$${formatUsd(floor)}` : '—',
-          volume24h: vol !== undefined ? `$${formatUsd(vol)}` : '—',
-          activeListings: active !== undefined ? formatInt(active) : '—',
+          floor: (data.floor as string | number) ?? null,
+          volume24h: (data.volume24h as string | number) ?? null,
+          totalListings: (data.totalListings as string | number) ?? null,
+          totalVolume: (data.totalVolume as string | number) ?? null,
         })
       } catch {
-        // Network/CORS errors fall back to placeholders silently.
+        if (!cancelled) setError(true)
       }
     }
     void load()
@@ -105,9 +87,16 @@ export function MarketplaceSection() {
           }}
         >
           {[
-            { label: 'Floor', value: stats.floor },
-            { label: '24h volume', value: stats.volume24h },
-            { label: 'Active listings', value: stats.activeListings },
+            { label: 'Floor', value: error ? '—' : stats ? formatUsdc(stats.floor) : '…' },
+            { label: '24h volume', value: error ? '—' : stats ? formatUsdc(stats.volume24h) : '…' },
+            {
+              label: 'Active listings',
+              value: error ? '—' : stats ? formatCount(stats.totalListings) : '…',
+            },
+            {
+              label: 'Total volume',
+              value: error ? '—' : stats ? formatUsdc(stats.totalVolume) : '…',
+            },
           ].map((s) => (
             <div
               key={s.label}
