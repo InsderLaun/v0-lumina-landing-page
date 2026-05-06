@@ -7,6 +7,7 @@ import { HowItWorks } from '@/components/lumina/redesign/HowItWorks'
 import { Bonds } from '@/components/lumina/redesign/Bonds'
 import { Products } from '@/components/lumina/redesign/Products'
 import { SdkCta } from '@/components/lumina/redesign/SdkCta'
+import { MarketplaceSection } from '@/components/lumina/redesign/MarketplaceSection'
 import { BurnEngine } from '@/components/lumina/redesign/BurnEngine'
 import { Audience } from '@/components/lumina/redesign/Audience'
 import { Roadmap } from '@/components/lumina/redesign/Roadmap'
@@ -26,6 +27,7 @@ export default function HomePage() {
         <Bonds />
         <Products />
         <SdkCta />
+        <MarketplaceSection />
         <BurnEngine />
         <Audience />
         <Roadmap />

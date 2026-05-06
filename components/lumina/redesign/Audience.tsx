@@ -29,7 +29,7 @@ export function Audience() {
     <section className="rd-sec" id="audiences" style={{ paddingBottom: 0 }}>
       <div className="wrap">
         <div className="rd-sec-num">
-          06 / 07 · <span>Three Doors</span>
+          07 / 08 · <span>Three Doors</span>
         </div>
         <h2>Built for humans, AI agents, and yield seekers — all using the same contracts.</h2>
         <p className="rd-sec-lede">
