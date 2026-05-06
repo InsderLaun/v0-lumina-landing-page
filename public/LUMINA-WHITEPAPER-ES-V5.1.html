@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumina Protocol — Whitepaper V5.1 (Español)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-dark:#0a0a0c;--bg-card:#111116;--bg-code:#0e0e12;
+  --accent:#00d4ff;--accent-dim:rgba(0,212,255,0.12);--accent-border:rgba(0,212,255,0.25);
+  --warn:#f59e0b;--pos:#00d48a;--neg:#ef4444;
+  --text-primary:#e8e8ec;--text-secondary:#a8a8b3;--text-muted:#6b6b78;
+  --border-subtle:rgba(255,255,255,0.06);--border-strong:#2a2a34;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+@page{margin:2cm;size:A4;}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.page-break{page-break-before:always;}.no-break,table{page-break-inside:avoid;}.cover-page,.toc-page{page-break-after:always;}}
+html{scroll-behavior:smooth;scroll-padding-top:80px;}
+h2[id],h3[id],[id^="sec-"]{scroll-margin-top:80px;}
+body{background:var(--bg-dark);color:var(--text-secondary);font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.7;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+.container{max-width:820px;margin:0 auto;padding:0 24px;}
+.cover-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;}
+.cover-page::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,var(--accent-dim) 0%,transparent 70%);pointer-events:none;}
+.cover-logo{font-size:56px;font-weight:900;color:var(--text-primary);letter-spacing:-0.04em;line-height:1;margin-bottom:18px;}
+.cover-logo span{color:var(--accent);}
+.cover-subtitle{font-size:18px;color:var(--text-secondary);max-width:560px;margin-bottom:32px;font-weight:300;letter-spacing:.005em;}
+.cover-divider{width:60px;height:2px;background:var(--accent);margin:24px 0;}
+.cover-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);letter-spacing:.04em;}
+.cover-meta strong{color:var(--text-primary);font-weight:500;}
+.cover-badges{display:flex;gap:10px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.cover-badge{padding:6px 14px;border:1px solid var(--accent-border);background:var(--accent-dim);color:var(--accent);border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;}
+.toc-page{padding:80px 0;}
+.toc-title{font-size:32px;font-weight:600;color:var(--text-primary);margin-bottom:32px;text-align:center;letter-spacing:-.02em;}
+.toc-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.toc-item{display:flex;align-items:baseline;gap:14px;padding:12px 16px;border-bottom:1px solid var(--border-subtle);transition:background .15s;}
+.toc-item:hover{background:rgba(255,255,255,.02);}
+.toc-number{font-family:'JetBrains Mono',monospace;color:var(--text-muted);font-size:12px;flex-shrink:0;width:32px;}
+.toc-label{color:var(--text-secondary);text-decoration:none;flex:1;}
+.toc-label:hover{color:var(--accent);}
+.section{padding:60px 0;}
+.section-divider{height:1px;background:var(--border-subtle);margin:0;}
+.section h2{font-size:28px;font-weight:700;color:var(--text-primary);margin:0 0 16px;letter-spacing:-.02em;line-height:1.2;}
+.section h3{font-size:18px;font-weight:600;color:var(--text-primary);margin:32px 0 12px;letter-spacing:-.01em;}
+.section p{margin-bottom:14px;}
+.section ul,.section ol{margin:0 0 14px 24px;}
+.section li{margin-bottom:6px;}
+strong{color:var(--text-primary);font-weight:600;}
+em{color:var(--accent);font-style:normal;font-weight:500;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--bg-code);padding:2px 6px;border-radius:3px;color:var(--text-primary);border:1px solid var(--border-subtle);}
+a{color:var(--accent);text-decoration:none;}
+a:hover{text-decoration:underline;}
+.callout{background:var(--bg-card);border:1px solid var(--border-subtle);border-left:3px solid var(--accent);padding:14px 18px;margin:18px 0;border-radius:6px;}
+.callout.warn{border-left-color:var(--warn);}
+.callout.danger{border-left-color:var(--neg);}
+.callout-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
+.callout.warn .callout-title{color:var(--warn);}
+.callout.danger .callout-title{color:var(--neg);}
+.table-wrap{margin:14px 0 22px;overflow-x:auto;border:1px solid var(--border-subtle);border-radius:8px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-subtle);}
+th{background:var(--bg-card);color:var(--text-primary);font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase;}
+tr:last-child td{border-bottom:0;}
+td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondary);}
+.code-block{background:var(--bg-code);border:1px solid var(--border-subtle);border-radius:8px;padding:14px 18px;margin:14px 0;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.55;color:var(--text-primary);overflow-x:auto;white-space:pre;}
+.code-block .keyword{color:var(--accent);}
+.code-block .comment{color:var(--text-muted);font-style:italic;}
+.code-block .value{color:var(--warn);}
+.formula{background:var(--bg-card);border:1px solid var(--border-subtle);padding:18px;margin:14px 0;border-radius:8px;font-family:'JetBrains Mono',monospace;text-align:center;font-size:14px;color:var(--text-primary);}
+.footer{padding:60px 0 80px;border-top:1px solid var(--border-subtle);font-size:12px;color:var(--text-muted);text-align:center;font-family:'JetBrains Mono',monospace;}
+.footer a{color:var(--text-secondary);}
+.lang-toggle{position:fixed;top:18px;right:18px;display:flex;gap:4px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:999px;padding:4px;font-family:'JetBrains Mono',monospace;font-size:11px;z-index:10;}
+.lang-toggle a{padding:5px 12px;border-radius:999px;color:var(--text-muted);}
+.lang-toggle a.active{background:var(--accent);color:#001018;font-weight:600;}
+@media (max-width:720px){
+  body{font-size:13px;}
+  .cover-logo{font-size:38px;}
+  .cover-subtitle{font-size:15px;padding:0 16px;}
+  .section h2{font-size:22px;}
+  .section h3{font-size:16px;}
+  .toc-page{padding:48px 0;}
+  .lang-toggle{top:12px;right:12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="lang-toggle">
+  <a href="/whitepaper/en">EN</a>
+  <a href="/whitepaper/es" class="active">ES</a>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     PORTADA
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="cover-page">
+  <div class="container">
+    <h1 class="cover-logo">LUMINA<span>.</span></h1>
+    <p class="cover-subtitle">Seguros paramétricos on-chain para agentes de IA autónomos y humanos. Las primas queman $LUMINA. Los disparos generan ClaimBonds cupón-cero. Liquidados por oráculos de grado Chainlink.</p>
+    <div class="cover-divider"></div>
+    <div class="cover-meta">
+      Whitepaper <strong>V5.1</strong> &middot; Español &middot; 06-05-2026<br>
+      Red: <strong>Base Sepolia</strong> (chainId 84532) &middot; Mainnet pendiente<br>
+      <a href="https://github.com/org-lumina">github.com/org-lumina</a>
+    </div>
+    <div class="cover-badges">
+      <span class="cover-badge">9 Shields activos</span>
+      <span class="cover-badge">Suministro fijo 100M</span>
+      <span class="cover-badge">Oráculo EIP-712</span>
+      <span class="cover-badge">Código abierto</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     ÍNDICE
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="toc-page">
+  <div class="container">
+    <h2 class="toc-title">Índice</h2>
+    <ol class="toc-list">
+      <li class="toc-item"><span class="toc-number">01</span><a class="toc-label" href="#sec-1">Resumen Ejecutivo</a></li>
+      <li class="toc-item"><span class="toc-number">02</span><a class="toc-label" href="#sec-2">Introducción</a></li>
+      <li class="toc-item"><span class="toc-number">03</span><a class="toc-label" href="#sec-3">Arquitectura del Protocolo</a></li>
+      <li class="toc-item"><span class="toc-number">04</span><a class="toc-label" href="#sec-4">Productos de Seguro — los 9 Shields</a></li>
+      <li class="toc-item"><span class="toc-number">05</span><a class="toc-label" href="#sec-5">Modelo de Precios y Primas</a></li>
+      <li class="toc-item"><span class="toc-number">06</span><a class="toc-label" href="#sec-6">BondVault, ClaimBond y Vencimiento</a></li>
+      <li class="toc-item"><span class="toc-number">07</span><a class="toc-label" href="#sec-7">Oráculo y Verificación</a></li>
+      <li class="toc-item"><span class="toc-number">08</span><a class="toc-label" href="#sec-8">Tokenomics</a></li>
+      <li class="toc-item"><span class="toc-number">09</span><a class="toc-label" href="#sec-9">Motor de Quema y Flujo Deflacionario</a></li>
+      <li class="toc-item"><span class="toc-number">10</span><a class="toc-label" href="#sec-10">Marketplace Secundario</a></li>
+      <li class="toc-item"><span class="toc-number">11</span><a class="toc-label" href="#sec-11">Modelo de Seguridad</a></li>
+      <li class="toc-item"><span class="toc-number">12</span><a class="toc-label" href="#sec-12">Para Agentes de IA</a></li>
+      <li class="toc-item"><span class="toc-number">13</span><a class="toc-label" href="#sec-13">Roadmap</a></li>
+      <li class="toc-item"><span class="toc-number">14</span><a class="toc-label" href="#sec-14">Riesgos y Aviso Legal</a></li>
+      <li class="toc-item"><span class="toc-number">15</span><a class="toc-label" href="#sec-15">Marco Legal</a></li>
+      <li class="toc-item"><span class="toc-number">A</span><a class="toc-label" href="#sec-A">Apéndice A — Direcciones Desplegadas</a></li>
+      <li class="toc-item"><span class="toc-number">B</span><a class="toc-label" href="#sec-B">Apéndice B — Glosario</a></li>
+      <li class="toc-item"><span class="toc-number">C</span><a class="toc-label" href="#sec-C">Apéndice C — Referencias</a></li>
+    </ol>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     1. RESUMEN EJECUTIVO
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-1">
+  <div class="container">
+    <h2>1. Resumen Ejecutivo</h2>
+    <p>Lumina Protocol es un <strong>sistema de seguros paramétricos on-chain</strong> desplegado sobre Base. Paga automáticamente cuando un oráculo confirma un evento medible —una caída de precio, una pérdida de paridad de un stablecoin, un alza sostenida de tasas de préstamo— sin peritos, sin votaciones y sin intervención humana.</p>
+    <p>El protocolo se construye sobre cuatro primitivas:</p>
+    <ul>
+      <li><strong>9 Shields paramétricos</strong> que cubren desplomes flash de BTC y ETH (ventanas de 1h, 4h, 24h y 48h), micro-pérdidas de paridad de USDT y choques de tasa en el mercado de USDC de Aave V3.</li>
+      <li><strong>Un único BondVault inmutable</strong> que custodia 70&nbsp;millones de $LUMINA como reserva del protocolo. Cuando una póliza se dispara, el comprador recibe <strong>ClaimBonds</strong>: bonos cupón-cero ERC-1155 con valor nominal fijo de USD 1 cada uno, redimibles en $LUMINA al vencimiento (730 días).</li>
+      <li><strong>Un token deflacionario (LUMINA, suministro fijo de 100M)</strong>. Cada prima en USDC y cada comisión del marketplace secundario se enrutan al <em>TWAPBurner</em>, que compra $LUMINA en Uniswap V3 y lo quema enviándolo a <code>0xdead</code>. No existe función de mint.</li>
+      <li><strong>Una API con relayer</strong> que permite a los agentes de IA autónomos comprar, redimir e intercambiar pólizas mediante una sola llamada HTTP firmada, sin necesidad de tener ETH para gas.</li>
+    </ul>
+    <p>V5.1 es la versión productiva actual en Base Sepolia. Está <strong>plenamente operativa</strong>: nueve shields activos, las primas fluyen al motor de quema, el marketplace está abierto, el oráculo EIP-712 (LuminaOracleV2) verifica pruebas de precio firmadas, y un endpoint de onboarding self-service permite a los agentes generar API keys con una sola firma de wallet.</p>
+    <p>Este whitepaper documenta lo que está desplegado al día de hoy. Las afirmaciones prospectivas se confinan a la <a href="#sec-13">Sección 13 (Roadmap)</a> y la <a href="#sec-14">Sección 14 (Riesgos)</a>. Cada cifra, dirección de contrato y firma de función está fundada en el código fuente de V5.1 y en el endpoint en vivo <code>/health</code> de la API productiva.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     2. INTRODUCCIÓN
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-2">
+  <div class="container">
+    <h2>2. Introducción</h2>
+    <h3>2.1 El problema: DeFi sin protección para agentes autónomos</h3>
+    <p>Las finanzas descentralizadas han madurado hacia una economía programable donde los bots y agentes de IA ejecutan ya la mayoría del volumen on-chain. Pueden prestar, tomar prestado, hacer swaps, cubrirse y rebalancear, pero no pueden asegurarse contra los pocos eventos que liquidan estrategias enteras en un solo bloque: desplomes flash, pérdidas de paridad de stablecoins, picos de tasa que fuerzan liquidaciones.</p>
+    <p>Los seguros cripto existentes —Nexus Mutual, InsurAce, Sherlock— se estructuran sobre <strong>siniestros discrecionales</strong>: se reporta el evento, un comité vota, el pago se emite (o se deniega) días o semanas después. Eso es fundamentalmente incompatible con agentes autónomos que requieren una respuesta determinística y de menos de un minuto.</p>
+    <h3>2.2 Lo que hace Lumina de forma distinta</h3>
+    <p>Lumina es <strong>paramétrico</strong>: cada póliza especifica una condición objetiva de disparo (por ejemplo, "BTC cae &ge; 5% en cualquier ventana móvil de 1 hora"). Cuando un oráculo confirma la condición, el pago se dispara automáticamente dentro de la misma transacción. No hay formulario de siniestro, no hay comité, no hay demora, no existe la posibilidad de denegación subjetiva.</p>
+    <p>Lumina también es <strong>agent-first</strong>. La API expone un patrón de relayer (<code>POST /api/v1/policies</code>) en el cual el protocolo paga el gas y el agente solo necesita un encabezado <code>x-api-key</code>. Veintidós archivos de SKILL individuales que estandarizan las operaciones más frecuentes permiten a un agente integrarse de extremo a extremo con Lumina en menos de una hora.</p>
+    <h3>2.3 Qué es V5.1</h3>
+    <p>V5.1 es la tercera revisión arquitectónica mayor. V1 usaba un modelo de bóvedas de rendimiento con depósitos en Aave V3. V2 incorporó shields de exploits verificados por Phala. V3 introdujo un modelo de pricing tipo "kink" sobre una topología multi-bóveda. V4 experimentó con distribución adaptativa de comisiones. V5 unificó todo en torno a un modelo de bóveda única con ClaimBonds. <strong>V5.1 endureció V5 con upgradeability UUPS, el oráculo EIP-712, la protección anti-MEV por commit-reveal del marketplace y el lanzamiento del token deflacionario</strong>. Las cinco versiones legacy se archivan en <code>/archive</code> con propósito histórico; solo V5.1 está en producción.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     3. ARQUITECTURA
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-3">
+  <div class="container">
+    <h2>3. Arquitectura del Protocolo</h2>
+    <h3>3.1 Mapa de componentes</h3>
+    <p>Doce contratos inteligentes colaboran para conformar el protocolo en vivo. Se agrupan en cinco áreas:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Área</th><th>Contratos</th><th>Función</th></tr></thead>
+        <tbody>
+          <tr><td>Token</td><td><code>LuminaTokenV2</code> &middot; <code>FounderVesting</code> &middot; <code>TreasuryVesting</code></td><td>ERC-20 de suministro fijo, lock del fundador con compuertas AltSeason, drip de tesorería</td></tr>
+          <tr><td>Bonos</td><td><code>BondVault</code> &middot; <code>ClaimBond</code></td><td>Reserva única de 70M; bonos cupón-cero ERC-1155, valor nominal de USD 1, vencimiento a 730 días</td></tr>
+          <tr><td>Núcleo</td><td><code>CoverRouterV2</code> &middot; <code>PolicyManagerV2</code> &middot; <code>TWAPBurner</code> &middot; <code>AdaptiveFeeDistributor</code></td><td>Compra / redención / cancelación; matemática de primas; enruta el 100% de las primas a la quema</td></tr>
+          <tr><td>Productos</td><td><code>BaseShield</code> + 9 implementaciones de shields</td><td>Un contrato por disparo paramétrico; proxies UUPS</td></tr>
+          <tr><td>Marketplace</td><td><code>LuminaBondMarketplace</code> &middot; <code>BuybackEngine</code></td><td>Trading secundario de ClaimBonds; protección anti-MEV por commit-reveal</td></tr>
+          <tr><td>Oráculos y automatización</td><td><code>LuminaOracleV2</code> &middot; <code>CapacityOracle</code> &middot; <code>SolvencyOracle</code> &middot; <code>ShieldKeeper</code></td><td>Pruebas firmadas EIP-712; TWAP del precio de LUMINA; piso de solvencia 125%; automatización de disparos</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3.2 Flujo de compra de póliza</h3>
+    <p>El flujo de extremo a extremo desde la perspectiva del comprador consta de cuatro pasos:</p>
+    <ol>
+      <li>El comprador consulta <code>CoverRouterV2.quotePremium(productId, coverageAmount)</code>, que devuelve la prima esperada y el pago.</li>
+      <li>El comprador aprueba al router para gastar la prima en USDC.</li>
+      <li>El comprador llama a <code>CoverRouterV2.purchasePolicy(productId, coverageAmount, asset)</code> (o a <code>purchasePolicyFor(...)</code> a través del relayer).</li>
+      <li>El router cobra la prima en USDC, la reenvía en su totalidad al <code>TWAPBurner</code> y luego invoca <code>PolicyManagerV2.recordPolicy(...)</code> para registrar la póliza. Se emite <code>PolicyCreated</code>.</li>
+    </ol>
+
+    <h3>3.3 Flujo de disparo y pago</h3>
+    <p>Los disparos son <strong>permisionless</strong>: cualquiera puede enviar una prueba válida del oráculo.</p>
+    <ol>
+      <li>Un firmante off-chain (operado por Lumina o por un keeper externo) lee los feeds de precio de Chainlink.</li>
+      <li>Construye una prueba EIP-712 <code>PriceProof(int256 price, bytes32 asset, uint256 verifiedAt)</code> y la firma con la <code>oracleKey</code> de confianza.</li>
+      <li>Cualquier dirección llama a <code>CoverRouterV2.submitTrigger(productId, policyId, oracleProof)</code>.</li>
+      <li>El router delega en <code>PolicyManagerV2.triggerPayout</code>, que invoca <code>verifyAndCalculate</code> del shield. El shield verifica la firma EIP-712 contra <code>LuminaOracleV2.oracleKey()</code>, valida la ventana temporal de la prueba, el activo, la ventana de cobertura de la póliza y la condición de disparo.</li>
+      <li>Si todo pasa, <code>BondVault.issueBond(buyer, payoutUSD)</code> emite ClaimBonds ERC-1155 al comprador en el epoch de vencimiento correspondiente.</li>
+    </ol>
+
+    <h3>3.4 Flujo de redención de bonos</h3>
+    <p>Los bonos vencen exactamente 730 días después de su emisión. Tras el vencimiento:</p>
+    <ol>
+      <li>El tenedor llama a <code>BondVault.redeemBond(epochId, usdAmount)</code>.</li>
+      <li>La bóveda quema el balance ERC-1155 del tenedor para ese epoch.</li>
+      <li>Transfiere el equivalente en $LUMINA de <em>usdAmount</em> al precio TWAP vigente (leído de <code>CapacityOracle</code>).</li>
+    </ol>
+    <p>Los bonos son transferibles a través del marketplace secundario antes del vencimiento. Una vez vencidos, ya no pueden listarse (la función <code>list()</code> del marketplace rechaza bonos vencidos).</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     4. SHIELDS
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-4">
+  <div class="container">
+    <h2>4. Productos de Seguro — los 9 Shields</h2>
+    <p>V5.1 despliega nueve productos paramétricos. Cada uno es un proxy UUPS que hereda de <code>BaseShield</code> e implementa su condición de disparo en <code>_doVerifyAndCalculate</code>. El registro on-chain de productos usa nombres canónicos del estilo <code>FLASHBTC1H-001</code>; el <code>productId</code> que el llamador pasa es <code>keccak256(canonicalName)</code>.</p>
+
+    <h3>4.1 Shields de Flash Crash (BTC, 4 ventanas)</h3>
+    <p>Pagan cuando el precio spot de BTC cae al menos un 5% (variante 1h) hasta un 15% (variante 48h) dentro de una ventana móvil. Cada variante tiene su propio umbral y ventana de observación:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Shield</th><th>Disparo</th><th>Nombre canónico</th><th>asset literal</th></tr></thead>
+      <tbody>
+        <tr><td>FlashBTC 1h</td><td>BTC &minus;5% / 1h</td><td><code>FLASHBTC1H-001</code></td><td><code>"BTC"</code></td></tr>
+        <tr><td>FlashBTC 4h</td><td>BTC &minus;8% / 4h</td><td><code>FLASHBTC4H-001</code></td><td><code>"BTC"</code></td></tr>
+        <tr><td>FlashBTC 24h</td><td>BTC &minus;10% / 24h</td><td><code>FLASHBTC24-001</code></td><td><code>"BTC"</code></td></tr>
+        <tr><td>FlashBTC 48h</td><td>BTC &minus;15% / 48h</td><td><code>FLASHBTC48-001</code></td><td><code>"BTC"</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>4.2 Shields de Flash Crash (ETH, 3 ventanas)</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Shield</th><th>Disparo</th><th>Nombre canónico</th><th>asset literal</th></tr></thead>
+      <tbody>
+        <tr><td>FlashETH 1h</td><td>ETH &minus;7% / 1h</td><td><code>FLASHETH1H-001</code></td><td><code>"ETH"</code></td></tr>
+        <tr><td>FlashETH 24h</td><td>ETH &minus;12% / 24h</td><td><code>FLASHETH24-001</code></td><td><code>"ETH"</code></td></tr>
+        <tr><td>FlashETH 48h</td><td>ETH &minus;18% / 48h</td><td><code>FLASHETH48-001</code></td><td><code>"ETH"</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>4.3 Shield de Micro-Depeg (USDT)</h3>
+    <p>Paga si el precio spot de USDT permanece por debajo de USD 0.995 durante 7 días consecutivos. Útil para estrategias de yield en stablecoins que no pueden rebalancear lo bastante rápido frente a un evento de pérdida de paridad de cola.</p>
+    <ul>
+      <li>Nombre canónico: <code>MICRODEPEG-001</code></li>
+      <li>Asset literal: <code>"USDT"</code></li>
+      <li>Duración: 7 días (<code>604800s</code>)</li>
+    </ul>
+
+    <h3>4.4 Shield de Rate Shock</h3>
+    <p>Paga si la tasa variable de préstamo de USDC en Aave V3 supera 10% APY durante 7 días consecutivos. Diseñado para estrategias apalancadas que dependen de costo barato de préstamo en stablecoin.</p>
+    <ul>
+      <li>Nombre canónico: <code>RATESHOCK-001</code></li>
+      <li>Asset literal: <code>"USDC"</code></li>
+      <li>Fuente del disparo: <code>aavePool.getReserveData(USDC).currentVariableBorrowRate &gt; 7e25</code> (10% APY en formato RAY)</li>
+      <li>La integración con Aave es de solo lectura; el protocolo nunca deposita ni toma prestado contra Aave.</li>
+    </ul>
+
+    <h3>4.5 Parámetros comunes (todos los shields)</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Parámetro</th><th>Valor</th><th>Origen</th></tr></thead>
+      <tbody>
+        <tr><td>Cobertura mínima</td><td>USD 100 USDC</td><td><code>BaseShield._minCoverage()</code></td></tr>
+        <tr><td>Ratio de pago</td><td>80% de la cobertura (8000 bps)</td><td><code>configureProduct(... 8000, ...)</code></td></tr>
+        <tr><td>Vencimiento del bono</td><td>730 días desde el disparo</td><td><code>BondVault.BOND_MATURITY_SECONDS</code></td></tr>
+        <tr><td>Asset bytes32</td><td>UTF-8 del literal con padding a la derecha</td><td><code>_doVerifyAndCalculate</code></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     5. PRECIOS Y PRIMAS
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-5">
+  <div class="container">
+    <h2>5. Modelo de Precios y Primas</h2>
+    <h3>5.1 Fórmula de la prima</h3>
+    <p>La prima se computa de forma determinística dentro de <code>CoverRouterV2.purchasePolicy</code>:</p>
+    <div class="formula">
+      prima = (cobertura &times; payoutRatioBps &times; triggerProbBps &times; marginBps) / 10000<sup>3</sup>
+    </div>
+    <p>Donde:</p>
+    <ul>
+      <li><strong>cobertura</strong>: monto de cobertura del comprador en unidades base de USDC (6 decimales).</li>
+      <li><strong>payoutRatioBps</strong>: fracción de la cobertura que se paga en caso de disparo (uniformemente 8000 bps = 80% en V5.1).</li>
+      <li><strong>triggerProbBps</strong>: probabilidad modelada de que el evento paramétrico ocurra dentro de la ventana de la póliza.</li>
+      <li><strong>marginBps</strong>: carga de riesgo del protocolo (15-25% en la calibración actual).</li>
+    </ul>
+    <p>Si la fórmula da cero (coberturas muy pequeñas), el contrato impone un piso de prima de <strong>1 micro-USDC</strong> (USD 0.000001).</p>
+
+    <h3>5.2 Verificación de capacidad</h3>
+    <p>Antes de registrar una póliza, <code>PolicyManagerV2</code> consulta <code>BondVault.availableCapacityUSD()</code>. Si el pago potencial de la póliza llevaría a la bóveda por debajo de su piso de solvencia (125% sobre las obligaciones vigentes), la compra revierte con <code>InsufficientCapacity</code>.</p>
+    <p><strong>La capacidad se computa sobre un TWAP de 1 hora del precio de LUMINA</strong>, no sobre el precio spot. Esta salvaguarda anti-MEV impide que un atacante manipule el spot, ya sea para denegar cobertura o para empujar al protocolo a reservas escasas.</p>
+
+    <h3>5.3 Disyuntor de auto-pausa</h3>
+    <p>Si el TWAP del precio de LUMINA cae por debajo de USD 0.005, <code>isProtocolAutoPaused()</code> devuelve true y las nuevas compras revierten. El disyuntor usa <strong>histéresis</strong>: una vez activado, requiere que el precio se recupere por encima de USD 0.008 (el <code>RESET_PRICE_FOR_NEW_POLICIES</code>) para volver a armarse. Esto evita oscilaciones cerca del umbral.</p>
+
+    <h3>5.4 Tabla de calibración (Sepolia actual)</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Shield</th><th>payoutBps</th><th>triggerProbBps</th><th>marginBps</th><th>durationSeconds</th></tr></thead>
+      <tbody>
+        <tr><td>FlashBTC 1h</td><td>8000</td><td>200</td><td>2500</td><td>3600</td></tr>
+        <tr><td>FlashBTC 4h</td><td>8000</td><td>150</td><td>2500</td><td>14400</td></tr>
+        <tr><td>FlashBTC 24h</td><td>8000</td><td>100</td><td>2500</td><td>86400</td></tr>
+        <tr><td>FlashBTC 48h</td><td>8000</td><td>80</td><td>2500</td><td>172800</td></tr>
+        <tr><td>FlashETH 1h</td><td>8000</td><td>200</td><td>2500</td><td>3600</td></tr>
+        <tr><td>FlashETH 24h</td><td>8000</td><td>100</td><td>2500</td><td>86400</td></tr>
+        <tr><td>FlashETH 48h</td><td>8000</td><td>80</td><td>2500</td><td>172800</td></tr>
+        <tr><td>MicroDepeg</td><td>8000</td><td>50</td><td>2500</td><td>604800</td></tr>
+        <tr><td>RateShock</td><td>8000</td><td>30</td><td>2500</td><td>604800</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     6. BONDVAULT
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-6">
+  <div class="container">
+    <h2>6. BondVault, ClaimBond y Vencimiento</h2>
+    <h3>6.1 El modelo de bóveda única</h3>
+    <p>Versiones anteriores de Lumina usaban cuatro bóvedas separadas (una por clase de activo). V5.1 las unifica en un único <code>BondVault</code> que custodia 70 millones de $LUMINA. La bóveda nunca se financia directamente con depósitos de usuarios; recibe su asignación en <code>LuminaTokenV2.initialize()</code> como parte de la distribución génesis.</p>
+    <p>La bóveda solo expone dos superficies con efecto de estado:</p>
+    <ul>
+      <li><code>issueBond(buyer, payoutUSD)</code>: invocado por <code>PolicyManagerV2</code> cuando una póliza se dispara. Emite ClaimBonds ERC-1155 en el epoch de vencimiento correspondiente a <code>now + 730 días</code>.</li>
+      <li><code>redeemBond(epochId, usdAmount)</code>: invocado por los tenedores tras el vencimiento. Quema el balance ERC-1155 del tenedor y transfiere $LUMINA al precio vigente.</li>
+    </ul>
+
+    <h3>6.2 ClaimBond — cupón-cero ERC-1155</h3>
+    <p>Los ClaimBonds son tokens ERC-1155 agrupados por <em>epoch mensual de vencimiento</em>. El <code>tokenId</code> es el identificador del epoch, calculado como <code>year &times; 100 + month</code> (por ejemplo, <code>202805</code> = mayo de 2028). Todos los bonos que vencen en el mismo mes calendario comparten el mismo <code>tokenId</code> y son <strong>fungibles</strong> dentro de ese epoch.</p>
+    <p>Críticamente, <strong>1 token = USD 1 de valor nominal al vencimiento</strong>. Las cantidades son dólares enteros, NO unidades base de USDC con 6 decimales. Una posición con balance 4000 representa USD 4.000 de valor nominal, no USD 0.004.</p>
+    <p>Los bonos son <strong>no transferibles peer-to-peer</strong> por diseño. El contrato sobrescribe <code>_update</code> para permitir solo emisiones (<code>from == 0</code>), quemas (<code>to == 0</code>) y transferencias vía operadores autorizados. El <code>LuminaBondMarketplace</code> es el único operador autorizado, lo que asegura que el protocolo capture la comisión por trading secundario.</p>
+
+    <h3>6.3 Período de vencimiento</h3>
+    <p><code>BOND_MATURITY_SECONDS = 730 días</code>. Un bono emitido hoy por una póliza disparada vence exactamente dos años después. El vencimiento se fija en la emisión y no cambia si el bono se vende en el marketplace: el comprador redime en la misma fecha.</p>
+
+    <h3>6.4 Piso de solvencia</h3>
+    <p>El protocolo lleva la cuenta de <code>totalCommittedUSD</code> (suma de bonos emitidos) y <code>totalReservedUSD</code> (suma de reservas de capacidad de pólizas activas). Su suma nunca puede exceder <code>SAFETY_FACTOR_BPS &times; reserveValueUSD / 10000</code>. <code>burnFromReserves</code> —ruta administrativa para retirar colateral excedente— revierte si su ejecución violaría el piso de solvencia del 125%.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     7. ORÁCULO
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-7">
+  <div class="container">
+    <h2>7. Oráculo y Verificación</h2>
+    <h3>7.1 LuminaOracleV2 (EIP-712)</h3>
+    <p>El oráculo de los shields es <code>LuminaOracleV2.sol</code>, un verificador EIP-712 desplegado en la dirección listada en el <a href="#sec-A">Apéndice A</a>. El domain separator del oráculo se fija en construcción:</p>
+    <div class="code-block">DOMAIN = {
+  name: "LuminaOracle",   <span class="comment">// literal en el contrato — NO "LuminaOracleV2"</span>
+  version: "2",
+  chainId: block.chainid, <span class="comment">// capturado al desplegar: 84532 en Sepolia</span>
+  verifyingContract: address(this),
+}</div>
+    <p>El firmante off-chain reproduce este dominio de forma exacta. Cualquier desajuste de campo produce un <code>DOMAIN_SEPARATOR</code> distinto, lo que hace que <code>verifyPriceProofEIP712</code> recupere un firmante incorrecto y revierta. Esto protege contra replay entre cadenas y entre despliegues.</p>
+
+    <h3>7.2 Tipo PriceProof</h3>
+    <div class="code-block">PriceProof {
+  int256  price       <span class="comment">// respuesta del feed con signo (formato Chainlink, 8 decimales)</span>
+  bytes32 asset       <span class="comment">// UTF-8 con padding a la derecha (p. ej. ethers.encodeBytes32String("BTC"))</span>
+  uint256 verifiedAt  <span class="comment">// segundos UNIX cuando la API observó el feed</span>
+}</div>
+    <p>El shield invoca <code>IOracleV2(oracle).verifyPriceProofEIP712(price, asset, verifiedAt, signature)</code> dentro de <code>_doVerifyAndCalculate</code>. El firmante recuperado debe coincidir con la <code>oracleKey()</code> del oráculo.</p>
+
+    <h3>7.3 Servicio de firma off-chain</h3>
+    <p>El servicio <code>lumina-api</code> expone <code>POST /api/v1/oracle/sign-proof</code>, que:</p>
+    <ol>
+      <li>Lee el feed de Chainlink correspondiente al activo solicitado.</li>
+      <li>Construye el envelope EIP-712 con <code>verifiedAt = now</code>.</li>
+      <li>Firma con la <code>ORACLE_PRIVATE_KEY</code> almacenada en el secret store de Railway.</li>
+      <li>Devuelve el <code>oracleProof</code> codificado en ABI listo para pasar a <code>submitTrigger</code>.</li>
+    </ol>
+    <p>La dirección del firmante es auditable on-chain mediante <code>LuminaOracleV2.oracleKey()</code>. Cualquier agente puede consultarla en <code>GET /api/v1/oracle/signer</code> antes de enviar un disparo.</p>
+
+    <h3>7.4 Envío de disparos sin permisos</h3>
+    <p><code>submitTrigger</code> no tiene control de acceso. El argumento es exclusivamente la prueba criptográfica; una prueba forjada o vencida revierte en la verificación del shield. Esto significa que cualquiera (el comprador de la póliza, un keeper bot, un buscador MEV) puede enviar una prueba válida y disparar el pago. El comprador de la póliza sigue siendo el único beneficiario, sin importar quién haga la llamada.</p>
+
+    <h3>7.5 Oráculo de capacidad y oráculo de solvencia</h3>
+    <p>Dos oráculos adicionales sirven necesidades internas del protocolo:</p>
+    <ul>
+      <li><code>CapacityOracle.getLuminaPrice()</code>: provee un TWAP de 1 hora del precio spot de LUMINA, usado por las verificaciones de capacidad y solvencia.</li>
+      <li><code>SolvencyOracle</code>: monitorea el piso de solvencia del 125% del BondVault; lo consume <code>burnFromReserves</code> para bloquear quemas que comprometerían la solvencia.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     8. TOKENOMICS
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-8">
+  <div class="container">
+    <h2>8. Tokenomics</h2>
+    <h3>8.1 Suministro y estándar</h3>
+    <p><strong>$LUMINA es un token ERC-20 + ERC-20Burnable desplegado tras un proxy UUPS</strong>. El suministro máximo es <code>100_000_000 * 1e18</code>, fijado en construcción. No existe función <code>mint</code>. El suministro solo decrece por quema.</p>
+    <p>El constructor refuerza <code>assert(totalSupply() == MAX_SUPPLY)</code> tras la distribución génesis, y <code>totalBurned()</code> devuelve <code>MAX_SUPPLY - totalSupply()</code>.</p>
+
+    <h3>8.2 Distribución inicial (100M)</h3>
+    <p>Se acuña por única vez en <code>initialize()</code> a través de cinco direcciones inmutables como argumentos:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Asignación</th><th>Tokens</th><th>%</th><th>Receptor</th><th>Comportamiento</th></tr></thead>
+      <tbody>
+        <tr><td>Reserva de Bonos</td><td>70.000.000</td><td>70%</td><td>BondVault</td><td>Respalda todos los siniestros; solo sale por redeemBond al vencimiento.</td></tr>
+        <tr><td>Liquidez CEX/DEX</td><td>14.000.000</td><td>14%</td><td>CEX Liquidity Reserve</td><td>Asignado para listings en exchanges centralizados y descentralizados.</td></tr>
+        <tr><td>Fundador</td><td>8.000.000</td><td>8%</td><td>FounderVesting</td><td>Bloqueado tras compuertas oracle 2-de-3 AltSeason — ver &sect; 8.4.</td></tr>
+        <tr><td>LBP</td><td>5.000.000</td><td>5%</td><td>LBP Deposit</td><td>Liquidity Bootstrapping Pool (Fjord Foundry) en TGE.</td></tr>
+        <tr><td>Tesorería</td><td>3.000.000</td><td>3%</td><td>TreasuryVesting</td><td>Lock de 180 días, luego drip de 250k/mes — ver &sect; 8.5.</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>100.000.000</strong></td><td><strong>100%</strong></td><td></td><td></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>8.3 BURNER_ROLE</h3>
+    <p>Solo el contrato <code>TWAPBurner</code> ostenta <code>BURNER_ROLE</code> sobre el token. Este rol permite invocar <code>burnFrom</code> sobre cualquier dirección, lo que es necesario porque el burner extrae $LUMINA de los buffers intermedios del protocolo y lo quema. <code>DEFAULT_ADMIN_ROLE</code> administra las asignaciones de roles. Renunciar a <code>DEFAULT_ADMIN_ROLE</code> bloquea de forma permanente la administración de <code>BURNER_ROLE</code>; el desplegador solo debería renunciar tras confirmarse el despliegue final del TWAPBurner.</p>
+
+    <h3>8.4 FounderVesting (8M, compuertas AltSeason)</h3>
+    <p>La asignación del fundador (8M) se desbloquea solo cuando al menos <strong>2 de 3 condiciones leídas por oráculo se mantienen durante &ge; 7 días consecutivos</strong>:</p>
+    <ul>
+      <li><strong>A</strong>: ratio ETH/BTC &gt; 0,050 (<code>ETH_BTC_THRESHOLD</code>).</li>
+      <li><strong>B</strong>: precio ETH/USD &gt; USD 4.000 (<code>ETH_USD_THRESHOLD</code>).</li>
+      <li><strong>C</strong>: tasa de préstamo USDC en Aave V3 &gt; 7% APY (<code>BORROW_RATE_THRESHOLD</code>).</li>
+    </ul>
+    <p>Una vez disparado el desbloqueo, tres tramos de ~3,333M cada uno se liberan cada 31 días. Si las condiciones nunca se disparan, un <strong>fallback a 1.460 días (4 años) desde el deploy</strong> libera el monto completo: protege al protocolo de un lockout indefinido del fundador sin darle una vía de escape fácil.</p>
+
+    <h3>8.5 TreasuryVesting (3M, drip)</h3>
+    <ul>
+      <li>Lock inicial: <strong>180 días</strong> desde el deploy.</li>
+      <li>Liberación máxima mensual: <strong>250.000 $LUMINA</strong>.</li>
+      <li>Implicancia matemática: 12 meses de drip + 6 meses de lock = <strong>18 meses</strong> mínimo para drenar la totalidad.</li>
+    </ul>
+    <p>Las liberaciones son <code>onlyOwner</code>; una liberación por ventana de 30 días, con tope en el máximo mensual.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     9. MOTOR DE QUEMA
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-9">
+  <div class="container">
+    <h2>9. Motor de Quema y Flujo Deflacionario</h2>
+    <h3>9.1 Dos rutas de quema</h3>
+    <p>Cada USDC que entra al protocolo se enruta a través del <code>TWAPBurner</code>:</p>
+    <ol>
+      <li><strong>Primas</strong>: <code>CoverRouterV2._purchase</code> invoca <code>twapBurner.receivePremium(premium)</code> tras cada compra de póliza. La transferencia es atómica respecto de la compra.</li>
+      <li><strong>Comisiones de marketplace</strong>: <code>LuminaBondMarketplace.executeBuy</code> deduce una comisión del 3% en cada trade secundario, también enrutada vía <code>receivePremium</code>.</li>
+    </ol>
+    <p>Los USDC se acumulan dentro del burner hasta que se invoca <code>executeBurn()</code>.</p>
+
+    <h3>9.2 Parámetros de executeBurn</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Parámetro</th><th>Valor por defecto</th><th>Efecto</th></tr></thead>
+      <tbody>
+        <tr><td><code>burnCooldown</code></td><td>900s (15 min)</td><td>Brecha mínima entre quemas.</td></tr>
+        <tr><td><code>minBurnAmount</code></td><td>1 USDC</td><td>Por debajo, la llamada revierte con "Below minimum".</td></tr>
+        <tr><td><code>maxBurnAmount</code></td><td>10.000 USDC</td><td>Tope duro por llamada para limitar slippage en un solo swap.</td></tr>
+        <tr><td><code>adaptiveModeEnabled</code></td><td>true</td><td>Enruta al <code>AdaptiveFeeDistributor</code> para split dinámico de 4 buckets. Si el distribuidor reporta unhealthy, hace fallback a bps fijos.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>9.3 Distribución de fallback en 4 buckets</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Bucket</th><th>BPS</th><th>%</th><th>Constante</th></tr></thead>
+      <tbody>
+        <tr><td>Burn (USDC &rarr; compra LUMINA &rarr; quema)</td><td>8500</td><td><strong>85%</strong></td><td><code>FALLBACK_BURN_BPS</code></td></tr>
+        <tr><td>Reserva de Buyback</td><td>800</td><td>8%</td><td><code>FALLBACK_BUYBACK_BPS</code></td></tr>
+        <tr><td>Reserva de Mantenimiento</td><td>500</td><td>5%</td><td><code>FALLBACK_MAINTENANCE_BPS</code></td></tr>
+        <tr><td>Reserva de Operaciones</td><td>200</td><td>2%</td><td><code>FALLBACK_OPS_BPS</code></td></tr>
+      </tbody>
+    </table></div>
+    <p>El bucket de Burn compra $LUMINA en Uniswap V3 (con Aerodrome como fallback secuencial) y lo envía a <code>0xdead</code>. Cada quema exitosa emite:</p>
+    <div class="code-block">event BurnExecuted(
+  uint256 usdcSpent,
+  uint256 luminaBurned,
+  uint256 effectivePrice,
+  uint256 timestamp
+)</div>
+
+    <h3>9.4 Caller permisionless</h3>
+    <p><code>executeBurn</code> es <code>external nonReentrant</code>: no hay <code>onlyAuthorized</code>. Cualquier wallet puede llamarla. El cooldown limita la frecuencia, y los topes mínimo/máximo limitan el slippage por llamada. Cualquiera puede ser el keeper de quema.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     10. MARKETPLACE
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-10">
+  <div class="container">
+    <h2>10. Marketplace Secundario</h2>
+    <h3>10.1 Propósito</h3>
+    <p>Los ClaimBonds vencen a 730 días. Los tenedores que necesitan liquidez antes los venden en el mercado secundario con descuento; los compradores obtienen un yield implícito esperando al vencimiento. El mercado es permisionless y on-chain.</p>
+
+    <h3>10.2 Flujo de listing</h3>
+    <ol>
+      <li>El vendedor ejecuta <code>ClaimBond.setApprovalForAll(marketplace, true)</code> (una sola vez por familia de epoch).</li>
+      <li>El vendedor llama <code>LuminaBondMarketplace.list(epochId, amount, priceUSDC)</code>. El contrato verifica <code>balanceOf(seller, epochId) &ge; amount</code> y que <code>block.timestamp &lt; maturityDate(epochId)</code>.</li>
+      <li>El marketplace extrae la cantidad ERC-1155 vía <code>safeTransferFrom</code>, almacena la struct <code>Listing</code> y emite <code>Listed(listingId, seller, epochId, amount, priceUSDC)</code>.</li>
+    </ol>
+
+    <h3>10.3 Flujo de compra</h3>
+    <ol>
+      <li>El comprador aprueba USDC al marketplace por <code>priceUSDC</code>.</li>
+      <li>El comprador invoca <code>executeBuy(listingId)</code>.</li>
+      <li>El marketplace transfiere USDC desde el comprador, deduce un 3% de comisión (enrutado al <code>TWAPBurner</code>), paga al vendedor y transfiere la cantidad ERC-1155 al comprador.</li>
+      <li>El vencimiento no cambia: el comprador redime en la fecha original, igual que lo haría el tenedor original.</li>
+    </ol>
+
+    <h3>10.4 Flujo de cancelación</h3>
+    <p>El vendedor puede cancelar cualquiera de sus propios listings vía <code>cancel(listingId)</code>. El bono regresa al wallet del vendedor. No hay enforcement on-chain de auto-compra, pero el frontend deshabilita el botón Buy cuando <code>seller == wallet conectado</code>.</p>
+
+    <h3>10.5 BuybackEngine (anti-MEV por commit-reveal)</h3>
+    <p>Un <code>BuybackEngine</code> separado consume el bucket de buyback del <code>TWAPBurner</code> usando un esquema de commit-reveal para impedir front-running. Las operaciones se baten en lotes y se revelan en una transacción separada; se recomienda enrutamiento por mempool privado del lado de operaciones.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     11. SEGURIDAD
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-11">
+  <div class="container">
+    <h2>11. Modelo de Seguridad</h2>
+    <h3>11.1 Upgradeability</h3>
+    <p>Todos los contratos del núcleo son <strong>upgradeables UUPS</strong> con <code>_authorizeUpgrade</code> protegido por <code>DEFAULT_ADMIN_ROLE</code>. Los upgrades hoy requieren un único firmante y migrarán a multisig antes de mainnet (ver Roadmap).</p>
+
+    <h3>11.2 Postura de auditoría</h3>
+    <p>Los reportes de auditoría interna para V5 y V5.1 son públicos:</p>
+    <ul>
+      <li><code>docs/SECURITY-AUDIT-V5.md</code>: última auditoría interna que cubre la arquitectura V5.1.</li>
+      <li><code>docs/audit/v5.1-uups/</code>: análisis por capítulo: aristas matemáticas, riesgo de claves admin, condiciones de carrera, dependencias temporales, integración del oráculo.</li>
+      <li><code>docs/audit/PHASE4-AUDIT-REPORT.md</code>: flujo de bonos + marketplace.</li>
+    </ul>
+    <p>El protocolo lleva una <strong>nota de riesgo aceptado</strong>: no hay auditoría de tercero Tier-1 previa al mainnet. La bug bounty del fundador + multisig + clave en cold storage entran en vigor en T+30d posterior al deploy de mainnet.</p>
+
+    <h3>11.3 Matriz de control de acceso</h3>
+    <p><code>docs/ACCESS-CONTROL-MATRIX.md</code> documenta cada rol privilegiado, su tenedor actual y la política de rotación. Roles clave:</p>
+    <ul>
+      <li><code>DEFAULT_ADMIN_ROLE</code> en cada contrato UUPS: wallet del desplegador hoy, multisig en mainnet.</li>
+      <li><code>BURNER_ROLE</code> en LuminaTokenV2: solo el TWAPBurner.</li>
+      <li><code>onlyRouter</code> en PolicyManagerV2: solo CoverRouterV2.</li>
+      <li><code>oracleKey</code> en LuminaOracleV2: la dirección del firmante off-chain (rotable).</li>
+    </ul>
+
+    <h3>11.4 Modelo de amenazas</h3>
+    <p>Documentado en <code>docs/audit/THREAT-MODEL.md</code>. Mayores riesgos residuales:</p>
+    <ul>
+      <li><strong>Compromiso de la oracleKey.</strong> Si la clave del firmante off-chain se filtra, un atacante puede fabricar pruebas y disparar todas las pólizas activas, drenando el BondVault. Mitigaciones en roadmap: custodia HSM + firmante multisig.</li>
+      <li><strong>Concentración en una sola bóveda.</strong> Un único BondVault custodia 70M LUMINA. Un bug de reentrancy o corrupción de storage allí es existencial. Mitigación: testing extenso, invariantes con fuente única de verdad, cadencia continua de auditoría.</li>
+      <li><strong>Dependencia de Aave V3 para RateShockShield.</strong> Si la lectura de la tasa de préstamo de Aave se vuelve manipulable, la condición de disparo se vuelve manipulable. Mitigación: uso de solo lectura, sin fondos custodiados en Aave.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     12. AGENTES DE IA
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-12">
+  <div class="container">
+    <h2>12. Para Agentes de IA</h2>
+    <h3>12.1 Onboarding self-service</h3>
+    <p>Un agente autónomo puede generar su propia API key sin intervención humana. El flujo consta de dos operaciones en línea:</p>
+    <ol>
+      <li>Firmar el envelope EIP-191 <code>"Lumina onboarding for {wallet} at {timestamp}"</code> con la wallet del agente.</li>
+      <li><code>POST /api/v1/agent/onboard</code> con <code>{walletAddress, label?, signature, timestamp}</code>.</li>
+    </ol>
+    <p>La API verifica la firma, acuña una key <code>lk_&lt;64hex&gt;</code> (hasheada con SHA-256 en reposo) y devuelve el plaintext una sola vez. Límites: máximo 3 keys activas por wallet, 10 intentos de onboard por IP por hora.</p>
+
+    <h3>12.2 Compra de pólizas con relayer</h3>
+    <p>La feature distintiva para agentes: <code>POST /api/v1/policies</code>. El wallet relayer de la API firma <code>purchasePolicyFor</code> on-chain en nombre del agente. El agente <strong>no necesita ETH para gas</strong>; solo USDC para la prima (custodiado por el wallet del agente, extraído por el contrato). Las idempotency keys impiden el doble-gasto en reintentos.</p>
+
+    <h3>12.3 Skill files</h3>
+    <p>El repo <code>lumina-api</code> ships <strong>22 skill files</strong> en <code>docs/skills/</code>: uno por operación frecuente. Cada archivo sigue una estructura fija: un bloque "What this does" en lenguaje llano, un prompt LLM listo para copiar-pegar, variables de entorno, ejemplos en curl + TypeScript + Python, esquemas de request/response y códigos de error. Diseñados para insertarse directamente en la lista de tools o el system prompt de un agente.</p>
+
+    <h3>12.4 Superficie de endpoints</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Método</th><th>Path</th><th>Auth</th><th>Propósito</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td><code>/health</code></td><td>none</td><td>Estado en vivo: chain, relayer, direcciones de contratos</td></tr>
+        <tr><td>GET</td><td><code>/products</code></td><td>none</td><td>Lista los 9 shields + capacidad</td></tr>
+        <tr><td>GET</td><td><code>/products/:id/quote?cover=N</code></td><td>none</td><td>Prima y pago para un monto de cobertura</td></tr>
+        <tr><td>POST</td><td><code>/api/v1/agent/onboard</code></td><td>firma EIP-191</td><td>Mint self-service de API key</td></tr>
+        <tr><td>GET</td><td><code>/api/v1/agent/keys</code></td><td>x-api-key</td><td>Lista las keys del llamador</td></tr>
+        <tr><td>DELETE</td><td><code>/api/v1/agent/keys/:keyId</code></td><td>x-api-key</td><td>Revoca una key propia</td></tr>
+        <tr><td>POST</td><td><code>/api/v1/policies</code></td><td>x-api-key</td><td>Compra una póliza vía relayer (el agente no paga gas)</td></tr>
+        <tr><td>GET</td><td><code>/api/v1/policies</code></td><td>x-api-key</td><td>Lista las pólizas del llamador</td></tr>
+        <tr><td>GET</td><td><code>/api/v1/bonds/:wallet</code></td><td>x-api-key</td><td>Posiciones de bonos del llamador</td></tr>
+        <tr><td>POST</td><td><code>/api/v1/redeem</code></td><td>x-api-key</td><td>Indexa una redención (redeem on-chain firmado por el agente)</td></tr>
+        <tr><td>POST</td><td><code>/api/v1/marketplace/list</code></td><td>x-api-key</td><td>Indexa un listing</td></tr>
+        <tr><td>POST</td><td><code>/api/v1/marketplace/buy</code></td><td>x-api-key</td><td>Indexa una compra</td></tr>
+        <tr><td>POST</td><td><code>/api/v1/oracle/sign-proof</code></td><td>x-api-key</td><td>Obtiene un PriceProof EIP-712 fresco para submitTrigger</td></tr>
+        <tr><td>GET</td><td><code>/api/v1/oracle/signer</code></td><td>x-api-key</td><td>Lee la dirección actual del firmante del oráculo</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     13. ROADMAP
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-13">
+  <div class="container">
+    <h2>13. Roadmap</h2>
+    <h3>Fase 1 — Sepolia testnet (actual)</h3>
+    <ul>
+      <li>9 shields desplegados y activos.</li>
+      <li>Onboarding self-service de agentes activo.</li>
+      <li>Oráculo EIP-712 activo.</li>
+      <li>Marketplace activo.</li>
+      <li>22 skill files publicados.</li>
+    </ul>
+
+    <h3>Fase 2 — Lanzamiento mainnet (objetivo Q3 2026)</h3>
+    <ul>
+      <li>Despliegue de los contratos V5.1 en Base (chainId 8453).</li>
+      <li>Multisig reemplaza al admin de firmante único (Gnosis Safe, 2-de-3 inicialmente).</li>
+      <li>Custodia en cold storage de la clave de firma del oráculo (HSM o hardware wallet).</li>
+      <li>Bug bounty activa en T+30d.</li>
+      <li>Auditoría externa (Tier-1) en marcha.</li>
+    </ul>
+
+    <h3>Fase 3 — Ecosistema de agentes (Q4 2026 / Q1 2027)</h3>
+    <ul>
+      <li>Paquete npm <code>@lumina/sdk</code> con cliente tipado.</li>
+      <li>Especificación OpenAPI para la superficie de agentes.</li>
+      <li>Worker de entrega de webhooks (notificación de eventos por push).</li>
+      <li>Endpoints de log de actividad y P&amp;L de earnings.</li>
+      <li>Tier upgrades y overrides de rate-limit por agente.</li>
+    </ul>
+
+    <h3>Fase 4 — Gobernanza y expansión (2027)</h3>
+    <ul>
+      <li>Gobernanza on-chain para cambios de parámetros (margin, capacidad, alta de shields).</li>
+      <li>Tiers de membresía basados en NFT.</li>
+      <li>Expansión cross-chain a L2s adicionales.</li>
+      <li>Nuevos productos shield: depeg de LSTs mayores, falla de pool Curve, staleness de oráculo, shields a medida para builders.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     14. RIESGOS
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-14">
+  <div class="container">
+    <h2>14. Riesgos y Aviso Legal</h2>
+    <div class="callout danger">
+      <div class="callout-title">⚠ Solo testnet</div>
+      V5.1 corre en Base Sepolia. El contrato USDC es un mock; los oráculos de BTC y ETH devuelven precios mock predefinidos para los disparos; no hay dinero real en riesgo porque no debería depositarse dinero real. No transfiera activos de mainnet a ninguna dirección listada en este documento.
+    </div>
+
+    <h3>14.1 Riesgo de smart contracts</h3>
+    <p>El protocolo no está auditado por una firma Tier-1 al momento de redacción. Las auditorías internas son públicas pero no sustituyen una externa. Un bug de reentrancy, colisión de storage o manipulación de oráculo en el BondVault o en la ruta de un shield podría resultar en pérdida total del colateral.</p>
+
+    <h3>14.2 Riesgo de oráculo</h3>
+    <p>Los disparos dependen de pruebas EIP-712 firmadas por un firmante off-chain. Si su clave se compromete, todas las pólizas activas pueden dispararse falsamente, drenando el BondVault. Las mitigaciones son ítems del roadmap (HSM, firmante multisig).</p>
+
+    <h3>14.3 Riesgo de liquidez</h3>
+    <p>La redención de bonos paga en $LUMINA al precio TWAP vigente. Si la liquidez secundaria de LUMINA es escasa en el momento de la redención, los tenedores pueden recibir menos USD-equivalente que el valor nominal del bono.</p>
+
+    <h3>14.4 Riesgo regulatorio</h3>
+    <p>El seguro paramétrico on-chain es novedoso. Puede ser clasificado como valor, derivado o producto de seguro regulado en algunas jurisdicciones. El uso del protocolo es por cuenta y riesgo legal del usuario.</p>
+
+    <h3>14.5 Aviso legal</h3>
+    <p>Este whitepaper describe el protocolo tal como está desplegado al 6 de mayo de 2026 en Base Sepolia. No constituye una oferta de venta ni una solicitud de compra de ningún token, valor o producto de seguro. Se provee con propósitos técnicos y educativos. Las afirmaciones prospectivas en la <a href="#sec-13">Sección 13</a> son aspiracionales; nada en este documento es garantía de despliegue futuro, fusión de funcionalidades o retorno financiero.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     15. MARCO LEGAL
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-15">
+  <div class="container">
+    <h2>15. Marco Legal</h2>
+    <h3>15.1 Estructura del protocolo</h3>
+    <p>Lumina Protocol es software de código abierto publicado bajo licencia MIT en <a href="https://github.com/org-lumina">github.com/org-lumina</a>. Los contratos están desplegados y operados por el equipo fundador durante el testnet; en mainnet, la gobernanza y autoridad sobre parámetros migran a un multisig y, en última instancia, a una gobernanza on-chain.</p>
+
+    <h3>15.2 Naturaleza del producto</h3>
+    <p>Los ClaimBonds son <strong>instrumentos paramétricos de pago</strong>, no contratos de seguro en el sentido regulado. No hay perito, no hay underwriter, no hay acuerdo de tomador de póliza. Un disparo es un evento on-chain determinístico; un pago es una transferencia on-chain determinística.</p>
+
+    <h3>15.3 Naturaleza del token</h3>
+    <p>$LUMINA es un token de utilidad con tres usos programáticos: (i) es el activo pagado por las redenciones de ClaimBond; (ii) el motor de quema del protocolo lo destruye permanentemente a medida que las primas y comisiones de marketplace fluyen; (iii) es la unidad de cuenta para la solvencia del BondVault. No está diseñado ni comercializado como inversión; cualquier trading especulativo queda fuera del propósito del protocolo.</p>
+
+    <h3>15.4 Jurisdicción</h3>
+    <p>El protocolo no apunta a usuarios de ninguna jurisdicción específica. Operadores, integradores y usuarios finales son responsables de su propio cumplimiento regulatorio.</p>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     APÉNDICE A — DIRECCIONES
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-A">
+  <div class="container">
+    <h2>Apéndice A — Direcciones Desplegadas (Base Sepolia, chainId 84532)</h2>
+    <p>Las direcciones que siguen provienen del snapshot en vivo de <code>/health</code> al 6 de mayo de 2026. La fuente canónica es siempre <code>https://lumina-api-production-ac85.up.railway.app/health</code>; si alguna dirección de este documento difiere de <code>/health</code>, considere a <code>/health</code> como autoridad.</p>
+
+    <h3>Núcleo del protocolo</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Contrato</th><th>Dirección</th></tr></thead>
+      <tbody>
+        <tr><td>LuminaTokenV2</td><td><code>0x8A0FDc2126eb9b0c88D17711D62713A1c06CF7Ab</code></td></tr>
+        <tr><td>CoverRouterV2</td><td><code>0xebC3A783477FbD2720C024e16A8d63B8Db983D84</code></td></tr>
+        <tr><td>PolicyManagerV2</td><td><code>0xd9732A8d6Cf5266Dd896B825E78E387B7Dd2c379</code></td></tr>
+        <tr><td>BondVault</td><td><code>0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B</code></td></tr>
+        <tr><td>ClaimBond</td><td><code>0x3d2F5DB2505367D00ef81c51AD3cA66159271730</code></td></tr>
+        <tr><td>LuminaBondMarketplace</td><td><code>0xfaC56692c626718aC8953A3d5fAE67fac2f1Be6E</code></td></tr>
+        <tr><td>USDC (mock Sepolia)</td><td><code>0xD944d8e5D8329994D83950872Ec210891d3Ab6AE</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>API + relayer</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Servicio</th><th>Endpoint / dirección</th></tr></thead>
+      <tbody>
+        <tr><td>URL base de la API</td><td><code>https://lumina-api-production-ac85.up.railway.app</code></td></tr>
+        <tr><td>Wallet del relayer</td><td><code>0x168dC7105e907294f9d066cee24f30caa5A17E4a</code></td></tr>
+        <tr><td>Block explorer</td><td><a href="https://sepolia.basescan.org">sepolia.basescan.org</a></td></tr>
+        <tr><td>RPC</td><td><code>https://sepolia.base.org</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="callout">
+      <div class="callout-title">Nota sobre drift de direcciones</div>
+      Artefactos de deploy anteriores en <code>LUMINA-PROTOCOL/deployments/sepolia/V5.1-2026-04-27.json</code> referencian un set distinto de direcciones para los mismos contratos. Ese artefacto corresponde a un deploy previo. Las direcciones de arriba (provenientes de <code>/health</code>) son las que la API y el frontend en vivo consultan. Verifique siempre contra <code>/health</code> antes de integrar.
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     APÉNDICE B — GLOSARIO
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-B">
+  <div class="container">
+    <h2>Apéndice B — Glosario</h2>
+    <div class="table-wrap"><table>
+      <tbody>
+        <tr><td><strong>BondVault</strong></td><td>Contrato único que custodia la reserva de 70M $LUMINA que respalda cada ClaimBond.</td></tr>
+        <tr><td><strong>ClaimBond</strong></td><td>Bono cupón-cero ERC-1155, valor nominal de USD 1, vencimiento a 730 días, redimible en $LUMINA.</td></tr>
+        <tr><td><strong>CoverRouterV2</strong></td><td>Punto de entrada para usuarios: <code>quotePremium</code>, <code>purchasePolicy</code>, <code>submitTrigger</code>.</td></tr>
+        <tr><td><strong>EIP-191</strong></td><td>Estándar "personal_sign" usado para la firma de onboarding de agentes.</td></tr>
+        <tr><td><strong>EIP-712</strong></td><td>Estándar de firma con tipos usado para los PriceProofs del oráculo.</td></tr>
+        <tr><td><strong>Epoch</strong></td><td>Bucket mensual de vencimiento. Codificado como <code>year &times; 100 + month</code>. Todos los bonos que vencen en el mismo mes calendario comparten epoch.</td></tr>
+        <tr><td><strong>FlashShield</strong></td><td>Uno de los siete productos de caída de precio que cubren BTC y ETH en ventanas de 1h-48h.</td></tr>
+        <tr><td><strong>Modelo Kink</strong></td><td>Modelo de pricing dependiente de capacidad que ajusta la prima conforme aumenta la utilización.</td></tr>
+        <tr><td><strong>LuminaOracleV2</strong></td><td>Verificador EIP-712 que autoriza los disparos de shields a partir de un firmante off-chain de confianza.</td></tr>
+        <tr><td><strong>oracleKey</strong></td><td>Dirección Ethereum cuya clave privada firma cada PriceProof; rotable por el owner del contrato.</td></tr>
+        <tr><td><strong>Paramétrico</strong></td><td>Seguro cuyo pago depende exclusivamente de un disparo objetivo y medible, sin ajuste de siniestros.</td></tr>
+        <tr><td><strong>Relayer</strong></td><td>Wallet de la API que firma transacciones <code>purchasePolicyFor</code> en nombre del agente, pagando el gas.</td></tr>
+        <tr><td><strong>Skill file</strong></td><td>Documento Markdown en <code>lumina-api/docs/skills/</code> con un prompt LLM listo para copiar-pegar y ejemplos de código.</td></tr>
+        <tr><td><strong>TWAPBurner</strong></td><td>Contrato que convierte primas en USDC a $LUMINA vía Uniswap V3 y lo quema.</td></tr>
+        <tr><td><strong>UUPS</strong></td><td>Universal Upgradeable Proxy Standard. Permite upgrades de implementación in-place por un admin.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     APÉNDICE C — REFERENCIAS
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-C">
+  <div class="container">
+    <h2>Apéndice C — Referencias</h2>
+    <p>Toda afirmación técnica de este whitepaper se trazea a alguna de estas fuentes:</p>
+    <ul>
+      <li>Código fuente V5.1: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/tree/main/src">github.com/org-lumina/LUMINA-PROTOCOL/tree/main/src</a></li>
+      <li>Tokenomics canónica: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/TOKENOMICS.md">docs/TOKENOMICS.md</a></li>
+      <li>Visión arquitectónica: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/SECURITY.md">SECURITY.md</a></li>
+      <li>Integración Aave V3: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/architecture/AAVE-INTEGRATION.md">docs/architecture/AAVE-INTEGRATION.md</a></li>
+      <li>Deep dive del Oráculo V2: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/architecture/ORACLE-V2.md">docs/architecture/ORACLE-V2.md</a></li>
+      <li>Referencia de endpoints de la API: <a href="https://github.com/org-lumina/lumina-api/blob/main/README.md">README de lumina-api</a></li>
+      <li>22 skill files: <a href="https://github.com/org-lumina/lumina-api/tree/main/docs/skills">lumina-api/docs/skills</a></li>
+      <li>Estado de deploy en vivo: <a href="https://lumina-api-production-ac85.up.railway.app/health">/health</a></li>
+      <li>Block explorer: <a href="https://sepolia.basescan.org">sepolia.basescan.org</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    Lumina Protocol &middot; Whitepaper V5.1 (Español) &middot; <a href="/whitepaper/en">English Version</a> &middot; <a href="https://github.com/org-lumina">github.com/org-lumina</a>
+  </div>
+</footer>
+
+</body>
+</html>
