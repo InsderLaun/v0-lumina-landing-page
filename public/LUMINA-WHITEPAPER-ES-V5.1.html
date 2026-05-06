@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumina Protocol — Whitepaper V5.1 (Español)</title>
+<title>Lumina Protocol — Whitepaper (Español)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
   --bg-dark:#0a0a0c;--bg-card:#111116;--bg-code:#0e0e12;
   --accent:#00d4ff;--accent-dim:rgba(0,212,255,0.12);--accent-border:rgba(0,212,255,0.25);
   --warn:#f59e0b;--pos:#00d48a;--neg:#ef4444;
-  --text-primary:#e8e8ec;--text-secondary:#a8a8b3;--text-muted:#6b6b78;
+  --text-primary:#ffffff;--text-secondary:#ffffff;--text-muted:#9aa0aa;
   --border-subtle:rgba(255,255,255,0.06);--border-strong:#2a2a34;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -42,9 +42,9 @@ body{background:var(--bg-dark);color:var(--text-secondary);font-family:'Inter',s
 .toc-label:hover{color:var(--accent);}
 .section{padding:60px 0;}
 .section-divider{height:1px;background:var(--border-subtle);margin:0;}
-.section h2{font-size:28px;font-weight:700;color:var(--text-primary);margin:0 0 16px;letter-spacing:-.02em;line-height:1.2;}
-.section h3{font-size:18px;font-weight:600;color:var(--text-primary);margin:32px 0 12px;letter-spacing:-.01em;}
-.section p{margin-bottom:14px;}
+.section h2{font-size:28px;font-weight:700;color:var(--accent);margin:0 0 16px;letter-spacing:-.02em;line-height:1.2;}
+.section h3{font-size:18px;font-weight:600;color:var(--accent);margin:32px 0 12px;letter-spacing:-.01em;}
+.section p{margin-bottom:14px;text-align:justify;text-justify:inter-word;hyphens:auto;}
 .section ul,.section ol{margin:0 0 14px 24px;}
 .section li{margin-bottom:6px;}
 strong{color:var(--text-primary);font-weight:600;}
@@ -71,9 +71,6 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 .formula{background:var(--bg-card);border:1px solid var(--border-subtle);padding:18px;margin:14px 0;border-radius:8px;font-family:'JetBrains Mono',monospace;text-align:center;font-size:14px;color:var(--text-primary);}
 .footer{padding:60px 0 80px;border-top:1px solid var(--border-subtle);font-size:12px;color:var(--text-muted);text-align:center;font-family:'JetBrains Mono',monospace;}
 .footer a{color:var(--text-secondary);}
-.lang-toggle{position:fixed;top:18px;right:18px;display:flex;gap:4px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:999px;padding:4px;font-family:'JetBrains Mono',monospace;font-size:11px;z-index:10;}
-.lang-toggle a{padding:5px 12px;border-radius:999px;color:var(--text-muted);}
-.lang-toggle a.active{background:var(--accent);color:#001018;font-weight:600;}
 @media (max-width:720px){
   body{font-size:13px;}
   .cover-logo{font-size:38px;}
@@ -81,16 +78,10 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
   .section h2{font-size:22px;}
   .section h3{font-size:16px;}
   .toc-page{padding:48px 0;}
-  .lang-toggle{top:12px;right:12px;}
 }
 </style>
 </head>
 <body>
-
-<div class="lang-toggle">
-  <a href="/whitepaper/en">EN</a>
-  <a href="/whitepaper/es" class="active">ES</a>
-</div>
 
 <!-- ═════════════════════════════════════════════════════════════════
      PORTADA
@@ -101,7 +92,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p class="cover-subtitle">Seguros paramétricos on-chain para agentes de IA autónomos y humanos. Las primas queman $LUMINA. Los disparos generan ClaimBonds cupón-cero. Liquidados por oráculos de grado Chainlink.</p>
     <div class="cover-divider"></div>
     <div class="cover-meta">
-      Whitepaper <strong>V5.1</strong> &middot; Español &middot; 06-05-2026<br>
+      <strong>Whitepaper</strong> &middot; Español &middot; 06-05-2026<br>
       Red: <strong>Base Sepolia</strong> (chainId 84532) &middot; Mainnet pendiente<br>
       <a href="https://github.com/org-lumina">github.com/org-lumina</a>
     </div>
@@ -129,13 +120,14 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
       <li class="toc-item"><span class="toc-number">06</span><a class="toc-label" href="#sec-6">BondVault, ClaimBond y Vencimiento</a></li>
       <li class="toc-item"><span class="toc-number">07</span><a class="toc-label" href="#sec-7">Oráculo y Verificación</a></li>
       <li class="toc-item"><span class="toc-number">08</span><a class="toc-label" href="#sec-8">Tokenomics</a></li>
-      <li class="toc-item"><span class="toc-number">09</span><a class="toc-label" href="#sec-9">Motor de Quema y Flujo Deflacionario</a></li>
-      <li class="toc-item"><span class="toc-number">10</span><a class="toc-label" href="#sec-10">Marketplace Secundario</a></li>
-      <li class="toc-item"><span class="toc-number">11</span><a class="toc-label" href="#sec-11">Modelo de Seguridad</a></li>
-      <li class="toc-item"><span class="toc-number">12</span><a class="toc-label" href="#sec-12">Para Agentes de IA</a></li>
-      <li class="toc-item"><span class="toc-number">13</span><a class="toc-label" href="#sec-13">Roadmap</a></li>
-      <li class="toc-item"><span class="toc-number">14</span><a class="toc-label" href="#sec-14">Riesgos y Aviso Legal</a></li>
-      <li class="toc-item"><span class="toc-number">15</span><a class="toc-label" href="#sec-15">Marco Legal</a></li>
+      <li class="toc-item"><span class="toc-number">09</span><a class="toc-label" href="#sec-burn-matrix">Distribución Adaptativa de Quema</a></li>
+      <li class="toc-item"><span class="toc-number">10</span><a class="toc-label" href="#sec-9">Motor de Quema y Flujo Deflacionario</a></li>
+      <li class="toc-item"><span class="toc-number">11</span><a class="toc-label" href="#sec-10">Marketplace Secundario</a></li>
+      <li class="toc-item"><span class="toc-number">12</span><a class="toc-label" href="#sec-11">Modelo de Seguridad</a></li>
+      <li class="toc-item"><span class="toc-number">13</span><a class="toc-label" href="#sec-12">Para Agentes de IA</a></li>
+      <li class="toc-item"><span class="toc-number">14</span><a class="toc-label" href="#sec-13">Roadmap</a></li>
+      <li class="toc-item"><span class="toc-number">15</span><a class="toc-label" href="#sec-14">Riesgos y Aviso Legal</a></li>
+      <li class="toc-item"><span class="toc-number">16</span><a class="toc-label" href="#sec-15">Marco Legal</a></li>
       <li class="toc-item"><span class="toc-number">A</span><a class="toc-label" href="#sec-A">Apéndice A — Direcciones Desplegadas</a></li>
       <li class="toc-item"><span class="toc-number">B</span><a class="toc-label" href="#sec-B">Apéndice B — Glosario</a></li>
       <li class="toc-item"><span class="toc-number">C</span><a class="toc-label" href="#sec-C">Apéndice C — Referencias</a></li>
@@ -159,8 +151,8 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
       <li><strong>Un token deflacionario (LUMINA, suministro fijo de 100M)</strong>. Cada prima en USDC y cada comisión del marketplace secundario se enrutan al <em>TWAPBurner</em>, que compra $LUMINA en Uniswap V3 y lo quema enviándolo a <code>0xdead</code>. No existe función de mint.</li>
       <li><strong>Una API con relayer</strong> que permite a los agentes de IA autónomos comprar, redimir e intercambiar pólizas mediante una sola llamada HTTP firmada, sin necesidad de tener ETH para gas.</li>
     </ul>
-    <p>V5.1 es la versión productiva actual en Base Sepolia. Está <strong>plenamente operativa</strong>: nueve shields activos, las primas fluyen al motor de quema, el marketplace está abierto, el oráculo EIP-712 (LuminaOracleV2) verifica pruebas de precio firmadas, y un endpoint de onboarding self-service permite a los agentes generar API keys con una sola firma de wallet.</p>
-    <p>Este whitepaper documenta lo que está desplegado al día de hoy. Las afirmaciones prospectivas se confinan a la <a href="#sec-13">Sección 13 (Roadmap)</a> y la <a href="#sec-14">Sección 14 (Riesgos)</a>. Cada cifra, dirección de contrato y firma de función está fundada en el código fuente de V5.1 y en el endpoint en vivo <code>/health</code> de la API productiva.</p>
+    <p>La arquitectura actual está <strong>plenamente operativa</strong> en Base Sepolia: nueve shields activos, las primas fluyen al motor de quema, el marketplace está abierto, el oráculo EIP-712 (LuminaOracleV2) verifica pruebas de precio firmadas, y un endpoint de onboarding self-service permite a los agentes generar API keys con una sola firma de wallet.</p>
+    <p>Este whitepaper documenta lo que está desplegado al día de hoy. Las afirmaciones prospectivas se confinan a la <a href="#sec-13">Sección 14 (Roadmap)</a> y la <a href="#sec-14">Sección 15 (Riesgos)</a>. Cada cifra, dirección de contrato y firma de función está fundada en el código fuente del protocolo y en el endpoint en vivo <code>/health</code> de la API productiva.</p>
   </div>
 </section>
 
@@ -178,8 +170,8 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <h3>2.2 Lo que hace Lumina de forma distinta</h3>
     <p>Lumina es <strong>paramétrico</strong>: cada póliza especifica una condición objetiva de disparo (por ejemplo, "BTC cae &ge; 5% en cualquier ventana móvil de 1 hora"). Cuando un oráculo confirma la condición, el pago se dispara automáticamente dentro de la misma transacción. No hay formulario de siniestro, no hay comité, no hay demora, no existe la posibilidad de denegación subjetiva.</p>
     <p>Lumina también es <strong>agent-first</strong>. La API expone un patrón de relayer (<code>POST /api/v1/policies</code>) en el cual el protocolo paga el gas y el agente solo necesita un encabezado <code>x-api-key</code>. Veintidós archivos de SKILL individuales que estandarizan las operaciones más frecuentes permiten a un agente integrarse de extremo a extremo con Lumina en menos de una hora.</p>
-    <h3>2.3 Qué es V5.1</h3>
-    <p>V5.1 es la tercera revisión arquitectónica mayor. V1 usaba un modelo de bóvedas de rendimiento con depósitos en Aave V3. V2 incorporó shields de exploits verificados por Phala. V3 introdujo un modelo de pricing tipo "kink" sobre una topología multi-bóveda. V4 experimentó con distribución adaptativa de comisiones. V5 unificó todo en torno a un modelo de bóveda única con ClaimBonds. <strong>V5.1 endureció V5 con upgradeability UUPS, el oráculo EIP-712, la protección anti-MEV por commit-reveal del marketplace y el lanzamiento del token deflacionario</strong>. Las cinco versiones legacy se archivan en <code>/archive</code> con propósito histórico; solo V5.1 está en producción.</p>
+    <h3>2.3 La arquitectura actual</h3>
+    <p>La arquitectura actual es la tercera revisión mayor del protocolo. La primera iteración usaba un modelo de bóvedas de rendimiento con depósitos en Aave V3. La segunda incorporó shields de exploits verificados por Phala. La tercera introdujo un modelo de pricing tipo "kink" sobre una topología multi-bóveda. La cuarta experimentó con distribución adaptativa de comisiones. La quinta unificó todo en torno a un modelo de bóveda única con ClaimBonds. <strong>La revisión actual endureció esa base con upgradeability UUPS, el oráculo EIP-712, la protección anti-MEV por commit-reveal del marketplace y el lanzamiento del token deflacionario</strong>. Las versiones legacy se archivan en <code>/archive</code> con propósito histórico; solo la revisión actual está en producción.</p>
   </div>
 </section>
 
@@ -245,7 +237,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 <section class="section" id="sec-4">
   <div class="container">
     <h2>4. Productos de Seguro — los 9 Shields</h2>
-    <p>V5.1 despliega nueve productos paramétricos. Cada uno es un proxy UUPS que hereda de <code>BaseShield</code> e implementa su condición de disparo en <code>_doVerifyAndCalculate</code>. El registro on-chain de productos usa nombres canónicos del estilo <code>FLASHBTC1H-001</code>; el <code>productId</code> que el llamador pasa es <code>keccak256(canonicalName)</code>.</p>
+    <p>Lumina despliega nueve productos paramétricos. Cada uno es un proxy UUPS que hereda de <code>BaseShield</code> e implementa su condición de disparo en <code>_doVerifyAndCalculate</code>. El registro on-chain de productos usa nombres canónicos del estilo <code>FLASHBTC1H-001</code>; el <code>productId</code> que el llamador pasa es <code>keccak256(canonicalName)</code>.</p>
 
     <h3>4.1 Shields de Flash Crash (BTC, 4 ventanas)</h3>
     <p>Pagan cuando el precio spot de BTC cae al menos un 5% (variante 1h) hasta un 15% (variante 48h) dentro de una ventana móvil. Cada variante tiene su propio umbral y ventana de observación:</p>
@@ -315,7 +307,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>Donde:</p>
     <ul>
       <li><strong>cobertura</strong>: monto de cobertura del comprador en unidades base de USDC (6 decimales).</li>
-      <li><strong>payoutRatioBps</strong>: fracción de la cobertura que se paga en caso de disparo (uniformemente 8000 bps = 80% en V5.1).</li>
+      <li><strong>payoutRatioBps</strong>: fracción de la cobertura que se paga en caso de disparo (uniformemente 8000 bps = 80%).</li>
       <li><strong>triggerProbBps</strong>: probabilidad modelada de que el evento paramétrico ocurra dentro de la ventana de la póliza.</li>
       <li><strong>marginBps</strong>: carga de riesgo del protocolo (15-25% en la calibración actual).</li>
     </ul>
@@ -355,7 +347,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
   <div class="container">
     <h2>6. BondVault, ClaimBond y Vencimiento</h2>
     <h3>6.1 El modelo de bóveda única</h3>
-    <p>Versiones anteriores de Lumina usaban cuatro bóvedas separadas (una por clase de activo). V5.1 las unifica en un único <code>BondVault</code> que custodia 70 millones de $LUMINA. La bóveda nunca se financia directamente con depósitos de usuarios; recibe su asignación en <code>LuminaTokenV2.initialize()</code> como parte de la distribución génesis.</p>
+    <p>Versiones anteriores de Lumina usaban cuatro bóvedas separadas (una por clase de activo). La arquitectura actual las unifica en un único <code>BondVault</code> que custodia 70 millones de $LUMINA. La bóveda nunca se financia directamente con depósitos de usuarios; recibe su asignación en <code>LuminaTokenV2.initialize()</code> como parte de la distribución génesis.</p>
     <p>La bóveda solo expone dos superficies con efecto de estado:</p>
     <ul>
       <li><code>issueBond(buyer, payoutUSD)</code>: invocado por <code>PolicyManagerV2</code> cuando una póliza se dispara. Emite ClaimBonds ERC-1155 en el epoch de vencimiento correspondiente a <code>now + 730 días</code>.</li>
@@ -474,11 +466,119 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 <div class="section-divider"></div>
 
 <!-- ═════════════════════════════════════════════════════════════════
-     9. MOTOR DE QUEMA
+     9. DISTRIBUCIÓN ADAPTATIVA DE QUEMA (matriz 16 cuadrantes)
+     ═════════════════════════════════════════════════════════════════ -->
+<section class="section" id="sec-burn-matrix">
+  <div class="container">
+    <h2>9. Distribución Adaptativa de Quema</h2>
+    <p>El 100% del USDC enrutado al <code>TWAPBurner</code> no siempre se quema directamente. Antes de comprar y quemar $LUMINA, el burner consulta a <code>AdaptiveFeeDistributor</code> para decidir cómo dividir el USDC entrante en cuatro buckets:</p>
+    <ul>
+      <li><strong>Quema (Burn)</strong>: convierte USDC en $LUMINA en Uniswap V3 y lo envía a <code>0xdead</code> (presión deflacionaria).</li>
+      <li><strong>Reserva de Buyback</strong>: acumula USDC para futuras compras de $LUMINA; se activa con más fuerza cuando el momentum es bajista.</li>
+      <li><strong>Operaciones</strong>: tesorería para gas de keepers, subsidios de oráculos y costos operativos.</li>
+      <li><strong>Mantenimiento</strong>: financia infraestructura de shields, auditorías y mantenimiento rutinario.</li>
+    </ul>
+    <p>El split no es estático. Adapta sobre <strong>dos ejes</strong>: solvencia del protocolo y momentum de mercado de LUMINA. El producto 4×4 de estos dos ejes produce <strong>16 distribuciones posibles</strong>, cada una pre-calibrada para un régimen específico. La matriz completa se implementa en <code>AdaptiveFeeDistributor._lookupDistribution(sLevel, mLevel)</code> y está verificada por tests unitarios que cubren los 16 cuadrantes.</p>
+
+    <h3>9.1 Los dos ejes</h3>
+    <p><strong>Niveles de solvencia</strong>: computados por <code>SolvencyOracle</code> como el ratio entre <em>(reserva LUMINA del BondVault &times; precio spot)</em> y <em>obligaciones totales comprometidas en USD</em>, expresado en basis points:</p>
+    <ul>
+      <li><strong>ULTRA</strong> (sLevel 0): profundamente sobrecapitalizado; el sistema puede permitirse máxima presión deflacionaria.</li>
+      <li><strong>HEALTHY</strong> (sLevel 1): cómodamente solvente; régimen operativo por defecto.</li>
+      <li><strong>STRESSED</strong> (sLevel 2): reservas bajo presión; quema lenta, ahorro de USDC para defensa.</li>
+      <li><strong>CRISIS</strong> (sLevel 3): cerca de subcapitalización; halt de quema, acumulación de USDC para defender el precio en la recuperación.</li>
+    </ul>
+    <p><strong>Buckets de momentum</strong>: computados a partir del ratio entre el TWAP de ventana corta (30 minutos) y el TWAP de ventana larga (1 día) del precio spot de LUMINA:</p>
+    <ul>
+      <li><strong>RALLY</strong> (mLevel 0): ratio &gt; 1.05; precio en tendencia alcista &mdash; quema agresiva mientras el sentimiento es fuerte.</li>
+      <li><strong>STABLE</strong> (mLevel 1): 0.95 &ndash; 1.05; lateral &mdash; split por defecto.</li>
+      <li><strong>DECLINE</strong> (mLevel 2): 0.85 &ndash; 0.95; precio cediendo &mdash; redirige más USDC a la reserva de buyback.</li>
+      <li><strong>CRASH</strong> (mLevel 3): ratio &lt; 0.85; drawdown agudo &mdash; halt total de quema, todo el USDC va a reserva de buyback para sostener la recuperación.</li>
+    </ul>
+
+    <h3>9.2 La matriz de 16 cuadrantes</h3>
+    <p>Cada celda muestra los basis points enrutados a <em>quema / buyback / operaciones / mantenimiento</em>, sumando 10000 (100%):</p>
+    <div class="table-wrap"><table>
+      <thead>
+        <tr>
+          <th>Solvencia \ Momentum</th>
+          <th>RALLY</th>
+          <th>STABLE</th>
+          <th>DECLINE</th>
+          <th>CRASH</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>ULTRA</th>
+          <td>9500/0/0/500</td>
+          <td>9000/500/0/500</td>
+          <td>8500/1000/0/500</td>
+          <td>7500/2000/0/500</td>
+        </tr>
+        <tr>
+          <th>HEALTHY</th>
+          <td>9000/500/0/500</td>
+          <td><strong>8500/800/200/500</strong></td>
+          <td>7000/2100/200/700</td>
+          <td>5500/3500/200/800</td>
+        </tr>
+        <tr>
+          <th>STRESSED</th>
+          <td>7500/1800/200/500</td>
+          <td>5500/3500/200/800</td>
+          <td>3800/5500/200/500</td>
+          <td>1800/7500/200/500</td>
+        </tr>
+        <tr>
+          <th>CRISIS</th>
+          <td>4800/4500/200/500</td>
+          <td>2800/6500/200/500</td>
+          <td>800/8500/200/500</td>
+          <td>0/9600/200/200</td>
+        </tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">Celda en negrita = HEALTHY/STABLE = régimen operativo por defecto. Las cuatro constantes <code>FALLBACK_*_BPS</code> en <code>TWAPBurner</code> espejan esta celda como red de seguridad si el distributor revierte.</p>
+
+    <h3>9.3 Ejemplos prácticos</h3>
+    <ul>
+      <li><strong>ULTRA × RALLY → 95% quema, 0% buyback.</strong> Reservas profundas, precio subiendo: deflación máxima. Cada USDC de prima se traduce en LUMINA comprado y quemado, amplificando la tendencia alcista.</li>
+      <li><strong>HEALTHY × STABLE → 85/8/2/5.</strong> Régimen por defecto: la mayor parte de la prima quema LUMINA, una pequeña fracción se acumula como reserva de buyback, el resto cubre operaciones y mantenimiento.</li>
+      <li><strong>STRESSED × DECLINE → 38% quema, 55% buyback.</strong> Solvencia ajustada y precio cediendo: la matriz pivota: la mayoría del USDC se retiene como reserva de buyback, menos del 40% se quema. La presión de quema se preserva, pero el capital se reserva para una intervención defensiva futura.</li>
+      <li><strong>CRISIS × CRASH → 0% quema, 96% buyback.</strong> Régimen de máxima tensión: toda quema se detiene, casi todo el USDC entrante va a la reserva de buyback. El protocolo prioriza capital de recuperación sobre señalización deflacionaria.</li>
+    </ul>
+
+    <h3>9.4 Estado de implementación (testnet Sepolia)</h3>
+    <div class="callout warn">
+      <div class="callout-title">⚠ Disclosure honesto</div>
+      La matriz de 16 cuadrantes está plenamente implementada en <code>AdaptiveFeeDistributor.sol</code> y ejercitada por tests unitarios que cubren los 16 cuadrantes en <code>AdaptiveFeeDistributorTest.t.sol</code>. Sin embargo, en Sepolia hoy, el <strong>input de momentum se mantiene en neutral (10000 bps)</strong> en <code>SolvencyOracle.sol</code>: aún no se desplegó un pool profundo de liquidez LUMINA/USDC en Sepolia, por lo que el oráculo de momentum no tiene TWAPs reales on-chain para leer.
+      <p style="margin-top:10px;margin-bottom:0;">En la práctica, esto significa que la matriz corre <strong>solo sobre el eje de solvencia</strong>: en runtime colapsa a la columna STABLE. El comportamiento completo de 16 cuadrantes se activa automáticamente una vez que tres piezas se entregan en conjunto:</p>
+      <ol style="margin-top:8px;margin-bottom:0;">
+        <li>Un pool real LUMINA/USDC en Uniswap V3 desplegado y fundeado con liquidez en la chain objetivo.</li>
+        <li>El hunk del oráculo de momentum (ya escrito en la branch <code>release/v5.1-pre-mainnet</code>, audit fix H-10) se cherry-pickea a <code>SolvencyOracle.sol</code>.</li>
+        <li>El contrato <code>BuybackSpender</code> se despliega y se cablea como consumidor de <code>buybackReserve</code>: la pieza faltante que convierte el USDC acumulado en buybacks de LUMINA en drawdowns de precio.</li>
+      </ol>
+      <p style="margin-top:10px;margin-bottom:0;">La secuenciación es intencional: desplegar la lógica de momentum antes de que exista un pool de liquidez profundo produciría una señal muerta indistinguible de neutral, sin síntoma off-chain que delate la regresión. Cada pieza aterriza cuando su dependencia está en su lugar.</p>
+    </div>
+
+    <h3>9.5 Referencias</h3>
+    <ul>
+      <li><a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/src/core/AdaptiveFeeDistributor.sol">AdaptiveFeeDistributor.sol</a>: implementación de la matriz.</li>
+      <li><a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/src/oracles/SolvencyOracle.sol">SolvencyOracle.sol</a>: clasificación de solvencia y momentum (momentum actualmente stubbed).</li>
+      <li><a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/test/core/AdaptiveFeeDistributorTest.t.sol">AdaptiveFeeDistributorTest.t.sol</a>: tests de los 16 cuadrantes.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═════════════════════════════════════════════════════════════════
+     10. MOTOR DE QUEMA
      ═════════════════════════════════════════════════════════════════ -->
 <section class="section" id="sec-9">
   <div class="container">
-    <h2>9. Motor de Quema y Flujo Deflacionario</h2>
+    <h2>10. Motor de Quema y Flujo Deflacionario</h2>
     <h3>9.1 Dos rutas de quema</h3>
     <p>Cada USDC que entra al protocolo se enruta a través del <code>TWAPBurner</code>:</p>
     <ol>
@@ -528,7 +628,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
      ═════════════════════════════════════════════════════════════════ -->
 <section class="section" id="sec-10">
   <div class="container">
-    <h2>10. Marketplace Secundario</h2>
+    <h2>11. Marketplace Secundario</h2>
     <h3>10.1 Propósito</h3>
     <p>Los ClaimBonds vencen a 730 días. Los tenedores que necesitan liquidez antes los venden en el mercado secundario con descuento; los compradores obtienen un yield implícito esperando al vencimiento. El mercado es permisionless y on-chain.</p>
 
@@ -562,14 +662,14 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
      ═════════════════════════════════════════════════════════════════ -->
 <section class="section" id="sec-11">
   <div class="container">
-    <h2>11. Modelo de Seguridad</h2>
+    <h2>12. Modelo de Seguridad</h2>
     <h3>11.1 Upgradeability</h3>
     <p>Todos los contratos del núcleo son <strong>upgradeables UUPS</strong> con <code>_authorizeUpgrade</code> protegido por <code>DEFAULT_ADMIN_ROLE</code>. Los upgrades hoy requieren un único firmante y migrarán a multisig antes de mainnet (ver Roadmap).</p>
 
     <h3>11.2 Postura de auditoría</h3>
-    <p>Los reportes de auditoría interna para V5 y V5.1 son públicos:</p>
+    <p>Los reportes de auditoría interna son públicos:</p>
     <ul>
-      <li><code>docs/SECURITY-AUDIT-V5.md</code>: última auditoría interna que cubre la arquitectura V5.1.</li>
+      <li><code>docs/SECURITY-AUDIT-V5.md</code>: última auditoría interna que cubre la arquitectura actual.</li>
       <li><code>docs/audit/v5.1-uups/</code>: análisis por capítulo: aristas matemáticas, riesgo de claves admin, condiciones de carrera, dependencias temporales, integración del oráculo.</li>
       <li><code>docs/audit/PHASE4-AUDIT-REPORT.md</code>: flujo de bonos + marketplace.</li>
     </ul>
@@ -601,7 +701,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
      ═════════════════════════════════════════════════════════════════ -->
 <section class="section" id="sec-12">
   <div class="container">
-    <h2>12. Para Agentes de IA</h2>
+    <h2>13. Para Agentes de IA</h2>
     <h3>12.1 Onboarding self-service</h3>
     <p>Un agente autónomo puede generar su propia API key sin intervención humana. El flujo consta de dos operaciones en línea:</p>
     <ol>
@@ -646,7 +746,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
      ═════════════════════════════════════════════════════════════════ -->
 <section class="section" id="sec-13">
   <div class="container">
-    <h2>13. Roadmap</h2>
+    <h2>14. Roadmap</h2>
     <h3>Fase 1 — Sepolia testnet (actual)</h3>
     <ul>
       <li>9 shields desplegados y activos.</li>
@@ -658,7 +758,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 
     <h3>Fase 2 — Lanzamiento mainnet (objetivo Q3 2026)</h3>
     <ul>
-      <li>Despliegue de los contratos V5.1 en Base (chainId 8453).</li>
+      <li>Despliegue de los contratos en Base (chainId 8453).</li>
       <li>Multisig reemplaza al admin de firmante único (Gnosis Safe, 2-de-3 inicialmente).</li>
       <li>Custodia en cold storage de la clave de firma del oráculo (HSM o hardware wallet).</li>
       <li>Bug bounty activa en T+30d.</li>
@@ -691,10 +791,10 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
      ═════════════════════════════════════════════════════════════════ -->
 <section class="section" id="sec-14">
   <div class="container">
-    <h2>14. Riesgos y Aviso Legal</h2>
+    <h2>15. Riesgos y Aviso Legal</h2>
     <div class="callout danger">
       <div class="callout-title">⚠ Solo testnet</div>
-      V5.1 corre en Base Sepolia. El contrato USDC es un mock; los oráculos de BTC y ETH devuelven precios mock predefinidos para los disparos; no hay dinero real en riesgo porque no debería depositarse dinero real. No transfiera activos de mainnet a ninguna dirección listada en este documento.
+      El deploy actual corre en Base Sepolia. El contrato USDC es un mock; los oráculos de BTC y ETH devuelven precios mock predefinidos para los disparos; no hay dinero real en riesgo porque no debería depositarse dinero real. No transfiera activos de mainnet a ninguna dirección listada en este documento.
     </div>
 
     <h3>14.1 Riesgo de smart contracts</h3>
@@ -721,7 +821,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
      ═════════════════════════════════════════════════════════════════ -->
 <section class="section" id="sec-15">
   <div class="container">
-    <h2>15. Marco Legal</h2>
+    <h2>16. Marco Legal</h2>
     <h3>15.1 Estructura del protocolo</h3>
     <p>Lumina Protocol es software de código abierto publicado bajo licencia MIT en <a href="https://github.com/org-lumina">github.com/org-lumina</a>. Los contratos están desplegados y operados por el equipo fundador durante el testnet; en mainnet, la gobernanza y autoridad sobre parámetros migran a un multisig y, en última instancia, a una gobernanza on-chain.</p>
 
@@ -818,7 +918,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <h2>Apéndice C — Referencias</h2>
     <p>Toda afirmación técnica de este whitepaper se trazea a alguna de estas fuentes:</p>
     <ul>
-      <li>Código fuente V5.1: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/tree/main/src">github.com/org-lumina/LUMINA-PROTOCOL/tree/main/src</a></li>
+      <li>Código fuente: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/tree/main/src">github.com/org-lumina/LUMINA-PROTOCOL/tree/main/src</a></li>
       <li>Tokenomics canónica: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/TOKENOMICS.md">docs/TOKENOMICS.md</a></li>
       <li>Visión arquitectónica: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/SECURITY.md">SECURITY.md</a></li>
       <li>Integración Aave V3: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/architecture/AAVE-INTEGRATION.md">docs/architecture/AAVE-INTEGRATION.md</a></li>
@@ -833,7 +933,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 
 <footer class="footer">
   <div class="container">
-    Lumina Protocol &middot; Whitepaper V5.1 (Español) &middot; <a href="/whitepaper/en">English Version</a> &middot; <a href="https://github.com/org-lumina">github.com/org-lumina</a>
+    Lumina Protocol &middot; Whitepaper (Español) &middot; <a href="/whitepaper/en">English Version</a> &middot; <a href="https://github.com/org-lumina">github.com/org-lumina</a>
   </div>
 </footer>
 

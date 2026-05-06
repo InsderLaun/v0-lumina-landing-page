@@ -116,7 +116,7 @@ export function WhitepaperShell({ lang, iframeSrc }: WhitepaperShellProps) {
 
       <iframe
         src={iframeSrc}
-        title={`Lumina Whitepaper V3 ${lang.toUpperCase()}`}
+        title={`Lumina Whitepaper ${lang.toUpperCase()}`}
         style={{
           flex: 1,
           width: '100%',

@@ -11,6 +11,7 @@ const ANCHOR_LINKS = [
 ] as const
 
 const PAGE_LINKS = [
+  { href: '/whitepaper', label: 'Whitepaper' },
   { href: '/docs', label: 'Docs' },
   { href: '/skills', label: 'Skills' },
   { href: '/tutorial', label: 'Tutorial' },
