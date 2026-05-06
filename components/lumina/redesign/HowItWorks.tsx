@@ -34,7 +34,7 @@ export function HowItWorks() {
     <section className="rd-sec" id="how">
       <div className="wrap">
         <div className="rd-sec-num">
-          01 / 07 · <span>Mechanics</span>
+          01 / 08 · <span>Mechanics</span>
         </div>
         <h2>Four steps from bet to burn. No middlemen, no disputes.</h2>
         <p className="rd-sec-lede">
