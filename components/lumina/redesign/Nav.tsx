@@ -44,9 +44,22 @@ export function Nav() {
         </div>
 
         <div className="rd-nav-cta">
-          <Link className="rd-btn rd-btn-ghost" href="/whitepaper">
-            Whitepaper
-          </Link>
+          <a
+            className="rd-btn rd-btn-ghost"
+            href="https://github.com/org-lumina"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+          <a
+            className="rd-btn rd-btn-primary"
+            href="https://docs.lumina-org.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Build →
+          </a>
           <Link className="rd-btn rd-btn-primary" href="/app">
             Launch app →
           </Link>

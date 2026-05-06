@@ -52,6 +52,34 @@ export function SiteFooter() {
           </div>
 
           <div className="rd-foot-col">
+            <h5>For builders</h5>
+            <a href="https://docs.lumina-org.com" target="_blank" rel="noopener noreferrer">
+              Docs (Mintlify)
+            </a>
+            <a
+              href="https://www.npmjs.com/package/@lumina-org/sdk"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @lumina-org/sdk on npm
+            </a>
+            <a
+              href="https://lumina-api-production-ac85.up.railway.app/openapi.json"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              OpenAPI spec
+            </a>
+            <a
+              href="https://lumina-api-production-ac85.up.railway.app/api-docs"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Swagger UI
+            </a>
+          </div>
+
+          <div className="rd-foot-col">
             <h5>Contact</h5>
             <a href="mailto:labs@lumina-org.com">labs@lumina-org.com</a>
             <a href="mailto:support@lumina-org.com">support@lumina-org.com</a>
@@ -59,6 +87,28 @@ export function SiteFooter() {
               GitHub
             </a>
           </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: 24,
+            paddingTop: 16,
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            fontSize: 12,
+            color: 'var(--rd-text-3)',
+          }}
+        >
+          API base URL ·{' '}
+          <code
+            style={{
+              padding: '2px 6px',
+              borderRadius: 4,
+              background: 'rgba(255,255,255,0.04)',
+              color: 'var(--rd-text-2)',
+            }}
+          >
+            https://lumina-api-production-ac85.up.railway.app
+          </code>
         </div>
 
         <div className="rd-foot-bottom">

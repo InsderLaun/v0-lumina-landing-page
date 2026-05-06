@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { LiveStatusBadge } from './LiveStatusBadge'
 
 const BURN_EVENTS = [
   { t: '00:42 UTC', action: 'Flash BTC 1h', amount: '+ 12.40 USDC', lumina: '344.4 LUMINA' },
@@ -20,9 +21,12 @@ export function Hero() {
   return (
     <section className="rd-hero">
       <div className="wrap">
-        <div className="rd-hero-eyebrow">
-          <span className="rd-dot" />
-          <span>v5.1 · Base Sepolia · ClaimBond Model · Live</span>
+        <div className="rd-hero-eyebrow" style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span className="rd-dot" />
+            <span>v5.1 · Base Sepolia · ClaimBond Model</span>
+          </span>
+          <LiveStatusBadge />
         </div>
         <div className="rd-hero-grid">
           <div>
@@ -40,15 +44,40 @@ export function Hero() {
               market and burns it forever. Every winning bet mints a ClaimBond — fixed-USD, 24-month,
               redeemable in $LUMINA.
             </p>
+            <p
+              className="rd-hero-sub"
+              style={{ marginTop: 8, fontSize: 14, color: 'var(--rd-text-3)' }}
+            >
+              Parametric DeFi insurance — built for AI agents. Install:{' '}
+              <code
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  fontSize: 13,
+                  color: 'var(--rd-text-1)',
+                }}
+              >
+                npm install @lumina-org/sdk
+              </code>
+            </p>
             <div className="rd-hero-cta">
               <a className="rd-btn rd-btn-primary" href="#products">
                 Speculate now →
+              </a>
+              <a
+                className="rd-btn rd-btn-primary"
+                href="https://docs.lumina-org.com/quickstart"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Build with Lumina →
               </a>
               <a className="rd-btn rd-btn-ghost" href="#bonds">
                 How bonds work
               </a>
               <Link className="rd-btn rd-btn-ghost" href="/whitepaper">
-                Read whitepaper
+                Whitepaper
               </Link>
             </div>
           </div>

@@ -11,9 +11,9 @@ const AUDIENCES = [
   {
     role: 'For agents',
     title: 'AI developers',
-    body: 'Drop the SKILL file into your agent. Authenticate. POST /api/v2/purchase. Same bond mechanics, same oracle resolution. No human-only paths.',
-    cta: 'Download SKILL',
-    href: '/skills',
+    body: 'Install @lumina-org/sdk. Sign one message to mint an API key. POST /api/v1/policies. The relayer pays gas — your agent only pays the USDC premium. Same bond mechanics, same oracle resolution as humans.',
+    cta: 'Read SDK docs',
+    href: 'https://docs.lumina-org.com/sdk/installation',
   },
   {
     role: 'For yield',
