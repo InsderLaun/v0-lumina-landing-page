@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { Bot, User } from 'lucide-react'
 import { LiveStatusBadge } from './LiveStatusBadge'
 
 const BURN_EVENTS = [
@@ -62,22 +63,21 @@ export function Hero() {
               </code>
             </p>
             <div className="rd-hero-cta">
-              <a className="rd-btn rd-btn-primary" href="#products">
-                Speculate now →
-              </a>
               <a
                 className="rd-btn rd-btn-primary"
-                href="https://docs.lumina-org.com/quickstart"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#sdk"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
               >
-                Build with Lumina →
+                <Bot size={16} aria-hidden="true" />
+                Connect AI agent
               </a>
-              <a className="rd-btn rd-btn-ghost" href="#bonds">
-                How bonds work
-              </a>
-              <Link className="rd-btn rd-btn-ghost" href="/whitepaper">
-                Whitepaper
+              <Link
+                className="rd-btn rd-btn-ghost"
+                href="/app/human/products"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+              >
+                <User size={16} aria-hidden="true" />
+                I&apos;m a human
               </Link>
             </div>
           </div>
