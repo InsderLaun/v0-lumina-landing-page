@@ -44,7 +44,9 @@ body{background:var(--bg-dark);color:var(--text-secondary);font-family:'Inter',s
 .section-divider{height:1px;background:var(--border-subtle);margin:0;}
 .section h2{font-size:28px;font-weight:700;color:var(--accent);margin:0 0 16px;letter-spacing:-.02em;line-height:1.2;}
 .section h3{font-size:18px;font-weight:600;color:var(--accent);margin:32px 0 12px;letter-spacing:-.01em;}
-.section p{margin-bottom:14px;text-align:justify;text-justify:inter-word;hyphens:auto;}
+.section p{margin-bottom:14px;}
+.section > .container > p,.section > .container > ul > li,.section > .container > ol > li{text-align:justify;text-justify:inter-word;hyphens:auto;word-spacing:0.02em;}
+.cover-subtitle,.cover-meta,.callout p,.callout li,.toc-label,.formula{text-align:inherit;hyphens:manual;word-spacing:normal;}
 .section ul,.section ol{margin:0 0 14px 24px;}
 .section li{margin-bottom:6px;}
 strong{color:var(--text-primary);font-weight:600;}
@@ -78,6 +80,9 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
   .section h2{font-size:22px;}
   .section h3{font-size:16px;}
   .toc-page{padding:48px 0;}
+}
+@media (max-width:640px){
+  .section > .container > p,.section > .container > ul > li,.section > .container > ol > li{text-align:left;word-spacing:normal;}
 }
 </style>
 </head>
@@ -170,8 +175,6 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <h3>2.2 What Lumina does differently</h3>
     <p>Lumina is <strong>parametric</strong>: every policy specifies an objective trigger condition (e.g., &ldquo;BTC drops &ge; 5% in any rolling 1-hour window&rdquo;). When an oracle confirms the condition, the payout fires automatically inside the same transaction. There is no claim form, no committee, no delay, no possibility of subjective denial.</p>
     <p>Lumina is also <strong>agent-first</strong>. The API exposes a relayer pattern (<code>POST /api/v1/policies</code>) where the protocol pays the gas and an agent only needs an <code>x-api-key</code> header. Mocking 22 individual SKILL files to streamline the most common operations means an agent can integrate Lumina end-to-end in under one hour.</p>
-    <h3>2.3 The current architecture</h3>
-    <p>The current architecture is the third major revision of the protocol. The first iteration used a yield-vault model with Aave V3 deposits. The second added Phala-verified exploit shields. The third introduced a kink-based pricing model on a multi-vault topology. The fourth tested adaptive fee distribution. The fifth unified everything around a single-vault ClaimBond model. <strong>The current revision hardened that foundation with UUPS upgradeability, the EIP-712 oracle, the marketplace's commit-reveal MEV protection, and the deflationary token launch</strong>. All legacy versions are archived in <code>/archive</code> for historical reference; only the current revision is live.</p>
   </div>
 </section>
 

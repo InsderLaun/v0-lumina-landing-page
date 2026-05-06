@@ -44,7 +44,9 @@ body{background:var(--bg-dark);color:var(--text-secondary);font-family:'Inter',s
 .section-divider{height:1px;background:var(--border-subtle);margin:0;}
 .section h2{font-size:28px;font-weight:700;color:var(--accent);margin:0 0 16px;letter-spacing:-.02em;line-height:1.2;}
 .section h3{font-size:18px;font-weight:600;color:var(--accent);margin:32px 0 12px;letter-spacing:-.01em;}
-.section p{margin-bottom:14px;text-align:justify;text-justify:inter-word;hyphens:auto;}
+.section p{margin-bottom:14px;}
+.section > .container > p,.section > .container > ul > li,.section > .container > ol > li{text-align:justify;text-justify:inter-word;hyphens:auto;word-spacing:0.02em;}
+.cover-subtitle,.cover-meta,.callout p,.callout li,.toc-label,.formula{text-align:inherit;hyphens:manual;word-spacing:normal;}
 .section ul,.section ol{margin:0 0 14px 24px;}
 .section li{margin-bottom:6px;}
 strong{color:var(--text-primary);font-weight:600;}
@@ -78,6 +80,9 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
   .section h2{font-size:22px;}
   .section h3{font-size:16px;}
   .toc-page{padding:48px 0;}
+}
+@media (max-width:640px){
+  .section > .container > p,.section > .container > ul > li,.section > .container > ol > li{text-align:left;word-spacing:normal;}
 }
 </style>
 </head>
@@ -170,8 +175,6 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <h3>2.2 Lo que hace Lumina de forma distinta</h3>
     <p>Lumina es <strong>paramétrico</strong>: cada póliza especifica una condición objetiva de disparo (por ejemplo, "BTC cae &ge; 5% en cualquier ventana móvil de 1 hora"). Cuando un oráculo confirma la condición, el pago se dispara automáticamente dentro de la misma transacción. No hay formulario de siniestro, no hay comité, no hay demora, no existe la posibilidad de denegación subjetiva.</p>
     <p>Lumina también es <strong>agent-first</strong>. La API expone un patrón de relayer (<code>POST /api/v1/policies</code>) en el cual el protocolo paga el gas y el agente solo necesita un encabezado <code>x-api-key</code>. Veintidós archivos de SKILL individuales que estandarizan las operaciones más frecuentes permiten a un agente integrarse de extremo a extremo con Lumina en menos de una hora.</p>
-    <h3>2.3 La arquitectura actual</h3>
-    <p>La arquitectura actual es la tercera revisión mayor del protocolo. La primera iteración usaba un modelo de bóvedas de rendimiento con depósitos en Aave V3. La segunda incorporó shields de exploits verificados por Phala. La tercera introdujo un modelo de pricing tipo "kink" sobre una topología multi-bóveda. La cuarta experimentó con distribución adaptativa de comisiones. La quinta unificó todo en torno a un modelo de bóveda única con ClaimBonds. <strong>La revisión actual endureció esa base con upgradeability UUPS, el oráculo EIP-712, la protección anti-MEV por commit-reveal del marketplace y el lanzamiento del token deflacionario</strong>. Las versiones legacy se archivan en <code>/archive</code> con propósito histórico; solo la revisión actual está en producción.</p>
   </div>
 </section>
 
