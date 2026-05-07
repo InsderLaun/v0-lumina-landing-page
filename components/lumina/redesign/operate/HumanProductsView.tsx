@@ -6,6 +6,7 @@ import { parseUnits, formatUnits } from 'viem'
 import { CONTRACTS } from '@/lib/lumina-config'
 import { coverRouterV2Abi, bondVaultAbi } from '@/lib/abis/operate'
 import { SHIELDS, type AssetSymbol } from '@/lib/operate/products'
+import { useContracts } from '@/hooks/use-contracts'
 import { ShieldCard } from './ShieldCard'
 
 const FILTERS = ['ALL', 'BTC', 'ETH', 'STABLES'] as const
@@ -15,6 +16,10 @@ const QUOTE_COVER = parseUnits('1000', 6) // $1,000 cover for the card preview
 
 export function HumanProductsView() {
   const [filter, setFilter] = useState<Filter>('ALL')
+  const { data: liveContracts } = useContracts()
+  // Prefer the runtime-resolved CoverRouter address for the basescan link;
+  // fall back to the snapshot in CONTRACTS only if /health is still pending.
+  const coverRouterForLink = liveContracts?.coverRouter ?? CONTRACTS.CoverRouter
 
   // Batch reads: per-shield quotePremium($1000) + getProductConfig (paused state).
   const contracts = useMemo(
@@ -181,7 +186,7 @@ export function HumanProductsView() {
             : 'ⓘ Premiums shown for $1,000 cover. Real premiums update on-chain on the detail page.'}
         </span>
         <a
-          href="https://sepolia.basescan.org/address/0x60447F880Fad94fe1E17DBe9A0Cb39923bC9f316"
+          href={`https://sepolia.basescan.org/address/${coverRouterForLink}`}
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: 'var(--rd-accent)', fontFamily: 'var(--font-jetbrains), monospace' }}
