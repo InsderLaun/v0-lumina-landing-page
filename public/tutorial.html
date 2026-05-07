@@ -152,7 +152,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <div style="max-width:480px;width:90%;background:#12121a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px">
 <h3 style="color:white;font-size:1.1rem;margin-bottom:16px">About Base Network</h3>
 <p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">Lumina Protocol runs on Base — a Layer 2 network built on Ethereum by Coinbase. It's faster and cheaper than Ethereum mainnet. Your agent operates exclusively on this network.</p>
-<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">To use Lumina, your wallet must be connected to Base Mainnet (Chain ID: 8453). If you don't have Base configured, click "Switch to Base" and MetaMask will set it up automatically.</p>
+<p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:12px">To use Lumina, your wallet must be connected to Base Sepolia testnet (Chain ID: 84532). If you don't have Base Sepolia configured, click "Switch to Base" and MetaMask will set it up automatically.</p>
 <p style="color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1.7;margin-bottom:20px">You'll need a small amount of ETH on Base (~$0.01) for transaction fees, plus USDC (available at <a href="https://coinbase.com" target="_blank">coinbase.com</a>).</p>
 <div style="text-align:right">
 <button id="btn-got-it" style="background:#22d3ee;color:#0a0a0f;border:none;padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer">Got it</button>
@@ -239,7 +239,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">For developers: alternative method (terminal) &#x25B8;</summary>
 <pre style="margin-top:8px">cast send 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 \
   "approve(address,uint256)" \
-  0xd5f8678A0F2149B6342F9014CCe6d743234Ca025 \
+  0xebC3A783477FbD2720C024e16A8d63B8Db983D84 \
   10000000000 \
   --rpc-url YOUR_RPC_URL --interactive</pre>
 <div class="info">
@@ -447,7 +447,7 @@ function finishSetup() {
 <li>Go to the <a href="https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913#writeContract" target="_blank" style="color:#22d3ee">USDC contract write page on Basescan</a></li>
 <li>Connect your wallet on Basescan</li>
 <li>Call <code>approve()</code> with:<br>
-<code>spender</code> = <code>0xd5f8678A0F2149B6342F9014CCe6d743234Ca025</code> (CoverRouter)<br>
+<code>spender</code> = <code>0xebC3A783477FbD2720C024e16A8d63B8Db983D84</code> (CoverRouter)<br>
 <code>amount</code> = <code>0</code></li>
 </ol>
 </div>
@@ -499,14 +499,14 @@ function finishSetup() {
 </style>
 
 <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;margin-top:24px">
-<h2 style="margin-top:0;border:none;padding:0;color:rgba(255,255,255,0.6)">&#x1F4CB; Contract Addresses (Base Mainnet)</h2>
-<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:16px">All contracts verified on <a href="https://basescan.org" target="_blank">Basescan</a>. Chain ID: 8453.</p>
+<h2 style="margin-top:0;border:none;padding:0;color:rgba(255,255,255,0.6)">&#x1F4CB; Contract Addresses (Base Sepolia testnet)</h2>
+<p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:16px">All contracts verified on <a href="https://sepolia.basescan.org" target="_blank">Basescan (Sepolia)</a>. Chain ID: 84532.</p>
 <table style="font-size:0.8rem">
 <tr><th>Contract</th><th>Address</th></tr>
-<tr><td>CoverRouter</td><td><code><a href="https://basescan.org/address/0xd5f8678A0F2149B6342F9014CCe6d743234Ca025" target="_blank" style="color:#22d3ee">0xd5f8678A...Ca025</a></code></td></tr>
-<tr><td>PolicyManager</td><td><code><a href="https://basescan.org/address/0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" target="_blank" style="color:#22d3ee">0xCCA07e...0162a</a></code></td></tr>
-<tr><td>LuminaOracleV2</td><td><code><a href="https://basescan.org/address/0x87B576f688bE0E1d7d23A299f55b475658215105" target="_blank" style="color:#22d3ee">0x87B576...15105</a></code></td></tr>
-<tr><td>USDC</td><td><code><a href="https://basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" target="_blank" style="color:#22d3ee">0x833589...02913</a></code></td></tr>
+<tr><td>CoverRouter</td><td><code><a href="https://sepolia.basescan.org/address/0xebC3A783477FbD2720C024e16A8d63B8Db983D84" target="_blank" style="color:#22d3ee">0xebC3A7...3D84</a></code></td></tr>
+<tr><td>PolicyManager</td><td><code><a href="https://sepolia.basescan.org/address/0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" target="_blank" style="color:#22d3ee">0xCCA07e...0162a</a></code></td></tr>
+<tr><td>LuminaOracleV2</td><td><code><a href="https://sepolia.basescan.org/address/0x87B576f688bE0E1d7d23A299f55b475658215105" target="_blank" style="color:#22d3ee">0x87B576...15105</a></code></td></tr>
+<tr><td>USDC</td><td><code><a href="https://sepolia.basescan.org/address/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" target="_blank" style="color:#22d3ee">0x833589...02913</a></code></td></tr>
 <tr><td colspan="2" style="color:rgba(255,255,255,0.3);padding-top:8px;font-style:italic">Core (see SKILL file for full list)</td></tr>
 <tr><td>BondVault (82M $LUMINA reserve)</td><td><code style="font-size:0.75rem">see SKILL file</code></td></tr>
 <tr><td>ClaimBond (ERC-1155 epochs)</td><td><code style="font-size:0.75rem">see SKILL file</code></td></tr>
@@ -533,8 +533,8 @@ function finishSetup() {
 
   // --- Constants ---
   const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-  const COVER_ROUTER = '0xd5f8678A0F2149B6342F9014CCe6d743234Ca025';
-  const BASE_CHAIN_ID = '0x2105';
+  const COVER_ROUTER = '0xebC3A783477FbD2720C024e16A8d63B8Db983D84';
+  const BASE_CHAIN_ID = '0x14a34';
   const UINT256_MAX = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
 
   const VAULTS = [
@@ -583,10 +583,10 @@ function finishSetup() {
           method: 'wallet_addEthereumChain',
           params: [{
             chainId: BASE_CHAIN_ID,
-            chainName: 'Base',
+            chainName: 'Base Sepolia',
             nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-            rpcUrls: ['https://mainnet.base.org'],
-            blockExplorerUrls: ['https://basescan.org']
+            rpcUrls: ['https://sepolia.base.org'],
+            blockExplorerUrls: ['https://sepolia.basescan.org']
           }]
         });
       } else { throw err; }
@@ -659,7 +659,7 @@ function finishSetup() {
     if (typeof showWalletConnected === 'function') showWalletConnected(address);
     // Show wrong network alert below
     step1Error.style.display = 'block';
-    step1ErrorMsg.textContent = 'Wrong network — please switch to Base Mainnet. Click Connect Wallet again to switch.';
+    step1ErrorMsg.textContent = 'Wrong network — please switch to Base Sepolia testnet. Click Connect Wallet again to switch.';
     generateSection.style.display = 'none';
     updateStep2State();
   }
@@ -1140,14 +1140,14 @@ async function handleConnectWallet() {
     var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     if (!accounts || accounts.length === 0) return;
     var chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    if (chainId !== '0x2105') {
+    if (chainId !== '0x14a34') {
       try {
-        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2105' }] });
+        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x14a34' }] });
       } catch (e) {
         if (e.code === 4902) {
-          await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x2105', chainName: 'Base', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.base.org'], blockExplorerUrls: ['https://basescan.org'] }] });
+          await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x14a34', chainName: 'Base Sepolia', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://sepolia.base.org'], blockExplorerUrls: ['https://sepolia.basescan.org'] }] });
         } else {
-          alert('Please switch to Base network');
+          alert('Please switch to Base Sepolia testnet');
           return;
         }
       }

@@ -51,7 +51,7 @@ export function Products() {
     <section className="rd-sec" id="products">
       <div className="wrap">
         <div className="rd-sec-num">
-          03 / 08 · <span>Live Markets</span>
+          03 / 09 · <span>Live Markets</span>
         </div>
         <h2>Nine products. Each with a precise trigger, probability, and multiplier.</h2>
         <p className="rd-sec-lede">

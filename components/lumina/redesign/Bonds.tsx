@@ -12,7 +12,7 @@ export function Bonds() {
     <section className="rd-sec rd-sec-alt" id="bonds">
       <div className="wrap">
         <div className="rd-sec-num">
-          02 / 08 · <span>ClaimBond Tokens</span>
+          02 / 09 · <span>ClaimBond Tokens</span>
         </div>
         <h2>When your bet wins, you don&apos;t get cash. You get something better.</h2>
         <p className="rd-sec-lede">

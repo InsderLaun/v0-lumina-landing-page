@@ -34,7 +34,7 @@ export function Roadmap() {
     <section className="rd-sec rd-sec-alt" id="roadmap">
       <div className="wrap">
         <div className="rd-sec-num">
-          08 / 08 · <span>Roadmap</span>
+          09 / 09 · <span>Roadmap</span>
         </div>
         <h2>From foundation to institutional. Four phases, no detours.</h2>
         <p className="rd-sec-lede">
