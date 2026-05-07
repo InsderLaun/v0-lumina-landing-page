@@ -13,6 +13,7 @@ import { COPY_ES } from '@/components/whitepaper-short/copy.es'
 import { Section1Hero } from '@/components/whitepaper-short/Section1Hero'
 import { Section2Problem } from '@/components/whitepaper-short/Section2Problem'
 import { Section3HowItWorks } from '@/components/whitepaper-short/Section3HowItWorks'
+import { Section4Lifecycle } from '@/components/whitepaper-short/Section4Lifecycle'
 import { Section4Shields } from '@/components/whitepaper-short/Section4Shields'
 import { Section5Tokenomics } from '@/components/whitepaper-short/Section5Tokenomics'
 import { Section6Matrix } from '@/components/whitepaper-short/Section6Matrix'
@@ -48,13 +49,14 @@ export default async function WhitepaperShortPage({
         <Section1Hero copy={copy.s1} />
         <Section2Problem copy={copy.s2} />
         <Section3HowItWorks copy={copy.s3} />
-        <Section4Shields copy={copy.s4} />
-        <Section5Tokenomics copy={copy.s5} lang={lang} />
-        <Section6Matrix copy={copy.s6} />
-        <Section7ForAgents copy={copy.s7} />
-        {/* Section 8 fetches /health on the server with revalidate: 30 */}
-        <Section8LiveState copy={copy.s8} lang={lang} />
-        <Section9CTA copy={copy.s9} />
+        <Section4Lifecycle copy={copy.s4} />
+        <Section4Shields copy={copy.s5} />
+        <Section5Tokenomics copy={copy.s6} lang={lang} />
+        <Section6Matrix copy={copy.s7} />
+        <Section7ForAgents copy={copy.s8} />
+        {/* Section 9 fetches /health on the server with revalidate: 30 */}
+        <Section8LiveState copy={copy.s9} lang={lang} />
+        <Section9CTA copy={copy.s10} />
       </main>
       <SiteFooter />
     </div>

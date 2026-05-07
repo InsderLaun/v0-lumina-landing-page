@@ -66,10 +66,10 @@ function formatEth(weiStr: string | undefined) {
 export async function Section8LiveState({
   copy,
   lang,
-}: { copy: CopyEN['s8']; lang: 'en' | 'es' }) {
+}: { copy: CopyEN['s9']; lang: 'en' | 'es' }) {
   const data = await fetchHealth()
   const fmt = new Intl.NumberFormat(lang === 'es' ? 'es-ES' : 'en-US')
-  const burned = fmt.format(COPY_EN.s8.fallbackBurned)
+  const burned = fmt.format(COPY_EN.s9.fallbackBurned)
 
   const stats: { label: string; value: string }[] = [
     { label: copy.statLabels[0], value: formatBlock(data.chain?.block, lang) },
@@ -83,7 +83,7 @@ export async function Section8LiveState({
     .concat([{ name: 'Relayer', addr: data.relayer?.address ?? FALLBACK.relayer!.address! }])
 
   return (
-    <section id="s8" className="wp-sec wp-sec--alt" data-screen-label="08 Live state">
+    <section id="s9" className="wp-sec wp-sec--alt" data-screen-label="09 Live state">
       <div className="wp-sec__inner">
         <FadeUp className="wp-eyebrow wp-eyebrow--mono">{copy.eyebrow}</FadeUp>
         <FadeUp delay={100} as="h2" className="wp-h2">

@@ -3,9 +3,9 @@ import { FadeUp } from './MotionWrapper'
 import { CodeBlock, Receipt } from './CodeAndReceipt'
 import type { CopyEN } from './copy.en'
 
-export function Section7ForAgents({ copy }: { copy: CopyEN['s7'] }) {
+export function Section7ForAgents({ copy }: { copy: CopyEN['s8'] }) {
   return (
-    <section id="s7" className="wp-sec" data-screen-label="07 For agents">
+    <section id="s8" className="wp-sec" data-screen-label="08 For agents">
       <div className="wp-sec__inner">
         <FadeUp className="wp-eyebrow wp-eyebrow--mono">{copy.eyebrow}</FadeUp>
         <FadeUp delay={100} as="h2" className="wp-h2">

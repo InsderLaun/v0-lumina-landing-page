@@ -23,11 +23,11 @@ function MiniBars({ values }: { values: readonly number[] }) {
   )
 }
 
-export function Section6Matrix({ copy }: { copy: CopyEN['s6'] }) {
+export function Section6Matrix({ copy }: { copy: CopyEN['s7'] }) {
   const [sel, setSel] = useState({ r: 1, c: 1 })
   const cell = copy.matrix[sel.r][sel.c]
   return (
-    <section id="s6" className="wp-sec wp-sec--alt" data-screen-label="06 Adaptive burn">
+    <section id="s7" className="wp-sec wp-sec--alt" data-screen-label="07 Adaptive burn">
       <div className="wp-sec__inner">
         <FadeUp className="wp-eyebrow wp-eyebrow--mono">{copy.eyebrow}</FadeUp>
         <FadeUp delay={100} as="h2" className="wp-h2">
