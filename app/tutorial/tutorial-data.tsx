@@ -319,7 +319,7 @@ USDC.approve(
           You have two paths once you hold a bond:
         </p>
         <ul>
-          <li><strong>Hold to maturity</strong> — wait 730 days, then redeem for the full $1/token from BondVault.</li>
+          <li><strong>Hold to maturity</strong> — wait 730 days, then redeem for <strong>$LUMINA</strong> at maturity (BondVault mints to your wallet).</li>
           <li><strong>List on the marketplace</strong> — sell your bond now to a buyer who is willing to wait. You receive USDC immediately at whatever discount the market clears.</li>
         </ul>
       </>
@@ -335,8 +335,9 @@ USDC.approve(
         <p>
           After 730 days, the portfolio shows a "Redeem" button. The wallet signs{' '}
           <code>BondVault.redeemBond(epochId, usdAmount)</code>. The contract burns
-          your ERC-1155 balance for that epoch and transfers <code>usdAmount</code>
-          {' '}of USDC out of the vault. <code>nonReentrant</code>, post-maturity only.
+          your ERC-1155 balance for that epoch and mints{' '}
+          <code>usdAmount × $1 ÷ LUMINA_price</code> worth of <strong>$LUMINA</strong>{' '}
+          to the holder. <code>nonReentrant</code>, post-maturity only.
         </p>
       </>
     ),
@@ -417,10 +418,9 @@ export const AGENT_STEPS: AnyStep[] = [
     ),
     humanRequired: (
       <>
-        Key issuance is admin-gated (route <code>POST /api/v1/keys/generate</code>{' '}
-        is behind <code>adminAuth</code> middleware). Until self-service signup
-        ships, contact the founder team to provision one. Self-service is on the
-        roadmap.
+        Key issuance is <strong>self-service via{' '}
+        <code>/app/agent/api-keys</code></strong> — connect wallet, sign EIP-712,
+        copy your <code>lk_…</code> key.
       </>
     ),
     apiRef: {
@@ -806,9 +806,12 @@ const bonds = await fetch(url, {
         <p>
           Unlike policy purchase, redemption is <strong>not</strong> relayer-paid
           — the agent (or its operator wallet) signs{' '}
-          <code>BondVault.redeemBond(epochId, usdAmount)</code> on-chain. After
-          the tx confirms, post the txHash to the API so the redemption is
-          indexed and surfaced in subsequent <code>/bonds</code> queries.
+          <code>BondVault.redeemBond(epochId, usdAmount)</code> on-chain.
+          BondVault mints <strong>$LUMINA</strong> (not USDC) to the holder at
+          the current oracle price:{' '}
+          <code>luminaAmount = usdAmount / LUMINA_price</code>. After the tx
+          confirms, post the txHash to the API so the redemption is indexed and
+          surfaced in subsequent <code>/bonds</code> queries.
         </p>
       </>
     ),

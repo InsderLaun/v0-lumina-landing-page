@@ -67,7 +67,7 @@ export function MarketplaceSection() {
     <section className="rd-sec" id="marketplace">
       <div className="wrap">
         <div className="rd-sec-num">
-          05 / 08 · <span>Marketplace</span>
+          05 / 09 · <span>Marketplace</span>
         </div>
         <h2>
           Trade <em>bonds</em> before maturity.

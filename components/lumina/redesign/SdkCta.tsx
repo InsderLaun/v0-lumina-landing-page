@@ -38,7 +38,7 @@ export function SdkCta() {
     <section className="rd-sec" id="sdk">
       <div className="wrap">
         <div className="rd-sec-num">
-          04 / 08 · <span>Connect your AI</span>
+          04 / 09 · <span>Connect your AI</span>
         </div>
         <h2>
           Connect your AI agent in <em>three lines</em>.

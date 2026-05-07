@@ -1,6 +1,47 @@
-# LUMINA PROTOCOL — SKILL V4.1 (SINGLE SOURCE OF TRUTH)
+# LUMINA PROTOCOL — SKILL V4.2 (SINGLE SOURCE OF TRUTH)
 ## Parametric risk speculation for humans and AI agents
-### Base L2 (Chain 8453) | Token: $LUMINA | Last update: April 2026
+### Base Sepolia testnet (Chain 84532) | Token: $LUMINA | Last update: 2026-05-06
+
+---
+
+## 0. LIFECYCLE OVERVIEW — FROM PREMIUM TO PAYOUT
+
+The full lifecycle of a Lumina position, in 6 steps:
+
+  1. BUY POLICY (USDC)
+     User pays a small premium in USDC. 100% of the premium is routed to
+     TWAPBurner and used to buy & burn $LUMINA on Uniswap V3. The premium
+     is gone forever — supply shrinks immediately.
+
+  2. TRIGGER FIRES
+     The oracle observes the covered asset's price/rate. If the trigger
+     condition is met inside the policy window, the policy enters the
+     "triggered" state and a ClaimBond is mintable for the policy holder.
+
+  3. CLAIMBOND MINTED (ERC-1155)
+     ClaimBond is minted to the holder's wallet, indexed by epoch.
+     Face value: $1 per unit, denominated in USD. Maturity: 730 days.
+     Until maturity, the bond is a claim on $LUMINA at redemption price.
+
+  4. CHOOSE: WAIT OR SELL
+     The holder picks one of two paths:
+       - WAIT  → hold the bond to maturity, redeem for $LUMINA
+       - SELL  → list on the secondary marketplace today, receive USDC
+
+  5. WAIT 730 DAYS → $LUMINA
+     At maturity, redeemBond() reads the current $LUMINA oracle price and
+     mints luminaAmount = usdAmount / currentPrice to the holder. The
+     ERC-1155 ticket is burned. If $LUMINA appreciates, the holder
+     captures the upside.
+
+  6. OR SELL NOW → USDC AT DISCOUNT
+     The holder lists the bond on the P2P marketplace. Buyer pays USDC at
+     a discount to face value. Seller pays 1.5% fee, buyer pays 1.5% fee,
+     and the full 3% of trade value is sent to TWAPBurner and burned.
+
+Worked example: $3 USDC premium covers $800. Trigger fires →
+800-unit ClaimBond minted. Wait 730d → at $0.50 LUMINA = 1,600 LUMINA.
+Or sell today on the secondary marketplace for USDC at a discount.
 
 ---
 
@@ -25,7 +66,7 @@ It's not just insurance. It's parametric speculation with built-in deflation.
 
 Total supply:     100,000,000 (fixed, no mint function)
 Burn:             ERC20Burnable + BURNER_ROLE
-Chain:            Base L2 (8453)
+Chain:            Base Sepolia testnet (84532)
 DEX:              Uniswap V3 (LUMINA/USDC)
 
 DISTRIBUTION:
@@ -152,7 +193,7 @@ REDEMPTION (at maturity, 24 months later):
 ## 7. COMPLETE FLOW
 
 1. USER BUYS POLICY
-   Humans: web app. AI Agents: POST /api/v2/purchase
+   Humans: web app. AI Agents: POST /api/v1/purchase
    Pays premium in USDC.
 
 2. PREMIUM BURNS $LUMINA IMMEDIATELY
@@ -268,23 +309,23 @@ Circulating: ~5M LUMINA (5%). Price: ~$0.036. FDV: ~$3.6M.
 
 ## 13. API — ENDPOINTS
 
-POST /api/v2/purchase          Buy policy (USDC)
-GET  /api/v2/products          Product list with pricing
-GET  /api/v2/capacity          Current protocol capacity
-GET  /api/v2/stats             Total burned, rate, supply, price
+POST /api/v1/purchase          Buy policy (USDC)
+GET  /api/v1/products          Product list with pricing
+GET  /api/v1/capacity          Current protocol capacity
+GET  /api/v1/stats             Total burned, rate, supply, price
 
-GET  /api/v2/bonds/:address    Bonds by address (ERC-1155 balances by epoch)
-GET  /api/v2/bonds/epoch/:id   Epoch detail (supply, maturity, holders)
-POST /api/v2/bonds/redeem      Redeem mature bonds
+GET  /api/v1/bonds/:address    Bonds by address (ERC-1155 balances by epoch)
+GET  /api/v1/bonds/epoch/:id   Epoch detail (supply, maturity, holders)
+POST /api/v1/bonds/redeem      Redeem mature bonds
 
-GET  /api/v2/marketplace/listings      Bonds for sale
-POST /api/v2/marketplace/list          List bonds for sale (seller pays 1.5% on sale)
-POST /api/v2/marketplace/buy           Buy listed bonds (buyer pays 1.5% fee)
-POST /api/v2/marketplace/cancel        Cancel listing
-GET  /api/v2/marketplace/stats         Volume, avg discount, fees burned
+GET  /api/v1/marketplace/listings      Bonds for sale
+POST /api/v1/marketplace/list          List bonds for sale (seller pays 1.5% on sale)
+POST /api/v1/marketplace/buy           Buy listed bonds (buyer pays 1.5% fee)
+POST /api/v1/marketplace/cancel        Cancel listing
+GET  /api/v1/marketplace/stats         Volume, avg discount, fees burned
 
-POST /api/v2/keys/create       Create API key (requires wallet signature)
-GET  /api/v2/keys/list         List API keys for wallet
+POST /api/v1/keys/create       Create API key (requires wallet signature)
+GET  /api/v1/keys/list         List API keys for wallet
 
 ---
 
