@@ -140,7 +140,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 <details style="margin-top:16px">
 <summary style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:0.85rem">For developers: alternative method (terminal) &#x25B8;</summary>
 <p style="margin-top:8px;color:rgba(255,255,255,0.5);font-size:0.85rem">Replace YOUR_WALLET with your actual wallet address:</p>
-<pre>curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/keys/create \
+<pre>curl -X POST https://lumina-protocol-production.up.railway.app/api/v1/keys/create \
   -H "Content-Type: application/json" \
   -d '{"wallet":"YOUR_WALLET_ADDRESS","label":"my-agent"}'</pre>
 </details>
@@ -387,7 +387,7 @@ th{color:rgba(255,255,255,0.5);font-weight:500}
 
 <details style="margin-bottom:16px">
 <summary style="color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.8rem">🔧 For developers: test with curl</summary>
-<pre style="margin-top:8px">curl -X POST https://lumina-protocol-production.up.railway.app/api/v2/purchase \
+<pre style="margin-top:8px">curl -X POST https://lumina-protocol-production.up.railway.app/api/v1/purchase \
   -H "Content-Type: application/json" \
   -H "X-API-Key: lum_your_key_here" \
   -d '{"productId":"FLASHBTC1H-001","coverageAmount":1000000000,"asset":"BTC"}'</pre>
@@ -466,7 +466,7 @@ function finishSetup() {
 <div style="height:3px;width:100%;background:linear-gradient(90deg,#00d4ff,transparent)"></div>
 <div style="padding:32px">
 <h2 style="margin-top:0;border:none;padding:0;color:#00d4ff">&#x26A1; The 9 Products</h2>
-<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Parametric bets on specific market events. Your agent bets via <code>POST /api/v2/purchase</code>. If the trigger fires, you receive a ClaimBond (ERC-1155) worth 80% of your coverage, USD-denominated, settled in $LUMINA at market price after 24 months.</p>
+<p style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:20px">Parametric bets on specific market events. Your agent bets via <code>POST /api/v1/purchase</code>. If the trigger fires, you receive a ClaimBond (ERC-1155) worth 80% of your coverage, USD-denominated, settled in $LUMINA at market price after 24 months.</p>
 <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-bottom:8px">Premium formula (fixed): <code>Premium = Coverage × 0.80 × P(trigger) × 1.50</code> — no kink, no utilization curves. Quick reference — <a href="https://www.lumina-org.com/#products" style="color:#22d3ee">full details on the main page</a></p>
 <div style="overflow-x:auto">
 <table class="table-insurance" style="width:100%">
@@ -721,7 +721,7 @@ function finishSetup() {
     generateStatus.textContent = 'Generating...';
     step1Error.style.display = 'none';
     try {
-      const res = await fetch('https://lumina-protocol-production.up.railway.app/api/v2/keys/create', {
+      const res = await fetch('https://lumina-protocol-production.up.railway.app/api/v1/keys/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wallet: connectedAddress, label: 'mi-agente' })
