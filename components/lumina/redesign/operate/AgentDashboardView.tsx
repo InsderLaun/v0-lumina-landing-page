@@ -4,9 +4,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useAccount, usePublicClient, useReadContract } from 'wagmi'
 import { erc20Abi, formatUnits, type Hex } from 'viem'
-import { CONTRACTS, TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { ASSET_COLORS, SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { useContracts } from '@/hooks/use-contracts'
 import { LoadError } from './LoadError'
 
 type FeedKind = 'POLICY' | 'TRIGGER' | 'BOND' | 'REDEEM' | 'LIST' | 'BOUGHT' | 'CANCEL'
@@ -33,6 +34,7 @@ const POLL_MS = 15_000
 export function AgentDashboardView() {
   const { address, isConnected } = useAccount()
   const publicClient = usePublicClient()
+  const { data: contracts } = useContracts()
 
   const [policies, setPolicies] = useState<PolicyEvent[]>([])
   const [feed, setFeed] = useState<FeedItem[]>([])
@@ -64,7 +66,7 @@ export function AgentDashboardView() {
     query: { enabled: !!address },
   })
   const { data: luminaBal } = useReadContract({
-    address: CONTRACTS.LuminaToken,
+    address: contracts?.luminaToken,
     abi: erc20Abi,
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
@@ -73,7 +75,7 @@ export function AgentDashboardView() {
 
   // Aggregate events on every tick + address change
   useEffect(() => {
-    if (!address || !publicClient) {
+    if (!address || !publicClient || !contracts) {
       setPolicies([])
       setFeed([])
       return
@@ -89,7 +91,7 @@ export function AgentDashboardView() {
           // PolicyCreated — buyer NOT indexed → pull all + filter
           getLogsChunked({
             client: publicClient,
-            address: CONTRACTS.PolicyManager,
+            address: contracts.policyManager,
             event: {
               type: 'event',
               name: 'PolicyCreated',
@@ -107,7 +109,7 @@ export function AgentDashboardView() {
           }),
           getLogsChunked({
             client: publicClient,
-            address: CONTRACTS.PolicyManager,
+            address: contracts.policyManager,
             event: {
               type: 'event',
               name: 'PolicyTriggered',
@@ -125,7 +127,7 @@ export function AgentDashboardView() {
           // BondsMinted — to IS indexed → use args filter
           getLogsChunked({
             client: publicClient,
-            address: CONTRACTS.ClaimBond,
+            address: contracts.claimBond,
             event: {
               type: 'event',
               name: 'BondsMinted',
@@ -142,7 +144,7 @@ export function AgentDashboardView() {
           // BondRedeemed — holder IS indexed
           getLogsChunked({
             client: publicClient,
-            address: CONTRACTS.BondVault,
+            address: contracts.bondVault,
             event: {
               type: 'event',
               name: 'BondRedeemed',
@@ -241,7 +243,7 @@ export function AgentDashboardView() {
     return () => {
       cancelled = true
     }
-  }, [address, publicClient, tick])
+  }, [address, publicClient, tick, contracts])
 
   // Distribution: count policies per shield
   const distribution = useMemo(() => {

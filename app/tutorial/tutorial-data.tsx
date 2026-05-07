@@ -19,6 +19,12 @@ function uiRef(path: string) {
   return `${FRONTEND_REPO}/blob/main/${path}`
 }
 
+// [TODO P2] Tutorial content is server-side rendered (module-evaluation
+// time) so React hooks are unavailable here. Addresses come from the
+// CONTRACTS snapshot in lib/lumina-config.ts which is verified on every
+// build. To make this redeploy-proof, refactor the tutorial step content
+// into a client component and consume via useContracts(); not done in
+// this sprint to avoid touching the tutorial UX.
 const COVER_ROUTER = CONTRACTS.CoverRouter
 const POLICY_MANAGER = CONTRACTS.PolicyManager
 const BOND_VAULT = CONTRACTS.BondVault

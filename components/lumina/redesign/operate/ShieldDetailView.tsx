@@ -6,8 +6,9 @@ import { ArrowLeft } from 'lucide-react'
 import { useAccount, useChainId, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { erc20Abi, formatUnits, parseUnits } from 'viem'
-import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
+import { TOKENS } from '@/lib/lumina-config'
 import { coverRouterV2Abi } from '@/lib/abis/operate'
+import { useContracts } from '@/hooks/use-contracts'
 import {
   ASSET_COLORS,
   COVER_MIN_USDC,
@@ -24,16 +25,17 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const wrongChain = isConnected && chainId !== baseSepolia.id
+  const { data: contracts } = useContracts()
 
   const coverWei = parseUnits(coverUsdc.toString(), 6)
 
   // Live premium quote — refetches when coverUsdc changes
   const { data: quoteResult, isLoading: quoteLoading } = useReadContract({
-    address: CONTRACTS.CoverRouter,
+    address: contracts?.coverRouter,
     abi: coverRouterV2Abi,
     functionName: 'quotePremium',
     args: [shield.productId, coverWei],
-    query: { enabled: coverUsdc >= COVER_MIN_USDC && coverUsdc <= COVER_MAX_USDC },
+    query: { enabled: !!contracts && coverUsdc >= COVER_MIN_USDC && coverUsdc <= COVER_MAX_USDC },
   })
 
   const premiumWei = quoteResult ? (quoteResult as readonly [bigint, bigint])[0] : 0n
@@ -43,10 +45,11 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
 
   // Per-product paused check
   const { data: config } = useReadContract({
-    address: CONTRACTS.CoverRouter,
+    address: contracts?.coverRouter,
     abi: coverRouterV2Abi,
     functionName: 'getProductConfig',
     args: [shield.productId],
+    query: { enabled: !!contracts },
   })
   const paused = config ? !(config as { active: boolean }).active : false
 
@@ -62,8 +65,8 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
     address: TOKENS.USDC.address,
     abi: erc20Abi,
     functionName: 'allowance',
-    args: address ? [address, CONTRACTS.CoverRouter] : undefined,
-    query: { enabled: !!address },
+    args: address && contracts ? [address, contracts.coverRouter] : undefined,
+    query: { enabled: !!address && !!contracts },
   })
   const balanceOk = usdcBal !== undefined && (usdcBal as bigint) >= premiumWei
   const allowanceOk = allowance !== undefined && (allowance as bigint) >= premiumWei
@@ -99,20 +102,30 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
 
   const handleApprove = () => {
     setErrMsg(null)
+    if (!contracts) {
+      setErrMsg('Contracts not yet loaded')
+      setStep('error')
+      return
+    }
     setStep('approving')
     approveWrite({
       address: TOKENS.USDC.address,
       abi: erc20Abi,
       functionName: 'approve',
-      args: [CONTRACTS.CoverRouter, premiumWei],
+      args: [contracts.coverRouter, premiumWei],
     })
   }
 
   const handleBuy = () => {
     setErrMsg(null)
+    if (!contracts) {
+      setErrMsg('Contracts not yet loaded')
+      setStep('error')
+      return
+    }
     setStep('buying')
     buyWrite({
-      address: CONTRACTS.CoverRouter,
+      address: contracts.coverRouter,
       abi: coverRouterV2Abi,
       functionName: 'purchasePolicy',
       args: [shield.productId, coverWei, shield.assetBytes],

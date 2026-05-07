@@ -3,6 +3,14 @@
 import { useEffect, useState } from 'react'
 import { usePublicClient } from 'wagmi'
 import { parseAbiItem, formatUnits } from 'viem'
+// [NOT-MIGRATABLE-TO-useContracts]
+// CONTRACTS.TWAPBurner is NOT exposed by /health (only the 7 canonical
+// keys are: coverRouter, policyManager, bondVault, claimBond,
+// marketplace, usdc, luminaToken). The TWAPBurner address lives in the
+// static lumina-config.ts snapshot and is verified against the
+// LUMINA-PROTOCOL `script/upgrade/UpgradeTWAPBurnerAutoBurn.s.sol`
+// PROXY constant. To make this redeploy-proof, expose `twapBurner` in
+// /health.contracts (server change) and then migrate to useContracts().
 import { CONTRACTS } from '@/lib/lumina-config'
 
 // Mock baseline used until a real on-chain query lands. Once the public client

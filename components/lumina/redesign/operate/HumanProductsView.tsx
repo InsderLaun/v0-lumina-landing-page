@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react'
 import { useReadContract, useReadContracts } from 'wagmi'
 import { parseUnits, formatUnits } from 'viem'
-import { CONTRACTS } from '@/lib/lumina-config'
 import { coverRouterV2Abi, bondVaultAbi } from '@/lib/abis/operate'
 import { SHIELDS, type AssetSymbol } from '@/lib/operate/products'
 import { useContracts } from '@/hooks/use-contracts'
@@ -17,42 +16,48 @@ const QUOTE_COVER = parseUnits('1000', 6) // $1,000 cover for the card preview
 export function HumanProductsView() {
   const [filter, setFilter] = useState<Filter>('ALL')
   const { data: liveContracts } = useContracts()
-  // Prefer the runtime-resolved CoverRouter address for the basescan link;
-  // fall back to the snapshot in CONTRACTS only if /health is still pending.
-  const coverRouterForLink = liveContracts?.coverRouter ?? CONTRACTS.CoverRouter
+  const coverRouterForLink = liveContracts?.coverRouter
 
   // Batch reads: per-shield quotePremium($1000) + getProductConfig (paused state).
-  const contracts = useMemo(
+  // Address resolved at runtime from /health via useContracts().
+  const readContractsConfig = useMemo(
     () =>
-      SHIELDS.flatMap((s) => [
-        {
-          address: CONTRACTS.CoverRouter,
-          abi: coverRouterV2Abi,
-          functionName: 'quotePremium' as const,
-          args: [s.productId, QUOTE_COVER] as const,
-        },
-        {
-          address: CONTRACTS.CoverRouter,
-          abi: coverRouterV2Abi,
-          functionName: 'getProductConfig' as const,
-          args: [s.productId] as const,
-        },
-      ]),
-    [],
+      liveContracts
+        ? SHIELDS.flatMap((s) => [
+            {
+              address: liveContracts.coverRouter,
+              abi: coverRouterV2Abi,
+              functionName: 'quotePremium' as const,
+              args: [s.productId, QUOTE_COVER] as const,
+            },
+            {
+              address: liveContracts.coverRouter,
+              abi: coverRouterV2Abi,
+              functionName: 'getProductConfig' as const,
+              args: [s.productId] as const,
+            },
+          ])
+        : [],
+    [liveContracts],
   )
 
-  const { data: shieldData, isLoading: shieldLoading } = useReadContracts({ contracts })
+  const { data: shieldData, isLoading: shieldLoading } = useReadContracts({
+    contracts: readContractsConfig,
+    query: { enabled: !!liveContracts },
+  })
 
   const { data: globalPaused } = useReadContract({
-    address: CONTRACTS.CoverRouter,
+    address: liveContracts?.coverRouter,
     abi: coverRouterV2Abi,
     functionName: 'isProtocolAutoPaused',
+    query: { enabled: !!liveContracts },
   })
 
   const { data: capacityRaw } = useReadContract({
-    address: CONTRACTS.BondVault,
+    address: liveContracts?.bondVault,
     abi: bondVaultAbi,
     functionName: 'availableCapacityUSD',
+    query: { enabled: !!liveContracts },
   })
 
   // BondVault.availableCapacityUSD returns INTEGER DOLLARS (no decimals).
@@ -186,9 +191,10 @@ export function HumanProductsView() {
             : 'ⓘ Premiums shown for $1,000 cover. Real premiums update on-chain on the detail page.'}
         </span>
         <a
-          href={`https://sepolia.basescan.org/address/${coverRouterForLink}`}
+          href={coverRouterForLink ? `https://sepolia.basescan.org/address/${coverRouterForLink}` : '#'}
           target="_blank"
           rel="noopener noreferrer"
+          aria-disabled={!coverRouterForLink}
           style={{ color: 'var(--rd-accent)', fontFamily: 'var(--font-jetbrains), monospace' }}
         >
           COVERROUTERV2 ON BASESCAN ↗

@@ -4,9 +4,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useAccount, usePublicClient, useReadContracts } from 'wagmi'
 import { formatUnits, type Hex } from 'viem'
-import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { useContracts } from '@/hooks/use-contracts'
 import { LoadError } from './LoadError'
 
 type RangeFilter = '24h' | '7d' | '30d' | 'all'
@@ -38,6 +39,7 @@ const RANGE_BLOCKS: Record<RangeFilter, bigint | null> = {
 }
 
 export function AgentBondsView() {
+  const { data: contracts } = useContracts()
   const { address, isConnected } = useAccount()
   const publicClient = usePublicClient()
 
@@ -51,7 +53,7 @@ export function AgentBondsView() {
   const retry = () => setRetryToken((t) => t + 1)
 
   useEffect(() => {
-    if (!address || !publicClient) return
+    if (!address || !publicClient || !contracts) return
     let cancelled = false
     setLoading(true)
     setErr(null)
@@ -63,7 +65,7 @@ export function AgentBondsView() {
 
         const logs = await getLogsChunked({
           client: publicClient,
-          address: CONTRACTS.ClaimBond,
+          address: contracts!.claimBond,
           event: {
             type: 'event',
             name: 'BondsMinted',
@@ -99,7 +101,7 @@ export function AgentBondsView() {
     return () => {
       cancelled = true
     }
-  }, [address, publicClient, retryToken])
+  }, [address, publicClient, retryToken, contracts])
 
   // Aggregate per-epoch mint totals (one row per epoch)
   const aggregatedEpochs = useMemo(() => {
@@ -128,9 +130,9 @@ export function AgentBondsView() {
             // Use balanceOf (= ERC1155 count = integer dollars), NOT
             // getHolderFaceValue (which scales to 18-dec USD-wei). Keeps units
             // aligned with `totalMinted` from BondsMinted event (also integer $).
-            { address: CONTRACTS.ClaimBond, abi: claimBondAbi, functionName: 'balanceOf' as const, args: [address, e.epochId] as const },
-            { address: CONTRACTS.ClaimBond, abi: claimBondAbi, functionName: 'isMatured' as const, args: [e.epochId] as const },
-            { address: CONTRACTS.ClaimBond, abi: claimBondAbi, functionName: 'getEpochInfo' as const, args: [e.epochId] as const },
+            { address: contracts!.claimBond, abi: claimBondAbi, functionName: 'balanceOf' as const, args: [address, e.epochId] as const },
+            { address: contracts!.claimBond, abi: claimBondAbi, functionName: 'isMatured' as const, args: [e.epochId] as const },
+            { address: contracts!.claimBond, abi: claimBondAbi, functionName: 'getEpochInfo' as const, args: [e.epochId] as const },
           ])
         : [],
     [address, aggregatedEpochs],

@@ -8,8 +8,8 @@ import {
   useWaitForTransactionReceipt,
 } from 'wagmi'
 import { parseUnits, formatUnits, type Hex } from 'viem'
-import { CONTRACTS } from '@/lib/lumina-config'
 import { claimBondAbi, marketplaceAbi } from '@/lib/abis/operate'
+import { useContracts } from '@/hooks/use-contracts'
 import { X } from 'lucide-react'
 
 interface Props {
@@ -37,6 +37,7 @@ type Step = 'idle' | 'approving' | 'approved' | 'listing' | 'success' | 'error'
  */
 export function ListBondModal({ epochId, faceValueBalance, maturityTs, onClose, onListed }: Props) {
   const { address } = useAccount()
+  const { data: contracts } = useContracts()
 
   // Default: sell entire balance at 75% of face.
   const [amount, setAmount] = useState<bigint>(faceValueBalance)
@@ -48,11 +49,11 @@ export function ListBondModal({ epochId, faceValueBalance, maturityTs, onClose, 
 
   // ─── Allowance read (setApprovalForAll on the ERC1155) ───
   const { data: isApproved, refetch: refetchApproval } = useReadContract({
-    address: CONTRACTS.ClaimBond,
+    address: contracts?.claimBond,
     abi: claimBondAbi,
     functionName: 'isApprovedForAll',
-    args: address ? [address, CONTRACTS.Marketplace] : undefined,
-    query: { enabled: !!address },
+    args: address && contracts ? [address, contracts.marketplace] : undefined,
+    query: { enabled: !!address && !!contracts },
   })
 
   // ─── Approve (one-time) ───
@@ -145,19 +146,24 @@ export function ListBondModal({ epochId, faceValueBalance, maturityTs, onClose, 
 
   const handleSubmit = () => {
     setErrMsg(null)
+    if (!contracts) {
+      setErrMsg('Contracts not yet loaded')
+      setStep('error')
+      return
+    }
     if (!isApproved) {
       setStep('approving')
       approveWrite({
-        address: CONTRACTS.ClaimBond,
+        address: contracts.claimBond,
         abi: claimBondAbi,
         functionName: 'setApprovalForAll',
-        args: [CONTRACTS.Marketplace, true],
+        args: [contracts.marketplace, true],
       })
       return
     }
     setStep('listing')
     listWrite({
-      address: CONTRACTS.Marketplace,
+      address: contracts.marketplace,
       abi: marketplaceAbi,
       functionName: 'list',
       args: [epochId, amount, priceUsdcBaseUnits],
