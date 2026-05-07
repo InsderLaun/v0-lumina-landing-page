@@ -2,9 +2,9 @@
 import { FadeUp } from './MotionWrapper'
 import type { CopyEN } from './copy.en'
 
-export function Section9CTA({ copy }: { copy: CopyEN['s9'] }) {
+export function Section9CTA({ copy }: { copy: CopyEN['s10'] }) {
   return (
-    <section id="s9" className="wp-sec wp-sec--cta" data-screen-label="09 CTA">
+    <section id="s10" className="wp-sec wp-sec--cta" data-screen-label="10 CTA">
       <div className="wp-sec__inner">
         <FadeUp className="wp-eyebrow wp-eyebrow--mono">{copy.eyebrow}</FadeUp>
         <div className="wp-cta">

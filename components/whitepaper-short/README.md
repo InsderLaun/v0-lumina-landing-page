@@ -1,14 +1,31 @@
 # Whitepaper Short
 
-Self-contained 9-section page at `/whitepaper-short/[lang]` — EN and ES.
+Self-contained 10-section page at `/whitepaper-short/[lang]` — EN and ES.
 Drops in alongside the existing redesign components without modifying any.
+
+## Section order (10 sections)
+
+1. Hero               (Section1Hero)
+2. Problem            (Section2Problem)
+3. How it works       (Section3HowItWorks)
+4. Lifecycle          (Section4Lifecycle) — NEW
+5. Shields            (Section4Shields)
+6. Tokenomics         (Section5Tokenomics)
+7. Adaptive burn      (Section6Matrix)
+8. For agents         (Section7ForAgents)
+9. Live state         (Section8LiveState)
+10. CTA               (Section9CTA)
+
+The component file names retain their original `SectionN…` numbering for stable
+imports. Only the `id="sN"`, `data-screen-label`, eyebrow, and `CopyEN['sN']`
+prop slot were rebound to the new positions in the running order.
 
 ## File map
 
 ```
 app/whitepaper-short/[lang]/page.tsx       ← server component, route entry
 components/whitepaper-short/
-├── copy.en.ts                             ← all EN strings + types
+├── copy.en.ts                             ← all EN strings + types (s1..s10)
 ├── copy.es.ts                             ← ES mirror (same shape)
 ├── wp-short.css                           ← page-scoped styles (wp-* classes)
 ├── MotionWrapper.tsx                      ← FadeUp + stagger variants
@@ -17,22 +34,23 @@ components/whitepaper-short/
 ├── HeroBurnFeed.tsx                       ← (client) burn-feed cycler
 ├── Section2Problem.tsx                    ← (server)
 ├── Section3HowItWorks.tsx                 ← (client) framer pathLength arrows
-├── Section4Shields.tsx                    ← (client) hover state
-├── Section5Tokenomics.tsx                 ← (server)
+├── Section4Lifecycle.tsx                  ← (server) NEW · 6-step lifecycle + worked example
+├── Section4Shields.tsx                    ← (client) hover state — slot 5
+├── Section5Tokenomics.tsx                 ← (server) — slot 6
 ├── DonutChart.tsx                         ← (client) animated donut
-├── Section6Matrix.tsx                     ← (client) selection state
-├── Section7ForAgents.tsx                  ← (server)
+├── Section6Matrix.tsx                     ← (client) selection state — slot 7
+├── Section7ForAgents.tsx                  ← (server) — slot 8
 ├── CodeAndReceipt.tsx                     ← (client) typewriter + receipt
-├── Section8LiveState.tsx                  ← (server) fetch /health, revalidate 30
+├── Section8LiveState.tsx                  ← (server) fetch /health, revalidate 30 — slot 9
 ├── AddressCopyButton.tsx                  ← (client) clipboard
-├── Section9CTA.tsx                        ← (server)
+├── Section9CTA.tsx                        ← (server) — slot 10
 └── README.md                              ← this file
 ```
 
 ## Server vs client
 
-Server: page.tsx, Section1Hero, Section2Problem, Section5Tokenomics, Section7ForAgents,
-Section8LiveState, Section9CTA.
+Server: page.tsx, Section1Hero, Section2Problem, Section4Lifecycle, Section5Tokenomics,
+Section7ForAgents, Section8LiveState, Section9CTA.
 
 Client (`'use client'`): MotionWrapper (uses framer-motion hooks), HeroBurnFeed,
 Section3HowItWorks (path-draw), Section4Shields (hover), DonutChart, Section6Matrix,

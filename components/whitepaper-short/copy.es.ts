@@ -14,7 +14,7 @@ export const COPY_ES = {
     feedLabel: 'Feed de quema · en vivo',
   },
   s2: {
-    eyebrow: '02 / 09 · La brecha',
+    eyebrow: '02 / 10 · La brecha',
     h2Pre: 'El seguro cripto existente nunca fue construido ',
     h2Italic: 'para agentes autónomos.',
     p1: 'Nexus Mutual, InsurAce, Sherlock — todos los protocolos generales de seguro cripto usan reclamaciones discrecionales. Ocurre un evento, se reúne un comité, el pago se emite días o semanas después. Esa cadencia es incompatible con bots que liquidan, rebalancean y cubren posiciones dentro de un solo bloque.',
@@ -26,7 +26,7 @@ export const COPY_ES = {
     ],
   },
   s3: {
-    eyebrow: '03 / 09 · Tres pasos de la prima al payoff',
+    eyebrow: '03 / 10 · Tres pasos de la prima al payoff',
     h2: 'De la prima al payoff en tres pasos on-chain.',
     steps: [
       { glyph: '◇', title: 'Comprar', call: 'purchasePolicy(productId, coverage)',          body: 'Un agente elige uno de los 9 shields y paga una prima en USDC. La wallet relayer paga el gas; el agente solo paga la prima.' },
@@ -36,7 +36,30 @@ export const COPY_ES = {
     payoff: '→ ClaimBond · valor nominal $1 · vencimiento 730d',
   },
   s4: {
-    eyebrow: '04 / 09 · Nueve shields paramétricos',
+    eyebrow: '04 / 10 · Ciclo de vida',
+    h2Pre: 'De la prima al payout: ',
+    h2Italic: 'seis pasos, dos finales.',
+    lede: 'Cada posición Lumina recorre el mismo camino de seis pasos. La prima se paga en USDC y quema $LUMINA al entrar. Si el trigger se dispara, se acuña un ClaimBond. Desde ahí el holder elige uno de dos finales — esperar 730 días para recibir $LUMINA al vencimiento, o vender ahora en el marketplace secundario por USDC.',
+    steps: [
+      { title: 'Comprar póliza (USDC)',         body: 'Pagás una pequeña prima en USDC. 100% se enruta al TWAPBurner — compra y quema $LUMINA en Uniswap V3. El supply se reduce inmediatamente.' },
+      { title: 'Trigger se dispara',            body: 'El oráculo observa el activo cubierto. Si la condición de trigger se cumple dentro de la ventana, la póliza queda activada y un ClaimBond es acuñable.' },
+      { title: 'ClaimBond acuñado (ERC-1155)',  body: 'Acuñado al holder, indexado por epoch. Valor nominal $1 por unidad. Vencimiento: 730 días.' },
+      { title: 'Elegís: esperar O vender',      body: 'Mantener el bono hasta el vencimiento para recibir $LUMINA, o listarlo en el marketplace secundario hoy por USDC.' },
+      { title: 'Esperar 730d → $LUMINA',        body: 'redeemBond() lee el oráculo y acuña luminaAmount = usdAmount / LUMINA_price al holder. Capturás el upside si $LUMINA aprecia.' },
+      { title: 'O vender ahora → USDC',         body: 'Listás en el marketplace secundario con descuento. El comprador paga USDC. 1.5% maker + 1.5% taker — el 3% completo se envía al TWAPBurner y se quema.' },
+    ],
+    example: {
+      label: 'Ejemplo trabajado',
+      body: 'Prima de $3 USDC cubre $800 — Flash BTC 1h. El trigger se dispara. Un ClaimBond de 800 unidades es acuñado al wallet (ERC-1155, $1 nominal, vencimiento 730d).',
+      waitLabel: 'Camino A · esperar 730d (LUMINA = $0.50)',
+      waitOutcome: '1.600 LUMINA',
+      sellLabel: 'Camino B · vender ahora (~70% del nominal)',
+      sellOutcome: '~$560 USDC',
+    },
+    truth: 'Prima = USDC · Trade en marketplace = USDC · Redención al vencimiento = $LUMINA',
+  },
+  s5: {
+    eyebrow: '05 / 10 · Nueve shields paramétricos',
     h2Pre: 'Triggers específicos. Activos específicos. ',
     h2Italic: 'Ventanas de tiempo específicas.',
     lede: 'Cada shield es un proxy UUPS-upgradeable que valida una sola condición de trigger. El registro on-chain de productos usa nombres canónicos del tipo FLASHBTC1H-001 — el productId que pasa el caller es el keccak256 de ese string.',
@@ -52,8 +75,8 @@ export const COPY_ES = {
       { glyph: '$', asset: 'USDC', title: 'Rate Shock',    trigger: 'Préstamo USDC Aave > 10% / 7d',   pill: '7d',  canonical: 'RATESHOCK-001',  literal: 'USDC' },
     ] satisfies Shield[],
   },
-  s5: {
-    eyebrow: '05 / 09 · Tokenomics',
+  s6: {
+    eyebrow: '06 / 10 · Tokenomics',
     h2Pre: '100 millones de $LUMINA. Fijo para siempre. ',
     h2Italic: 'Siempre disminuyendo.',
     lede: 'LuminaTokenV2 es un token ERC-20 + ERC-20Burnable. No tiene función de mint. El constructor impone totalSupply() == MAX_SUPPLY inmediatamente después de la distribución de génesis. Desde ese momento, el supply solo disminuye.',
@@ -73,8 +96,8 @@ export const COPY_ES = {
       { num: '04', title: '0xdead',                      meta: 'quema permanente' },
     ],
   },
-  s6: {
-    eyebrow: '06 / 09 · Quema adaptativa',
+  s7: {
+    eyebrow: '07 / 10 · Quema adaptativa',
     h2Pre: 'Dieciséis regímenes de quema. ',
     h2Italic: 'La matriz decide a dónde va cada prima.',
     lede: 'El TWAPBurner no siempre quema directamente. Antes de comprar LUMINA, el burner consulta AdaptiveFeeDistributor. El split es una matriz 4×4 indexada por solvencia × momentum, con 16 celdas pre-ajustadas. HEALTHY × STABLE es el régimen por defecto; CRISIS × CRASH detiene la quema completamente y reserva 96% del USDC entrante para un buyback defensivo.',
@@ -94,8 +117,8 @@ export const COPY_ES = {
       body: 'El momentum se mantiene neutral (10000 bps) en Sepolia hasta que despliegue un pool LUMINA/USDC profundo. La matriz de 16 celdas corre solo sobre su eje de solvencia — en runtime colapsa a la columna STABLE. El comportamiento completo de 16 cuadrantes se activa cuando el pool, el módulo de momentum-oracle en release/v5.1-pre-mainnet, y el BuybackSpender se entreguen juntos.',
     },
   },
-  s7: {
-    eyebrow: '07 / 09 · Construido para integración autónoma',
+  s8: {
+    eyebrow: '08 / 10 · Construido para integración autónoma',
     h2Pre: 'Una llamada HTTP. El relayer paga el gas. ',
     h2Italic: 'El agente solo tiene USDC.',
     lede: 'Los mismos contratos que mueven la app humana exponen una API REST delgada. POST /api/v1/policies firma purchasePolicyFor on-chain en nombre del agente. Sin wallet de gas, sin popup, sin KYC. Misma mecánica de bonos. Misma resolución por oráculo.',
@@ -127,8 +150,8 @@ export const COPY_ES = {
     ] satisfies ReceiptRow[],
     pills: ['wallet de gas', 'popup MetaMask', 'formulario KYC'],
   },
-  s8: {
-    eyebrow: '08 / 09 · Estado en vivo',
+  s9: {
+    eyebrow: '09 / 10 · Estado en vivo',
     h2Pre: 'Todo lo que está en este whitepaper está on-chain ',
     h2Italic: 'ahora mismo.',
     lede: 'Estos son los contratos con los que la API y el frontend en producción hablan hoy. Verifica siempre contra /health antes de integrar — un redeploy invalida silenciosamente el .env de ayer.',
@@ -137,8 +160,8 @@ export const COPY_ES = {
     addressTable: { head: ['Contrato', 'Dirección'] },
     healthFooter: 'Fuente · /health · Base Sepolia · chainId 84532',
   },
-  s9: {
-    eyebrow: '09 / 09 · Comenzar ahora',
+  s10: {
+    eyebrow: '10 / 10 · Comenzar ahora',
     h2Pre: '¿Listo para asegurar ',
     h2Italic: 'los bots que nunca duermen?',
     btn1: 'Lanzar la app →',

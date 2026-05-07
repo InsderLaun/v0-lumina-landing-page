@@ -1009,3 +1009,80 @@ em { font-style: italic; }
   .wp-live-dot { animation: none; }
   .wp-matrix__cell { animation: none; }
 }
+
+/* ===== Section 4 — Lifecycle ===== */
+.wp-life-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.wp-life-card {
+  border: 1px solid var(--rd-line-strong);
+  border-radius: var(--rd-radius);
+  background: var(--rd-bg-2);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wp-life-card__num {
+  font-family: var(--font-jetbrains);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--rd-text-3);
+}
+.wp-life-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--rd-text);
+}
+.wp-life-card__body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--rd-text-2);
+}
+.wp-life-example {
+  margin-top: 24px;
+  border: 1px solid var(--rd-line-strong);
+  border-radius: var(--rd-radius);
+  background: var(--rd-bg-2);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wp-life-example__label {
+  font-family: var(--font-jetbrains);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rd-text-3);
+}
+.wp-life-example__body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--rd-text-2);
+}
+.wp-life-example__outcome {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--rd-text);
+  border-top: 1px dashed var(--rd-line);
+  padding-top: 8px;
+}
+.wp-life-example__outcome strong {
+  font-family: var(--font-jetbrains);
+  color: var(--rd-accent);
+}
+.wp-life-truth {
+  margin-top: 16px;
+  font-family: var(--font-jetbrains);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--rd-text-3);
+}

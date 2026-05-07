@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { FadeUp } from './MotionWrapper'
 import type { CopyEN } from './copy.en'
 
-export function Section4Shields({ copy }: { copy: CopyEN['s4'] }) {
+export function Section4Shields({ copy }: { copy: CopyEN['s5'] }) {
   const [hovered, setHovered] = useState<number | null>(null)
   return (
-    <section id="s4" className="wp-sec wp-sec--alt" data-screen-label="04 Shields">
+    <section id="s5" className="wp-sec wp-sec--alt" data-screen-label="05 Shields">
       <div className="wp-sec__inner">
         <FadeUp className="wp-eyebrow wp-eyebrow--mono">{copy.eyebrow}</FadeUp>
         <FadeUp delay={100} as="h2" className="wp-h2">

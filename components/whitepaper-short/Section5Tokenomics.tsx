@@ -3,9 +3,9 @@ import { FadeUp } from './MotionWrapper'
 import { DonutChart } from './DonutChart'
 import type { CopyEN } from './copy.en'
 
-export function Section5Tokenomics({ copy, lang }: { copy: CopyEN['s5']; lang: 'en' | 'es' }) {
+export function Section5Tokenomics({ copy, lang }: { copy: CopyEN['s6']; lang: 'en' | 'es' }) {
   return (
-    <section id="s5" className="wp-sec" data-screen-label="05 Tokenomics">
+    <section id="s6" className="wp-sec" data-screen-label="06 Tokenomics">
       <div className="wp-sec__inner">
         <FadeUp className="wp-eyebrow wp-eyebrow--mono">{copy.eyebrow}</FadeUp>
         <FadeUp delay={100} as="h2" className="wp-h2">
