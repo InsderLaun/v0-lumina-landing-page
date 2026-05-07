@@ -131,7 +131,7 @@ export const COPY_ES = {
       { type: 'kw', text: 'const' }, { type: 'txt', text: ' ' }, { type: 'id', text: 'policy' }, { type: 'txt', text: ' = ' }, { type: 'kw', text: 'await' }, { type: 'txt', text: ' lumina.policies.' }, { type: 'id', text: 'purchase' }, { type: 'txt', text: '({' }, { type: 'br' },
       { type: 'txt', text: '  productName:    ' }, { type: 'str', text: "'FLASHBTC1H-001'" }, { type: 'txt', text: ',' }, { type: 'br' },
       { type: 'txt', text: '  buyer:          ' }, { type: 'str', text: "'0xYourAgentWallet'" }, { type: 'txt', text: ',' }, { type: 'br' },
-      { type: 'txt', text: '  coverageAmount: ' }, { type: 'str', text: "'50000000'" }, { type: 'txt', text: ',' }, { type: 'comment', text: '  // $50, 6-dec USDC' }, { type: 'br' },
+      { type: 'txt', text: '  coverageAmount: ' }, { type: 'str', text: "'100000000'" }, { type: 'txt', text: ',' }, { type: 'comment', text: '  // $100, 6-dec USDC (mín. on-chain)' }, { type: 'br' },
       { type: 'txt', text: '})' }, { type: 'br' },
       { type: 'br' },
       { type: 'id', text: 'console' }, { type: 'txt', text: '.' }, { type: 'id', text: 'log' }, { type: 'txt', text: '(policy.policyId, policy.txHash)' }, { type: 'br' },
