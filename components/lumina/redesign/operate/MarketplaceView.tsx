@@ -12,9 +12,10 @@ import {
 } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { erc20Abi, formatUnits, type Hex } from 'viem'
-import { CONTRACTS, TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { marketplaceAbi, claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { useContracts } from '@/hooks/use-contracts'
 import { LoadError } from './LoadError'
 import {
   MarketplaceFilters,
@@ -40,6 +41,7 @@ export function MarketplaceView() {
   const [tab, setTab] = useState<Tab>('browse')
   const { address, isConnected } = useAccount()
   const publicClient = usePublicClient()
+  const { data: contracts } = useContracts()
 
   const [activeIds, setActiveIds] = useState<bigint[]>([])
   const [logsErr, setLogsErr] = useState<string | null>(null)
@@ -49,7 +51,7 @@ export function MarketplaceView() {
 
   // ─── Index marketplace events: Listed - Cancelled - Bought = active ───
   useEffect(() => {
-    if (!publicClient) return
+    if (!publicClient || !contracts) return
     let cancelled = false
     setLoading(true)
     setLogsErr(null)
@@ -60,7 +62,7 @@ export function MarketplaceView() {
         const [listed, cancelledLogs, bought] = await Promise.all([
           getLogsChunked({
             client: publicClient,
-            address: CONTRACTS.Marketplace,
+            address: contracts.marketplace,
             event: {
               type: 'event',
               name: 'Listed',
@@ -77,7 +79,7 @@ export function MarketplaceView() {
           }),
           getLogsChunked({
             client: publicClient,
-            address: CONTRACTS.Marketplace,
+            address: contracts.marketplace,
             event: {
               type: 'event',
               name: 'Cancelled',
@@ -91,7 +93,7 @@ export function MarketplaceView() {
           }),
           getLogsChunked({
             client: publicClient,
-            address: CONTRACTS.Marketplace,
+            address: contracts.marketplace,
             event: {
               type: 'event',
               name: 'Bought',
@@ -127,18 +129,20 @@ export function MarketplaceView() {
     return () => {
       cancelled = true
     }
-  }, [publicClient, retryToken])
+  }, [publicClient, retryToken, contracts])
 
   // Read fresh state for each active listing (active flag may have changed)
   const listingReads = useMemo(
     () =>
-      activeIds.map((id) => ({
-        address: CONTRACTS.Marketplace,
-        abi: marketplaceAbi,
-        functionName: 'getListing' as const,
-        args: [id] as const,
-      })),
-    [activeIds],
+      contracts
+        ? activeIds.map((id) => ({
+            address: contracts.marketplace,
+            abi: marketplaceAbi,
+            functionName: 'getListing' as const,
+            args: [id] as const,
+          }))
+        : [],
+    [activeIds, contracts],
   )
   const { data: listingData } = useReadContracts({
     contracts: listingReads,
@@ -168,13 +172,15 @@ export function MarketplaceView() {
   const uniqueEpochs = useMemo(() => Array.from(new Set(listings.map((l) => l.epochId.toString()))).map(BigInt), [listings])
   const epochReads = useMemo(
     () =>
-      uniqueEpochs.map((e) => ({
-        address: CONTRACTS.ClaimBond,
-        abi: claimBondAbi,
-        functionName: 'getEpochInfo' as const,
-        args: [e] as const,
-      })),
-    [uniqueEpochs],
+      contracts
+        ? uniqueEpochs.map((e) => ({
+            address: contracts.claimBond,
+            abi: claimBondAbi,
+            functionName: 'getEpochInfo' as const,
+            args: [e] as const,
+          }))
+        : [],
+    [uniqueEpochs, contracts],
   )
   const { data: epochData } = useReadContracts({
     contracts: epochReads,
@@ -356,6 +362,7 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const wrongChain = isConnected && chainId !== baseSepolia.id
+  const { data: contracts } = useContracts()
   const { writeContract, data: tx, isPending, error: writeErr, reset } = useWriteContract()
   const { isLoading: confirming, isSuccess } = useWaitForTransactionReceipt({ hash: tx })
 
@@ -364,24 +371,24 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
     address: TOKENS.USDC.address,
     abi: erc20Abi,
     functionName: 'allowance',
-    args: address ? [address, CONTRACTS.Marketplace] : undefined,
-    query: { enabled: !!address },
+    args: address && contracts ? [address, contracts.marketplace] : undefined,
+    query: { enabled: !!address && !!contracts },
   })
 
   const handleBuy = async () => {
     reset()
-    if (!isConnected) return
+    if (!isConnected || !contracts) return
     if (allowance === undefined || (allowance as bigint) < listing.priceUSDC) {
       writeContract({
         address: TOKENS.USDC.address,
         abi: erc20Abi,
         functionName: 'approve',
-        args: [CONTRACTS.Marketplace, listing.priceUSDC],
+        args: [contracts.marketplace, listing.priceUSDC],
       })
       return
     }
     writeContract({
-      address: CONTRACTS.Marketplace,
+      address: contracts.marketplace,
       abi: marketplaceAbi,
       functionName: 'executeBuy',
       args: [listing.listingId],
@@ -390,8 +397,9 @@ function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) 
 
   const handleCancel = () => {
     reset()
+    if (!contracts) return
     writeContract({
-      address: CONTRACTS.Marketplace,
+      address: contracts.marketplace,
       abi: marketplaceAbi,
       functionName: 'cancel',
       args: [listing.listingId],

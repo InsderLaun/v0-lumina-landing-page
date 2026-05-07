@@ -622,9 +622,9 @@
             <li><strong>Agente IA</strong> llama a la API de Lumina para obtener cotizacion</li>
             <li><strong>API</strong> calcula la prima usando el modelo kink y devuelve los parametros</li>
             <li><strong>Agente</strong> aprueba USDC al CoverRouter y ejecuta <code>purchaseCover()</code></li>
-            <li><strong>CoverRouter</strong> (<code class="address">0xd5f8678A0F2149B6342F9014CCe6d743234Ca025</code>) valida parametros y rutea al Shield correcto</li>
+            <li><strong>CoverRouter</strong> (<code class="address">0xebC3A783477FbD2720C024e16A8d63B8Db983D84</code>) valida parametros y rutea al Shield correcto</li>
             <li><strong>Shield</strong> (BCS/EAS/Depeg/IL/Exploit) valida reglas especificas del producto</li>
-            <li><strong>PolicyManager</strong> (<code class="address">0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a</code>) registra la poliza on-chain</li>
+            <li><strong>PolicyManager</strong> (<code class="address">0xd9732A8d6Cf5266Dd896B825E78E387B7Dd2c379</code>) registra la poliza on-chain</li>
             <li><strong>Vault</strong> bloquea colateral 1:1 para respaldar la cobertura</li>
             <li><strong>USDC</strong> se transfiere del agente al vault (prima) y se cobra el 3% de fee</li>
         </ol>
@@ -992,7 +992,7 @@ Payout neto al agente: <span class="value">$38,800</span>
                     </thead>
                     <tbody>
                         <tr><td>Producto ID</td><td><code>EXPLOIT-SHIELD-001</code></td></tr>
-                        <tr><td>Contrato</td><td><a class="address-link" href="https://basescan.org/address/0x63D340AE7229BB464bC801f225651341ebcD3693" target="_blank">0x63D340AE7229BB464bC801f225651341ebcD3693</a></td></tr>
+                        <tr><td>Contrato</td><td><a class="address-link" href="https://basescan.org/address/0xD944d8e5D8329994D83950872Ec210891d3Ab6AE" target="_blank">0xD944d8e5D8329994D83950872Ec210891d3Ab6AE</a></td></tr>
                         <tr><td>Trigger dual</td><td>(1) Token de gobernanza -25% en 24h AND (2) Receipt token -30% por 4h O contrato pausado</td></tr>
                         <tr><td>Verificacion</td><td>Oracle (Precio spot de Chainlink via prueba firmada EIP-712) + Verificacion ECDSA del worker de Phala (lista curada por admin — NO atestacion de hardware)</td></tr>
                         <tr><td>Deducible</td><td>10%</td></tr>
@@ -1804,8 +1804,8 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                     <tr><th>Contrato</th><th>Direccion</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>CoverRouter</td><td><a class="address-link" href="https://basescan.org/address/0xd5f8678A0F2149B6342F9014CCe6d743234Ca025" target="_blank">0xd5f8678A0F2149B6342F9014CCe6d743234Ca025</a></td></tr>
-                    <tr><td>PolicyManager</td><td><a class="address-link" href="https://basescan.org/address/0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a" target="_blank">0xCCA07e06762222AA27DEd58482DeD3d9a7d0162a</a></td></tr>
+                    <tr><td>CoverRouter</td><td><a class="address-link" href="https://basescan.org/address/0xebC3A783477FbD2720C024e16A8d63B8Db983D84" target="_blank">0xebC3A783477FbD2720C024e16A8d63B8Db983D84</a></td></tr>
+                    <tr><td>PolicyManager</td><td><a class="address-link" href="https://basescan.org/address/0xd9732A8d6Cf5266Dd896B825E78E387B7Dd2c379" target="_blank">0xd9732A8d6Cf5266Dd896B825E78E387B7Dd2c379</a></td></tr>
                     <tr><td>LuminaOracleV2</td><td><a class="address-link" href="https://basescan.org/address/0x87B576f688bE0E1d7d23A299f55b475658215105" target="_blank">0x87B576f688bE0E1d7d23A299f55b475658215105</a></td></tr>
                     <tr><td>LuminaPhalaVerifier</td><td><a class="address-link" href="https://basescan.org/address/0x468b9D2E9043c80467B610bC290b698ae23adb9B" target="_blank">0x468b9D2E9043c80467B610bC290b698ae23adb9B</a></td></tr>
                 </tbody>
@@ -1840,7 +1840,7 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
                     <tr><td>ETH Apocalypse Shield (EAS)</td><td><a class="address-link" href="https://basescan.org/address/0x70f1c92EFcFe55e8d460aAa6d626779536b15128" target="_blank">0x70f1c92EFcFe55e8d460aAa6d626779536b15128</a></td></tr>
                     <tr><td>DepegShield</td><td><a class="address-link" href="https://basescan.org/address/0x881f683291122c3A72bdD504F71ddCAf47d9AE0e" target="_blank">0x881f683291122c3A72bdD504F71ddCAf47d9AE0e</a></td></tr>
                     <tr><td>ILIndexCover</td><td><a class="address-link" href="https://basescan.org/address/0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a" target="_blank">0x01Df7f2953dce5be3afFb72CB9F059f3D3eE9e5a</a></td></tr>
-                    <tr><td>ExploitShield</td><td><a class="address-link" href="https://basescan.org/address/0x63D340AE7229BB464bC801f225651341ebcD3693" target="_blank">0x63D340AE7229BB464bC801f225651341ebcD3693</a></td></tr>
+                    <tr><td>ExploitShield</td><td><a class="address-link" href="https://basescan.org/address/0xD944d8e5D8329994D83950872Ec210891d3Ab6AE" target="_blank">0xD944d8e5D8329994D83950872Ec210891d3Ab6AE</a></td></tr>
                 </tbody>
             </table>
         </div>
@@ -2075,4 +2075,6 @@ Protocol Fee Receiver: <span class="var">0x2b4D825417f568231e809E31B9332ED146760
   }
 </script>
 </body>
+<!-- Snapshot de direcciones al 2026-05-07. Fuente de verdad live:
+     GET https://lumina-api-production-ac85.up.railway.app/health -->
 </html>

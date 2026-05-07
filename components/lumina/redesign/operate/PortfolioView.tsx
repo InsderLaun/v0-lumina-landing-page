@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAccount, usePublicClient, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { erc20Abi, formatUnits, parseUnits, type Hex } from 'viem'
-import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { claimBondAbi, bondVaultAbi, policyManagerV2Abi } from '@/lib/abis/operate'
 import { SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { useContracts } from '@/hooks/use-contracts'
 import { LoadError } from './LoadError'
 import { BondCard } from './BondCard'
 
@@ -37,6 +38,7 @@ export function PortfolioView() {
   const [tab, setTab] = useState<Tab>('policies')
   const { address, isConnected } = useAccount()
   const publicClient = usePublicClient()
+  const { data: contracts } = useContracts()
 
   const [policies, setPolicies] = useState<PolicyRow[]>([])
   const [policiesLoading, setPoliciesLoading] = useState(false)
@@ -50,7 +52,7 @@ export function PortfolioView() {
 
   // ─── Load policies (PolicyCreated events; buyer NOT indexed → filter client-side) ───
   useEffect(() => {
-    if (!address || !publicClient) {
+    if (!address || !publicClient || !contracts) {
       setPolicies([])
       return
     }
@@ -63,7 +65,7 @@ export function PortfolioView() {
         const head = await publicClient.getBlockNumber()
         const logs = await getLogsChunked({
           client: publicClient,
-          address: CONTRACTS.PolicyManager,
+          address: contracts!.policyManager,
           event: {
             type: 'event',
             name: 'PolicyCreated',
@@ -126,11 +128,11 @@ export function PortfolioView() {
     return () => {
       cancelled = true
     }
-  }, [address, publicClient, retryToken])
+  }, [address, publicClient, retryToken, contracts])
 
   // ─── Load user's bond epochs (BondsMinted with `to` indexed) ───
   useEffect(() => {
-    if (!address || !publicClient) {
+    if (!address || !publicClient || !contracts) {
       setUserEpochs([])
       return
     }
@@ -142,7 +144,7 @@ export function PortfolioView() {
         const head = await publicClient.getBlockNumber()
         const logs = await getLogsChunked({
           client: publicClient,
-          address: CONTRACTS.ClaimBond,
+          address: contracts!.claimBond,
           event: {
             type: 'event',
             name: 'BondsMinted',
@@ -171,7 +173,7 @@ export function PortfolioView() {
     return () => {
       cancelled = true
     }
-  }, [address, publicClient, retryToken])
+  }, [address, publicClient, retryToken, contracts])
 
   // For each user epoch read: balanceOf (= ERC1155 token count = integer dollars,
   // because 1 bond token = $1), isMatured, getEpochInfo (4 outputs: exists,
@@ -181,19 +183,19 @@ export function PortfolioView() {
       address
         ? userEpochs.flatMap((epochId) => [
             {
-              address: CONTRACTS.ClaimBond,
+              address: contracts!.claimBond,
               abi: claimBondAbi,
               functionName: 'balanceOf' as const,
               args: [address, epochId] as const,
             },
             {
-              address: CONTRACTS.ClaimBond,
+              address: contracts!.claimBond,
               abi: claimBondAbi,
               functionName: 'isMatured' as const,
               args: [epochId] as const,
             },
             {
-              address: CONTRACTS.ClaimBond,
+              address: contracts!.claimBond,
               abi: claimBondAbi,
               functionName: 'getEpochInfo' as const,
               args: [epochId] as const,
@@ -236,7 +238,7 @@ export function PortfolioView() {
   const policyReadContracts = useMemo(
     () =>
       policies.map((p) => ({
-        address: CONTRACTS.PolicyManager,
+        address: contracts!.policyManager,
         abi: policyManagerV2Abi,
         functionName: 'getPolicy' as const,
         args: [p.productId, p.policyId] as const,
@@ -395,6 +397,7 @@ function BondsTable({ rows, err, onRetry, onRedeemed }: { rows: BondRow[]; err: 
 }
 
 function BondActionRow({ bond, last, onRedeemed }: { bond: BondRow; last: boolean; onRedeemed: () => void }) {
+  const { data: contracts } = useContracts()
   const { writeContract, data: tx, isPending, error: writeErr } = useWriteContract()
   const { isLoading: confirming, isSuccess } = useWaitForTransactionReceipt({ hash: tx })
 
@@ -403,8 +406,9 @@ function BondActionRow({ bond, last, onRedeemed }: { bond: BondRow; last: boolea
   }, [isSuccess, onRedeemed])
 
   const handleRedeem = () => {
+    if (!contracts) return
     writeContract({
-      address: CONTRACTS.BondVault,
+      address: contracts.bondVault,
       abi: bondVaultAbi,
       functionName: 'redeemBond',
       args: [bond.epochId, bond.faceValue],

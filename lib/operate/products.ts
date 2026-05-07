@@ -4,11 +4,19 @@
 // strings are NOT the slugs, they are the literal bytes the deployer
 // hashed at registration. Verified live on Base Sepolia: every id
 // here resolves to active=true via CoverRouterV2.getProductConfig.
-// Addresses come from CONTRACTS.shields in lib/lumina-config.ts.
 //
 // IShield does NOT expose a `name()` function — names live here, not
 // on-chain. Premium / cover limits / paused state come from CoverRouterV2
 // (verified against /tmp/lp-s2/src/core/CoverRouterV2.sol).
+//
+// [NOT-MIGRATABLE-TO-useShields-here]
+// Shield addresses come from CONTRACTS.shields snapshot in
+// lib/lumina-config.ts (LIVE V5.1 from /api/v1/products at 2026-05-07).
+// This module is non-React static data — hooks can't be invoked at
+// module-eval time. Components that need runtime-fresh shield addresses
+// should import `useShields()` from `hooks/use-shields.ts` directly
+// and ignore the address fields below; the rest of the descriptor
+// (slug, asset, productId, durationLabel, etc.) is build-time stable.
 
 import { keccak256, toBytes, toHex, padHex, type Address, type Hex } from 'viem'
 import { CONTRACTS } from '@/lib/lumina-config'

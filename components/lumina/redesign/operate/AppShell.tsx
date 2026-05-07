@@ -8,7 +8,8 @@ import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { baseSepolia } from 'wagmi/chains'
 import { erc20Abi, formatUnits } from 'viem'
 import { LogOut } from 'lucide-react'
-import { CONTRACTS, TOKENS } from '@/lib/lumina-config'
+import { TOKENS } from '@/lib/lumina-config'
+import { useContracts } from '@/hooks/use-contracts'
 
 type Role = 'human' | 'agent'
 
@@ -39,6 +40,7 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
 
   const wrongChain = isConnected && chainId !== baseSepolia.id
   const links = role === 'agent' ? AGENT_LINKS : HUMAN_LINKS
+  const { data: contracts } = useContracts()
 
   const { data: usdcRaw } = useReadContract({
     address: TOKENS.USDC.address,
@@ -48,11 +50,11 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
     query: { enabled: !!address && !wrongChain },
   })
   const { data: luminaRaw } = useReadContract({
-    address: CONTRACTS.LuminaToken,
+    address: contracts?.luminaToken,
     abi: erc20Abi,
     functionName: 'balanceOf',
     args: address ? [address] : undefined,
-    query: { enabled: !!address && !wrongChain },
+    query: { enabled: !!address && !wrongChain && !!contracts },
   })
 
   const usdc = usdcRaw

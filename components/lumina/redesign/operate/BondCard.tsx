@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { Wallet, Tag, Coins } from 'lucide-react'
-import { CONTRACTS } from '@/lib/lumina-config'
 import { bondVaultAbi } from '@/lib/abis/operate'
+import { useContracts } from '@/hooks/use-contracts'
 import { ListBondModal } from './ListBondModal'
 import { AddToWalletFallback } from './AddToWalletFallback'
 
@@ -30,6 +30,7 @@ type Status = 'redeemable' | 'outstanding'
  *   - Redeem  (only enabled once `matured`)
  */
 export function BondCard({ epochId, faceValue, maturityTs, matured, onRedeemed }: Props) {
+  const { data: contracts } = useContracts()
   const [showList, setShowList] = useState(false)
   const [showFallback, setShowFallback] = useState(false)
   const [redeemErr, setRedeemErr] = useState<string | null>(null)
@@ -68,7 +69,7 @@ export function BondCard({ epochId, faceValue, maturityTs, matured, onRedeemed }
         params: {
           type: 'ERC1155',
           options: {
-            address: CONTRACTS.ClaimBond,
+            address: contracts?.claimBond,
             tokenId: epochId.toString(),
           },
         },
@@ -91,8 +92,12 @@ export function BondCard({ epochId, faceValue, maturityTs, matured, onRedeemed }
 
   const handleRedeem = () => {
     setRedeemErr(null)
+    if (!contracts) {
+      setRedeemErr('Contracts not yet loaded')
+      return
+    }
     writeContract({
-      address: CONTRACTS.BondVault,
+      address: contracts.bondVault,
       abi: bondVaultAbi,
       functionName: 'redeemBond',
       args: [epochId, faceValue],
@@ -239,9 +244,9 @@ export function BondCard({ epochId, faceValue, maturityTs, matured, onRedeemed }
           }}
         />
       )}
-      {showFallback && (
+      {showFallback && contracts && (
         <AddToWalletFallback
-          bondAddress={CONTRACTS.ClaimBond}
+          bondAddress={contracts.claimBond}
           bondId={epochId}
           onClose={() => setShowFallback(false)}
         />

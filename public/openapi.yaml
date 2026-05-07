@@ -903,7 +903,7 @@ paths:
                     error: "Insufficient USDC allowance. Approve the CoverRouter from your wallet first."
                     required: "2650000"
                     allowance: "0"
-                    coverRouter: "0xd5f8678A0F2149B6342F9014CCe6d743234Ca025"
+                    coverRouter: "0xebC3A783477FbD2720C024e16A8d63B8Db983D84"
                     wallet: "0x1234..."
         "401":
           description: Missing or invalid API key

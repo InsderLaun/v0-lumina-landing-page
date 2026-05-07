@@ -11,7 +11,7 @@
 ## Pre-conditions
 
 - [ ] Wallet connected with **≥ 0.001 test ETH** for gas (faucet: https://www.alchemy.com/faucets/base-sepolia)
-- [ ] Wallet has **≥ 10 test USDC** (mint via MockUSDC at `0x63D340AE7229BB464bC801f225651341ebcD3693` → `mint(yourAddress, 10000000)` for $10)
+- [ ] Wallet has **≥ 10 test USDC** (mint via MockUSDC at `0xD944d8e5D8329994D83950872Ec210891d3Ab6AE` → `mint(yourAddress, 10000000)` for $10)
 - [ ] Wallet currently on Base Sepolia (`84532`)
 - [ ] Browser console open to catch any JS errors
 

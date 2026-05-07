@@ -4,9 +4,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useAccount, usePublicClient } from 'wagmi'
 import { formatUnits, type Hex } from 'viem'
-import { CONTRACTS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
 import { SHIELDS, SHIELD_BY_PRODUCT_ID } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
+import { useContracts } from '@/hooks/use-contracts'
 import { LoadError } from './LoadError'
 
 type RangeFilter = '24h' | '7d' | '30d' | 'all'
@@ -33,6 +34,7 @@ const RANGE_BLOCKS: Record<RangeFilter, bigint | null> = {
 export function AgentPoliciesView() {
   const { address, isConnected } = useAccount()
   const publicClient = usePublicClient()
+  const { data: contracts } = useContracts()
 
   const [rows, setRows] = useState<PolicyRow[]>([])
   const [loading, setLoading] = useState(false)
@@ -45,7 +47,7 @@ export function AgentPoliciesView() {
   const retry = () => setRetryToken((t) => t + 1)
 
   useEffect(() => {
-    if (!address || !publicClient) return
+    if (!address || !publicClient || !contracts) return
     let cancelled = false
     setLoading(true)
     setErr(null)
@@ -58,7 +60,7 @@ export function AgentPoliciesView() {
 
         const logs = await getLogsChunked({
           client: publicClient,
-          address: CONTRACTS.PolicyManager,
+          address: contracts.policyManager,
           event: {
             type: 'event',
             name: 'PolicyCreated',
@@ -105,7 +107,7 @@ export function AgentPoliciesView() {
     return () => {
       cancelled = true
     }
-  }, [address, publicClient, retryToken])
+  }, [address, publicClient, retryToken, contracts])
 
   const filtered = useMemo(() => {
     let out = rows

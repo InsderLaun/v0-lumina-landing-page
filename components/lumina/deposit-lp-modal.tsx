@@ -8,6 +8,13 @@ import { parseUnits, formatUnits } from "viem"
 import { useUSDCBalance, useUSDCAllowance } from "@/hooks/use-web3"
 import { useLuminaWallet } from "@/hooks/use-lumina-wallet"
 import { bridgeWagmi } from "@/lib/wallet-bridge"
+// [NOT-MIGRATABLE-TO-useContracts]
+// CONTRACTS.vaults.* is an alias map (5 legacy V1-shape vault keys all
+// pointing at the single V5.1 BondVault). /health only exposes the
+// single bondVault, so a direct hook substitute would lose the named
+// aliases this UI depends on. The "My Vaults" UX is V1 legacy and
+// scheduled for redesign around the V5.1 single-BondVault primitive;
+// migration deferred to that follow-up sprint.
 import { CONTRACTS, CHAIN } from "@/lib/lumina-config"
 import { CONTRACTS as LEGACY_CONTRACTS } from "@/lib/constants"
 import { ERC20_ABI, BASE_VAULT_ABI } from "@/lib/abis"

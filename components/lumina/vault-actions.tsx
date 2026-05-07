@@ -23,6 +23,12 @@ import { BASE_VAULT_ABI } from "@/lib/abis"
 import { useLuminaWallet } from "@/hooks/use-lumina-wallet"
 import { bridgeWagmi } from "@/lib/wallet-bridge"
 import { DepositLPModal } from "./deposit-lp-modal"
+// [NOT-MIGRATABLE-TO-useContracts]
+// Reads CONTRACTS.vaults (5 V1-legacy aliases, all pointing at the
+// single V5.1 BondVault) to do an Object.entries reverse-lookup name
+// → address. /health only exposes `bondVault`, so the hook can't supply
+// the 5 named aliases this component needs. Same V1-legacy UI as
+// deposit-lp-modal; both migrate together when "My Vaults" is redesigned.
 import { CONTRACTS } from "@/lib/lumina-config"
 
 interface VaultActionsProps {
