@@ -97,7 +97,7 @@ export const CONTRACTS = {
   // LuminaOracleV2 — real EIP-712 shield oracle, deployed 2026-05-04.
   // The 9 V5.1 shields were rebound to this address via UUPS upgrade
   // in PR org-lumina/LUMINA-PROTOCOL#101. See docs/architecture/ORACLE-V2.md.
-  LuminaOracleV2: "0x8cAbC4645a3981FF59d39328f9F65FdFD19Bd194" as `0x${string}`,
+  LuminaOracleV2: "0x0000000000000000000000000000000000000000" as `0x${string}`, // SPRINT_Z2: cleared pre-redeploy
   Phala: "0x0000000000000000000000000000000000000000" as `0x${string}`, // not deployed in V5.1 testnet
   BuybackEngine: "0x5a74f8A6A11679b12aDAE479C686880CCf8720b3" as `0x${string}`,
   ShieldKeeper: "0xB5dE54F34deC8309bD8C1B8c1eF854C88D386Bca" as `0x${string}`,
