@@ -310,7 +310,7 @@ export const VAULTS = {
 export const PROTOCOL = {
   feeBps: 300,             // 3% protocol fee on premiums, payouts, and vault performance
   performanceFeeBps: 300,  // 3% on positive yield at vault withdrawal
-  feeReceiver: "0x2b4D825417f568231e809E31B9332ED146760337" as `0x${string}`,
+  feeReceiver: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - Sprint Z.2 cleanup, awaiting redeploy (was 0x2b4D825417f568231e809E31B9332ED146760337)
   claimGracePeriodHours: 24,
   maxCoverageUSD: 100_000,
   minCoverageUSD: 100,
