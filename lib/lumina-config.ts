@@ -37,7 +37,7 @@ export const DEPLOY_BLOCK_SEPOLIA = 40_775_000n
 export const TOKENS = {
   USDC: {
     // V5.1 testnet — MockUSDC deployed alongside the protocol
-    address: "0xD944d8e5D8329994D83950872Ec210891d3Ab6AE" as `0x${string}`,
+    address: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
     symbol: "USDC",
     name: "USD Coin (mock)",
     decimals: 6,
@@ -46,7 +46,7 @@ export const TOKENS = {
   aBasUSDC: {
     // V5.1 testnet has no Aave integration; placeholder pointing at MockUSDC
     // so any UI reading TOKENS.aBasUSDC still type-checks.
-    address: "0xD944d8e5D8329994D83950872Ec210891d3Ab6AE" as `0x${string}`,
+    address: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
     symbol: "aBasUSDC",
     name: "Aave Base USDC (mock)",
     decimals: 6,
@@ -62,8 +62,8 @@ export const AAVE = {
 
 export const ORACLES = {
   // V5.1 testnet uses MockChainlinkOracle for ETH and BTC feeds.
-  ETH_USD: "0x2a370A7dAE38aF7EECA20C9438Bd5154889cdc5e" as `0x${string}`,
-  BTC_USD: "0x2aDC8718F0b7Efb18a07aBc7595F1364730bb99E" as `0x${string}`,
+  ETH_USD: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  BTC_USD: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
 } as const
 
 // CONTRACTS — V5.1 on Base Sepolia (chainId 84532).
@@ -86,32 +86,32 @@ export const ORACLES = {
 // `useShields()` instead.
 export const CONTRACTS = {
   // ─── Mirrored from /health.contracts (use useContracts() in client) ───
-  CoverRouter: "0xebC3A783477FbD2720C024e16A8d63B8Db983D84" as `0x${string}`,
-  PolicyManager: "0xd9732A8d6Cf5266Dd896B825E78E387B7Dd2c379" as `0x${string}`,
-  LuminaToken: "0x8A0FDc2126eb9b0c88D17711D62713A1c06CF7Ab" as `0x${string}`,
-  ClaimBond: "0x3d2F5DB2505367D00ef81c51AD3cA66159271730" as `0x${string}`,
-  BondVault: "0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B" as `0x${string}`,
-  Marketplace: "0xfaC56692c626718aC8953A3d5fAE67fac2f1Be6E" as `0x${string}`,
+  CoverRouter: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  PolicyManager: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  LuminaToken: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  ClaimBond: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  BondVault: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  Marketplace: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
   // ─── NOT in /health, static snapshot ───
-  Oracle: "0xe935806729Df8C95f3E8ab4e8D92FA29ad9B2867" as `0x${string}`, // CapacityOracle proxy
+  Oracle: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — CapacityOracle proxy
   // LuminaOracleV2 — real EIP-712 shield oracle, deployed 2026-05-04.
   // The 9 V5.1 shields were rebound to this address via UUPS upgrade
   // in PR org-lumina/LUMINA-PROTOCOL#101. See docs/architecture/ORACLE-V2.md.
   LuminaOracleV2: "0x0000000000000000000000000000000000000000" as `0x${string}`, // SPRINT_Z2: cleared pre-redeploy
   Phala: "0x0000000000000000000000000000000000000000" as `0x${string}`, // not deployed in V5.1 testnet
-  BuybackEngine: "0x5a74f8A6A11679b12aDAE479C686880CCf8720b3" as `0x${string}`,
-  ShieldKeeper: "0xB5dE54F34deC8309bD8C1B8c1eF854C88D386Bca" as `0x${string}`,
-  TWAPBurner: "0x357BAF511383be70d1F3A5de7D3b07561Eec7d99" as `0x${string}`,
-  TreasuryVesting: "0xC647E8D8daFeC1Ac1B8e039Cf78F27A023393354" as `0x${string}`,
+  BuybackEngine: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  ShieldKeeper: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  TWAPBurner: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  TreasuryVesting: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
   // V5.1 has a SINGLE BondVault. The legacy 5-vault keys below all alias
   // BondVault so existing UI components compile; the "My Vaults" tab
   // needs a redesign to expose V5.1's actual primitives.
   vaults: {
-    VolatileShort: "0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B" as `0x${string}`,
-    VolatileLong:  "0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B" as `0x${string}`,
-    StableShort:   "0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B" as `0x${string}`,
-    StableLong:    "0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B" as `0x${string}`,
-    FlashVault:    "0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B" as `0x${string}`,
+    VolatileShort: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    VolatileLong:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    StableShort:   "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    StableLong:    "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    FlashVault:    "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
   },
   // V5.1 shield addresses (LIVE from /api/v1/products at 2026-05-07).
   // For runtime resolution use `useShields()` from `hooks/use-shields.ts`.
@@ -119,21 +119,21 @@ export const CONTRACTS = {
   // closest V5.1 product so existing UI keeps resolving.
   shields: {
     // Legacy aliases → closest V5.1 match
-    BCS:     "0x40E95285f70b875F0000e7a2C4de3CfEf075102b" as `0x${string}`, // → FLASHBTC48-001
-    EAS:     "0xff6Ae8135Ae334223F0f748A889B3DBa8556CA2F" as `0x${string}`, // → FLASHETH48-001
-    Depeg:   "0x44a4488A16b4d92dc50f990F904D8eca7e6fb219" as `0x${string}`, // → MICRODEPEG-001
-    ILIndex: "0x63C93d21738c1FebE9c6E599CF44D3630B2C6A8F" as `0x${string}`, // → RATESHOCK-001 (closest)
-    Exploit: "0x63C93d21738c1FebE9c6E599CF44D3630B2C6A8F" as `0x${string}`, // → RATESHOCK-001
+    BCS:     "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → FLASHBTC48-001
+    EAS:     "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → FLASHETH48-001
+    Depeg:   "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → MICRODEPEG-001
+    ILIndex: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → RATESHOCK-001 (closest)
+    Exploit: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → RATESHOCK-001
     // V5.1 canonical 9 shields
-    FlashBTC1h:  "0xF5753268bcb2D920Cf904F674b8A1e8297267Ac0" as `0x${string}`,
-    FlashBTC4h:  "0x245D6b71F058E1029db2dA23801b7768DF0C55AA" as `0x${string}`,
-    FlashBTC24h: "0xCBDA797924BAdbE28c3e719a8ef2Ef534a062468" as `0x${string}`,
-    FlashBTC48h: "0x40E95285f70b875F0000e7a2C4de3CfEf075102b" as `0x${string}`,
-    FlashETH1h:  "0x0E1156f34201D254f8bD7e69843c37daF62d04ac" as `0x${string}`,
-    FlashETH24h: "0xD9B0E4A7D369473e05BD86A94eB60C297a996c6a" as `0x${string}`,
-    FlashETH48h: "0xff6Ae8135Ae334223F0f748A889B3DBa8556CA2F" as `0x${string}`,
-    MicroDepeg:  "0x44a4488A16b4d92dc50f990F904D8eca7e6fb219" as `0x${string}`,
-    RateShock:   "0x63C93d21738c1FebE9c6E599CF44D3630B2C6A8F" as `0x${string}`,
+    FlashBTC1h:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    FlashBTC4h:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    FlashBTC24h: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    FlashBTC48h: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    FlashETH1h:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    FlashETH24h: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    FlashETH48h: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    MicroDepeg:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    RateShock:   "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
   },
   // EmergencyPause / TimelockController / GnosisSafe are not deployed in V5.1
   // testnet per protocol policy ("NO TimelockController in any deploy" — see
@@ -141,7 +141,7 @@ export const CONTRACTS = {
   // Set to zero address sentinels so UI references resolve without throwing.
   EmergencyPause: "0x0000000000000000000000000000000000000000" as `0x${string}`,
   TimelockController: "0x0000000000000000000000000000000000000000" as `0x${string}`,
-  GnosisSafe: "0xe585e76A0b8CbbC2d10b1110a9ac3F4c11dBfDa8" as `0x${string}`, // V5.1 testnet "multisig" is the deployer EOA
+  GnosisSafe: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — V5.1 testnet "multisig" was the deployer EOA
 } as const
 
 // V5.1 lumina-api endpoint (public read + agent-key write surface).
