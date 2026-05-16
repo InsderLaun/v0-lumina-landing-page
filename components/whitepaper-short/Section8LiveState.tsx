@@ -14,17 +14,20 @@ type Health = {
   contracts?: Record<string, string>
 }
 
+// SPRINT_Z2: contract addresses cleared pre-redeploy. After new deployment,
+// the live values are fetched from /health at runtime; this FALLBACK only
+// renders if /health is unreachable.
 const FALLBACK: Health = {
   chain: { block: 41159517, chainId: 84532, rpcConnected: true },
-  relayer: { address: '0x168dC7105e907294f9d066cee24f30caa5A17E4a', balanceWei: '19945485874244489' },
+  relayer: { address: 'Awaiting redeploy post-Sprint Z.2', balanceWei: '19945485874244489' },
   contracts: {
-    coverRouter:   '0xebC3A783477FbD2720C024e16A8d63B8Db983D84',
-    policyManager: '0xd9732A8d6Cf5266Dd896B825E78E387B7Dd2c379',
-    bondVault:     '0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B',
-    claimBond:     '0x3d2F5DB2505367D00ef81c51AD3cA66159271730',
-    marketplace:   '0xfaC56692c626718aC8953A3d5fAE67fac2f1Be6E',
-    usdc:          '0xD944d8e5D8329994D83950872Ec210891d3Ab6AE',
-    luminaToken:   '0x8A0FDc2126eb9b0c88D17711D62713A1c06CF7Ab',
+    coverRouter:   'Awaiting redeploy post-Sprint Z.2',
+    policyManager: 'Awaiting redeploy post-Sprint Z.2',
+    bondVault:     'Awaiting redeploy post-Sprint Z.2',
+    claimBond:     'Awaiting redeploy post-Sprint Z.2',
+    marketplace:   'Awaiting redeploy post-Sprint Z.2',
+    usdc:          'Awaiting redeploy post-Sprint Z.2',
+    luminaToken:   'Awaiting redeploy post-Sprint Z.2',
   },
 }
 
