@@ -14,20 +14,20 @@ type Health = {
   contracts?: Record<string, string>
 }
 
-// SPRINT_Z2: contract addresses cleared pre-redeploy. After new deployment,
-// the live values are fetched from /health at runtime; this FALLBACK only
-// renders if /health is unreachable.
+// Sprint Deploy V5.2 (2026-05-18): addresses repobladas tras redeploy 26-contract.
+// Live values fetched from /health at runtime; this FALLBACK only renders if
+// /health is unreachable.
 const FALLBACK: Health = {
-  chain: { block: 41159517, chainId: 84532, rpcConnected: true },
-  relayer: { address: 'Awaiting redeploy post-Sprint Z.2', balanceWei: '19945485874244489' },
+  chain: { block: 41680365, chainId: 84532, rpcConnected: true },
+  relayer: { address: '0xe585e76A0b8CbbC2d10b1110a9ac3F4c11dBfDa8', balanceWei: '159192547587961617' },
   contracts: {
-    coverRouter:   'Awaiting redeploy post-Sprint Z.2',
-    policyManager: 'Awaiting redeploy post-Sprint Z.2',
-    bondVault:     'Awaiting redeploy post-Sprint Z.2',
-    claimBond:     'Awaiting redeploy post-Sprint Z.2',
-    marketplace:   'Awaiting redeploy post-Sprint Z.2',
-    usdc:          'Awaiting redeploy post-Sprint Z.2',
-    luminaToken:   'Awaiting redeploy post-Sprint Z.2',
+    coverRouter:   '0xcdB70B40e6a3DEac3189185d947A0e458518F566',
+    policyManager: '0x546C07e07DeBCdbf7a2A7Ef12C38c8c8fcAFcDd8',
+    bondVault:     '0x193acBc1EdC5E565a4aBE96941C7E7AeF637B6EC',
+    claimBond:     '0xaa57Ab52Eb00f296Ad4CFA9E9c201f3737271FB4',
+    marketplace:   '0x0938205f4cBe5F572656533FC930FFce6F5F4345',
+    usdc:          '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+    luminaToken:   '0x62C0b58bB30CA857674ec593F1e23B3F15266680',
   },
 }
 
