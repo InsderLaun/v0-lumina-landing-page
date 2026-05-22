@@ -78,7 +78,7 @@ export async function Section8LiveState({
     { label: copy.statLabels[0], value: formatBlock(data.chain?.block, lang) },
     { label: copy.statLabels[1], value: formatEth(data.relayer?.balanceWei) },
     { label: copy.statLabels[2], value: burned },
-    { label: copy.statLabels[3], value: '9 / 9' },
+    { label: copy.statLabels[3], value: '6 / 6' },
   ]
 
   const addresses = ROW_ORDER

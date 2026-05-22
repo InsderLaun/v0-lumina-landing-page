@@ -915,7 +915,8 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
         <tr><td><strong>EIP-191</strong></td><td>Estándar "personal_sign" usado para la firma de onboarding de agentes.</td></tr>
         <tr><td><strong>EIP-712</strong></td><td>Estándar de firma con tipos usado para los PriceProofs del oráculo.</td></tr>
         <tr><td><strong>Epoch</strong></td><td>Bucket mensual de vencimiento. Codificado como <code>year &times; 100 + month</code>. Todos los bonos que vencen en el mismo mes calendario comparten epoch.</td></tr>
-        <tr><td><strong>FlashShield</strong></td><td>Uno de los siete productos de caída de precio que cubren BTC y ETH en ventanas de 1h-48h.</td></tr>
+        <tr><td><strong>FlashShield</strong></td><td>Uno de los seis productos de caída de precio que cubren BTC y ETH en ventanas de 1h, 24h y 48h (tres por activo).</td></tr>
+        <tr><td><strong>FlashShieldAdapter</strong></td><td>Contrato bridge UUPS que expone los Flash shields T-30a a través de la superficie legacy <code>IShieldV2</code> consumida por <code>PolicyManagerV2</code>.</td></tr>
         <tr><td><strong>Modelo Kink</strong></td><td>Modelo de pricing dependiente de capacidad que ajusta la prima conforme aumenta la utilización.</td></tr>
         <tr><td><strong>LuminaOracleV2</strong></td><td>Verificador EIP-712 que autoriza los disparos de shields a partir de un firmante off-chain de confianza.</td></tr>
         <tr><td><strong>oracleKey</strong></td><td>Dirección Ethereum cuya clave privada firma cada PriceProof; rotable por el owner del contrato.</td></tr>

@@ -5,10 +5,10 @@ import type { CodeToken, ReceiptRow, Shield } from './copy.en'
 
 export const COPY_ES = {
   s1: {
-    eyebrow: '· v5.1 · Base Sepolia · Modelo ClaimBond',
+    eyebrow: '· v5.3 · Base Sepolia · Modelo ClaimBond',
     h1Pre: 'Seguro para los agentes que nunca duermen — ',
     h1Italic: 'resuelto por oráculos, quemado por código.',
-    sub: 'Lumina es un protocolo de seguro paramétrico on-chain en Base L2. Cada prima en USDC compra y quema $LUMINA de forma permanente. Cada póliza activada acuña un bono fijado en USD, redimible en 24 meses. Construido para agentes de IA autónomos que necesitan un payout en menos de un minuto.',
+    sub: 'Lumina es un protocolo de seguro paramétrico on-chain en Base L2. Cada prima en USDC pasa por el AdaptiveFeeDistributor: el 85% compra y quema $LUMINA en Uniswap V3. Cada póliza activada acuña un bono fijado en USD, redimible en 24 meses. Construido para agentes de IA autónomos que necesitan un payout en menos de un minuto.',
     btnPrimary: 'Lanzar app →',
     btnGhost: 'Leer whitepaper completo',
     feedLabel: 'Feed de quema · en vivo',
@@ -88,8 +88,8 @@ export const COPY_ES = {
     flowTitle: 'Flujo deflacionario',
     flow: [
       { num: '01', title: 'Prima pagada',                meta: 'USDC' },
-      { num: '02', title: 'TWAPBurner.receivePremium',   meta: '100%' },
-      { num: '03', title: 'Uniswap V3',                  meta: 'USDC → LUMINA' },
+      { num: '02', title: 'AdaptiveFeeDistributor',      meta: 'split 85/8/2/5' },
+      { num: '03', title: 'TWAPBurner → Uniswap V3',     meta: 'USDC → LUMINA' },
       { num: '04', title: '0xdead',                      meta: 'quema permanente' },
     ],
   },
@@ -97,7 +97,7 @@ export const COPY_ES = {
     eyebrow: '07 / 10 · Quema adaptativa',
     h2Pre: 'Dieciséis regímenes de quema. ',
     h2Italic: 'La matriz decide a dónde va cada prima.',
-    lede: 'El TWAPBurner no siempre quema directamente. Antes de comprar LUMINA, el burner consulta AdaptiveFeeDistributor. El split es una matriz 4×4 indexada por solvencia × momentum, con 16 celdas pre-ajustadas. HEALTHY × STABLE es el régimen por defecto; CRISIS × CRASH detiene la quema completamente y reserva 96% del USDC entrante para un buyback defensivo.',
+    lede: 'El AdaptiveFeeDistributor está al frente del burner. Antes de comprar LUMINA, el router consulta una matriz 4×4 indexada por solvencia × momentum, con 16 celdas pre-ajustadas. HEALTHY × STABLE es el régimen por defecto de V5.3 y aplica un split 85/8/2/5 (BuybackBurn / Treasury / Operations / Founder); CRISIS × CRASH detiene la quema completamente y reserva 96% del USDC entrante para un buyback defensivo.',
     rowLabels: ['ULTRA', 'HEALTHY', 'STRESSED', 'CRISIS'],
     colLabels: ['RALLY', 'STABLE', 'DECLINE', 'CRASH'],
     matrix: [
@@ -110,8 +110,8 @@ export const COPY_ES = {
     defaultLabel: 'DEFAULT',
     selectionHint: 'Toca cualquier celda para inspeccionar el split de 4 canales.',
     callout: {
-      title: 'Estado en Sepolia',
-      body: 'El momentum se mantiene neutral (10000 bps) en Sepolia hasta que despliegue un pool LUMINA/USDC profundo. La matriz de 16 celdas corre solo sobre su eje de solvencia — en runtime colapsa a la columna STABLE. El comportamiento completo de 16 cuadrantes se activa cuando el pool, el módulo de momentum-oracle en release/v5.1-pre-mainnet, y el BuybackSpender se entreguen juntos.',
+      title: 'Estado en Sepolia (V5.3)',
+      body: 'El momentum se mantiene neutral (10000 bps) en Sepolia hasta que despliegue un pool LUMINA/USDC profundo. La matriz de 16 celdas corre solo sobre su eje de solvencia — en runtime colapsa a la columna STABLE con el split por defecto 85/8/2/5. El comportamiento completo de 16 cuadrantes se activa cuando el pool, el momentum oracle, y el BuybackSpender se entreguen juntos en el sprint pre-mainnet.',
     },
   },
   s8: {
