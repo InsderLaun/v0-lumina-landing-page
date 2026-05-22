@@ -36,11 +36,9 @@ export function SiteFooter() {
           </div>
 
           <div className="rd-foot-col">
-            <h5>Products</h5>
-            <span className="rd-foot-link">Flash BTC 1h / 4h / 24h / 48h</span>
+            <h5>Products · V5.3</h5>
+            <span className="rd-foot-link">Flash BTC 1h / 24h / 48h</span>
             <span className="rd-foot-link">Flash ETH 1h / 24h / 48h</span>
-            <span className="rd-foot-link">Micro Depeg USDT</span>
-            <span className="rd-foot-link">Rate Shock</span>
           </div>
 
           <div className="rd-foot-col">
