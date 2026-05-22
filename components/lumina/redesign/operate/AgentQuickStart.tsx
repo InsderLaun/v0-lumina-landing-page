@@ -5,7 +5,7 @@ import { useState } from 'react'
 const COVER_USDC_DEFAULT = '100000000' // $100 — on-chain minimum
 
 const SNIPPETS = {
-  ts: `// npm i @lumina-org/sdk@^0.3.0 ethers
+  ts: `// npm i @lumina-org/sdk@^0.6.0 ethers
 import { LuminaClient } from '@lumina-org/sdk'
 import { Wallet, JsonRpcProvider } from 'ethers'
 
@@ -17,7 +17,8 @@ const buyer = new Wallet(process.env.BUYER_PRIVATE_KEY!, provider)
 await lumina.policies.ensureAllowance(buyer)
 
 // Buy a $100 FLASHBTC1H policy.
-// SDK 0.3.0+ resolves productId hash + per-shield asset literal from productName.
+// SDK 0.6.0 (V5.3) resolves productId hash + per-shield asset from productName,
+// and pulls contract addresses at runtime via GET /health.
 const receipt = await lumina.policies.purchase({
   productName: 'FLASHBTC1H-001',
   buyer: await buyer.getAddress(),

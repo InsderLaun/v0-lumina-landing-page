@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-const INSTALL_CMD = 'npm install @lumina-org/sdk'
+const INSTALL_CMD = 'npm install @lumina-org/sdk@^0.6.0'
 const NPM_URL = 'https://www.npmjs.com/package/@lumina-org/sdk'
 const DOCS_URL = 'https://docs.lumina-org.com/sdk/installation'
 
@@ -112,7 +112,7 @@ export function SdkCta() {
             letterSpacing: '0.04em',
           }}
         >
-          Premium paid in USDC · Relayer covers gas · Compatible with Node 18+ and edge runtimes
+          v0.6.0 (V5.3) · Runtime address resolution via /health · Premium paid in USDC · Relayer covers gas · Node 18+ &amp; edge runtimes
         </p>
       </div>
     </section>
