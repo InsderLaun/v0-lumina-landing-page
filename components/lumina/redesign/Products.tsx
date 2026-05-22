@@ -2,28 +2,86 @@
 
 import { useState, useMemo } from 'react'
 
-// 9 products matching the V5.1 deployed shields:
-// FlashBTC × 4 (1h/4h/24h/48h) + FlashETH × 3 (1h/24h/48h)
-// + Micro Depeg USDT + Rate Shock (Aave USDC).
-// Source: org-lumina/LUMINA-PROTOCOL deployments/sepolia/V5.1-2026-04-27.json
-// (cf. lib/lumina-config.ts comment "9 shield products").
-//
-// `coveredAsset` is the asset whose price/rate is observed by the trigger.
-// `paymentAsset` is the asset paid as premium and as the marketplace settlement
-// currency — always USDC across the V5.1 product line.
-//
-// TODO(sprint-future): expose this list from a shared lib (lib/products.ts is
-// still on the V2 6-product schema). Don't import from there yet.
+// Sprint Landing Integral V5.3 — 6 productos live on Base Sepolia.
+// FlashBTC × 3 (1h/24h/48h) + FlashETH × 3 (1h/24h/48h). RateShock está
+// pausado (CR.products.active = false + PM.productActive = false desde
+// 2026-05-22); MicroDepeg y FlashBTC 4h fueron retirados en T-30c. La
+// columna "Prob." se eliminó intencionalmente — el premium ya viene
+// pre-calculado por la formula on-chain (payoutRatio · triggerProb ·
+// margin / 10⁹) y muestra el costo per $1k de cobertura directamente.
 const PRODUCTS = [
-  { key: 'btc-1h',  symbol: 'FLASHBTC1H-001', label: 'Flash BTC 1h',     coveredAsset: 'BTC',  paymentAsset: 'USDC', duration: '1h',  trigger: 'BTC −5% / 1h',          prob: '0.20', mult: '333x', tier: 1 },
-  { key: 'btc-4h',  symbol: 'FLASHBTC4H-001', label: 'Flash BTC 4h',     coveredAsset: 'BTC',  paymentAsset: 'USDC', duration: '4h',  trigger: 'BTC −8% / 4h',          prob: '0.35', mult: '190x', tier: 1 },
-  { key: 'btc-24h', symbol: 'FLASHBTC24-001', label: 'Flash BTC 24h',    coveredAsset: 'BTC',  paymentAsset: 'USDC', duration: '24h', trigger: 'BTC −10% / 24h',        prob: '1.50', mult: '44x',  tier: 1 },
-  { key: 'btc-48h', symbol: 'FLASHBTC48-001', label: 'Flash BTC 48h',    coveredAsset: 'BTC',  paymentAsset: 'USDC', duration: '48h', trigger: 'BTC −15% / 48h',        prob: '0.80', mult: '83x',  tier: 1 },
-  { key: 'eth-1h',  symbol: 'FLASHETH1H-001', label: 'Flash ETH 1h',     coveredAsset: 'ETH',  paymentAsset: 'USDC', duration: '1h',  trigger: 'ETH −7% / 1h',          prob: '0.25', mult: '266x', tier: 1 },
-  { key: 'eth-24h', symbol: 'FLASHETH24-001', label: 'Flash ETH 24h',    coveredAsset: 'ETH',  paymentAsset: 'USDC', duration: '24h', trigger: 'ETH −12% / 24h',        prob: '2.00', mult: '33x',  tier: 1 },
-  { key: 'eth-48h', symbol: 'FLASHETH48-001', label: 'Flash ETH 48h',    coveredAsset: 'ETH',  paymentAsset: 'USDC', duration: '48h', trigger: 'ETH −18% / 48h',        prob: '0.90', mult: '74x',  tier: 1 },
-  { key: 'depeg',   symbol: 'MICRODEPEG-001', label: 'Micro Depeg USDT', coveredAsset: 'USDT', paymentAsset: 'USDC', duration: '7d',  trigger: 'USDT < $0.995 / 7d',    prob: '3.50', mult: '19x',  tier: 2 },
-  { key: 'rate',    symbol: 'RATESHOCK-001',  label: 'Rate Shock',       coveredAsset: 'USDC', paymentAsset: 'USDC', duration: '7d',  trigger: 'Aave USDC > 10% / 7d',  prob: '4.00', mult: '17x',  tier: 2 },
+  {
+    key: 'btc-1h',
+    symbol: 'FLASHBTC1H-001',
+    label: 'Flash BTC 1h',
+    coveredAsset: 'BTC',
+    paymentAsset: 'USDC',
+    duration: '1h',
+    trigger: 'BTC -2.5% / 1h',
+    premium: 2.92,
+    mult: '342x',
+    tier: 1,
+  },
+  {
+    key: 'btc-24h',
+    symbol: 'FLASHBTC24-001',
+    label: 'Flash BTC 24h',
+    coveredAsset: 'BTC',
+    paymentAsset: 'USDC',
+    duration: '24h',
+    trigger: 'BTC -6% / 24h',
+    premium: 52.60,
+    mult: '19x',
+    tier: 1,
+  },
+  {
+    key: 'btc-48h',
+    symbol: 'FLASHBTC48-001',
+    label: 'Flash BTC 48h',
+    coveredAsset: 'BTC',
+    paymentAsset: 'USDC',
+    duration: '48h',
+    trigger: 'BTC -10% / 48h',
+    premium: 148.67,
+    mult: '7x',
+    tier: 1,
+  },
+  {
+    key: 'eth-1h',
+    symbol: 'FLASHETH1H-001',
+    label: 'Flash ETH 1h',
+    coveredAsset: 'ETH',
+    paymentAsset: 'USDC',
+    duration: '1h',
+    trigger: 'ETH -4% / 1h',
+    premium: 1.68,
+    mult: '595x',
+    tier: 1,
+  },
+  {
+    key: 'eth-24h',
+    symbol: 'FLASHETH24-001',
+    label: 'Flash ETH 24h',
+    coveredAsset: 'ETH',
+    paymentAsset: 'USDC',
+    duration: '24h',
+    trigger: 'ETH -8.5% / 24h',
+    premium: 45.80,
+    mult: '22x',
+    tier: 1,
+  },
+  {
+    key: 'eth-48h',
+    symbol: 'FLASHETH48-001',
+    label: 'Flash ETH 48h',
+    coveredAsset: 'ETH',
+    paymentAsset: 'USDC',
+    duration: '48h',
+    trigger: 'ETH -14% / 48h',
+    premium: 123.01,
+    mult: '8x',
+    tier: 1,
+  },
 ] as const
 
 const FILTERS = ['ALL', 'BTC', 'ETH', 'STABLES'] as const
@@ -36,15 +94,13 @@ export function Products() {
   const filtered = useMemo(() => {
     if (filter === 'BTC') return PRODUCTS.filter((p) => p.coveredAsset === 'BTC')
     if (filter === 'ETH') return PRODUCTS.filter((p) => p.coveredAsset === 'ETH')
-    if (filter === 'STABLES')
-      return PRODUCTS.filter((p) => p.coveredAsset === 'USDT' || p.coveredAsset === 'USDC')
+    if (filter === 'STABLES') return []
     return PRODUCTS
   }, [filter])
 
   const a = PRODUCTS.find((p) => p.key === active) ?? PRODUCTS[0]
   const cov = 1000
-  const probNum = parseFloat(a.prob) / 100
-  const premium = (cov * 0.8 * probNum * 1.5).toFixed(2)
+  const premium = a.premium.toFixed(2)
   const payout = (cov * 0.8).toFixed(2)
 
   return (
@@ -53,10 +109,10 @@ export function Products() {
         <div className="rd-sec-num">
           03 / 09 · <span>Live Markets</span>
         </div>
-        <h2>Nine products. Each with a precise trigger, probability, and multiplier.</h2>
+        <h2>Six flash products. Each with a precise drop trigger and a fixed multiplier.</h2>
         <p className="rd-sec-lede">
-          Click a row to open the bet sheet. Probabilities are derived from rolling 90-day
-          historical volatility; multipliers are derived from the bond reserve curve.
+          Click a row to open the bet sheet. Triggers measure the drop from the spot price
+          at purchase time over a fixed window; multipliers come from the bond reserve curve.
         </p>
         <p
           className="rd-sec-lede"
@@ -69,13 +125,13 @@ export function Products() {
           }}
         >
           Premium and bond settlement always denominated in <strong style={{ color: 'var(--rd-text-2)' }}>USDC</strong>.
-          The <em>Covers</em> column is the asset whose price (or rate) the oracle observes for the
+          The <em>Covers</em> column is the asset whose price the Chainlink oracle observes for the
           trigger.
         </p>
 
         <div className="rd-prod-shell">
           <div className="rd-prod-head">
-            <div className="label">PRODUCTS · 9 ACTIVE</div>
+            <div className="label">PRODUCTS · 6 ACTIVE</div>
             <div className="rd-prod-tabs">
               {FILTERS.map((t) => (
                 <button
@@ -95,16 +151,20 @@ export function Products() {
                   <th>Product</th>
                   <th>Covers</th>
                   <th>Trigger</th>
-                  <th className="rd-r">Prob.</th>
                   <th className="rd-r">Multiplier</th>
                   <th className="rd-r">Premium /$1K</th>
                   <th className="rd-r">Tier</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((p) => {
-                  const prem = (1000 * 0.8 * (parseFloat(p.prob) / 100) * 1.5).toFixed(2)
-                  return (
+                {filter === 'STABLES' ? (
+                  <tr>
+                    <td colSpan={6} className="rd-muted" style={{ textAlign: 'center', padding: '32px 0' }}>
+                      <em>Stables coverage — coming soon.</em>
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((p) => (
                     <tr
                       key={p.key}
                       className={active === p.key ? 'rd-on' : ''}
@@ -117,17 +177,16 @@ export function Products() {
                         </span>
                       </td>
                       <td>{p.trigger}</td>
-                      <td className="rd-r">{p.prob}%</td>
                       <td className="rd-r">
                         <span className="rd-mult">{p.mult}</span>
                       </td>
-                      <td className="rd-r mono">${prem}</td>
+                      <td className="rd-r mono">${p.premium.toFixed(2)}</td>
                       <td className="rd-r">
                         <span className="rd-pill">T{p.tier}</span>
                       </td>
                     </tr>
-                  )
-                })}
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -17,15 +17,15 @@ export function Bonds() {
         <h2>When your bet wins, you don&apos;t get cash. You get something better.</h2>
         <p className="rd-sec-lede">
           ClaimBonds are ERC-1155 tokens. All bonds maturing the same month are interchangeable. 1
-          bond = $1 USD claimable at maturity, settled in $LUMINA at market price. You have three
-          options.
+          bond = $1 USD claimable at maturity (~730 days), settled in $LUMINA at market price. You
+          have three options.
         </p>
 
         <div className="rd-bonds-grid">
           {/* OPTION A · HOLD */}
           <div className="rd-bond-card">
             <div className="rd-bond-tag">OPTION A · HOLD</div>
-            <h4>Wait 24 months. Redeem full face value.</h4>
+            <h4>Wait 730 days. Redeem full face value.</h4>
             <p>
               Fixed in USD. An $800 bond always redeems for $800 worth of $LUMINA at the market
               price on the day of redemption — regardless of where the token trades.

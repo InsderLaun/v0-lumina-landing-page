@@ -6,10 +6,10 @@ import { Bot, User } from 'lucide-react'
 import { LiveStatusBadge } from './LiveStatusBadge'
 
 const BURN_EVENTS = [
-  { t: '00:42 UTC', action: 'Flash BTC 1h', amount: '+ 12.40 USDC', lumina: '344.4 LUMINA' },
-  { t: '00:38 UTC', action: 'Micro Depeg', amount: '+ 42.00 USDC', lumina: '1,166.6 LUMINA' },
-  { t: '00:31 UTC', action: 'Flash ETH 24h', amount: '+ 8.00 USDC', lumina: '222.2 LUMINA' },
-  { t: '00:27 UTC', action: 'Bond resale 3%', amount: '+ 12.00 USDC', lumina: '333.3 LUMINA' },
+  { t: '00:42 UTC', action: 'Flash BTC 1h', amount: '+ 2.92 USDC', lumina: '80.2 LUMINA' },
+  { t: '00:38 UTC', action: 'Flash ETH 24h', amount: '+ 45.80 USDC', lumina: '1,258.2 LUMINA' },
+  { t: '00:31 UTC', action: 'Flash BTC 48h', amount: '+ 148.67 USDC', lumina: '4,083.5 LUMINA' },
+  { t: '00:27 UTC', action: 'Bond resale 2%', amount: '+ 12.00 USDC', lumina: '329.7 LUMINA' },
 ] as const
 
 export function Hero() {
@@ -25,7 +25,7 @@ export function Hero() {
         <div className="rd-hero-eyebrow" style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span className="rd-dot" />
-            <span>v5.1 · Base Sepolia · ClaimBond Model</span>
+            <span>v5.3 · Base Sepolia · Flash Shield Adapters · ClaimBond Model</span>
           </span>
           <LiveStatusBadge />
         </div>
@@ -41,15 +41,17 @@ export function Hero() {
               by code.
             </h1>
             <p className="rd-hero-sub">
-              Bet against market chaos on Base L2. Every losing premium buys $LUMINA on the open
-              market and burns it forever. Every winning bet mints a ClaimBond — fixed-USD, 24-month,
-              redeemable in $LUMINA.
+              Bet against market chaos on Base L2. Every losing premium routes through the
+              AdaptiveFeeDistributor and burns $LUMINA on the open market — 85% of every premium
+              dollar destroyed forever. Every winning bet mints a ClaimBond — fixed-USD, 730-day,
+              redeemable in $LUMINA at market price.
             </p>
             <p
               className="rd-hero-sub"
               style={{ marginTop: 8, fontSize: 14, color: 'var(--rd-text-3)' }}
             >
-              Parametric DeFi insurance — built for AI agents. Install:{' '}
+              Six flash products live on Base Sepolia · BTC + ETH · 1h / 24h / 48h windows. Parametric
+              DeFi insurance — built for AI agents. Install:{' '}
               <code
                 style={{
                   background: 'rgba(255,255,255,0.06)',
@@ -59,7 +61,7 @@ export function Hero() {
                   color: 'var(--rd-text-1)',
                 }}
               >
-                npm install @lumina-org/sdk
+                npm install @lumina-org/sdk@^0.6.0
               </code>
             </p>
             <div className="rd-hero-cta">
