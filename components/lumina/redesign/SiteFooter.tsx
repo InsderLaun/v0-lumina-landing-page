@@ -47,6 +47,7 @@ export function SiteFooter() {
             <Link href="/skills">SKILL file</Link>
             <Link href="/docs">Smart contracts</Link>
             <Link href="/tutorial">Tutorial</Link>
+            <Link href="/faucet">Testnet faucet</Link>
           </div>
 
           <div className="rd-foot-col">
