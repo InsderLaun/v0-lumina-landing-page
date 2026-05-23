@@ -5,10 +5,10 @@ import type { CodeToken, ReceiptRow, Shield } from './copy.en'
 
 export const COPY_ES = {
   s1: {
-    eyebrow: '· v5.1 · Base Sepolia · Modelo ClaimBond',
+    eyebrow: '· v5.3 · Base Sepolia · Modelo ClaimBond',
     h1Pre: 'Seguro para los agentes que nunca duermen — ',
     h1Italic: 'resuelto por oráculos, quemado por código.',
-    sub: 'Lumina es un protocolo de seguro paramétrico on-chain en Base L2. Cada prima en USDC compra y quema $LUMINA de forma permanente. Cada póliza activada acuña un bono fijado en USD, redimible en 24 meses. Construido para agentes de IA autónomos que necesitan un payout en menos de un minuto.',
+    sub: 'Lumina es un protocolo de seguro paramétrico on-chain en Base L2. Cada prima en USDC pasa por el AdaptiveFeeDistributor: el 85% compra y quema $LUMINA en Uniswap V3. Cada póliza activada acuña un bono fijado en USD, redimible en 24 meses. Construido para agentes de IA autónomos que necesitan un payout en menos de un minuto.',
     btnPrimary: 'Lanzar app →',
     btnGhost: 'Leer whitepaper completo',
     feedLabel: 'Feed de quema · en vivo',
@@ -29,7 +29,7 @@ export const COPY_ES = {
     eyebrow: '03 / 10 · Tres pasos de la prima al payoff',
     h2: 'De la prima al payoff en tres pasos on-chain.',
     steps: [
-      { glyph: '◇', title: 'Comprar', call: 'purchasePolicy(productId, coverage)',          body: 'Un agente elige uno de los 9 shields y paga una prima en USDC. La wallet relayer paga el gas; el agente solo paga la prima.' },
+      { glyph: '◇', title: 'Comprar', call: 'purchasePolicy(productId, coverage)',          body: 'Un agente elige uno de los 6 flash shields V5.3 y paga una prima en USDC. La wallet relayer paga el gas; el agente solo paga la prima.' },
       { glyph: '◆', title: 'Activar', call: 'submitTrigger(policyId, oracleProof)',         body: 'Cualquiera — agente, keeper, bot MEV — puede enviar un PriceProof firmado EIP-712. Si la condición paramétrica se cumple, el pago se ejecuta en la misma transacción.' },
       { glyph: '◈', title: 'Redimir', call: 'BondVault.redeemBond(epochId, usdAmount)',     body: 'La póliza activada acuña ClaimBonds ERC-1155 con valor nominal de $1. Mantén hasta vencimiento (730 días), o vende temprano en el marketplace secundario con descuento.' },
     ],
@@ -41,12 +41,12 @@ export const COPY_ES = {
     h2Italic: 'seis pasos, dos finales.',
     lede: 'Cada posición Lumina recorre el mismo camino de seis pasos. La prima se paga en USDC y quema $LUMINA al entrar. Si el trigger se dispara, se acuña un ClaimBond. Desde ahí el holder elige uno de dos finales — esperar 730 días para recibir $LUMINA al vencimiento, o vender ahora en el marketplace secundario por USDC.',
     steps: [
-      { title: 'Comprar póliza (USDC)',         body: 'Pagás una pequeña prima en USDC. 100% se enruta al TWAPBurner — compra y quema $LUMINA en Uniswap V3. El supply se reduce inmediatamente.' },
+      { title: 'Comprar póliza (USDC)',         body: 'Pagás una pequeña prima en USDC. Se enruta al AdaptiveFeeDistributor: 85% al TWAPBurner — compra y quema $LUMINA en Uniswap V3 — y 8/2/5% reparte treasury/ops/founder. El supply se reduce inmediatamente.' },
       { title: 'Trigger se dispara',            body: 'El oráculo observa el activo cubierto. Si la condición de trigger se cumple dentro de la ventana, la póliza queda activada y un ClaimBond es acuñable.' },
       { title: 'ClaimBond acuñado (ERC-1155)',  body: 'Acuñado al holder, indexado por epoch. Valor nominal $1 por unidad. Vencimiento: 730 días.' },
       { title: 'Elegís: esperar O vender',      body: 'Mantener el bono hasta el vencimiento para recibir $LUMINA, o listarlo en el marketplace secundario hoy por USDC.' },
       { title: 'Esperar 730d → $LUMINA',        body: 'redeemBond() lee el oráculo y acuña luminaAmount = usdAmount / LUMINA_price al holder. Capturás el upside si $LUMINA aprecia.' },
-      { title: 'O vender ahora → USDC',         body: 'Listás en el marketplace secundario con descuento. El comprador paga USDC. 1.5% maker + 1.5% taker — el 3% completo se envía al TWAPBurner y se quema.' },
+      { title: 'O vender ahora → USDC',         body: 'Listás en el marketplace secundario con descuento. El comprador paga USDC. Fee 2% — enrutado por el AdaptiveFeeDistributor con el mismo split 85/8/2/5.' },
     ],
     example: {
       label: 'Ejemplo trabajado',
@@ -59,20 +59,17 @@ export const COPY_ES = {
     truth: 'Prima = USDC · Trade en marketplace = USDC · Redención al vencimiento = $LUMINA',
   },
   s5: {
-    eyebrow: '05 / 10 · Nueve shields paramétricos',
+    eyebrow: '05 / 10 · Seis flash shields paramétricos',
     h2Pre: 'Triggers específicos. Activos específicos. ',
     h2Italic: 'Ventanas de tiempo específicas.',
-    lede: 'Cada shield es un proxy UUPS-upgradeable que valida una sola condición de trigger. El registro on-chain de productos usa nombres canónicos del tipo FLASHBTC1H-001 — el productId que pasa el caller es el keccak256 de ese string.',
+    lede: 'Cada flash shield V5.3 es BaseFlashShield + un FlashShieldAdapter UUPS-upgradeable que valida un drop desde el precio de compra dentro de una ventana fija. El registro on-chain de productos usa nombres canónicos del tipo FLASHBTC1H-001 — el productId que pasa el caller es el keccak256 de ese string.',
     shields: [
-      { glyph: '₿', asset: 'BTC',  title: 'Flash BTC 1h',  trigger: 'BTC −5% / 1h',                    pill: '1h',  canonical: 'FLASHBTC1H-001', literal: 'BTC' },
-      { glyph: '₿', asset: 'BTC',  title: 'Flash BTC 4h',  trigger: 'BTC −8% / 4h',                    pill: '4h',  canonical: 'FLASHBTC4H-001', literal: 'BTC' },
-      { glyph: '₿', asset: 'BTC',  title: 'Flash BTC 24h', trigger: 'BTC −10% / 24h',                  pill: '24h', canonical: 'FLASHBTC24-001', literal: 'BTC' },
-      { glyph: '₿', asset: 'BTC',  title: 'Flash BTC 48h', trigger: 'BTC −15% / 48h',                  pill: '48h', canonical: 'FLASHBTC48-001', literal: 'BTC' },
-      { glyph: 'Ξ', asset: 'ETH',  title: 'Flash ETH 1h',  trigger: 'ETH −7% / 1h',                    pill: '1h',  canonical: 'FLASHETH1H-001', literal: 'ETH' },
-      { glyph: 'Ξ', asset: 'ETH',  title: 'Flash ETH 24h', trigger: 'ETH −12% / 24h',                  pill: '24h', canonical: 'FLASHETH24-001', literal: 'ETH' },
-      { glyph: 'Ξ', asset: 'ETH',  title: 'Flash ETH 48h', trigger: 'ETH −18% / 48h',                  pill: '48h', canonical: 'FLASHETH48-001', literal: 'ETH' },
-      { glyph: '₮', asset: 'USDT', title: 'Micro Depeg',   trigger: 'USDT < $0.995 / 7d',              pill: '7d',  canonical: 'MICRODEPEG-001', literal: 'USDT' },
-      { glyph: '$', asset: 'USDC', title: 'Rate Shock',    trigger: 'Préstamo USDC Aave > 10% / 7d',   pill: '7d',  canonical: 'RATESHOCK-001',  literal: 'USDC' },
+      { glyph: '₿', asset: 'BTC',  title: 'Flash BTC 1h',  trigger: 'BTC −2.5% / 1h',  pill: '1h',  canonical: 'FLASHBTC1H-001', literal: 'BTC' },
+      { glyph: '₿', asset: 'BTC',  title: 'Flash BTC 24h', trigger: 'BTC −6% / 24h',   pill: '24h', canonical: 'FLASHBTC24-001', literal: 'BTC' },
+      { glyph: '₿', asset: 'BTC',  title: 'Flash BTC 48h', trigger: 'BTC −10% / 48h',  pill: '48h', canonical: 'FLASHBTC48-001', literal: 'BTC' },
+      { glyph: 'Ξ', asset: 'ETH',  title: 'Flash ETH 1h',  trigger: 'ETH −4% / 1h',    pill: '1h',  canonical: 'FLASHETH1H-001', literal: 'ETH' },
+      { glyph: 'Ξ', asset: 'ETH',  title: 'Flash ETH 24h', trigger: 'ETH −8.5% / 24h', pill: '24h', canonical: 'FLASHETH24-001', literal: 'ETH' },
+      { glyph: 'Ξ', asset: 'ETH',  title: 'Flash ETH 48h', trigger: 'ETH −14% / 48h',  pill: '48h', canonical: 'FLASHETH48-001', literal: 'ETH' },
     ] satisfies Shield[],
   },
   s6: {
@@ -91,8 +88,8 @@ export const COPY_ES = {
     flowTitle: 'Flujo deflacionario',
     flow: [
       { num: '01', title: 'Prima pagada',                meta: 'USDC' },
-      { num: '02', title: 'TWAPBurner.receivePremium',   meta: '100%' },
-      { num: '03', title: 'Uniswap V3',                  meta: 'USDC → LUMINA' },
+      { num: '02', title: 'AdaptiveFeeDistributor',      meta: 'split 85/8/2/5' },
+      { num: '03', title: 'TWAPBurner → Uniswap V3',     meta: 'USDC → LUMINA' },
       { num: '04', title: '0xdead',                      meta: 'quema permanente' },
     ],
   },
@@ -100,7 +97,7 @@ export const COPY_ES = {
     eyebrow: '07 / 10 · Quema adaptativa',
     h2Pre: 'Dieciséis regímenes de quema. ',
     h2Italic: 'La matriz decide a dónde va cada prima.',
-    lede: 'El TWAPBurner no siempre quema directamente. Antes de comprar LUMINA, el burner consulta AdaptiveFeeDistributor. El split es una matriz 4×4 indexada por solvencia × momentum, con 16 celdas pre-ajustadas. HEALTHY × STABLE es el régimen por defecto; CRISIS × CRASH detiene la quema completamente y reserva 96% del USDC entrante para un buyback defensivo.',
+    lede: 'El AdaptiveFeeDistributor está al frente del burner. Antes de comprar LUMINA, el router consulta una matriz 4×4 indexada por solvencia × momentum, con 16 celdas pre-ajustadas. HEALTHY × STABLE es el régimen por defecto de V5.3 y aplica un split 85/8/2/5 (BuybackBurn / Treasury / Operations / Founder); CRISIS × CRASH detiene la quema completamente y reserva 96% del USDC entrante para un buyback defensivo.',
     rowLabels: ['ULTRA', 'HEALTHY', 'STRESSED', 'CRISIS'],
     colLabels: ['RALLY', 'STABLE', 'DECLINE', 'CRASH'],
     matrix: [
@@ -113,8 +110,8 @@ export const COPY_ES = {
     defaultLabel: 'DEFAULT',
     selectionHint: 'Toca cualquier celda para inspeccionar el split de 4 canales.',
     callout: {
-      title: 'Estado en Sepolia',
-      body: 'El momentum se mantiene neutral (10000 bps) en Sepolia hasta que despliegue un pool LUMINA/USDC profundo. La matriz de 16 celdas corre solo sobre su eje de solvencia — en runtime colapsa a la columna STABLE. El comportamiento completo de 16 cuadrantes se activa cuando el pool, el módulo de momentum-oracle en release/v5.1-pre-mainnet, y el BuybackSpender se entreguen juntos.',
+      title: 'Estado en Sepolia (V5.3)',
+      body: 'El momentum se mantiene neutral (10000 bps) en Sepolia hasta que despliegue un pool LUMINA/USDC profundo. La matriz de 16 celdas corre solo sobre su eje de solvencia — en runtime colapsa a la columna STABLE con el split por defecto 85/8/2/5. El comportamiento completo de 16 cuadrantes se activa cuando el pool, el momentum oracle, y el BuybackSpender se entreguen juntos en el sprint pre-mainnet.',
     },
   },
   s8: {

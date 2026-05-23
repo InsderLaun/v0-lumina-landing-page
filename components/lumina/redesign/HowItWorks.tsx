@@ -3,29 +3,29 @@ const STEPS = [
     id: '01',
     glyph: '◇',
     title: 'Choose your bet',
-    meta: '9 products · BTC / ETH / USDT / USDC',
-    body: 'Pick a parametric product (Flash BTC 1h, Micro Depeg, Rate Shock, …) and select coverage. Each product has a precise trigger condition, probability, and multiplier.',
+    meta: '6 products · BTC / ETH · 1h / 24h / 48h',
+    body: 'Pick a flash product (Flash BTC 1h, Flash ETH 24h, …) and select coverage between $100 and the live BondVault capacity. Each product has a precise drop-from-purchase-price trigger and a fixed multiplier.',
   },
   {
     id: '02',
     glyph: '◆',
-    title: 'Premium burns LUMINA',
-    meta: '100% to TWAPBurner · zero to team',
-    body: 'Your premium routes through the TWAPBurner: USDC buys $LUMINA on Uniswap, tokens are sent to 0xdead. Permanent supply reduction, every transaction.',
+    title: 'Premium routes to burn',
+    meta: '85% burned · 8% treasury · 2% ops · 5% founder',
+    body: 'Your premium routes through the AdaptiveFeeDistributor. 85% reaches the TWAPBurner: USDC buys $LUMINA on Uniswap V3, tokens go to 0xdead. The remaining 15% funds treasury, ops, and the founder vesting reserve. Burns are atomic with the originating transaction.',
   },
   {
     id: '03',
     glyph: '◈',
     title: 'Oracle resolves',
-    meta: 'Chainlink · same-block · trustless',
-    body: "Chainlink oracles monitor the trigger condition in real time. No committees, no governance, no disputes. The trigger fires or it doesn't. Pure math.",
+    meta: 'Chainlink BTC/USD + ETH/USD · MIN-of-3 confirmations · trustless',
+    body: "The shield reads spot 3 times in-transaction (MIN-of-3 = conservative reference). If the drop from your purchase price meets the trigger, the policy fires. No committees, no governance, no disputes — pure math.",
   },
   {
     id: '04',
     glyph: '◉',
     title: 'Bond or burn',
-    meta: 'ERC-1155 · 24-month · USD-fixed',
-    body: 'Trigger fires → ClaimBond minted from the 82M reserve, redeemable for the full USD face value in $LUMINA at maturity. No trigger → premium stays burned.',
+    meta: 'ERC-1155 · 730-day maturity · USD-fixed',
+    body: 'Trigger fires → ClaimBond minted from the BondVault reserve, redeemable for the full USD face value in $LUMINA at maturity (~730 days). No trigger → premium stays burned. The bond is freely transferable on the secondary marketplace before maturity.',
   },
 ] as const
 
@@ -38,8 +38,9 @@ export function HowItWorks() {
         </div>
         <h2>Four steps from bet to burn. No middlemen, no disputes.</h2>
         <p className="rd-sec-lede">
-          ClaimBond is a parametric risk protocol on Base L2. Premiums always burn $LUMINA; payouts
-          always come from a sealed on-chain reserve. The state machine has four states.
+          ClaimBond is a parametric risk protocol on Base L2. Premiums route 85% to burn through the
+          AdaptiveFeeDistributor; payouts always come from a sealed on-chain reserve. The state
+          machine has four states.
         </p>
 
         <div className="rd-steps">

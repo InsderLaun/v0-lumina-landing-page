@@ -95,7 +95,7 @@ export function HumanProductsView() {
               marginBottom: 8,
             }}
           >
-            SHIELDS · 9 ACTIVE PRODUCTS · BASE SEPOLIA · CAPACITY ${capacityUsd}
+            SHIELDS · 6 ACTIVE PRODUCTS · BASE SEPOLIA · CAPACITY ${capacityUsd}
           </div>
           <h1
             style={{

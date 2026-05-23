@@ -1,9 +1,11 @@
 // 22 SKILLS — full lifecycle coverage (discover → quote → buy → monitor →
 // claim → marketplace → integration). Each `githubUrl` points to a real
-// file:line in either /tmp/lp-s2 (LUMINA-PROTOCOL @ 6a3ce42) or /tmp/la-s2
-// (lumina-api @ 575a4d0). `todoNote` is set when no per-skill doc exists
-// yet — the URL falls back to the most relevant README + the note surfaces
-// in UI as a "doc pending" badge.
+// file:line in either LUMINA-PROTOCOL (V5.3 on Base Sepolia: 6 Flash shields
+// behind FlashShieldAdapter (UUPS) over BaseFlashShield slim, PolicyManagerV2
+// routes through adapters) or lumina-api (V5.3: runtime address resolution
+// via GET /health; @lumina-org/sdk @ 0.6.0). `todoNote` is set when no
+// per-skill doc exists yet — the URL falls back to the most relevant README
+// and the note surfaces in UI as a "doc pending" badge.
 
 export type Audience = 'human' | 'agent' | 'both'
 export type Category =
@@ -38,9 +40,9 @@ export const SKILLS: Skill[] = [
   {
     id: 'browse-shields',
     number: '01',
-    title: 'Browse the 9 Shields catalog',
+    title: 'Browse the 6 Shields catalog',
     description:
-      'List all active parametric products available on Base Sepolia: 4 Flash BTC (1h/4h/24h/48h), 3 Flash ETH (1h/24h/48h), Micro Depeg USDT, and Rate Shock. Each shield has its own contract address, trigger condition, and probability.',
+      'List all active parametric products on Base Sepolia (V5.3): 3 Flash BTC (1h/24h/48h) and 3 Flash ETH (1h/24h/48h). Each shield has its own contract address, trigger condition, premium formula, and capacity. RateShock is paused; FlashBTC4h and MicroDepeg are not in the V5.3 bundle.',
     audience: 'both',
     difficulty: 1,
     tags: ['read', 'catalog', 'public'],
@@ -81,7 +83,7 @@ export const SKILLS: Skill[] = [
     number: '04',
     title: 'Quote a parametric policy',
     description:
-      'Get a real-time on-chain quote for any shield. Returns the (premium, payout) tuple — premium scales with cover × triggerProbBps × marginBps × payoutRatioBps.',
+      'Get a real-time on-chain quote for any shield. Returns the (premium, payout) tuple — premium scales with cover × payoutRatioBps × marginBps and the per-shield rate, evaluated atomically against current capacity.',
     audience: 'both',
     difficulty: 1,
     tags: ['read', 'onchain', 'pricing'],
@@ -299,7 +301,7 @@ export const SKILLS: Skill[] = [
     number: '20',
     title: 'Generate an agent API key',
     description:
-      'Self-service key issuance is admin-only on V5.1 testnet — request via labs@lumina-org.com with your wallet address. Max 3 active keys per wallet, plaintext shown once.',
+      'Self-service key issuance is admin-only on V5.3 testnet — request via labs@lumina-org.com with your wallet address. Max 3 active keys per wallet, plaintext shown once.',
     audience: 'agent',
     difficulty: 2,
     tags: ['api', 'auth', 'admin'],

@@ -1,9 +1,11 @@
 // Curated documentation catalog for /docs page.
 // All paths verified against post-merge state of:
-//   - org-lumina/LUMINA-PROTOCOL  (PR #96 merged: SECURITY rewritten,
-//                                   AAVE-INTEGRATION added, file renames)
-//   - org-lumina/lumina-api        (PRs #7 + #8 merged: 22 skills under
-//                                   docs/skills/)
+//   - org-lumina/LUMINA-PROTOCOL  (V5.3 on Base Sepolia: 6 Flash shields
+//                                   behind FlashShieldAdapter (UUPS) over
+//                                   BaseFlashShield slim, PolicyManagerV2
+//                                   routes through adapters)
+//   - org-lumina/lumina-api        (V5.3: runtime address resolution
+//                                   via /health; @lumina-org/sdk@0.6.0)
 // Whitepaper docs are intentionally excluded — they live on /whitepaper.
 
 export type DocCategory =
@@ -83,11 +85,87 @@ export function docsByCategory(category: DocCategory): DocEntry[] {
   return DOCS.filter((d) => d.category === category)
 }
 
+// ────────────────────────────────────────────────────────────────
+// V5.3 deployment on Base Sepolia (chain 84532).
+// Shield adapters were redeployed in V5.3 (PolicyManagerV2 →
+// FlashShieldAdapter (UUPS) → BaseFlashShield slim). Core V5.2
+// contracts continue to back the system — no redeploy.
+// Authoritative source of truth for consumers that render the docs
+// page; UI components SHOULD NOT hardcode addresses elsewhere.
+// ────────────────────────────────────────────────────────────────
+
+export interface V53Address {
+  label: string
+  address: `0x${string}`
+  note?: string
+}
+
+export const V53_NETWORK = {
+  name: 'Base Sepolia',
+  chainId: 84532,
+  explorer: 'https://sepolia.basescan.org',
+} as const
+
+// One FlashShieldAdapter (UUPS) per shield — 6 total on V5.3.
+export const V53_FLASH_ADAPTERS: V53Address[] = [
+  { label: 'FlashBTC1h_Adapter',  address: '0x5fC732D28c09DfcA2e7eF0AAd6C9491c8474eAdB', note: 'Trigger BTC -2.5% / 1h' },
+  { label: 'FlashBTC24h_Adapter', address: '0x844A5fDb3C910DC33Eb720fDB5387C3d55eC867d', note: 'Trigger BTC -6% / 24h' },
+  { label: 'FlashBTC48h_Adapter', address: '0x0840d638a3E79919afE3b1AB589E6D4b5E8C45Bb', note: 'Trigger BTC -10% / 48h' },
+  { label: 'FlashETH1h_Adapter',  address: '0xeC42c7169B4D80F4D8A113607367F75c2df02935', note: 'Trigger ETH -4% / 1h' },
+  { label: 'FlashETH24h_Adapter', address: '0xb0f143beF75F32BcAB569766e9159366f8fD69C4', note: 'Trigger ETH -8.5% / 24h' },
+  { label: 'FlashETH48h_Adapter', address: '0x26db224D3Ddc00F4bFcF8ab26A92B9f7c81A47E6', note: 'Trigger ETH -14% / 48h' },
+]
+
+// Core V5.2 contracts — reused unchanged by V5.3.
+export const V53_CORE: V53Address[] = [
+  { label: 'LuminaTokenV2',          address: '0x62C0b58bB30CA857674ec593F1e23B3F15266680' },
+  { label: 'BondVault',              address: '0x193acBc1EdC5E565a4aBE96941C7E7AeF637B6EC', note: 'Throttle 1.08%/week, FIFO per epoch' },
+  { label: 'ClaimBond',              address: '0xaa57Ab52Eb00f296Ad4CFA9E9c201f3737271FB4' },
+  { label: 'CoverRouter',            address: '0xcdB70B40e6a3DEac3189185d947A0e458518F566' },
+  { label: 'PolicyManager (proxy)',  address: '0x546C07e07DeBCdbf7a2A7Ef12C38c8c8fcAFcDd8', note: 'Sprint Cleanup impl 0xdE41D414eD191A1090546078DF8e120c196Be22F' },
+  { label: 'FounderVesting',         address: '0xfF4Db529bBCd4E3CC091E07b7845241EB4762832', note: 'V2 — 3 unlock paths' },
+  { label: 'LuminaOracleV2',         address: '0x9bfa2f7A5098C89b8740D1694d1f716A0Bd871dD' },
+  { label: 'TWAPBurner',             address: '0x242d76082856901b4ba1E7c50C022D46a6941bC0' },
+  { label: 'AdaptiveFeeDistributor', address: '0xeC7841A4a9ecfb8cA58391E233A645B021c59D54', note: 'Split 85/8/2/5 (BuybackBurn/Treasury/Operations/Founder)' },
+  { label: 'BuybackEngine',          address: '0x56B5a1115B0d9781E7358521204d927d2F80d8B4' },
+  { label: 'Marketplace',            address: '0x0938205f4cBe5F572656533FC930FFce6F5F4345' },
+]
+
+// Off-chain surface — the SDK resolves addresses at runtime via /health,
+// so consumers should not pin contract addresses in their own code.
+export const V53_API = {
+  baseUrl: 'https://lumina-api-production-ac85.up.railway.app',
+  sdkPackage: '@lumina-org/sdk',
+  sdkVersion: '0.6.0',
+  sdkRegistry: 'https://www.npmjs.com/package/@lumina-org/sdk',
+} as const
+
+// Shield product semantics — single source of truth for the 6 active products.
+export const V53_PRODUCTS = [
+  { id: 'flash-btc-1h',  asset: 'BTC', window: '1h',  trigger: '-2.5%' },
+  { id: 'flash-btc-24h', asset: 'BTC', window: '24h', trigger: '-6%' },
+  { id: 'flash-btc-48h', asset: 'BTC', window: '48h', trigger: '-10%' },
+  { id: 'flash-eth-1h',  asset: 'ETH', window: '1h',  trigger: '-4%' },
+  { id: 'flash-eth-24h', asset: 'ETH', window: '24h', trigger: '-8.5%' },
+  { id: 'flash-eth-48h', asset: 'ETH', window: '48h', trigger: '-14%' },
+] as const
+
+// Common policy economics for every Flash shield on V5.3.
+export const V53_POLICY_TERMS = {
+  bondMaturityDays: 730,
+  deductibleBps: 2000,        // 20%
+  payoutBps: 8000,            // 80%
+  marginBps: 20000,           // 2.00x
+  paymentAsset: 'USDC',
+  strikeSnapshot: 'spot at createPolicy',
+  sequencerL2Check: 'active (no-op on Base Sepolia)',
+} as const
+
 export const DOCS: DocEntry[] = [
   // ─── 🚀 GETTING STARTED ──────────────────────────────────────
   {
     title: 'Protocol README',
-    description: 'High-level overview of the Lumina parametric insurance protocol and how the V5.1 contracts fit together.',
+    description: 'High-level overview of the Lumina parametric insurance protocol and how the V5.3 contracts fit together.',
     repo: 'LUMINA-PROTOCOL',
     path: 'README.md',
     category: 'getting-started',
@@ -105,6 +183,22 @@ export const DOCS: DocEntry[] = [
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/AI-AGENT-QUICK-START.md',
     category: 'getting-started',
+  },
+  {
+    title: 'V5.3 deployment addresses (Base Sepolia)',
+    description: 'Authoritative deployed addresses for the V5.3 release on Base Sepolia (chain 84532). Includes the 6 FlashShieldAdapter instances and the V5.2 core that V5.3 reuses.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/DEPLOYMENTS-V5.3.md',
+    category: 'getting-started',
+    badge: 'new',
+  },
+  {
+    title: 'API base URL + SDK pointer',
+    description: 'Public API at https://lumina-api-production-ac85.up.railway.app and @lumina-org/sdk @ v0.6.0 on npm. The SDK resolves contract addresses at runtime via /health, so consumers do not pin addresses.',
+    repo: 'lumina-api',
+    path: 'README.md#api-base-url',
+    category: 'getting-started',
+    badge: 'new',
   },
 
   // ─── 🤖 FOR AI AGENTS ────────────────────────────────────────
@@ -165,7 +259,7 @@ export const DOCS: DocEntry[] = [
   },
   {
     title: 'FounderVesting.sol',
-    description: '8M LUMINA locked behind 2-of-3 AltSeason conditions sustained 7 days, then 3 tranches every 31 days. 4-year fallback.',
+    description: '8M LUMINA locked behind 3 unlock paths: PATH1 (2-of-3 AltSeason oracle conditions sustained 1 day), PATH2 (ETH > $5,000 sustained 1 day), PATH3 (3-year fallback). UUPS upgradeable.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/token/FounderVesting.sol',
     category: 'source',
@@ -197,7 +291,7 @@ export const DOCS: DocEntry[] = [
   // Core protocol (4)
   {
     title: 'PolicyManagerV2.sol',
-    description: 'Buy / redeem / cancel policies. Computes premium = cover × payoutRatio × triggerProb × margin.',
+    description: 'Buy / redeem / cancel policies. Routes purchases through a FlashShieldAdapter per shield (UUPS); strike spot snapshotted at createPolicy. Premium = cover × payoutRatio × marginBps / 10000.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/core/PolicyManagerV2.sol',
     category: 'source',
@@ -243,7 +337,7 @@ export const DOCS: DocEntry[] = [
   // Oracles (3)
   {
     title: 'LuminaOracleV2.sol',
-    description: 'EIP-712 signed price proofs from the off-chain signer. Verifies signatures against the trusted oracleKey. The 9 V5.1 shields call verifyPriceProofEIP712 here in their _doVerifyAndCalculate path. Replaces the pre-launch MockShieldOracle.',
+    description: 'EIP-712 signed price proofs from the off-chain signer. Verifies signatures against the trusted oracleKey. The 6 V5.3 shields (3 Flash BTC + 3 Flash ETH) call verifyPriceProofEIP712 here in their _doVerifyAndCalculate path. Replaces the pre-launch MockShieldOracle.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/oracles/LuminaOracleV2.sol',
     category: 'source',
@@ -289,75 +383,62 @@ export const DOCS: DocEntry[] = [
     category: 'source',
   },
 
-  // Products / Shields (10)
+  // Products / Shields (8: 1 slim base + 1 adapter + 6 shields)
   {
-    title: 'BaseShield.sol',
-    description: 'Abstract base for every shield product. Holds shared payout, pause, and replay-protection logic.',
+    title: 'BaseFlashShield.sol',
+    description: 'Slim abstract base for every Flash shield. Holds shared payout, pause, replay-protection, sequencer L2 uptime check, and strike-spot snapshot logic.',
     repo: 'LUMINA-PROTOCOL',
-    path: 'src/products/BaseShield.sol',
+    path: 'src/products/BaseFlashShield.sol',
     category: 'source',
   },
   {
+    title: 'FlashShieldAdapter.sol',
+    description: 'UUPS adapter sitting between PolicyManagerV2 and each BaseFlashShield. One adapter is deployed per shield (6 total on V5.3) — upgrade path stays per-product.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'src/products/FlashShieldAdapter.sol',
+    category: 'source',
+    badge: 'new',
+  },
+  {
     title: 'FlashBTCShield1h.sol',
-    description: 'Flash crash protection for BTC over a 1-hour window. Triggers on % drop vs reference price.',
+    description: 'Flash crash protection for BTC over a 1-hour window. Triggers at -2.5% vs strike spot snapshot.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/products/FlashBTCShield1h.sol',
     category: 'source',
   },
   {
-    title: 'FlashBTCShield4h.sol',
-    description: 'Flash crash protection for BTC over a 4-hour window.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'src/products/FlashBTCShield4h.sol',
-    category: 'source',
-  },
-  {
     title: 'FlashBTCShield24h.sol',
-    description: 'Flash crash protection for BTC over a 24-hour window.',
+    description: 'Flash crash protection for BTC over a 24-hour window. Triggers at -6% vs strike spot snapshot.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/products/FlashBTCShield24h.sol',
     category: 'source',
   },
   {
     title: 'FlashBTCShield48h.sol',
-    description: 'Flash crash protection for BTC over a 48-hour window.',
+    description: 'Flash crash protection for BTC over a 48-hour window. Triggers at -10% vs strike spot snapshot.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/products/FlashBTCShield48h.sol',
     category: 'source',
   },
   {
     title: 'FlashETHShield1h.sol',
-    description: 'Flash crash protection for ETH over a 1-hour window.',
+    description: 'Flash crash protection for ETH over a 1-hour window. Triggers at -4% vs strike spot snapshot.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/products/FlashETHShield1h.sol',
     category: 'source',
   },
   {
     title: 'FlashETHShield24h.sol',
-    description: 'Flash crash protection for ETH over a 24-hour window.',
+    description: 'Flash crash protection for ETH over a 24-hour window. Triggers at -8.5% vs strike spot snapshot.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/products/FlashETHShield24h.sol',
     category: 'source',
   },
   {
     title: 'FlashETHShield48h.sol',
-    description: 'Flash crash protection for ETH over a 48-hour window.',
+    description: 'Flash crash protection for ETH over a 48-hour window. Triggers at -14% vs strike spot snapshot.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/products/FlashETHShield48h.sol',
-    category: 'source',
-  },
-  {
-    title: 'MicroDepegShield.sol',
-    description: 'Micro-depeg protection for USDT (and similar). Triggers on small but sustained price deviation.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'src/products/MicroDepegShield.sol',
-    category: 'source',
-  },
-  {
-    title: 'RateShockShield.sol',
-    description: 'Rate-shock protection — triggers when Aave V3 USDC borrow rate exceeds 10% APY.',
-    repo: 'LUMINA-PROTOCOL',
-    path: 'src/products/RateShockShield.sol',
     category: 'source',
   },
 
@@ -380,31 +461,39 @@ export const DOCS: DocEntry[] = [
   // ─── 🔐 ARCHITECTURE & INTEGRATIONS ──────────────────────────
   {
     title: 'Aave V3 integration',
-    description: 'How V5.1 uses Aave V3 read-only as price oracle (RateShockShield + FounderVesting Condition C). NOT for yield.',
+    description: 'How Lumina uses Aave V3 read-only as a price oracle input for FounderVesting unlock paths. NOT for yield.',
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/architecture/AAVE-INTEGRATION.md',
+    category: 'contracts',
+  },
+  {
+    title: 'Cross-contract integration map',
+    description: 'How the 6 V5.3 shields (via FlashShieldAdapter), BondVault, ClaimBond, and CoverRouter connect. Auditor reference.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/audit/v5.3/30-cross-contract/01-INTEGRATION-MAP.md',
     category: 'contracts',
     badge: 'new',
   },
   {
-    title: 'Cross-contract integration map',
-    description: 'How the 9 shields, BondVault, ClaimBond, and CoverRouterV2 connect. Auditor reference.',
+    title: 'Adapter pattern (V5.3)',
+    description: 'PolicyManagerV2 → FlashShieldAdapter (UUPS) → BaseFlashShield slim. One adapter per shield keeps the upgrade surface bounded and per-product.',
     repo: 'LUMINA-PROTOCOL',
-    path: 'docs/audit/v5.1-uups/30-cross-contract/01-INTEGRATION-MAP.md',
+    path: 'docs/architecture/ADAPTER-PATTERN.md',
     category: 'contracts',
+    badge: 'new',
   },
   {
     title: 'Aave audit chapter',
-    description: 'Audit deep-dive on the Aave V3 integration. Covers manipulation surfaces and 2-of-3 mitigation in FounderVesting.',
+    description: 'Audit deep-dive on the Aave V3 integration. Covers manipulation surfaces and the FounderVesting unlock-path mitigations.',
     repo: 'LUMINA-PROTOCOL',
-    path: 'docs/audit/v5.1-uups/12-aave-integration/REPORT.md',
+    path: 'docs/audit/v5.3/12-aave-integration/REPORT.md',
     category: 'contracts',
   },
 
   // ─── 🛡️ SECURITY & AUDITS ────────────────────────────────────
   {
     title: 'Security policy',
-    description: 'Reporting process, scope, bug bounty, V5.1 contracts in scope (single BondVault + 9 shields), Aave dependency.',
+    description: 'Reporting process, scope, bug bounty, V5.3 contracts in scope (single BondVault + 6 Flash shields behind FlashShieldAdapter), Aave dependency.',
     repo: 'LUMINA-PROTOCOL',
     path: 'SECURITY.md',
     category: 'security',
@@ -412,7 +501,7 @@ export const DOCS: DocEntry[] = [
   },
   {
     title: 'Security audit V5',
-    description: 'Latest internal audit report covering V5.1 architecture (renamed from SECURITY-AUDIT-V4 — content was already V5.1).',
+    description: 'Latest internal audit report covering the V5.x architecture, rolled forward through the V5.3 adapter-pattern redeploy.',
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/SECURITY-AUDIT-V5.md',
     category: 'security',
@@ -507,7 +596,7 @@ export const DOCS: DocEntry[] = [
   },
 
   // ─── 📊 TOKENOMICS & ECONOMICS ───────────────────────────────
-  // Every entry here links to the canonical V5.1 source: contract code
+  // Every entry here links to the canonical V5.3 source: contract code
   // for things that are code, audit chapters for things that are
   // analysis. No README anchors, no ROADMAP detours. If a number on the
   // /docs page disagrees with these source files, the source wins.
@@ -534,14 +623,14 @@ export const DOCS: DocEntry[] = [
   },
   {
     title: 'Premium formula',
-    description: 'CoverRouterV2.purchasePolicy: premium = coverage × payoutRatioBps × triggerProbBps × marginBps / 10000³, with a 1-unit USDC ($0.000001) floor.',
+    description: 'CoverRouter.purchasePolicy: premium = coverage × payoutRatioBps × marginBps / 10000² (marginBps = 20000 → 2.00x), with a 1-unit USDC ($0.000001) floor. Deductible 20%, payout 80% of coverage.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/core/CoverRouterV2.sol#L200-L203',
     category: 'economics',
   },
   {
-    title: 'Founder vesting (8M LUMINA)',
-    description: 'All FounderVesting constants: 8M total, 3 tranches every 31 days, 2-of-3 oracle conditions sustained 7 days (ETH/BTC > 0.050, ETH > $4k, Aave borrow > 7%), 1460-day fallback.',
+    title: 'Founder vesting V2 (8M LUMINA)',
+    description: 'FounderVesting V2 unlocks via 3 paths: PATH1 (2-of-3 AltSeason oracle conditions sustained 1 day), PATH2 (ETH > $5,000 sustained 1 day), PATH3 (3-year fallback).',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/token/FounderVesting.sol#L43-L51',
     category: 'economics',
@@ -568,10 +657,17 @@ export const DOCS: DocEntry[] = [
     category: 'economics',
   },
   {
-    title: 'Premium math — edge cases (audit)',
-    description: 'Audit deep-dive on the premium formula: rounding behavior, integer overflow surfaces, BPS-cube precision loss. Companion analysis to the on-chain formula above.',
+    title: 'BondVault redemption throttle',
+    description: 'FIFO queue per epoch with a 1.08% per-week cap on principal exit. Smooths catastrophic-scenario outflows without freezing redemptions.',
     repo: 'LUMINA-PROTOCOL',
-    path: 'docs/audit/v5.1-uups/05-math-edge-cases/REPORT.md',
+    path: 'src/bonds/BondVault.sol',
+    category: 'economics',
+  },
+  {
+    title: 'Premium math — edge cases (audit)',
+    description: 'Audit deep-dive on the premium formula: rounding behavior, integer overflow surfaces, BPS-square precision loss. Companion analysis to the on-chain formula above.',
+    repo: 'LUMINA-PROTOCOL',
+    path: 'docs/audit/v5.3/05-math-edge-cases/REPORT.md',
     category: 'economics',
   },
 
@@ -587,7 +683,7 @@ export const DOCS: DocEntry[] = [
   // ─── 📜 HISTORICAL ───────────────────────────────────────────
   {
     title: 'Changelog',
-    description: 'Version-by-version change log. Older entries reference V1/V2/V4 by design — current architecture is V5.1.',
+    description: 'Version-by-version change log. Older entries reference V1/V2/V4/V5.1 by design — current architecture is V5.3 (adapter pattern, 6 Flash shields).',
     repo: 'LUMINA-PROTOCOL',
     path: 'CHANGELOG.md',
     category: 'historical',

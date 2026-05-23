@@ -84,8 +84,11 @@ export default function SkillsPage() {
               What you (or your <em>agent</em>) can do.
             </h1>
             <p className="rd-lede">
-              Every skill maps to a real contract function or REST endpoint. Click any card to jump
-              to the source on GitHub. {todoCount > 0 && `${todoCount} skills marked "doc pending" — fallback to repo README.`}
+              Every skill maps to a real contract function or REST endpoint on Lumina Protocol{' '}
+              <strong>V5.3</strong> (6 Flash shields live on Base Sepolia, served by{' '}
+              <code style={{ fontFamily: 'var(--font-jetbrains), monospace' }}>@lumina-org/sdk@0.6.0</code>).
+              Click any card to jump to the source on GitHub.{' '}
+              {todoCount > 0 && `${todoCount} skills marked "doc pending" — fallback to repo README.`}
             </p>
           </div>
         </header>
@@ -165,6 +168,9 @@ export default function SkillsPage() {
             </span>
           </a>
         </section>
+
+        {/* SDK Quick-Start */}
+        <SdkQuickStart />
 
         {/* Filters */}
         <section className="wrap" style={{ padding: '32px 32px 16px' }}>
@@ -321,6 +327,165 @@ function FilterGroup<T extends string>({
         )
       })}
     </div>
+  )
+}
+
+const SDK_SNIPPETS: { label: string; code: string }[] = [
+  {
+    label: 'Install',
+    code: `npm install @lumina-org/sdk@^0.6.0
+# or: pnpm add @lumina-org/sdk@^0.6.0
+# or: yarn add @lumina-org/sdk@^0.6.0`,
+  },
+  {
+    label: 'Init + runtime address resolution',
+    code: `import { LuminaClient } from '@lumina-org/sdk'
+
+const lumina = new LuminaClient({
+  apiKey: process.env.LUMINA_API_KEY!, // 'lumina_...'
+  apiUrl: 'https://lumina-api-production-ac85.up.railway.app',
+})
+
+// 0.5.2+ resolves contract addresses at runtime via GET /health.
+// Memoized after first call; fresh-fetched on failure.
+const contracts = await lumina.getContracts()
+// → { coverRouter, policyManager, bondVault, claimBond,
+//     marketplace, usdc, luminaToken }`,
+  },
+  {
+    label: 'Purchase a policy',
+    code: `// productName ∈ FLASHBTC1H-001 | FLASHBTC24-001 | FLASHBTC48-001
+//                | FLASHETH1H-001 | FLASHETH24-001 | FLASHETH48-001
+const policy = await lumina.policies.purchase({
+  productName: 'FLASHBTC1H-001',
+  coverageUSD: 100,                  // $100 minimum
+  // walletPrivateKey: '0x...',      // optional — relayer covers gas
+})
+console.log('policyId =', policy.policyId)`,
+  },
+  {
+    label: 'List + redeem your bonds',
+    code: `// Wallet auto-resolved from /auth/me when not provided.
+const myBonds = await lumina.bonds.list()
+for (const b of myBonds) {
+  if (b.matured) {
+    await lumina.bonds.redeem({ epochId: b.epochId, usdAmount: b.usdAmount })
+  }
+}`,
+  },
+  {
+    label: 'Marketplace (list / buy / cancel)',
+    code: `// Approve once, then list at a discount to face value.
+await lumina.marketplace.approveBonds()
+const listing = await lumina.marketplace.list({
+  epochId: 202805,
+  amount: 100,        // 100 bond tokens ($100 face value)
+  priceUSDC: 92,      // 8% discount
+})
+
+// Discover live listings (any wallet)
+const all = await lumina.marketplace.list({})
+
+// Buy at the listed price (3% fee → TWAPBurner, 100% burned).
+await lumina.marketplace.approve()
+await lumina.marketplace.buy({ listingId: listing.id })
+
+// Or cancel before someone buys it.
+await lumina.marketplace.cancel({ listingId: listing.id })`,
+  },
+]
+
+function SdkQuickStart() {
+  const [tab, setTab] = useState(0)
+  const snippet = SDK_SNIPPETS[tab]
+  return (
+    <section className="wrap" style={{ padding: '32px 32px 0' }}>
+      <div
+        style={{
+          border: '1px solid var(--rd-line)',
+          borderRadius: 10,
+          background: 'var(--rd-surface)',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 16,
+            padding: '14px 18px',
+            borderBottom: '1px solid var(--rd-line)',
+            background: 'var(--rd-surface-2)',
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontFamily: 'var(--font-jetbrains), monospace',
+                fontSize: 10,
+                color: 'var(--rd-text-3)',
+                letterSpacing: '0.1em',
+                marginBottom: 4,
+                textTransform: 'uppercase',
+              }}
+            >
+              SDK · @lumina-org/sdk · v0.6.0 (V5.3)
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: 'var(--rd-text)',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Three-line quick-start for the most common skills
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {SDK_SNIPPETS.map((s, i) => {
+              const isOn = i === tab
+              return (
+                <button
+                  key={s.label}
+                  onClick={() => setTab(i)}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: 4,
+                    fontSize: 11,
+                    background: isOn ? 'var(--rd-accent-dim)' : 'transparent',
+                    color: isOn ? 'var(--rd-accent)' : 'var(--rd-text-3)',
+                    border: `1px solid ${isOn ? 'var(--rd-accent)' : 'var(--rd-line)'}`,
+                    fontFamily: 'var(--font-jetbrains), monospace',
+                    cursor: 'pointer',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {s.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        <pre
+          style={{
+            margin: 0,
+            padding: 18,
+            background: 'var(--rd-bg-2, var(--rd-surface))',
+            color: 'var(--rd-text)',
+            fontFamily: 'var(--font-jetbrains), monospace',
+            fontSize: 12.5,
+            lineHeight: 1.6,
+            overflowX: 'auto',
+            whiteSpace: 'pre',
+          }}
+        >
+          <code>{snippet.code}</code>
+        </pre>
+      </div>
+    </section>
   )
 }
 

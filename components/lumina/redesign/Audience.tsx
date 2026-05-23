@@ -4,7 +4,7 @@ const AUDIENCES = [
   {
     role: 'For humans',
     title: 'Speculators',
-    body: 'Connect a wallet. Browse 9 products. Pay a premium in USDC. If the trigger fires, you receive a ClaimBond — sell early or hold to maturity.',
+    body: 'Connect a wallet. Browse six flash products. Pay a premium in USDC. If the trigger fires, you receive a ClaimBond — sell early or hold to maturity.',
     cta: 'Read the guide',
     href: '/tutorial?mode=human',
   },

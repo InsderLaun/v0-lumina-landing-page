@@ -7,14 +7,15 @@
 // NEVER hardcode protocol data anywhere else.
 //
 // [Audit #35 CHAIN-1] Migrated from Base Mainnet (V1/V2) to
-// Base Sepolia (V5.1, deploy 2026-04-27). The protocol shape
-// also changed: V5.1 has a SINGLE BondVault (not 5 named vaults)
-// and 9 shield products (FlashBTC×4 + FlashETH×3 + MicroDepeg
-// + RateShock). The legacy 5-vault and 5-shield UI keys are
-// kept as aliases so existing components continue to compile;
-// they all point at the closest V5.1 equivalent (or BondVault
-// for vault-shaped UI). A future PR should redesign the
-// "My Vaults" UX around the V5.1 primitives.
+// Base Sepolia. Currently on V5.3 (Sprint T-30c deploy 2026-05-21):
+// 6 active flash products (FlashBTC × 3 + FlashETH × 3) wired
+// through FlashShieldAdapter UUPS proxies. V5.1 legacy products
+// (FlashBTC4h, MicroDepeg USDT, RateShock) are retired or paused
+// and their address fields here retain zero placeholders so
+// existing UI imports keep compiling; the user-facing surfaces
+// no longer reference them. A future PR can drop the legacy keys
+// entirely once all downstream imports migrate to `useShields()`
+// or `lib/operate/products.ts`.
 // ════════════════════════════════════════════════════════════
 
 export const CHAIN = {
@@ -124,7 +125,7 @@ export const CONTRACTS = {
     Depeg:   "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → MICRODEPEG-001
     ILIndex: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → RATESHOCK-001 (closest)
     Exploit: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → RATESHOCK-001
-    // V5.1 canonical 9 shields
+    // V5.3 canonical 6 flash shields + legacy zero placeholders
     FlashBTC1h:  "0x06ED1ffB6bA493c036472bf1C58EC9301B5A2363" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
     FlashBTC4h:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — not in V5.3 T-30c bundle
     FlashBTC24h: "0x9E4C1E799AA41a36ae074768b33198b9D8aCC173" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)

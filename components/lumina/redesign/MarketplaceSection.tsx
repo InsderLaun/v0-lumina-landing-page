@@ -8,8 +8,13 @@ const OPERATE_URL = '/app/human/marketplace'
 const DOCS_URL = 'https://docs.lumina-org.com/concepts/marketplace'
 
 const SNIPPET = `import { LuminaClient } from '@lumina-org/sdk';
-const lumina = new LuminaClient({ apiKey });
-const listings = await lumina.marketplace.listings();`
+const lumina = new LuminaClient({ apiKey }); // sdk v0.6.0 (V5.3)
+// Resolve addresses at runtime from /health (incl. Marketplace, ClaimBond)
+const { marketplace, claimBond } = await lumina.getContracts();
+// List your matured / pre-matured bonds for sale
+await lumina.marketplace.list({ epochId, amount, priceUSDC });
+// Or browse open listings
+const open = await lumina.marketplace.myListings();`
 
 export function toNum(v: string | number | null | undefined): number {
   if (v === null || v === undefined) return 0
@@ -73,8 +78,8 @@ export function MarketplaceSection() {
           Trade <em>bonds</em> before maturity.
         </h2>
         <p className="rd-sec-lede">
-          Sellers exit early with USDC. Buyers acquire bonds at discount, redeemed in $LUMINA at
-          730d.
+          Sellers exit early in USDC. Buyers acquire bonds at discount, redeemed in $LUMINA at
+          730d. ERC-1155 transfers; bonds from all six V5.3 flash products are tradeable.
         </p>
 
         <div
@@ -182,7 +187,7 @@ export function MarketplaceSection() {
             letterSpacing: '0.04em',
           }}
         >
-          Marketplace 0xfaC5…Be6E (Base Sepolia) · 1.5% maker + 1.5% taker · min $1/unit
+          Marketplace 0x0938…4345 (Base Sepolia · V5.3) · USDC settlement · 2% protocol fee burned · min $1/unit
         </p>
       </div>
     </section>

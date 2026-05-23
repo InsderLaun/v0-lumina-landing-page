@@ -99,14 +99,14 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p class="cover-subtitle">Parametric on-chain insurance for autonomous AI agents and humans. Premiums burn $LUMINA. Triggers mint zero-coupon ClaimBonds. Settled by Chainlink-grade oracles.</p>
     <div class="cover-divider"></div>
     <div class="cover-meta">
-      <strong>Whitepaper</strong> &middot; English &middot; 2026-05-06<br>
+      <strong>Whitepaper</strong> &middot; English &middot; v5.3 &middot; 2026-05-22<br>
       Network: <strong>Base Sepolia</strong> (chainId 84532) &middot; Mainnet pending<br>
       <a href="https://github.com/org-lumina">github.com/org-lumina</a>
     </div>
     <div class="cover-badges">
-      <span class="cover-badge">9 Shields Live</span>
+      <span class="cover-badge">6 Flash Shields Live</span>
       <span class="cover-badge">100M Fixed Supply</span>
-      <span class="cover-badge">EIP-712 Oracle</span>
+      <span class="cover-badge">Chainlink Oracle</span>
       <span class="cover-badge">Open Source</span>
     </div>
   </div>
@@ -122,7 +122,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
       <li class="toc-item"><span class="toc-number">01</span><a class="toc-label" href="#sec-1">Executive Summary</a></li>
       <li class="toc-item"><span class="toc-number">02</span><a class="toc-label" href="#sec-2">Introduction</a></li>
       <li class="toc-item"><span class="toc-number">03</span><a class="toc-label" href="#sec-3">Protocol Architecture</a></li>
-      <li class="toc-item"><span class="toc-number">04</span><a class="toc-label" href="#sec-4">Insurance Products — the 9 Shields</a></li>
+      <li class="toc-item"><span class="toc-number">04</span><a class="toc-label" href="#sec-4">Insurance Products — the 6 Flash Shields</a></li>
       <li class="toc-item"><span class="toc-number">05</span><a class="toc-label" href="#sec-5">Pricing &amp; Premium Model</a></li>
       <li class="toc-item"><span class="toc-number">06</span><a class="toc-label" href="#sec-6">BondVault, ClaimBond &amp; Maturity</a></li>
       <li class="toc-item"><span class="toc-number">07</span><a class="toc-label" href="#sec-7">Oracle &amp; Verification</a></li>
@@ -153,13 +153,13 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>Lumina Protocol is a <strong>parametric on-chain insurance system</strong> deployed on Base. It pays out automatically when an oracle confirms a measurable event — a price drop, a stablecoin depeg, a sustained borrow-rate spike — without claims adjusters, voting, or human intervention.</p>
     <p>The protocol is built around four primitives:</p>
     <ul>
-      <li><strong>9 parametric Shields</strong> covering BTC and ETH flash crashes (1h, 4h, 24h, 48h windows), USDT micro-depegs, and Aave V3 USDC borrow-rate shocks.</li>
-      <li><strong>A single, immutable BondVault</strong> holding 70&nbsp;million $LUMINA as the protocol's reserve. When a policy triggers, the buyer receives <strong>ClaimBonds</strong> — ERC-1155 zero-coupon bonds with a fixed face value of $1 each, redeemable for $LUMINA at maturity (730 days).</li>
+      <li><strong>6 parametric Flash Shields</strong> covering BTC and ETH flash crashes across three windows each (1h, 24h, 48h). Strike snapshot is the spot price at <code>createPolicy</code> and triggers fire when the asset drops by the configured threshold from that strike.</li>
+      <li><strong>A single, immutable BondVault</strong> holding 70&nbsp;million $LUMINA as the protocol's reserve. When a policy triggers, the buyer receives <strong>ClaimBonds</strong> — ERC-1155 zero-coupon bonds with a fixed face value of $1 each, redeemable for $LUMINA at maturity (730 days). Payout is 80% of cover (deductible 20%, <code>DEDUCTIBLE_BPS = 2000</code>).</li>
       <li><strong>A deflationary token (LUMINA, 100M fixed supply)</strong>. Every USDC premium and every secondary-market trading fee is routed through the <em>TWAPBurner</em>, which buys $LUMINA on Uniswap V3 and burns it to <code>0xdead</code>. There is no mint function.</li>
       <li><strong>A relayer-paid API</strong> that lets autonomous AI agents purchase, redeem, and trade policies via a single signed HTTP call — without holding ETH for gas.</li>
     </ul>
-    <p>The current architecture is <strong>fully operational</strong> on Base Sepolia: nine shields are live and active, premiums flow into the burner, the marketplace is open, the EIP-712 oracle (LuminaOracleV2) verifies signed price proofs, and a self-service onboarding endpoint lets agents mint API keys with a single wallet signature.</p>
-    <p>This whitepaper documents what is deployed today. Forward-looking statements are confined to <a href="#sec-13">Section 14 (Roadmap)</a> and <a href="#sec-14">Section 15 (Risks)</a>. Every numeric claim, contract address, and function signature is grounded in the protocol source code and the live <code>/health</code> endpoint of the production API.</p>
+    <p>The current architecture is <strong>fully operational</strong> on Base Sepolia: six Flash Shields are live, premiums flow into the burner, the marketplace is open (2% fee burn, USDC settlement), the Chainlink-backed oracle (BTC/USD + ETH/USD) feeds shields via the <code>FlashShieldAdapter</code> UUPS bridge, and a self-service onboarding endpoint lets agents mint API keys with a single wallet signature.</p>
+    <p>This whitepaper documents what is deployed today on V5.3. Forward-looking statements are confined to <a href="#sec-13">Section 14 (Roadmap)</a> and <a href="#sec-14">Section 15 (Risks)</a>. Every numeric claim, contract address, and function signature is grounded in the protocol source code and the live <code>/health</code> endpoint of the production API.</p>
   </div>
 </section>
 
@@ -197,7 +197,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
           <tr><td>Token</td><td><code>LuminaTokenV2</code> &middot; <code>FounderVesting</code> &middot; <code>TreasuryVesting</code></td><td>Fixed-supply ERC-20, founder lock with AltSeason gates, treasury drip</td></tr>
           <tr><td>Bonds</td><td><code>BondVault</code> &middot; <code>ClaimBond</code></td><td>Single 70M reserve; ERC-1155 zero-coupon bonds, $1 face, 730d maturity</td></tr>
           <tr><td>Core</td><td><code>CoverRouterV2</code> &middot; <code>PolicyManagerV2</code> &middot; <code>TWAPBurner</code> &middot; <code>AdaptiveFeeDistributor</code></td><td>Buy / redeem / cancel; premium math; routes 100% of premiums to burn</td></tr>
-          <tr><td>Products</td><td><code>BaseShield</code> + 9 shield implementations</td><td>One contract per parametric trigger; UUPS proxies</td></tr>
+          <tr><td>Products</td><td><code>BaseFlashShield</code> + 6 Flash shield implementations behind <code>FlashShieldAdapter</code></td><td>One contract per BTC/ETH trigger window; UUPS proxies; adapter bridges to the legacy <code>IShieldV2</code> surface</td></tr>
           <tr><td>Marketplace</td><td><code>LuminaBondMarketplace</code> &middot; <code>BuybackEngine</code></td><td>Secondary trading of ClaimBonds; commit-reveal MEV protection</td></tr>
           <tr><td>Oracles &amp; automation</td><td><code>LuminaOracleV2</code> &middot; <code>CapacityOracle</code> &middot; <code>SolvencyOracle</code> &middot; <code>ShieldKeeper</code></td><td>EIP-712 signed proofs; LUMINA TWAP price; 125% solvency floor; trigger automation</td></tr>
         </tbody>
@@ -241,58 +241,60 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
      ═════════════════════════════════════════════════════════════════ -->
 <section class="section" id="sec-4">
   <div class="container">
-    <h2>4. Insurance Products — the 9 Shields</h2>
-    <p>Lumina deploys nine parametric products. Each is a UUPS proxy inheriting from <code>BaseShield</code>; each verifies its own trigger condition inside <code>_doVerifyAndCalculate</code>. The on-chain product registry uses canonical names of the form <code>FLASHBTC1H-001</code> &mdash; the <code>productId</code> a caller passes is <code>keccak256(canonicalName)</code>.</p>
+    <h2>4. Insurance Products — the 6 Flash Shields</h2>
+    <p>Lumina V5.3 ships six parametric Flash products: three BTC drawdown windows and three ETH drawdown windows. Each shield is a UUPS proxy inheriting from <code>BaseFlashShield</code>; each verifies its own trigger condition inside <code>_doVerifyAndCalculate</code>. The on-chain product registry uses canonical names of the form <code>FLASHBTC1H-001</code> &mdash; the <code>productId</code> a caller passes is <code>keccak256(canonicalName)</code>.</p>
+    <p>The <code>FlashShieldAdapter</code> (UUPS) is a bridge contract: it exposes the slim T-30a Flash shields through the legacy <code>IShieldV2</code> surface that <code>PolicyManagerV2</code> still calls, so the new shields plug into the existing core without redeploying it.</p>
 
-    <h3>4.1 Flash Crash Shields (BTC, 4 windows)</h3>
-    <p>Pay out when BTC's spot price drops at least 5% (1h variant) up to 15% (48h variant) within a rolling time window. Each variant has its own threshold and observation window:</p>
+    <h3>4.1 Flash Crash Shields (BTC, 3 windows)</h3>
+    <p>Pay out when BTC's spot price drops from the <strong>strike snapshot taken at <code>createPolicy</code></strong> by the configured threshold inside the policy window. Premium is quoted per $1,000 of cover (payout = $800 LUMINA per $1,000 cover after the 20% deductible).</p>
     <div class="table-wrap"><table>
-      <thead><tr><th>Shield</th><th>Trigger</th><th>Canonical name</th><th>asset literal</th></tr></thead>
+      <thead><tr><th>Shield</th><th>Trigger</th><th>Window</th><th>Premium / $1k</th><th>Canonical name</th></tr></thead>
       <tbody>
-        <tr><td>FlashBTC 1h</td><td>BTC &minus;5% / 1h</td><td><code>FLASHBTC1H-001</code></td><td><code>"BTC"</code></td></tr>
-        <tr><td>FlashBTC 4h</td><td>BTC &minus;8% / 4h</td><td><code>FLASHBTC4H-001</code></td><td><code>"BTC"</code></td></tr>
-        <tr><td>FlashBTC 24h</td><td>BTC &minus;10% / 24h</td><td><code>FLASHBTC24-001</code></td><td><code>"BTC"</code></td></tr>
-        <tr><td>FlashBTC 48h</td><td>BTC &minus;15% / 48h</td><td><code>FLASHBTC48-001</code></td><td><code>"BTC"</code></td></tr>
+        <tr><td>Flash BTC 1h</td><td>BTC &minus;2.5% from strike</td><td>1h</td><td>$2.92</td><td><code>FLASHBTC1H-001</code></td></tr>
+        <tr><td>Flash BTC 24h</td><td>BTC &minus;6% from strike</td><td>24h</td><td>$52.60</td><td><code>FLASHBTC24-001</code></td></tr>
+        <tr><td>Flash BTC 48h</td><td>BTC &minus;10% from strike</td><td>48h</td><td>$148.67</td><td><code>FLASHBTC48-001</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Shield</th><th>Adapter address (Base Sepolia)</th></tr></thead>
+      <tbody>
+        <tr><td>Flash BTC 1h</td><td><code>0x5fC732D28c09DfcA2e7eF0AAd6C9491c8474eAdB</code></td></tr>
+        <tr><td>Flash BTC 24h</td><td><code>0x844A5fDb3C910DC33Eb720fDB5387C3d55eC867d</code></td></tr>
+        <tr><td>Flash BTC 48h</td><td><code>0x0840d638a3E79919afE3b1AB589E6D4b5E8C45Bb</code></td></tr>
       </tbody>
     </table></div>
 
     <h3>4.2 Flash Crash Shields (ETH, 3 windows)</h3>
     <div class="table-wrap"><table>
-      <thead><tr><th>Shield</th><th>Trigger</th><th>Canonical name</th><th>asset literal</th></tr></thead>
+      <thead><tr><th>Shield</th><th>Trigger</th><th>Window</th><th>Premium / $1k</th><th>Canonical name</th></tr></thead>
       <tbody>
-        <tr><td>FlashETH 1h</td><td>ETH &minus;7% / 1h</td><td><code>FLASHETH1H-001</code></td><td><code>"ETH"</code></td></tr>
-        <tr><td>FlashETH 24h</td><td>ETH &minus;12% / 24h</td><td><code>FLASHETH24-001</code></td><td><code>"ETH"</code></td></tr>
-        <tr><td>FlashETH 48h</td><td>ETH &minus;18% / 48h</td><td><code>FLASHETH48-001</code></td><td><code>"ETH"</code></td></tr>
+        <tr><td>Flash ETH 1h</td><td>ETH &minus;4% from strike</td><td>1h</td><td>$1.68</td><td><code>FLASHETH1H-001</code></td></tr>
+        <tr><td>Flash ETH 24h</td><td>ETH &minus;8.5% from strike</td><td>24h</td><td>$45.80</td><td><code>FLASHETH24-001</code></td></tr>
+        <tr><td>Flash ETH 48h</td><td>ETH &minus;14% from strike</td><td>48h</td><td>$123.01</td><td><code>FLASHETH48-001</code></td></tr>
+      </tbody>
+    </table></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Shield</th><th>Adapter address (Base Sepolia)</th></tr></thead>
+      <tbody>
+        <tr><td>Flash ETH 1h</td><td><code>0xeC42c7169B4D80F4D8A113607367F75c2df02935</code></td></tr>
+        <tr><td>Flash ETH 24h</td><td><code>0xb0f143beF75F32BcAB569766e9159366f8fD69C4</code></td></tr>
+        <tr><td>Flash ETH 48h</td><td><code>0x26db224D3Ddc00F4bFcF8ab26A92B9f7c81A47E6</code></td></tr>
       </tbody>
     </table></div>
 
-    <h3>4.3 Micro Depeg Shield (USDT)</h3>
-    <p>Pays out if USDT's spot price stays below $0.995 for 7 consecutive days. Useful for stablecoin yield strategies that cannot rebalance fast enough during a tail-event depeg.</p>
-    <ul>
-      <li>Canonical name: <code>MICRODEPEG-001</code></li>
-      <li>Asset literal: <code>"USDT"</code></li>
-      <li>Duration: 7 days (<code>604800s</code>)</li>
-    </ul>
-
-    <h3>4.4 Rate Shock Shield</h3>
-    <p>Pays out if the Aave V3 USDC variable borrow rate exceeds 10% APY for 7 consecutive days. Designed for leveraged strategies that depend on cheap stablecoin borrow.</p>
-    <ul>
-      <li>Canonical name: <code>RATESHOCK-001</code></li>
-      <li>Asset literal: <code>"USDC"</code></li>
-      <li>Trigger source: <code>aavePool.getReserveData(USDC).currentVariableBorrowRate &gt; 7e25</code> (10% APY in RAY format)</li>
-      <li>Aave is read-only; the protocol never deposits or borrows against Aave.</li>
-    </ul>
-
-    <h3>4.5 Common parameters (all shields)</h3>
+    <h3>4.3 Common parameters (all shields)</h3>
     <div class="table-wrap"><table>
       <thead><tr><th>Parameter</th><th>Value</th><th>Source</th></tr></thead>
       <tbody>
-        <tr><td>Minimum cover</td><td>$100 USDC</td><td><code>BaseShield._minCoverage()</code></td></tr>
-        <tr><td>Payout ratio</td><td>80% of cover (8000 bps)</td><td><code>configureProduct(... 8000, ...)</code></td></tr>
+        <tr><td>Minimum cover</td><td>$100 USDC</td><td><code>BaseFlashShield._minCoverage()</code></td></tr>
+        <tr><td>Deductible</td><td>20% (<code>DEDUCTIBLE_BPS = 2000</code>)</td><td>Payout = $800 LUMINA per $1,000 cover</td></tr>
+        <tr><td>Margin</td><td>2.00&times; (<code>marginBps = 20000</code>) &mdash; effective multiplier ~1.60&times;</td><td><code>configureProduct(...)</code></td></tr>
+        <tr><td>Strike snapshot</td><td>Spot at <code>createPolicy</code></td><td><code>BaseFlashShield._strikeAt(...)</code></td></tr>
         <tr><td>Bond maturity</td><td>730 days from trigger</td><td><code>BondVault.BOND_MATURITY_SECONDS</code></td></tr>
-        <tr><td>Asset bytes32</td><td>right-padded UTF-8 of asset literal</td><td><code>_doVerifyAndCalculate</code></td></tr>
+        <tr><td>L2 sequencer check</td><td>active in <code>BaseFlashShield</code>; <code>address(0)</code> on Base Sepolia &rarr; no-op</td><td>Chainlink L2 Sequencer Uptime Feed (mainnet wiring)</td></tr>
       </tbody>
     </table></div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">Earlier V5.1 testnet builds also exposed a Flash BTC 4h window, a USDT Micro Depeg shield, and an Aave USDC Rate Shock shield. In V5.3 those products are not user-facing: the 4h BTC window was retired, the Micro Depeg product was dropped, and Rate Shock remains paused on-chain pending real-Aave wiring.</p>
   </div>
 </section>
 
@@ -304,40 +306,38 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 <section class="section" id="sec-5">
   <div class="container">
     <h2>5. Pricing &amp; Premium Model</h2>
-    <h3>5.1 Premium formula</h3>
-    <p>The premium is computed deterministically inside <code>CoverRouterV2.purchasePolicy</code>:</p>
+    <h3>5.1 Premium quote</h3>
+    <p>V5.3 publishes a flat premium per $1,000 of cover for each shield. The buyer-facing surface is:</p>
     <div class="formula">
-      premium = (cover &times; payoutRatioBps &times; triggerProbBps &times; marginBps) / 10000<sup>3</sup>
+      premium = cover &times; premiumPer1k / 1000
     </div>
-    <p>Where:</p>
+    <p>The protocol still applies a deterministic risk-loading inside the shield (<code>marginBps = 20000</code>, i.e. 2.00&times;) before the payout is computed; the published $/$1k figure already incorporates that loading. There is no probability factor exposed to callers &mdash; the buyer only ever needs to read the premium per $1k and the multiplier.</p>
     <ul>
       <li><strong>cover</strong> &mdash; the buyer's coverage amount in 6-decimal USDC base units.</li>
-      <li><strong>payoutRatioBps</strong> &mdash; what fraction of the cover pays out on a trigger (uniformly 8000 bps = 80%).</li>
-      <li><strong>triggerProbBps</strong> &mdash; the modeled probability the parametric event fires within the policy's window.</li>
-      <li><strong>marginBps</strong> &mdash; the protocol's risk loading (15-25% in current calibration).</li>
+      <li><strong>premiumPer1k</strong> &mdash; the canonical premium per $1,000 cover from <a href="#sec-4">Section 4</a>.</li>
+      <li><strong>payout on trigger</strong> &mdash; <code>cover &times; (10000 - DEDUCTIBLE_BPS) / 10000 = 80%</code> of cover (deductible 20%).</li>
+      <li><strong>marginBps</strong> &mdash; 20000 (effective economic multiplier ~1.60&times; after the 20% deductible is applied to the payout).</li>
     </ul>
     <p>If the formula evaluates to zero (very small covers), the contract floors the premium at <strong>1 micro-USDC</strong> ($0.000001).</p>
 
     <h3>5.2 Capacity check</h3>
     <p>Before recording a policy, <code>PolicyManagerV2</code> queries <code>BondVault.availableCapacityUSD()</code>. If the policy's potential payout would push the vault below its solvency floor (125% over outstanding obligations), the purchase reverts with <code>InsufficientCapacity</code>.</p>
     <p><strong>Capacity is computed on a 1-hour TWAP of LUMINA price</strong>, not the spot price. This anti-MEV safeguard prevents an attacker from manipulating spot to either deny coverage or force the protocol into thin reserves.</p>
+    <p>BondVault enforces an additional throttle on burns/redemptions: <strong>cap 1.08% per week, FIFO queue</strong>, so a single block cannot drain the reserve even if a large cohort triggers simultaneously.</p>
 
     <h3>5.3 Auto-pause circuit breaker</h3>
     <p>If the LUMINA TWAP price falls below 0.005 USD, <code>isProtocolAutoPaused()</code> returns true and new purchases revert. The breaker uses <strong>hysteresis</strong>: once tripped, it requires the price to recover above 0.008 USD (the <code>RESET_PRICE_FOR_NEW_POLICIES</code>) before re-arming. This avoids flapping near the threshold.</p>
 
-    <h3>5.4 Calibration table (current Sepolia)</h3>
+    <h3>5.4 Calibration table (current Sepolia, V5.3)</h3>
     <div class="table-wrap"><table>
-      <thead><tr><th>Shield</th><th>payoutBps</th><th>triggerProbBps</th><th>marginBps</th><th>durationSeconds</th></tr></thead>
+      <thead><tr><th>Shield</th><th>Window</th><th>Drop from strike</th><th>Premium / $1k</th><th>marginBps</th></tr></thead>
       <tbody>
-        <tr><td>FlashBTC 1h</td><td>8000</td><td>200</td><td>2500</td><td>3600</td></tr>
-        <tr><td>FlashBTC 4h</td><td>8000</td><td>150</td><td>2500</td><td>14400</td></tr>
-        <tr><td>FlashBTC 24h</td><td>8000</td><td>100</td><td>2500</td><td>86400</td></tr>
-        <tr><td>FlashBTC 48h</td><td>8000</td><td>80</td><td>2500</td><td>172800</td></tr>
-        <tr><td>FlashETH 1h</td><td>8000</td><td>200</td><td>2500</td><td>3600</td></tr>
-        <tr><td>FlashETH 24h</td><td>8000</td><td>100</td><td>2500</td><td>86400</td></tr>
-        <tr><td>FlashETH 48h</td><td>8000</td><td>80</td><td>2500</td><td>172800</td></tr>
-        <tr><td>MicroDepeg</td><td>8000</td><td>50</td><td>2500</td><td>604800</td></tr>
-        <tr><td>RateShock</td><td>8000</td><td>30</td><td>2500</td><td>604800</td></tr>
+        <tr><td>Flash BTC 1h</td><td>3600s</td><td>2.5%</td><td>$2.92</td><td>20000</td></tr>
+        <tr><td>Flash BTC 24h</td><td>86400s</td><td>6%</td><td>$52.60</td><td>20000</td></tr>
+        <tr><td>Flash BTC 48h</td><td>172800s</td><td>10%</td><td>$148.67</td><td>20000</td></tr>
+        <tr><td>Flash ETH 1h</td><td>3600s</td><td>4%</td><td>$1.68</td><td>20000</td></tr>
+        <tr><td>Flash ETH 24h</td><td>86400s</td><td>8.5%</td><td>$45.80</td><td>20000</td></tr>
+        <tr><td>Flash ETH 48h</td><td>172800s</td><td>14%</td><td>$123.01</td><td>20000</td></tr>
       </tbody>
     </table></div>
   </div>
@@ -380,15 +380,16 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 <section class="section" id="sec-7">
   <div class="container">
     <h2>7. Oracle &amp; Verification</h2>
-    <h3>7.1 LuminaOracleV2 (EIP-712)</h3>
-    <p>The shield oracle is <code>LuminaOracleV2.sol</code>, an EIP-712 verifier deployed at the address listed in <a href="#sec-A">Appendix A</a>. The oracle's domain separator is fixed at construction:</p>
+    <h3>7.1 LuminaOracleV2 (Chainlink-backed on Base Sepolia)</h3>
+    <p>The shield oracle is <code>LuminaOracleV2.sol</code> at <code>0x9bfa2f7A5098C89b8740D1694d1f716A0Bd871dD</code> (Base Sepolia). It reads live <strong>Chainlink BTC/USD and ETH/USD feeds</strong> directly &mdash; no off-chain EIP-712 signer is required on the path; the legacy EIP-712 verifier remains in the contract for backwards compatibility and for future feeds that lack a Chainlink aggregator.</p>
+    <p>The legacy EIP-712 envelope (kept for upgrade compatibility) is:</p>
     <div class="code-block">DOMAIN = {
   name: "LuminaOracle",   <span class="comment">// literal in the contract — NOT "LuminaOracleV2"</span>
   version: "2",
   chainId: block.chainid, <span class="comment">// captured at deploy: 84532 on Sepolia</span>
   verifyingContract: address(this),
 }</div>
-    <p>The off-chain signer reproduces this domain exactly. Any field mismatch yields a different <code>DOMAIN_SEPARATOR</code>, causing <code>verifyPriceProofEIP712</code> to recover the wrong signer and revert. This protects against cross-chain and cross-deployment replay.</p>
+    <p>For Flash BTC and Flash ETH the shield calls Chainlink's <code>latestRoundData()</code> path inside <code>FlashShieldAdapter</code>; the legacy EIP-712 path is only invoked when the asset has no native Chainlink feed.</p>
 
     <h3>7.2 PriceProof typed data</h3>
     <div class="code-block">PriceProof {
@@ -449,14 +450,14 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <h3>8.3 BURNER_ROLE</h3>
     <p>Only the <code>TWAPBurner</code> contract holds <code>BURNER_ROLE</code> on the token. This role allows <code>burnFrom</code> to be called on any address &mdash; necessary because the burner pulls $LUMINA from the protocol's intermediate buffers and burns it. <code>DEFAULT_ADMIN_ROLE</code> manages role assignments. Renouncing <code>DEFAULT_ADMIN_ROLE</code> permanently locks <code>BURNER_ROLE</code> management; the deployer should only renounce after the final TWAPBurner deployment is confirmed.</p>
 
-    <h3>8.4 FounderVesting (8M, AltSeason gates)</h3>
-    <p>The 8M founder allocation unlocks only when at least <strong>2 of 3 oracle-driven conditions hold for &ge; 7 consecutive days</strong>:</p>
+    <h3>8.4 FounderVesting V2 (8M, three independent paths)</h3>
+    <p>The 8M founder allocation unlocks via <strong>FounderVesting V2</strong>: three independent gates, first-to-trigger wins, then three tranches of ~3.333M each release every 31 days.</p>
     <ul>
-      <li><strong>A</strong> &mdash; ETH/BTC ratio &gt; 0.050 (<code>ETH_BTC_THRESHOLD</code>).</li>
-      <li><strong>B</strong> &mdash; ETH/USD price &gt; $4,000 (<code>ETH_USD_THRESHOLD</code>).</li>
-      <li><strong>C</strong> &mdash; Aave V3 USDC borrow rate &gt; 7% APY (<code>BORROW_RATE_THRESHOLD</code>).</li>
+      <li><strong>PATH 1</strong> &mdash; 2-of-3 AltSeason gates sustained for 1 day: (A) ETH/BTC ratio &gt; 0.050, (B) ETH/USD &gt; $4,000, (C) Aave V3 USDC borrow rate &gt; 7% APY.</li>
+      <li><strong>PATH 2</strong> &mdash; ETH/USD &gt; $5,000 sustained for 1 day (independent override of PATH 1).</li>
+      <li><strong>PATH 3</strong> &mdash; Time fallback: 1,095 days (3 years) from deploy. With deploy on 2026-05-14, the absolute backstop date is 2029-05-13.</li>
     </ul>
-    <p>Once triggered, three tranches of ~3.333M each unlock every 31 days. If conditions never trigger, a <strong>fallback at 1,460 days (4 years) from deploy</strong> releases the full amount &mdash; protecting the protocol from indefinite founder lockout without giving the founder an easy escape hatch.</p>
+    <p>FounderVesting V2 is deployed at <code>0xfF4Db529bBCd4E3CC091E07b7845241EB4762832</code> and is wired to <code>LuminaOracleV2</code> for the live ETH/USD and ETH/BTC reads.</p>
 
     <h3>8.5 TreasuryVesting (3M, drip)</h3>
     <ul>
@@ -692,9 +693,8 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <h3>11.4 Threat model</h3>
     <p>Documented in <code>docs/audit/THREAT-MODEL.md</code>. Highest residual risks:</p>
     <ul>
-      <li><strong>Oracle key compromise.</strong> If the off-chain signer's key leaks, an attacker can fabricate proofs and trigger every active policy. Mitigation roadmap: HSM custody + multisig signer.</li>
-      <li><strong>Single vault concentration.</strong> One BondVault holds 70M LUMINA. A reentrancy or storage corruption bug there is existential. Mitigation: extensive testing, single-source-of-truth invariants, continued audit cadence.</li>
-      <li><strong>Aave V3 dependency for RateShockShield.</strong> If Aave's borrow rate read becomes manipulable, the trigger condition becomes manipulable. Mitigation: read-only usage, no funds held by Aave.</li>
+      <li><strong>Chainlink dependency.</strong> Flash BTC and Flash ETH shields trust the Chainlink BTC/USD and ETH/USD feeds on Base. A feed deviation or staleness event can cause spurious triggers or denied triggers. Mitigation: <code>BaseFlashShield</code> sanity-checks each round (positive answer, fresh <code>updatedAt</code>, round consistency) and reverts on stale data; the L2 sequencer uptime feed is also checked on Base mainnet (<code>address(0)</code> &rarr; no-op on Sepolia).</li>
+      <li><strong>Single vault concentration.</strong> One BondVault holds 70M LUMINA. A reentrancy or storage corruption bug there is existential. Mitigation: extensive testing, single-source-of-truth invariants, continued audit cadence, 1.08%/week FIFO throttle on outbound flows.</li>
     </ul>
   </div>
 </section>
@@ -726,7 +726,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
       <thead><tr><th>Method</th><th>Path</th><th>Auth</th><th>Purpose</th></tr></thead>
       <tbody>
         <tr><td>GET</td><td><code>/health</code></td><td>none</td><td>Live state &mdash; chain, relayer, contract addresses</td></tr>
-        <tr><td>GET</td><td><code>/products</code></td><td>none</td><td>List 9 shields + capacity</td></tr>
+        <tr><td>GET</td><td><code>/products</code></td><td>none</td><td>List 6 active Flash shields + capacity</td></tr>
         <tr><td>GET</td><td><code>/products/:id/quote?cover=N</code></td><td>none</td><td>Premium &amp; payout for a coverage amount</td></tr>
         <tr><td>POST</td><td><code>/api/v1/agent/onboard</code></td><td>EIP-191 sig</td><td>Self-service mint API key</td></tr>
         <tr><td>GET</td><td><code>/api/v1/agent/keys</code></td><td>x-api-key</td><td>List caller's keys</td></tr>
@@ -752,39 +752,37 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 <section class="section" id="sec-13">
   <div class="container">
     <h2>14. Roadmap</h2>
-    <h3>Phase 1 — Sepolia testnet (current)</h3>
+    <h3>Phases 1-4 — V5.3 deployed ✅ (Base Sepolia, 2026-05-14)</h3>
     <ul>
-      <li>9 shields live and active.</li>
-      <li>Self-service agent onboarding live.</li>
-      <li>EIP-712 oracle live.</li>
-      <li>Marketplace live.</li>
-      <li>22 skill files published.</li>
+      <li>6 Flash shields (BTC and ETH; 1h, 24h, 48h) live and active behind <code>FlashShieldAdapter</code>.</li>
+      <li>Chainlink BTC/USD and ETH/USD live; L2 sequencer feed wired (no-op on Sepolia).</li>
+      <li>Single BondVault + 1.08%/week FIFO throttle live.</li>
+      <li>Marketplace V5.3 live: 2% fee burn, USDC settlement.</li>
+      <li>FounderVesting V2 with three independent paths live.</li>
+      <li>Self-service agent onboarding + 22 skill files published.</li>
     </ul>
 
-    <h3>Phase 2 — Mainnet launch (target Q3 2026)</h3>
+    <h3>Phase 5 — Testnet usage &amp; bake (current)</h3>
+    <ul>
+      <li>Real testnet usage and stress-tests with agent integrators.</li>
+      <li>Marketplace liquidity bootstrap.</li>
+      <li>Adaptive burn matrix observability dashboards.</li>
+    </ul>
+
+    <h3>Phase 6 — Pre-mainnet hardening</h3>
+    <ul>
+      <li>Tier-1 external audit.</li>
+      <li>Multisig replaces single-signer admin (Gnosis Safe, 2-of-3 to start).</li>
+      <li>Cold-storage custody for any rotatable oracle key.</li>
+      <li>Bug bounty live at T+30d.</li>
+    </ul>
+
+    <h3>Phase 7 — Mainnet launch</h3>
     <ul>
       <li>Deploy contracts to Base (chainId 8453).</li>
-      <li>Multisig replaces single-signer admin (Gnosis Safe, 2-of-3 to start).</li>
-      <li>Cold-storage custody for the oracle signing key (HSM or hardware wallet).</li>
-      <li>Bug bounty live at T+30d.</li>
-      <li>External audit (Tier-1) commencing.</li>
-    </ul>
-
-    <h3>Phase 3 — Agent ecosystem (Q4 2026 / Q1 2027)</h3>
-    <ul>
-      <li><code>@lumina/sdk</code> npm package with typed client.</li>
-      <li>OpenAPI spec for the agent surface.</li>
-      <li>Webhook delivery worker (push-based event notification).</li>
-      <li>Activity log + earnings P&amp;L endpoints.</li>
-      <li>Tier upgrades and per-agent rate-limit overrides.</li>
-    </ul>
-
-    <h3>Phase 4 — Governance &amp; expansion (2027)</h3>
-    <ul>
-      <li>On-chain governance for parameter changes (margin, capacity, shield additions).</li>
-      <li>NFT-based membership tiers.</li>
+      <li>Activate L2 sequencer uptime check with the real Chainlink feed address.</li>
       <li>Cross-chain expansion to additional L2s.</li>
-      <li>New shield products: depeg of major LSTs, Curve pool failure, oracle staleness, custom builder shields.</li>
+      <li>New shield products (depeg of major LSTs, Curve pool failure, oracle staleness, custom builder shields).</li>
     </ul>
   </div>
 </section>
@@ -799,7 +797,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <h2>15. Risks &amp; Disclaimer</h2>
     <div class="callout danger">
       <div class="callout-title">⚠ Testnet only</div>
-      The current deploy runs on Base Sepolia. The USDC contract is a mock; the BTC and ETH oracles return canned mock prices for triggers; no real money is at risk because no real money should be deposited. Do not transfer mainnet assets to any address listed in this document.
+      The current deploy runs on Base Sepolia. The USDC contract is a mock; the BTC and ETH oracle reads are real Chainlink feeds on Base Sepolia, but no real money is at risk because no real money should be deposited. Do not transfer mainnet assets to any address listed in this document.
     </div>
 
     <h3>14.1 Smart contract risk</h3>
@@ -815,7 +813,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>Parametric on-chain insurance is novel. It may be classified as a security, a derivative, or a regulated insurance product in some jurisdictions. The protocol's use is at the user's own legal risk.</p>
 
     <h3>14.5 Disclaimer</h3>
-    <p>This whitepaper describes the protocol as deployed on 2026-05-06 to Base Sepolia. It is not an offer to sell or a solicitation to buy any token, security, or insurance product. It is provided for technical and educational purposes. Forward-looking statements in <a href="#sec-13">Section 13</a> are aspirational; nothing in this document is a guarantee of future deployment, merger of features, or financial return.</p>
+    <p>This whitepaper describes the protocol as deployed on 2026-05-14 to Base Sepolia (V5.3). It is not an offer to sell or a solicitation to buy any token, security, or insurance product. It is provided for technical and educational purposes. Forward-looking statements in <a href="#sec-13">Section 14</a> are aspirational; nothing in this document is a guarantee of future deployment, merger of features, or financial return.</p>
   </div>
 </section>
 
@@ -849,19 +847,38 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 <section class="section" id="sec-A">
   <div class="container">
     <h2>Appendix A — Deployed Addresses (Base Sepolia, chainId 84532)</h2>
-    <p>Addresses below come from the live <code>/health</code> snapshot at 2026-05-06. The canonical source is always <code>https://lumina-api-production-ac85.up.railway.app/health</code>; if any address in this document drifts from <code>/health</code>, treat <code>/health</code> as authoritative.</p>
+    <p>V5.3 keeps the V5.2 core addresses (no redeploy of <code>BondVault</code>, <code>PolicyManager</code>, etc.) and adds six new shield adapters. The canonical source is always <code>https://lumina-api-production-ac85.up.railway.app/health</code>; if any address in this document drifts from <code>/health</code>, treat <code>/health</code> as authoritative.</p>
 
-    <h3>Core protocol</h3>
+    <h3>Core protocol (V5.2 addresses, vigentes)</h3>
     <div class="table-wrap"><table>
       <thead><tr><th>Contract</th><th>Address</th></tr></thead>
       <tbody>
-        <tr><td>LuminaTokenV2</td><td><code>0x8A0FDc2126eb9b0c88D17711D62713A1c06CF7Ab</code></td></tr>
-        <tr><td>CoverRouterV2</td><td><code>0xebC3A783477FbD2720C024e16A8d63B8Db983D84</code></td></tr>
-        <tr><td>PolicyManagerV2</td><td><code>0xd9732A8d6Cf5266Dd896B825E78E387B7Dd2c379</code></td></tr>
-        <tr><td>BondVault</td><td><code>0x101F92fC506C1e60A2A0dD01eA29597EBf222d2B</code></td></tr>
-        <tr><td>ClaimBond</td><td><code>0x3d2F5DB2505367D00ef81c51AD3cA66159271730</code></td></tr>
-        <tr><td>LuminaBondMarketplace</td><td><code>0xfaC56692c626718aC8953A3d5fAE67fac2f1Be6E</code></td></tr>
-        <tr><td>USDC (Sepolia mock)</td><td><code>0xD944d8e5D8329994D83950872Ec210891d3Ab6AE</code></td></tr>
+        <tr><td>LuminaTokenV2</td><td><code>0x62C0b58bB30CA857674ec593F1e23B3F15266680</code></td></tr>
+        <tr><td>BondVault</td><td><code>0x193acBc1EdC5E565a4aBE96941C7E7AeF637B6EC</code></td></tr>
+        <tr><td>ClaimBond</td><td><code>0xaa57Ab52Eb00f296Ad4CFA9E9c201f3737271FB4</code></td></tr>
+        <tr><td>CoverRouter</td><td><code>0xcdB70B40e6a3DEac3189185d947A0e458518F566</code></td></tr>
+        <tr><td>PolicyManager (proxy)</td><td><code>0x546C07e07DeBCdbf7a2A7Ef12C38c8c8fcAFcDd8</code></td></tr>
+        <tr><td>PolicyManager (Sprint Cleanup impl)</td><td><code>0xdE41D414eD191A1090546078DF8e120c196Be22F</code></td></tr>
+        <tr><td>FounderVesting V2</td><td><code>0xfF4Db529bBCd4E3CC091E07b7845241EB4762832</code></td></tr>
+        <tr><td>LuminaOracleV2</td><td><code>0x9bfa2f7A5098C89b8740D1694d1f716A0Bd871dD</code></td></tr>
+        <tr><td>TWAPBurner</td><td><code>0x242d76082856901b4ba1E7c50C022D46a6941bC0</code></td></tr>
+        <tr><td>AdaptiveFeeDistributor</td><td><code>0xeC7841A4a9ecfb8cA58391E233A645B021c59D54</code></td></tr>
+        <tr><td>BuybackEngine</td><td><code>0x56B5a1115B0d9781E7358521204d927d2F80d8B4</code></td></tr>
+        <tr><td>LuminaBondMarketplace</td><td><code>0x0938205f4cBe5F572656533FC930FFce6F5F4345</code></td></tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:6px;"><strong>AdaptiveFeeDistributor split:</strong> 85% BuybackBurn / 8% Treasury / 2% Operations / 5% Founder.</p>
+
+    <h3>Flash shield adapters (V5.3, deployed 2026-05-14)</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Adapter</th><th>Address</th></tr></thead>
+      <tbody>
+        <tr><td>Flash BTC 1h</td><td><code>0x5fC732D28c09DfcA2e7eF0AAd6C9491c8474eAdB</code></td></tr>
+        <tr><td>Flash BTC 24h</td><td><code>0x844A5fDb3C910DC33Eb720fDB5387C3d55eC867d</code></td></tr>
+        <tr><td>Flash BTC 48h</td><td><code>0x0840d638a3E79919afE3b1AB589E6D4b5E8C45Bb</code></td></tr>
+        <tr><td>Flash ETH 1h</td><td><code>0xeC42c7169B4D80F4D8A113607367F75c2df02935</code></td></tr>
+        <tr><td>Flash ETH 24h</td><td><code>0xb0f143beF75F32BcAB569766e9159366f8fD69C4</code></td></tr>
+        <tr><td>Flash ETH 48h</td><td><code>0x26db224D3Ddc00F4bFcF8ab26A92B9f7c81A47E6</code></td></tr>
       </tbody>
     </table></div>
 
@@ -870,7 +887,6 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
       <thead><tr><th>Service</th><th>Endpoint / address</th></tr></thead>
       <tbody>
         <tr><td>API base URL</td><td><code>https://lumina-api-production-ac85.up.railway.app</code></td></tr>
-        <tr><td>Relayer wallet</td><td><code>0x168dC7105e907294f9d066cee24f30caa5A17E4a</code></td></tr>
         <tr><td>Block explorer</td><td><a href="https://sepolia.basescan.org">sepolia.basescan.org</a></td></tr>
         <tr><td>RPC</td><td><code>https://sepolia.base.org</code></td></tr>
       </tbody>
@@ -878,7 +894,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
 
     <div class="callout">
       <div class="callout-title">Note on address drift</div>
-      Earlier deploy artifacts in <code>LUMINA-PROTOCOL/deployments/sepolia/V5.1-2026-04-27.json</code> reference a different set of addresses for the same contracts. That artifact corresponds to a previous deploy. The contracts above (from <code>/health</code>) are what the live API and the live frontend talk to. Always verify against <code>/health</code> before integrating.
+      V5.3 reuses the V5.2 core addresses and adds only the six Flash shield adapters above. Earlier deploy artifacts referencing V5.1 addresses are obsolete. Always verify against <code>/health</code> before integrating.
     </div>
   </div>
 </section>
@@ -899,7 +915,8 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
         <tr><td><strong>EIP-191</strong></td><td>The "personal_sign" standard used for the agent onboarding signature.</td></tr>
         <tr><td><strong>EIP-712</strong></td><td>The typed-data signing standard used for oracle PriceProofs.</td></tr>
         <tr><td><strong>Epoch</strong></td><td>A monthly maturity bucket. Encoded as <code>year &times; 100 + month</code>. All bonds maturing in the same calendar month share an epoch.</td></tr>
-        <tr><td><strong>FlashShield</strong></td><td>One of seven price-drop products covering BTC and ETH across 1h-48h windows.</td></tr>
+        <tr><td><strong>FlashShield</strong></td><td>One of the six price-drop products covering BTC and ETH across 1h, 24h, and 48h windows (three per asset).</td></tr>
+        <tr><td><strong>FlashShieldAdapter</strong></td><td>UUPS bridge contract that exposes the slim T-30a Flash shields through the legacy <code>IShieldV2</code> surface consumed by <code>PolicyManagerV2</code>.</td></tr>
         <tr><td><strong>Kink Model</strong></td><td>The capacity-driven pricing model that tightens premium as utilization rises.</td></tr>
         <tr><td><strong>LuminaOracleV2</strong></td><td>The EIP-712 verifier that authorizes shield triggers from a trusted off-chain signer.</td></tr>
         <tr><td><strong>oracleKey</strong></td><td>The Ethereum address whose private key signs every PriceProof; rotatable by the contract owner.</td></tr>
