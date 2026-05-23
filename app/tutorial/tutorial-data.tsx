@@ -13,6 +13,7 @@
 //     5. SDK v0.6.0
 
 import type { TutorialStepProps } from '@/components/lumina/redesign/TutorialStep'
+import { FaucetButton } from '@/components/lumina/redesign/Faucet'
 import { CHAIN, LUMINA_API_URL } from '@/lib/lumina-config'
 
 const PROTOCOL_REPO = 'https://github.com/org-lumina/LUMINA-PROTOCOL'
@@ -104,6 +105,17 @@ export const HUMAN_STEPS: AnyStep[] = [
           </a>
           .
         </p>
+        <p>
+          <strong>Need test funds?</strong> Once connected, click below to
+          claim <strong>10,000 mock USDC</strong> + <strong>0.05 ETH</strong>{' '}
+          on Base Sepolia. One claim per wallet per 24h. The dedicated{' '}
+          <a href="/faucet" style={{ color: 'var(--rd-accent)' }}>
+            /faucet
+          </a>{' '}
+          page also exposes the global cap and the MockUSDC contract address
+          if you need to add it to your wallet manually.
+        </p>
+        <FaucetButton />
       </>
     ),
     frontendRef: {
