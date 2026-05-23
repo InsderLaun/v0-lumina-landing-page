@@ -76,7 +76,7 @@ export default function WhitepaperHubPage() {
               pages="2 pages"
               title="Summary · English"
               desc="Two-page brief covering what Lumina is, why parametric speculation for AI agents matters, and how to integrate. Ideal for investors, partners, or quick technical orientation."
-              toc="Problem · Solution · Architecture · 9 products at a glance · Tokenomics · Roadmap · Contact"
+              toc="Problem · Solution · Architecture · 6 products at a glance · Tokenomics · Roadmap · Contact"
               href={SUMMARY_EN_URL}
               external
               cta="Open PDF ↗"

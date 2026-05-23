@@ -35,6 +35,30 @@ const nextConfig = {
       },
     ];
   },
+  // [Sprint Polish Final] Agent-discovery files mirrored from the canonical
+  // Mintlify docs site. Rewrites (200) instead of redirects (3xx) so that
+  // LLMs probing the apex domain get the actual content back and don't have
+  // to follow a redirect chain. Source-of-truth lives in org-lumina/docs.
+  async rewrites() {
+    return [
+      {
+        source: "/llms.txt",
+        destination: "https://docs.lumina-org.com/llms.txt",
+      },
+      {
+        source: "/llms-full.txt",
+        destination: "https://docs.lumina-org.com/llms-full.txt",
+      },
+      {
+        source: "/agent.md",
+        destination: "https://docs.lumina-org.com/llms.txt",
+      },
+      {
+        source: "/.well-known/ai-plugin.json",
+        destination: "https://docs.lumina-org.com/.well-known/ai-plugin.json",
+      },
+    ];
+  },
 }
 
 export default nextConfig

@@ -87,18 +87,43 @@ const PRODUCTS = [
 const FILTERS = ['ALL', 'BTC', 'ETH', 'STABLES'] as const
 type Filter = (typeof FILTERS)[number]
 
-export function Products() {
+interface ProductsProps {
+  /**
+   * Live premiums per $1k cover, keyed by canonical productName (e.g.
+   * `FLASHBTC1H-001`). Built at request time by `app/page.tsx` via
+   * `/products/{id}/quote?coverageAmount=1000000000`. When the API is
+   * reachable this overrides the hardcoded `premium` in `PRODUCTS` so the
+   * table never drifts from the live on-chain formula. When `undefined` /
+   * the API failed, the hardcoded source-of-truth is used.
+   */
+  livePremiums?: Record<string, number>
+}
+
+export function Products({ livePremiums }: ProductsProps = {}) {
   const [filter, setFilter] = useState<Filter>('ALL')
   const [active, setActive] = useState<string>('btc-1h')
 
-  const filtered = useMemo(() => {
-    if (filter === 'BTC') return PRODUCTS.filter((p) => p.coveredAsset === 'BTC')
-    if (filter === 'ETH') return PRODUCTS.filter((p) => p.coveredAsset === 'ETH')
-    if (filter === 'STABLES') return []
-    return PRODUCTS
-  }, [filter])
+  // Apply live premium overlay onto the static PRODUCTS source-of-truth.
+  // Fall back to the hardcoded value when the API didn't return a quote
+  // for a given productName (this keeps the table coherent even if a
+  // product is partially missing from the live response).
+  const PRODUCTS_WITH_LIVE = useMemo(
+    () =>
+      PRODUCTS.map((p) => {
+        const live = livePremiums?.[p.symbol]
+        return live !== undefined ? { ...p, premium: live } : p
+      }),
+    [livePremiums],
+  )
 
-  const a = PRODUCTS.find((p) => p.key === active) ?? PRODUCTS[0]
+  const filtered = useMemo(() => {
+    if (filter === 'BTC') return PRODUCTS_WITH_LIVE.filter((p) => p.coveredAsset === 'BTC')
+    if (filter === 'ETH') return PRODUCTS_WITH_LIVE.filter((p) => p.coveredAsset === 'ETH')
+    if (filter === 'STABLES') return []
+    return PRODUCTS_WITH_LIVE
+  }, [filter, PRODUCTS_WITH_LIVE])
+
+  const a = PRODUCTS_WITH_LIVE.find((p) => p.key === active) ?? PRODUCTS_WITH_LIVE[0]
   const cov = 1000
   const premium = a.premium.toFixed(2)
   const payout = (cov * 0.8).toFixed(2)
@@ -164,28 +189,40 @@ export function Products() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((p) => (
-                    <tr
-                      key={p.key}
-                      className={active === p.key ? 'rd-on' : ''}
-                      onClick={() => setActive(p.key)}
-                    >
-                      <td className="rd-first">{p.label}</td>
-                      <td className="rd-muted">
-                        <span className="rd-pill" title={`Covered asset · premium paid in ${p.paymentAsset}`}>
-                          {p.coveredAsset}
-                        </span>
-                      </td>
-                      <td>{p.trigger}</td>
-                      <td className="rd-r">
-                        <span className="rd-mult">{p.mult}</span>
-                      </td>
-                      <td className="rd-r mono">${p.premium.toFixed(2)}</td>
-                      <td className="rd-r">
-                        <span className="rd-pill">T{p.tier}</span>
-                      </td>
-                    </tr>
-                  ))
+                  filtered.map((p) => {
+                    const isLive = livePremiums?.[p.symbol] !== undefined
+                    return (
+                      <tr
+                        key={p.key}
+                        className={active === p.key ? 'rd-on' : ''}
+                        onClick={() => setActive(p.key)}
+                      >
+                        <td className="rd-first">{p.label}</td>
+                        <td className="rd-muted">
+                          <span className="rd-pill" title={`Covered asset · premium paid in ${p.paymentAsset}`}>
+                            {p.coveredAsset}
+                          </span>
+                        </td>
+                        <td>{p.trigger}</td>
+                        <td className="rd-r">
+                          <span className="rd-mult">{p.mult}</span>
+                        </td>
+                        <td
+                          className="rd-r mono"
+                          title={
+                            isLive
+                              ? 'Live premium from /products/{id}/quote · refreshed every hour'
+                              : 'Cached premium (live API was unreachable at build time)'
+                          }
+                        >
+                          ${p.premium.toFixed(2)}
+                        </td>
+                        <td className="rd-r">
+                          <span className="rd-pill">T{p.tier}</span>
+                        </td>
+                      </tr>
+                    )
+                  })
                 )}
               </tbody>
             </table>
