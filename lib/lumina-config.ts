@@ -126,13 +126,13 @@ export const CONTRACTS = {
     ILIndex: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → RATESHOCK-001 (closest)
     Exploit: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → RATESHOCK-001
     // V5.3 canonical 6 flash shields + legacy zero placeholders
-    FlashBTC1h:  "0x06ED1ffB6bA493c036472bf1C58EC9301B5A2363" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashBTC1h:  "0x7d1615C90d01712a3b86Df26312aC6D8EFa0d0b3" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
     FlashBTC4h:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — not in V5.3 T-30c bundle
-    FlashBTC24h: "0x9E4C1E799AA41a36ae074768b33198b9D8aCC173" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashBTC48h: "0x815802E93cD7fB0C4Ce49f290F1A1Ee9473F0406" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH1h:  "0xF858b572De264DF8980dF57A680762B7cb88E351" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH24h: "0x18ccC1eE644C8A79DD93D0F4694960FeC5348eFA" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH48h: "0xC42360BC94401B07ca337Bc4d0Fb338604F8f4cE" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashBTC24h: "0x18e2D3b8Ff4D194CDB9862f8e6239E5e1145961d" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashBTC48h: "0xe206dd8fb02b1C2A0507566c3d03a27554E8CBeB" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashETH1h:  "0xfF1a1B20153019C22f97278204Ccfc1b1409a518" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashETH24h: "0x2832b5543f6F2a055312654739F0ae03F5b0b582" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashETH48h: "0x60dFC6610c64aC84e12afA943737Cf7733215B75" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
     MicroDepeg:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
     RateShock:   "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
   },
@@ -144,12 +144,12 @@ export const CONTRACTS = {
   // every shield redeploy. Static snapshot — runtime resolution can be
   // added later via /api/v1/products if the adapters get registered there.
   adapters: {
-    FlashBTC1h:  "0x5fC732D28c09DfcA2e7eF0AAd6C9491c8474eAdB" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashBTC24h: "0x844A5fDb3C910DC33Eb720fDB5387C3d55eC867d" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashBTC48h: "0x0840d638a3E79919afE3b1AB589E6D4b5E8C45Bb" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH1h:  "0xeC42c7169B4D80F4D8A113607367F75c2df02935" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH24h: "0xb0f143beF75F32BcAB569766e9159366f8fD69C4" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH48h: "0x26db224D3Ddc00F4bFcF8ab26A92B9f7c81A47E6" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashBTC1h:  "0x5d50310B9166184e822cD5368F51C1409713054f" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashBTC24h: "0x475b3F712707F61824122a94fE78b106260F8882" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashBTC48h: "0xdc6387E86F7D852D1f99F4009cFd8AdC2d500298" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashETH1h:  "0x57869AD3E7C56B0c96F357179DD231b407C88338" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashETH24h: "0x4fD09cF98F6814Cc8b33C2E491429f59d0bCf089" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashETH48h: "0x9696CFFD7dE8B1e16F83Dcc798c5CE69a61C884C" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
   },
   // EmergencyPause / TimelockController / GnosisSafe are not deployed in V5.1
   // testnet per protocol policy ("NO TimelockController in any deploy" — see
