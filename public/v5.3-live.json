@@ -12,33 +12,33 @@
   "shields": [
     {
       "key": "FlashBTC1h",
-      "shield": "0x06ED1ffB6bA493c036472bf1C58EC9301B5A2363",
-      "adapter": "0x5fC732D28c09DfcA2e7eF0AAd6C9491c8474eAdB"
+      "shield": "0x7d1615C90d01712a3b86Df26312aC6D8EFa0d0b3",
+      "adapter": "0x5d50310B9166184e822cD5368F51C1409713054f"
     },
     {
       "key": "FlashBTC24h",
-      "shield": "0x9E4C1E799AA41a36ae074768b33198b9D8aCC173",
-      "adapter": "0x844A5fDb3C910DC33Eb720fDB5387C3d55eC867d"
+      "shield": "0x18e2D3b8Ff4D194CDB9862f8e6239E5e1145961d",
+      "adapter": "0x475b3F712707F61824122a94fE78b106260F8882"
     },
     {
       "key": "FlashBTC48h",
-      "shield": "0x815802E93cD7fB0C4Ce49f290F1A1Ee9473F0406",
-      "adapter": "0x0840d638a3E79919afE3b1AB589E6D4b5E8C45Bb"
+      "shield": "0xe206dd8fb02b1C2A0507566c3d03a27554E8CBeB",
+      "adapter": "0xdc6387E86F7D852D1f99F4009cFd8AdC2d500298"
     },
     {
       "key": "FlashETH1h",
-      "shield": "0xF858b572De264DF8980dF57A680762B7cb88E351",
-      "adapter": "0xeC42c7169B4D80F4D8A113607367F75c2df02935"
+      "shield": "0xfF1a1B20153019C22f97278204Ccfc1b1409a518",
+      "adapter": "0x57869AD3E7C56B0c96F357179DD231b407C88338"
     },
     {
       "key": "FlashETH24h",
-      "shield": "0x18ccC1eE644C8A79DD93D0F4694960FeC5348eFA",
-      "adapter": "0xb0f143beF75F32BcAB569766e9159366f8fD69C4"
+      "shield": "0x2832b5543f6F2a055312654739F0ae03F5b0b582",
+      "adapter": "0x4fD09cF98F6814Cc8b33C2E491429f59d0bCf089"
     },
     {
       "key": "FlashETH48h",
-      "shield": "0xC42360BC94401B07ca337Bc4d0Fb338604F8f4cE",
-      "adapter": "0x26db224D3Ddc00F4bFcF8ab26A92B9f7c81A47E6"
+      "shield": "0x60dFC6610c64aC84e12afA943737Cf7733215B75",
+      "adapter": "0x9696CFFD7dE8B1e16F83Dcc798c5CE69a61C884C"
     }
   ]
 }

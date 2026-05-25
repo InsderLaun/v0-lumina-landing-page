@@ -108,12 +108,12 @@ export const V53_NETWORK = {
 
 // One FlashShieldAdapter (UUPS) per shield — 6 total on V5.3.
 export const V53_FLASH_ADAPTERS: V53Address[] = [
-  { label: 'FlashBTC1h_Adapter',  address: '0x5fC732D28c09DfcA2e7eF0AAd6C9491c8474eAdB', note: 'Trigger BTC -2.5% / 1h' },
-  { label: 'FlashBTC24h_Adapter', address: '0x844A5fDb3C910DC33Eb720fDB5387C3d55eC867d', note: 'Trigger BTC -6% / 24h' },
-  { label: 'FlashBTC48h_Adapter', address: '0x0840d638a3E79919afE3b1AB589E6D4b5E8C45Bb', note: 'Trigger BTC -10% / 48h' },
-  { label: 'FlashETH1h_Adapter',  address: '0xeC42c7169B4D80F4D8A113607367F75c2df02935', note: 'Trigger ETH -4% / 1h' },
-  { label: 'FlashETH24h_Adapter', address: '0xb0f143beF75F32BcAB569766e9159366f8fD69C4', note: 'Trigger ETH -8.5% / 24h' },
-  { label: 'FlashETH48h_Adapter', address: '0x26db224D3Ddc00F4bFcF8ab26A92B9f7c81A47E6', note: 'Trigger ETH -14% / 48h' },
+  { label: 'FlashBTC1h_Adapter',  address: '0x5d50310B9166184e822cD5368F51C1409713054f', note: 'Trigger BTC -2.5% / 1h' },
+  { label: 'FlashBTC24h_Adapter', address: '0x475b3F712707F61824122a94fE78b106260F8882', note: 'Trigger BTC -6% / 24h' },
+  { label: 'FlashBTC48h_Adapter', address: '0xdc6387E86F7D852D1f99F4009cFd8AdC2d500298', note: 'Trigger BTC -10% / 48h' },
+  { label: 'FlashETH1h_Adapter',  address: '0x57869AD3E7C56B0c96F357179DD231b407C88338', note: 'Trigger ETH -4% / 1h' },
+  { label: 'FlashETH24h_Adapter', address: '0x4fD09cF98F6814Cc8b33C2E491429f59d0bCf089', note: 'Trigger ETH -8.5% / 24h' },
+  { label: 'FlashETH48h_Adapter', address: '0x9696CFFD7dE8B1e16F83Dcc798c5CE69a61C884C', note: 'Trigger ETH -14% / 48h' },
 ]
 
 // Core V5.2 contracts — reused unchanged by V5.3.
