@@ -12,7 +12,7 @@ import {
 } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { erc20Abi, formatUnits, type Hex } from 'viem'
-import { TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { TOKENS, DEPLOY_BLOCK_SEPOLIA, LUMINA_API_URL } from '@/lib/lumina-config'
 import { marketplaceAbi, claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { useContracts } from '@/hooks/use-contracts'
@@ -58,6 +58,26 @@ export function MarketplaceView() {
 
     ;(async () => {
       try {
+        // [fix BUG-1] Primary source: the cached server API, which reconstructs
+        // active listings server-side. This avoids a wide client-side eth_getLogs
+        // scan from the browser (the cause of the "FAILED TO LOAD" / 429s). The
+        // on-chain getListing reads below still validate each id's live state.
+        try {
+          const res = await fetch(`${LUMINA_API_URL}/api/v1/marketplace/listings?limit=200`, {
+            cache: 'no-store',
+          })
+          if (res.ok) {
+            const body = (await res.json()) as { listings?: Array<{ listingId: string | number }> }
+            const apiIds = (body.listings ?? []).map((l) => BigInt(l.listingId))
+            if (cancelled) return
+            setActiveIds(apiIds)
+            return // success — skip the on-chain log scan entirely
+          }
+        } catch (apiErr) {
+          console.warn('[marketplace] listings API failed, falling back to on-chain scan:', apiErr)
+        }
+
+        // Fallback (API unreachable): reconstruct active listings from events.
         const head = await publicClient.getBlockNumber()
         const [listed, cancelledLogs, bought] = await Promise.all([
           getLogsChunked({
