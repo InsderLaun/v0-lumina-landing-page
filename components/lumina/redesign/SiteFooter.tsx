@@ -117,7 +117,7 @@ export function SiteFooter() {
 
         <div className="rd-foot-bottom">
           <span>© 2026 LUMINA PROTOCOL · ALL RIGHTS RESERVED</span>
-          <span>BURN RATIO 1.50 · 6 PRODUCTS · BASE L2</span>
+          <span>6 PRODUCTS · BASE SEPOLIA · TESTNET</span>
         </div>
       </div>
     </footer>

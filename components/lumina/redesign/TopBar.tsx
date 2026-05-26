@@ -2,13 +2,25 @@
 
 import { useState, useEffect } from 'react'
 
+const LIVE_STATS_URL = 'https://lumina-api-production-ac85.up.railway.app/api/v1/live-stats'
+
+/**
+ * Top status bar. Shows the REAL LUMINA price from /api/v1/live-stats (verifiable
+ * on-chain). Previous mock values (a random-walk price + fake cumulative burned /
+ * active-bets counters) were removed: the price is now live, and cumulative figures
+ * require the parked indexer so they are not shown rather than faked.
+ */
 export function TopBar() {
-  const [price, setPrice] = useState(0.0364)
+  const [price, setPrice] = useState<number | null>(null)
   useEffect(() => {
-    const id = setInterval(() => {
-      setPrice((p) => +(p + (Math.random() - 0.5) * 0.0006).toFixed(4))
-    }, 2400)
-    return () => clearInterval(id)
+    const ctrl = new AbortController()
+    fetch(LIVE_STATS_URL, { signal: ctrl.signal, cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.luminaPrice?.usd != null) setPrice(d.luminaPrice.usd)
+      })
+      .catch(() => {})
+    return () => ctrl.abort()
   }, [])
 
   return (
@@ -20,20 +32,11 @@ export function TopBar() {
         <span className="rd-topbar-divider">·</span>
         <div className="rd-topbar-item">
           <span>LUMINA / USDC</span>
-          <b className="mono">${price.toFixed(4)}</b>
-          <span className="rd-ticker">+2.31%</span>
+          <b className="mono">{price != null ? `$${price.toFixed(4)}` : '—'}</b>
         </div>
         <span className="rd-topbar-divider">·</span>
         <div className="rd-topbar-item">
-          <span>BURNED</span> <b className="mono">1,284,402 LUMINA</b>
-        </div>
-        <span className="rd-topbar-divider">·</span>
-        <div className="rd-topbar-item">
-          <span>ACTIVE BETS</span> <b className="mono">312</b>
-        </div>
-        <span className="rd-topbar-divider">·</span>
-        <div className="rd-topbar-item">
-          <span>BASE L2</span> <b>OK</b>
+          <span>BASE SEPOLIA</span> <b>TESTNET</b>
         </div>
         <span className="rd-topbar-divider">·</span>
         <div className="rd-topbar-item">
