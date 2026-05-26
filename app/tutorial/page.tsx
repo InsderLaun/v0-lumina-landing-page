@@ -100,6 +100,28 @@ function TutorialBody() {
             handler that runs it.
           </p>
 
+          <a
+            href="https://docs.lumina-org.com/mcp/quickstart"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'block',
+              margin: '16px 0 4px',
+              padding: '12px 16px',
+              border: '1px solid var(--rd-accent)',
+              borderRadius: 'var(--rd-radius)',
+              background: 'var(--rd-accent-dim)',
+              color: 'var(--rd-text)',
+              textDecoration: 'none',
+              fontSize: 14,
+              lineHeight: 1.5,
+            }}
+          >
+            💡 Prefer your AI assistant? Add Lumina via <strong>MCP</strong> in 3 lines
+            (Claude Desktop, Cursor, Windsurf, Continue, Claude Code) and buy a policy
+            by just asking → <span style={{ color: 'var(--rd-accent)' }}>MCP quickstart ↗</span>
+          </a>
+
           <div className="rd-tut-mode" role="tablist">
             {(['human', 'agent'] as const).map((m) => (
               <button

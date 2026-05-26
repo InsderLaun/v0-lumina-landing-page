@@ -444,7 +444,7 @@ function McpServerCard() {
               ⚡ NEW · MCP Server · @lumina-org/mcp-server
             </div>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--rd-text)', letterSpacing: '-0.01em' }}>
-              Connect Claude Desktop, Cursor, Windsurf & Continue — buy a policy in one sentence
+              Connect Claude Desktop, Cursor, Windsurf, Continue & Claude Code — buy a policy in one sentence
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
