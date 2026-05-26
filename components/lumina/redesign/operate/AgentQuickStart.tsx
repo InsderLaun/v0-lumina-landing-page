@@ -10,7 +10,13 @@ import { LuminaClient } from '@lumina-org/sdk'
 import { Wallet, JsonRpcProvider } from 'ethers'
 
 const lumina = new LuminaClient({ apiKey: process.env.LUMINA_API_KEY! })
-const provider = new JsonRpcProvider('https://base-sepolia-rpc.publicnode.com')
+// Honor the dedicated RPC env var (matches web3-provider.tsx) so this path is
+// not stuck on a rate-limited public endpoint; fall back to public when unset.
+const provider = new JsonRpcProvider(
+  process.env.NEXT_PUBLIC_RPC_URL_ALCHEMY ??
+    process.env.NEXT_PUBLIC_RPC_URL ??
+    'https://base-sepolia-rpc.publicnode.com',
+)
 const buyer = new Wallet(process.env.BUYER_PRIVATE_KEY!, provider)
 
 // One-time: approve CoverRouter to spend USDC
