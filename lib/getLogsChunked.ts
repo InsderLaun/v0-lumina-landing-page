@@ -9,6 +9,12 @@ import type { Address, Log, PublicClient } from 'viem'
 const DEFAULT_CHUNK_SIZE = 5_000n
 const RETRY_CHUNK_SIZE = 1_000n
 const PER_CHUNK_TIMEOUT_MS = 30_000
+// [perf] Chunks were scanned strictly sequentially — a ~340k-block range at 5k
+// chunks is ~68 serial eth_getLogs round-trips on the user's wallet RPC, which is
+// what made marketplace/portfolio "tardar muchísimo". We now run chunks in
+// bounded-concurrency batches (same calls, issued in parallel). Bounded to keep
+// under typical public-RPC rate limits.
+const CHUNK_CONCURRENCY = 8
 
 function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined
@@ -63,50 +69,53 @@ export async function getLogsChunked<TEvent, TArgs>(
 
   if (toBlock < fromBlock) return []
 
-  const allLogs: Log[] = []
-  let cursor = fromBlock
-  const totalChunks = Math.max(
-    1,
-    Number(((toBlock - fromBlock + chunkSize) / chunkSize).toString()),
-  )
+  // Build all chunk ranges up front.
+  const ranges: Array<[bigint, bigint]> = []
+  for (let cursor = fromBlock; cursor <= toBlock; cursor += chunkSize) {
+    const end = cursor + chunkSize - 1n
+    ranges.push([cursor, end > toBlock ? toBlock : end])
+  }
+  const totalChunks = Math.max(1, ranges.length)
   let fetchedChunks = 0
+  const allLogs: Log[] = []
 
-  while (cursor <= toBlock) {
-    const proposedEnd = cursor + chunkSize - 1n
-    const chunkEnd = proposedEnd > toBlock ? toBlock : proposedEnd
-
+  // Fetch one chunk, preserving the "payload too large → smaller sub-window" retry.
+  const fetchChunk = async ([from, to]: [bigint, bigint]): Promise<Log[]> => {
     try {
       const logs = await withTimeout(
         client.getLogs({
           address,
-          fromBlock: cursor,
-          toBlock: chunkEnd,
+          fromBlock: from,
+          toBlock: to,
           ...(event ? { event } : {}),
           ...(events ? { events } : {}),
           ...(args ? { args } : {}),
         } as Parameters<PublicClient['getLogs']>[0]),
         PER_CHUNK_TIMEOUT_MS,
-        `eth_getLogs ${cursor}-${chunkEnd}`,
+        `eth_getLogs ${from}-${to}`,
       )
-      allLogs.push(...(logs as Log[]))
+      return logs as Log[]
     } catch (err) {
       if (isPayloadTooLarge(err) && chunkSize > RETRY_CHUNK_SIZE) {
-        const subLogs = await getLogsChunked({
+        return await getLogsChunked({
           ...params,
-          fromBlock: cursor,
-          toBlock: chunkEnd,
+          fromBlock: from,
+          toBlock: to,
           chunkSize: RETRY_CHUNK_SIZE,
           onProgress: undefined,
         })
-        allLogs.push(...subLogs)
-      } else {
-        throw err
       }
+      throw err
     }
+  }
 
-    fetchedChunks += 1
+  // Run chunks in bounded-concurrency batches (was strictly sequential).
+  for (let i = 0; i < ranges.length; i += CHUNK_CONCURRENCY) {
+    const batch = ranges.slice(i, i + CHUNK_CONCURRENCY)
+    const results = await Promise.all(batch.map(fetchChunk))
+    for (const r of results) allLogs.push(...r)
+    fetchedChunks += batch.length
     onProgress?.({ fetched: fetchedChunks, total: totalChunks, logsSoFar: allLogs.length })
-    cursor = chunkEnd + 1n
   }
 
   return allLogs
