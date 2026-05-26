@@ -2,7 +2,7 @@ import '@/components/lumina/redesign/redesign.css'
 
 import { TopBar } from '@/components/lumina/redesign/TopBar'
 import { Nav } from '@/components/lumina/redesign/Nav'
-import { Hero } from '@/components/lumina/redesign/Hero'
+import { Hero, type HeroStats } from '@/components/lumina/redesign/Hero'
 import { HowItWorks } from '@/components/lumina/redesign/HowItWorks'
 import { Bonds } from '@/components/lumina/redesign/Bonds'
 import { Products } from '@/components/lumina/redesign/Products'
@@ -71,15 +71,31 @@ async function fetchLivePremiums(): Promise<Record<string, number> | null> {
   }
 }
 
+/**
+ * Fetch the aggregated live on-chain stats (price/reserve/capacity/supply) from
+ * the cached /api/v1/live-stats endpoint. ISR 60s; returns null on failure so the
+ * Hero renders "—" instead of a fake number (never a fabricated value).
+ */
+async function fetchLiveStats(): Promise<HeroStats | null> {
+  try {
+    const r = await fetch(`${API_BASE}/api/v1/live-stats`, { next: { revalidate: 60 } })
+    if (!r.ok) throw new Error(`/live-stats ${r.status}`)
+    return (await r.json()) as HeroStats
+  } catch (err) {
+    console.error('[page.tsx] live-stats fetch failed:', err)
+    return null
+  }
+}
+
 export default async function HomePage() {
-  const livePremiums = await fetchLivePremiums()
+  const [livePremiums, liveStats] = await Promise.all([fetchLivePremiums(), fetchLiveStats()])
 
   return (
     <div className="rd-page">
       <TopBar />
       <Nav />
       <main>
-        <Hero />
+        <Hero stats={liveStats} />
         <HowItWorks />
         <Bonds />
         <Products livePremiums={livePremiums ?? undefined} />

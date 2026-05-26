@@ -1,24 +1,35 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Bot, User } from 'lucide-react'
 import { LiveStatusBadge } from './LiveStatusBadge'
 
-const BURN_EVENTS = [
-  { t: '00:42 UTC', action: 'Flash BTC 1h', amount: '+ 2.92 USDC', lumina: '80.2 LUMINA' },
-  { t: '00:38 UTC', action: 'Flash ETH 24h', amount: '+ 45.80 USDC', lumina: '1,258.2 LUMINA' },
-  { t: '00:31 UTC', action: 'Flash BTC 48h', amount: '+ 148.67 USDC', lumina: '4,083.5 LUMINA' },
-  { t: '00:27 UTC', action: 'Bond resale 3%', amount: '+ 12.00 USDC', lumina: '329.7 LUMINA' },
-] as const
+/**
+ * Live on-chain stats from `GET /api/v1/live-stats` (fetched server-side in
+ * app/page.tsx with ISR). Every field is verifiable on-chain. When `stats` is
+ * null (API/RPC unreachable) the snapshot renders "—" rather than a fake number.
+ *
+ * Cumulative/historical figures (total burned, active ClaimBonds, burn ratio)
+ * were intentionally REMOVED — they require the Ponder indexer (parked) and we
+ * do not display invented aggregates.
+ */
+export interface HeroStats {
+  luminaPrice: { usd: number }
+  bondReserve: { lumina: string }
+  capacity: { usedPercent: string }
+  totalSupply: { lumina: string }
+  lastUpdated?: string
+  stale?: boolean
+}
 
-export function Hero() {
-  const [feed, setFeed] = useState(0)
-  useEffect(() => {
-    const id = setInterval(() => setFeed((f) => (f + 1) % BURN_EVENTS.length), 3000)
-    return () => clearInterval(id)
-  }, [])
+function reserveM(luminaStr: string): string {
+  const n = Number(luminaStr)
+  if (!isFinite(n)) return '—'
+  return `${(n / 1_000_000).toFixed(2)}M`
+}
 
+export function Hero({ stats }: { stats?: HeroStats | null }) {
+  const live = !!stats && !stats.stale
   return (
     <section className="rd-hero">
       <div className="wrap">
@@ -61,7 +72,7 @@ export function Hero() {
                   color: 'var(--rd-text-1)',
                 }}
               >
-                npm install @lumina-org/sdk@^0.6.0
+                npm install @lumina-org/sdk@^0.7.0
               </code>
             </p>
             <div className="rd-hero-cta">
@@ -85,53 +96,55 @@ export function Hero() {
           </div>
 
           <aside className="rd-hero-side">
-            <div className="rd-hero-side-title">Protocol Snapshot · Live</div>
-            <div className="rd-stat-row">
-              <span className="rd-stat-label">$LUMINA Price</span>
-              <span className="rd-stat-right">
-                <span className="rd-stat-val rd-accent">$0.0364</span>
-                <span className="rd-stat-delta">+2.31%</span>
+            <div
+              className="rd-hero-side-title"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}
+            >
+              <span>Protocol Snapshot</span>
+              <span
+                title={live ? `Live on-chain · updated ${stats?.lastUpdated ?? ''}` : 'Last known (API unreachable)'}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, letterSpacing: '0.06em', color: live ? 'var(--rd-accent)' : 'var(--rd-text-3)' }}
+              >
+                <span
+                  style={{
+                    width: 7, height: 7, borderRadius: '50%',
+                    background: live ? 'var(--rd-accent)' : 'var(--rd-text-3)',
+                    boxShadow: live ? '0 0 6px var(--rd-accent)' : 'none',
+                    animation: live ? 'rd-pulse 2s infinite' : 'none',
+                  }}
+                />
+                {live ? 'LIVE' : 'LAST KNOWN'}
               </span>
             </div>
             <div className="rd-stat-row">
-              <span className="rd-stat-label">Total Burned</span>
+              <span className="rd-stat-label">$LUMINA Price</span>
               <span className="rd-stat-right">
-                <span className="rd-stat-val">1,284,402</span>
+                <span className="rd-stat-val rd-accent">{stats ? `$${stats.luminaPrice.usd.toFixed(4)}` : '—'}</span>
               </span>
             </div>
             <div className="rd-stat-row">
               <span className="rd-stat-label">Bond Reserve</span>
               <span className="rd-stat-right">
-                <span className="rd-stat-val">82,000,000</span>
+                <span className="rd-stat-val">{stats ? `${reserveM(stats.bondReserve.lumina)} LUMINA` : '—'}</span>
               </span>
             </div>
             <div className="rd-stat-row">
-              <span className="rd-stat-label">Active ClaimBonds</span>
+              <span className="rd-stat-label">Capacity Used</span>
               <span className="rd-stat-right">
-                <span className="rd-stat-val">2,184</span>
+                <span className="rd-stat-val">{stats ? stats.capacity.usedPercent : '—'}</span>
               </span>
             </div>
             <div className="rd-stat-row">
-              <span className="rd-stat-label">Burn Ratio (30d)</span>
+              <span className="rd-stat-label">Total Supply</span>
               <span className="rd-stat-right">
-                <span className="rd-stat-val">1.50</span>
-                <span className="rd-stat-delta">stable</span>
+                <span className="rd-stat-val">{stats ? stats.totalSupply.lumina : '100,000,000'}</span>
+                <span className="rd-stat-delta">fixed</span>
               </span>
+            </div>
+            <div style={{ marginTop: 10, fontSize: 10, color: 'var(--rd-text-3)', letterSpacing: '0.04em' }}>
+              {live ? 'Live data from Base Sepolia · refreshed ~60s' : 'Showing last known values · verify on-chain'}
             </div>
           </aside>
-        </div>
-
-        <div className="rd-burn-feed">
-          {BURN_EVENTS.map((e, i) => (
-            <div key={i} className={`rd-burn-feed-item ${i === feed ? 'rd-lit' : ''}`}>
-              <span className="rd-meta">
-                {e.t} · {e.action}
-              </span>
-              <span className="rd-v">
-                {e.amount} → {e.lumina} burned
-              </span>
-            </div>
-          ))}
         </div>
       </div>
     </section>
