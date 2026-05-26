@@ -86,10 +86,15 @@ export function ListBondModal({ epochId, faceValueBalance, maturityTs, onClose, 
 
   useEffect(() => {
     if (listConfirmed) {
+      // [fix BUG-2] Show the success state briefly, refresh the portfolio, then
+      // auto-close the modal. Previously it set 'success' + onListed() but never
+      // called onClose(), so the modal stayed open until dismissed manually.
       setStep('success')
-      onListed()
+      onListed() // refresh portfolio (removes the now-listed bond, surfaces the listing)
+      const t = setTimeout(() => onClose(), 1500)
+      return () => clearTimeout(t)
     }
-  }, [listConfirmed, onListed])
+  }, [listConfirmed, onListed, onClose])
 
   useEffect(() => {
     if (approveErr) {
