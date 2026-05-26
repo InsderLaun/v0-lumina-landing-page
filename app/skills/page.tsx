@@ -169,6 +169,9 @@ export default function SkillsPage() {
           </a>
         </section>
 
+        {/* MCP Server — connect any AI client */}
+        <McpServerCard />
+
         {/* SDK Quick-Start */}
         <SdkQuickStart />
 
@@ -394,6 +397,119 @@ await lumina.marketplace.buy({ listingId: listing.id })
 await lumina.marketplace.cancel({ listingId: listing.id })`,
   },
 ]
+
+function McpServerCard() {
+  const config = `{
+  "mcpServers": {
+    "lumina": {
+      "command": "npx",
+      "args": ["-y", "@lumina-org/mcp-server"]
+    }
+  }
+}`
+  return (
+    <section className="wrap" style={{ padding: '32px 32px 0' }}>
+      <div
+        style={{
+          border: '1px solid var(--rd-accent)',
+          borderRadius: 10,
+          background: 'var(--rd-surface)',
+          overflow: 'hidden',
+          boxShadow: '0 0 24px color-mix(in oklab, var(--rd-accent) 14%, transparent)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 16,
+            padding: '16px 18px',
+            borderBottom: '1px solid var(--rd-line)',
+            background: 'var(--rd-surface-2)',
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontFamily: 'var(--font-jetbrains), monospace',
+                fontSize: 10,
+                color: 'var(--rd-accent)',
+                letterSpacing: '0.1em',
+                marginBottom: 4,
+                textTransform: 'uppercase',
+              }}
+            >
+              ⚡ NEW · MCP Server · @lumina-org/mcp-server
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--rd-text)', letterSpacing: '-0.01em' }}>
+              Connect Claude Desktop, Cursor, Windsurf & Continue — buy a policy in one sentence
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <a
+              href="https://docs.lumina-org.com/mcp/quickstart"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '6px 12px',
+                borderRadius: 4,
+                fontSize: 11,
+                background: 'var(--rd-accent-dim)',
+                color: 'var(--rd-accent)',
+                border: '1px solid var(--rd-accent)',
+                fontFamily: 'var(--font-jetbrains), monospace',
+                textDecoration: 'none',
+              }}
+            >
+              Docs ↗
+            </a>
+            <a
+              href="https://github.com/org-lumina/lumina-mcp"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '6px 12px',
+                borderRadius: 4,
+                fontSize: 11,
+                background: 'transparent',
+                color: 'var(--rd-text-3)',
+                border: '1px solid var(--rd-line)',
+                fontFamily: 'var(--font-jetbrains), monospace',
+                textDecoration: 'none',
+              }}
+            >
+              GitHub ↗
+            </a>
+          </div>
+        </div>
+        <div style={{ padding: '14px 18px', color: 'var(--rd-text-2)', fontSize: 13, lineHeight: 1.6 }}>
+          One server reaches every MCP client. 11 tools · 4 resources · 3 prompts. The default
+          purchase path is the <strong style={{ color: 'var(--rd-text)' }}>sandbox</strong> — a real
+          on-chain policy with <strong style={{ color: 'var(--rd-text)' }}>no wallet, no gas, no API key</strong>.
+          The server never holds keys; self-signed actions return unsigned transactions for your wallet.
+        </div>
+        <pre
+          style={{
+            margin: 0,
+            padding: 18,
+            background: 'var(--rd-bg-2, var(--rd-surface))',
+            color: 'var(--rd-text)',
+            fontFamily: 'var(--font-jetbrains), monospace',
+            fontSize: 12.5,
+            lineHeight: 1.6,
+            overflowX: 'auto',
+            whiteSpace: 'pre',
+            borderTop: '1px solid var(--rd-line)',
+          }}
+        >
+          <code>{config}</code>
+        </pre>
+      </div>
+    </section>
+  )
+}
 
 function SdkQuickStart() {
   const [tab, setTab] = useState(0)
