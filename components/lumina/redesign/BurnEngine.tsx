@@ -114,7 +114,7 @@ export function BurnEngine() {
               fee (1.5% seller + 1.5% buyer) that takes the same 85/8/2/5 path.
             </p>
             <ul className="rd-flow-list">
-              <li>– 85% of every premium destroyed forever; 15% funds treasury, ops, founder.</li>
+              <li>– 85% of every premium destroyed forever; 15% funds buyback, ops, maintenance.</li>
               <li>– No buyback queue — burns are atomic with the originating transaction.</li>
               <li>– AdaptiveFeeDistributor split is on-chain and immutable per deploy.</li>
               <li>– Sequencer-down + Chainlink-stale guards block every purchase entrypoint.</li>
@@ -135,7 +135,7 @@ export function BurnEngine() {
             <div className="rd-flow-step">
               <div className="rd-num">02</div>
               <div className="rd-desc">
-                AdaptiveFeeDistributor splits <small>85/8/2/5 · TWAPBurner / Treasury / Ops / Founder</small>
+                AdaptiveFeeDistributor splits <small>85/8/2/5 · TWAPBurner / Buyback / Ops / Maintenance</small>
               </div>
               <div className="rd-amt">$2.48 to burn</div>
             </div>

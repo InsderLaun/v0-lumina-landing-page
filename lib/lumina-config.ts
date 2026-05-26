@@ -171,6 +171,13 @@ export const KINK_MODEL = {
   U_MAX: 0.95,        // 95% max utilization — rejects above this
 } as const
 
+// ⚠️ DEPRECATED / LEGACY (pre-V5.3) — NOT user-facing. These entries (BCS / EAS /
+// DEPEG / IL / EXPLOIT and any non-canonical FLASH thresholds) describe the old
+// vault-era product set and do NOT match the live V5.4 catalog (6 flash shields:
+// FLASHBTC/ETH × 1h/24h/48h — BTC 2.5/6/10%, ETH 4/8.5/14%). The rendered product
+// list comes from `components/lumina/redesign/Products.tsx` + `operate/products.ts`,
+// not this object. Kept ONLY because `lib/pricing.ts` still references PRODUCTS.BCS/
+// .EAS keys; fully removing it requires refactoring lib/pricing.ts (tracked separately).
 // PRODUCTS — per actuarial specs (docs/actuarial/)
 export const PRODUCTS = {
   BCS: {

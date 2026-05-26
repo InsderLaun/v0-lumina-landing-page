@@ -199,7 +199,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
           <tr><td>Núcleo</td><td><code>CoverRouterV2</code> &middot; <code>PolicyManagerV2</code> &middot; <code>TWAPBurner</code> &middot; <code>AdaptiveFeeDistributor</code></td><td>Compra / redención / cancelación; matemática de primas; enruta el 100% de las primas a la quema</td></tr>
           <tr><td>Productos</td><td><code>BaseFlashShield</code> + 6 shields Flash tras <code>FlashShieldAdapter</code></td><td>Un contrato por ventana de disparo BTC/ETH; proxies UUPS; el adapter expone la superficie legacy <code>IShieldV2</code> al core</td></tr>
           <tr><td>Marketplace</td><td><code>LuminaBondMarketplace</code> &middot; <code>BuybackEngine</code></td><td>Trading secundario de ClaimBonds; protección anti-MEV por commit-reveal</td></tr>
-          <tr><td>Oráculos y automatización</td><td><code>LuminaOracleV2</code> &middot; <code>CapacityOracle</code> &middot; <code>SolvencyOracle</code> &middot; <code>ShieldKeeper</code></td><td>Pruebas firmadas EIP-712; TWAP del precio de LUMINA; piso de solvencia 125%; automatización de disparos</td></tr>
+          <tr><td>Oráculos y automatización</td><td><code>LuminaOracleV2</code> &middot; <code>CapacityOracle</code> &middot; <code>SolvencyOracle</code> &middot; <code>ShieldKeeper</code></td><td>Pruebas firmadas EIP-712; TWAP del precio de LUMINA; monitoreo del ratio de solvencia (bandas 200/100/70%); automatización de disparos</td></tr>
         </tbody>
       </table>
     </div>
@@ -321,7 +321,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>Si la fórmula da cero (coberturas muy pequeñas), el contrato impone un piso de prima de <strong>1 micro-USDC</strong> (USD 0.000001).</p>
 
     <h3>5.2 Verificación de capacidad</h3>
-    <p>Antes de registrar una póliza, <code>PolicyManagerV2</code> consulta <code>BondVault.availableCapacityUSD()</code>. Si el pago potencial de la póliza llevaría a la bóveda por debajo de su piso de solvencia (125% sobre las obligaciones vigentes), la compra revierte con <code>InsufficientCapacity</code>.</p>
+    <p>Antes de registrar una póliza, <code>PolicyManagerV2</code> consulta <code>BondVault.availableCapacityUSD()</code>. Si el pago potencial de la póliza llevaría a la bóveda por debajo de su piso de respaldo (comprometido ≤ 50% del valor de reserva, ~200% de respaldo), la compra revierte con <code>InsufficientCapacity</code>.</p>
     <p><strong>La capacidad se computa sobre un TWAP de 1 hora del precio de LUMINA</strong>, no sobre el precio spot. Esta salvaguarda anti-MEV impide que un atacante manipule el spot, ya sea para denegar cobertura o para empujar al protocolo a reservas escasas.</p>
     <p>BondVault aplica un throttle adicional sobre quemas/redenciones: <strong>cap de 1,08% por semana, cola FIFO</strong>, de modo que un solo bloque no puede vaciar la reserva incluso si un gran cohorte se dispara simultáneamente.</p>
 
@@ -368,7 +368,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p><code>BOND_MATURITY_SECONDS = 730 días</code>. Un bono emitido hoy por una póliza disparada vence exactamente dos años después. El vencimiento se fija en la emisión y no cambia si el bono se vende en el marketplace: el comprador redime en la misma fecha.</p>
 
     <h3>6.4 Piso de solvencia</h3>
-    <p>El protocolo lleva la cuenta de <code>totalCommittedUSD</code> (suma de bonos emitidos) y <code>totalReservedUSD</code> (suma de reservas de capacidad de pólizas activas). Su suma nunca puede exceder <code>SAFETY_FACTOR_BPS &times; reserveValueUSD / 10000</code>. <code>burnFromReserves</code> —ruta administrativa para retirar colateral excedente— revierte si su ejecución violaría el piso de solvencia del 125%.</p>
+    <p>El protocolo lleva la cuenta de <code>totalCommittedUSD</code> (suma de bonos emitidos) y <code>totalReservedUSD</code> (suma de reservas de capacidad de pólizas activas). Su suma nunca puede exceder <code>SAFETY_FACTOR_BPS &times; reserveValueUSD / 10000</code>. <code>burnFromReserves</code> —ruta administrativa para retirar colateral excedente— está limitada al 5% de las reservas de la bóveda por transacción.</p>
   </div>
 </section>
 
@@ -416,7 +416,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>Dos oráculos adicionales sirven necesidades internas del protocolo:</p>
     <ul>
       <li><code>CapacityOracle.getLuminaPrice()</code>: provee un TWAP de 1 hora del precio spot de LUMINA, usado por las verificaciones de capacidad y solvencia.</li>
-      <li><code>SolvencyOracle</code>: monitorea el piso de solvencia del 125% del BondVault; lo consume <code>burnFromReserves</code> para bloquear quemas que comprometerían la solvencia.</li>
+      <li><code>SolvencyOracle</code>: monitorea el ratio de solvencia del BondVault (bandas 200/100/70%); lo consume <code>burnFromReserves</code> para bloquear quemas que comprometerían la solvencia.</li>
     </ul>
   </div>
 </section>

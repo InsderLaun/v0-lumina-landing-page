@@ -4,7 +4,7 @@ const PHASES = [
     current: false,
     status: '2026-05-22 · Done',
     title: 'V5.3 Foundation',
-    body: '6 flash shields deployed on Base Sepolia (BTC/ETH × 1h/24h/48h). FlashShieldAdapter UUPS bridge between PolicyManagerV2 legacy IShieldV2 surface and slim BaseFlashShield. BondVault throttle 1.08%/week + FIFO queue. Strike snapshot from Chainlink spot at purchase. AdaptiveFeeDistributor 85/8/2/5 split routing premiums to burn / treasury / ops / founder.',
+    body: '6 flash shields deployed on Base Sepolia (BTC/ETH × 1h/24h/48h). FlashShieldAdapter UUPS bridge between PolicyManagerV2 legacy IShieldV2 surface and slim BaseFlashShield. BondVault throttle 1.08%/week + FIFO queue. Strike snapshot from Chainlink spot at purchase. AdaptiveFeeDistributor 85/8/2/5 split routing premiums to burn / buyback / ops / maintenance.',
   },
   {
     id: 'P2',

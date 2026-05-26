@@ -10,8 +10,8 @@ const STEPS = [
     id: '02',
     glyph: '◆',
     title: 'Premium routes to burn',
-    meta: '85% burned · 8% treasury · 2% ops · 5% founder',
-    body: 'Your premium routes through the AdaptiveFeeDistributor. 85% reaches the TWAPBurner: USDC buys $LUMINA on Uniswap V3, tokens go to 0xdead. The remaining 15% funds treasury, ops, and the founder vesting reserve. Burns are atomic with the originating transaction.',
+    meta: '85% burned · 8% buyback · 2% ops · 5% maintenance',
+    body: 'Your premium routes through the AdaptiveFeeDistributor. 85% reaches the TWAPBurner: USDC buys $LUMINA on Uniswap V3, tokens go to 0xdead. The remaining 15% funds buyback, ops, and the maintenance reserve. Burns are atomic with the originating transaction.',
   },
   {
     id: '03',
