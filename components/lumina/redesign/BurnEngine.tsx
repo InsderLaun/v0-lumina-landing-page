@@ -109,9 +109,9 @@ export function BurnEngine() {
             </h2>
             <p className="rd-sec-lede" style={{ marginTop: 32 }}>
               The protocol has two burn paths. Premiums route through the AdaptiveFeeDistributor —
-              85% to TWAPBurner (USDC buys $LUMINA on Uniswap V3, tokens are sent to 0xdead),
-              8% treasury, 2% operations, 5% founder vesting. Secondary marketplace trades pay a 2%
-              fee that takes the same 85/8/2/5 path.
+              85% burn (USDC buys $LUMINA on Uniswap V3, tokens are sent to 0xdead),
+              8% buyback, 2% operations, 5% maintenance. Secondary marketplace trades pay a 3%
+              fee (1.5% seller + 1.5% buyer) that takes the same 85/8/2/5 path.
             </p>
             <ul className="rd-flow-list">
               <li>– 85% of every premium destroyed forever; 15% funds treasury, ops, founder.</li>

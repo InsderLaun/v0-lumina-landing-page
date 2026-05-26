@@ -440,7 +440,10 @@ redeemBond(
           USDC.
         </p>
         <p>
-          A flat <strong>2% fee</strong> is taken on every fill. The fee is
+          A <strong>3% fee</strong> is taken on every fill — split{' '}
+          <strong>1.5% from the seller + 1.5% from the buyer</strong>
+          {' '}(contract <code>SELLER_FEE_BPS = 150</code> +{' '}
+          <code>BUYER_FEE_BPS = 150</code>). The fee is
           <strong> burned by the protocol</strong> (routed through the
           TWAPBurner), not paid to a treasury.
         </p>
@@ -505,9 +508,9 @@ list(
           atomic transaction the contract:
         </p>
         <ol>
-          <li>Pulls the total USDC price from the buyer.</li>
-          <li>Pays 98% of it to the seller.</li>
-          <li>Routes the remaining 2% to the TWAPBurner (fee burn).</li>
+          <li>Pulls the listing price plus the 1.5% buyer fee in USDC from the buyer.</li>
+          <li>Pays the seller the listing price minus the 1.5% seller fee.</li>
+          <li>Routes the combined 3% fee (1.5% seller + 1.5% buyer) to the TWAPBurner (fee burn).</li>
           <li>Transfers the ERC-1155 bonds from escrow to the buyer.</li>
         </ol>
         <p>

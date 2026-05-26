@@ -55,7 +55,7 @@ export function Nav() {
         <div className="rd-nav-cta">
           <a
             className="rd-btn rd-btn-ghost"
-            href="https://github.com/org-lumina"
+            href="https://github.com/org-lumina/LUMINA-PROTOCOL"
             target="_blank"
             rel="noopener noreferrer"
           >

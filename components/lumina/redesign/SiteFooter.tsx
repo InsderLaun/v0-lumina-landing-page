@@ -48,6 +48,7 @@ export function SiteFooter() {
             <Link href="/docs">Smart contracts</Link>
             <Link href="/tutorial">Tutorial</Link>
             <Link href="/faucet">Testnet faucet</Link>
+            <Link href="/legal">Legal · Terms &amp; Risk</Link>
           </div>
 
           <div className="rd-foot-col">
@@ -82,7 +83,11 @@ export function SiteFooter() {
             <h5>Contact</h5>
             <a href="mailto:labs@lumina-org.com">labs@lumina-org.com</a>
             <a href="mailto:support@lumina-org.com">support@lumina-org.com</a>
-            <a href="https://github.com/org-lumina" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://github.com/org-lumina/LUMINA-PROTOCOL"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               GitHub
             </a>
           </div>

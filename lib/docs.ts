@@ -126,7 +126,7 @@ export const V53_CORE: V53Address[] = [
   { label: 'FounderVesting',         address: '0xfF4Db529bBCd4E3CC091E07b7845241EB4762832', note: 'V2 — 3 unlock paths' },
   { label: 'LuminaOracleV2',         address: '0x9bfa2f7A5098C89b8740D1694d1f716A0Bd871dD' },
   { label: 'TWAPBurner',             address: '0x242d76082856901b4ba1E7c50C022D46a6941bC0' },
-  { label: 'AdaptiveFeeDistributor', address: '0xeC7841A4a9ecfb8cA58391E233A645B021c59D54', note: 'Split 85/8/2/5 (BuybackBurn/Treasury/Operations/Founder)' },
+  { label: 'AdaptiveFeeDistributor', address: '0xeC7841A4a9ecfb8cA58391E233A645B021c59D54', note: 'Split 85/8/2/5 (Burn/Buyback/Operations/Maintenance)' },
   { label: 'BuybackEngine',          address: '0x56B5a1115B0d9781E7358521204d927d2F80d8B4' },
   { label: 'Marketplace',            address: '0x0938205f4cBe5F572656533FC930FFce6F5F4345' },
 ]

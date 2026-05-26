@@ -158,7 +158,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
       <li><strong>A deflationary token (LUMINA, 100M fixed supply)</strong>. Every USDC premium and every secondary-market trading fee is routed through the <em>TWAPBurner</em>, which buys $LUMINA on Uniswap V3 and burns it to <code>0xdead</code>. There is no mint function.</li>
       <li><strong>A relayer-paid API</strong> that lets autonomous AI agents purchase, redeem, and trade policies via a single signed HTTP call — without holding ETH for gas.</li>
     </ul>
-    <p>The current architecture is <strong>fully operational</strong> on Base Sepolia: six Flash Shields are live, premiums flow into the burner, the marketplace is open (2% fee burn, USDC settlement), the Chainlink-backed oracle (BTC/USD + ETH/USD) feeds shields via the <code>FlashShieldAdapter</code> UUPS bridge, and a self-service onboarding endpoint lets agents mint API keys with a single wallet signature.</p>
+    <p>The current architecture is <strong>fully operational</strong> on Base Sepolia: six Flash Shields are live, premiums flow into the burner, the marketplace is open (3% fee burn — 1.5% seller + 1.5% buyer — USDC settlement), the Chainlink-backed oracle (BTC/USD + ETH/USD) feeds shields via the <code>FlashShieldAdapter</code> UUPS bridge, and a self-service onboarding endpoint lets agents mint API keys with a single wallet signature.</p>
     <p>This whitepaper documents what is deployed today on V5.3. Forward-looking statements are confined to <a href="#sec-13">Section 14 (Roadmap)</a> and <a href="#sec-14">Section 15 (Risks)</a>. Every numeric claim, contract address, and function signature is grounded in the protocol source code and the live <code>/health</code> endpoint of the production API.</p>
   </div>
 </section>
@@ -176,7 +176,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>Existing crypto insurance — Nexus Mutual, InsurAce, Sherlock — is built around <strong>discretionary claims</strong>: an event is reported, a committee votes, a payout is issued (or denied) days or weeks later. That is fundamentally incompatible with autonomous agents that need a deterministic, sub-minute response.</p>
     <h3>2.2 What Lumina does differently</h3>
     <p>Lumina is <strong>parametric</strong>: every policy specifies an objective trigger condition (e.g., &ldquo;BTC drops &ge; 5% in any rolling 1-hour window&rdquo;). When an oracle confirms the condition, the payout fires automatically inside the same transaction. There is no claim form, no committee, no delay, no possibility of subjective denial.</p>
-    <p>Lumina is also <strong>agent-first</strong>. The API exposes a relayer pattern (<code>POST /api/v1/policies</code>) where the protocol pays the gas and an agent only needs an <code>x-api-key</code> header. Mocking 22 individual SKILL files to streamline the most common operations means an agent can integrate Lumina end-to-end in under one hour.</p>
+    <p>Lumina is also <strong>agent-first</strong>. The API exposes a relayer pattern (<code>POST /api/v1/policies</code>) where the protocol pays the gas and an agent only needs an <code>x-api-key</code> header. Maintaining 24 individual skill files to streamline the most common operations means an agent can integrate Lumina end-to-end in under one hour.</p>
   </div>
 </section>
 
@@ -719,7 +719,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>The signature feature for agents: <code>POST /api/v1/policies</code>. The API's relayer wallet signs <code>purchasePolicyFor</code> on-chain on the agent's behalf. The agent <strong>does not need ETH for gas</strong>; only USDC for the premium (held by the agent's wallet, pulled by the contract). Idempotency keys prevent double-spend on retry.</p>
 
     <h3>12.3 Skill files</h3>
-    <p>The <code>lumina-api</code> repo ships <strong>22 skill files</strong> at <code>docs/skills/</code> &mdash; one per common operation. Each file follows a fixed structure: a "What this does" plain-English block, a copy-pasteable LLM prompt, env vars, curl + TypeScript + Python examples, request/response schemas, and error codes. Designed to be dropped straight into an agent's tool list or system prompt.</p>
+    <p>The <code>lumina-api</code> repo ships <strong>24 skill files</strong> at <code>docs/skills/</code> &mdash; one per common operation. Each file follows a fixed structure: a "What this does" plain-English block, a copy-pasteable LLM prompt, env vars, curl + TypeScript + Python examples, request/response schemas, and error codes. Designed to be dropped straight into an agent's tool list or system prompt.</p>
 
     <h3>12.4 Endpoint surface</h3>
     <div class="table-wrap"><table>
@@ -757,9 +757,9 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
       <li>6 Flash shields (BTC and ETH; 1h, 24h, 48h) live and active behind <code>FlashShieldAdapter</code>.</li>
       <li>Chainlink BTC/USD and ETH/USD live; L2 sequencer feed wired (no-op on Sepolia).</li>
       <li>Single BondVault + 1.08%/week FIFO throttle live.</li>
-      <li>Marketplace V5.3 live: 2% fee burn, USDC settlement.</li>
+      <li>Marketplace V5.3 live: 3% fee burn (1.5% seller + 1.5% buyer), USDC settlement.</li>
       <li>FounderVesting V2 with three independent paths live.</li>
-      <li>Self-service agent onboarding + 22 skill files published.</li>
+      <li>Self-service agent onboarding + 24 skill files published.</li>
     </ul>
 
     <h3>Phase 5 — Testnet usage &amp; bake (current)</h3>
@@ -867,7 +867,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
         <tr><td>LuminaBondMarketplace</td><td><code>0x0938205f4cBe5F572656533FC930FFce6F5F4345</code></td></tr>
       </tbody>
     </table></div>
-    <p style="font-size:12px;color:var(--text-muted);margin-top:6px;"><strong>AdaptiveFeeDistributor split:</strong> 85% BuybackBurn / 8% Treasury / 2% Operations / 5% Founder.</p>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:6px;"><strong>AdaptiveFeeDistributor split:</strong> 85% Burn / 8% Buyback / 2% Operations / 5% Maintenance.</p>
 
     <h3>Flash shield adapters (V5.3, deployed 2026-05-14)</h3>
     <div class="table-wrap"><table>
@@ -946,7 +946,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
       <li>Aave V3 integration: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/architecture/AAVE-INTEGRATION.md">docs/architecture/AAVE-INTEGRATION.md</a></li>
       <li>Oracle V2 deep dive: <a href="https://github.com/org-lumina/LUMINA-PROTOCOL/blob/main/docs/architecture/ORACLE-V2.md">docs/architecture/ORACLE-V2.md</a></li>
       <li>API endpoint reference: <a href="https://github.com/org-lumina/lumina-api/blob/main/README.md">lumina-api README</a></li>
-      <li>22 skill files: <a href="https://github.com/org-lumina/lumina-api/tree/main/docs/skills">lumina-api/docs/skills</a></li>
+      <li>24 skill files: <a href="https://github.com/org-lumina/lumina-api/tree/main/docs/skills">lumina-api/docs/skills</a></li>
       <li>Live deploy state: <a href="https://lumina-api-production-ac85.up.railway.app/health">/health</a></li>
       <li>Block explorer: <a href="https://sepolia.basescan.org">sepolia.basescan.org</a></li>
     </ul>
