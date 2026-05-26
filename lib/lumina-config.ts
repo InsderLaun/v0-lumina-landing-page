@@ -37,8 +37,8 @@ export const DEPLOY_BLOCK_SEPOLIA = 40_775_000n
 
 export const TOKENS = {
   USDC: {
-    // V5.1 testnet — MockUSDC deployed alongside the protocol
-    address: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    // V5.4 testnet — MockUSDC (mintable, permissionless faucet)
+    address: "0xD944d8e5D8329994D83950872Ec210891d3Ab6AE" as `0x${string}`, // LIVE mUSDC (Base Sepolia)
     symbol: "USDC",
     name: "USD Coin (mock)",
     decimals: 6,
@@ -62,9 +62,9 @@ export const AAVE = {
 } as const
 
 export const ORACLES = {
-  // V5.1 testnet uses MockChainlinkOracle for ETH and BTC feeds.
-  ETH_USD: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  BTC_USD: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  // V5.4 testnet — Chainlink feeds on Base Sepolia (wired in DeployShieldsAndAdapters).
+  ETH_USD: "0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1" as `0x${string}`, // Chainlink ETH/USD (Base Sepolia)
+  BTC_USD: "0x0FB99723Aee6f420beAD13e6bBB79b7E6F034298" as `0x${string}`, // Chainlink BTC/USD (Base Sepolia)
 } as const
 
 // CONTRACTS — V5.1 on Base Sepolia (chainId 84532).
@@ -86,24 +86,24 @@ export const ORACLES = {
 // LIVE V5.1 from `/api/v1/products`; for runtime resolution use
 // `useShields()` instead.
 export const CONTRACTS = {
-  // ─── Mirrored from /health.contracts (use useContracts() in client) ───
-  CoverRouter: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  PolicyManager: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  LuminaToken: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  ClaimBond: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  BondVault: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  Marketplace: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  // ─── NOT in /health, static snapshot ───
-  Oracle: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — CapacityOracle proxy
-  // LuminaOracleV2 — real EIP-712 shield oracle, deployed 2026-05-04.
-  // The 9 V5.1 shields were rebound to this address via UUPS upgrade
-  // in PR org-lumina/LUMINA-PROTOCOL#101. See docs/architecture/ORACLE-V2.md.
-  LuminaOracleV2: "0x0000000000000000000000000000000000000000" as `0x${string}`, // SPRINT_Z2: cleared pre-redeploy
-  Phala: "0x0000000000000000000000000000000000000000" as `0x${string}`, // not deployed in V5.1 testnet
-  BuybackEngine: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  ShieldKeeper: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  TWAPBurner: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-  TreasuryVesting: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+  // ─── Canonical LIVE V5.4 (Base Sepolia), derived on-chain — see
+  //     audit-pack/manifests/V5.4-canonical-deployed.json. Runtime source of
+  //     truth for the user-facing 6 remains /health.contracts via useContracts();
+  //     these are the static fallback (no longer zeroed). ───
+  CoverRouter: "0xcdB70B40e6a3DEac3189185d947A0e458518F566" as `0x${string}`,
+  PolicyManager: "0x546C07e07DeBCdbf7a2A7Ef12C38c8c8fcAFcDd8" as `0x${string}`,
+  LuminaToken: "0x62C0b58bB30CA857674ec593F1e23B3F15266680" as `0x${string}`,
+  ClaimBond: "0xaa57Ab52Eb00f296Ad4CFA9E9c201f3737271FB4" as `0x${string}`,
+  BondVault: "0x193acBc1EdC5E565a4aBE96941C7E7AeF637B6EC" as `0x${string}`,
+  Marketplace: "0x0938205f4cBe5F572656533FC930FFce6F5F4345" as `0x${string}`,
+  // ─── NOT in /health, static snapshot (canonical V5.4) ───
+  Oracle: "0xd52aef11ff411E9e54F7a1bB680065F158cF6545" as `0x${string}`, // CapacityOracle proxy (LIVE)
+  LuminaOracleV2: "0x9bfa2f7A5098C89b8740D1694d1f716A0Bd871dD" as `0x${string}`, // EIP-712 shield oracle (non-upgradeable)
+  Phala: "0x0000000000000000000000000000000000000000" as `0x${string}`, // not deployed
+  BuybackEngine: "0x56B5a1115B0d9781E7358521204d927d2F80d8B4" as `0x${string}`,
+  ShieldKeeper: "0x0000000000000000000000000000000000000000" as `0x${string}`, // GAP: not wired (adapter.keeper()==0x0); settlement via relayer
+  TWAPBurner: "0x242d76082856901b4ba1E7c50C022D46a6941bC0" as `0x${string}`,
+  TreasuryVesting: "0x0000000000000000000000000000000000000000" as `0x${string}`, // address not in canonical manifest — confirm on-chain before use
   // V5.1 has a SINGLE BondVault. The legacy 5-vault keys below all alias
   // BondVault so existing UI components compile; the "My Vaults" tab
   // needs a redesign to expose V5.1's actual primitives.
