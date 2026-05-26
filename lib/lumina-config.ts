@@ -33,7 +33,7 @@ export const CHAIN = {
 // 0x6b4eac4d3d083432699c511897b21c2e49a6d3b8c6dc16f934db6add375c0616).
 // Floored to 40_775_000 to leave a small margin for any contract redeployed
 // in the same window. Bound by getLogsChunked so size is not a concern.
-export const DEPLOY_BLOCK_SEPOLIA = 40_775_000n
+export const DEPLOY_BLOCK_SEPOLIA = 41_680_000n // [perf] V5.4 contracts (ClaimBond 41680286 / BondVault 41680290 / Marketplace 41680314) all deployed ~41,680,28x; was 40,775,000 (V5.0) → ~905k empty blocks scanned per load
 
 export const TOKENS = {
   USDC: {

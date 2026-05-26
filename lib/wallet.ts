@@ -145,7 +145,11 @@ export const ensureBaseNetwork = async () => {
           chainId: BASE_CHAIN_ID,
           chainName: 'Base Sepolia',
           nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-          rpcUrls: ['https://sepolia.base.org'],
+          rpcUrls: [
+            process.env.NEXT_PUBLIC_RPC_URL_ALCHEMY,
+            process.env.NEXT_PUBLIC_RPC_URL_QUICKNODE,
+            'https://sepolia.base.org', // last-resort fallback
+          ].filter(Boolean) as string[],
           blockExplorerUrls: ['https://sepolia.basescan.org'],
         }],
       });
