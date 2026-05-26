@@ -1,5 +1,15 @@
 'use client'
 
+// [tutorial loading-bug fix] Every other route in this app declares
+// `force-dynamic`; /tutorial was the only one that did not. Without it, Next
+// (output: "standalone") tried to STATICALLY prerender this 'use client' page,
+// and because <TutorialBody> reads useSearchParams() the prerender bailed to
+// the <Suspense> fallback ("Tutorial · loading…"). That fallback HTML was then
+// served (and, with no-store headers + per-deploy build IDs, never re-hydrated
+// to the real body). Forcing dynamic rendering makes the body render per
+// request, matching the behavior of /faucet, /whitepaper, /app/*, etc.
+export const dynamic = 'force-dynamic'
+
 import '@/components/lumina/redesign/redesign.css'
 
 import Link from 'next/link'

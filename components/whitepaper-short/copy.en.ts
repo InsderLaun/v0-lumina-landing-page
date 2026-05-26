@@ -57,7 +57,7 @@ export const COPY_EN = {
       { title: 'ClaimBond minted (ERC-1155)', body: 'Minted to the holder, indexed by epoch. $1 face value per unit. Maturity: 730 days.' },
       { title: 'Choose: wait OR sell',       body: 'Hold the bond to maturity for $LUMINA, or list it on the secondary marketplace today for USDC.' },
       { title: 'Wait 730d → $LUMINA',        body: 'redeemBond() reads the oracle and mints luminaAmount = usdAmount / LUMINA_price to the holder. Captures the upside if $LUMINA appreciates.' },
-      { title: 'OR sell now → USDC',         body: 'List on the secondary marketplace at a discount. Buyer pays USDC. 2% protocol fee — routed through the AdaptiveFeeDistributor on the same 85/8/2/5 split.' },
+      { title: 'OR sell now → USDC',         body: 'List on the secondary marketplace at a discount. Buyer pays USDC. 3% marketplace fee (1.5% seller + 1.5% buyer) — routed through the AdaptiveFeeDistributor on the same 85/8/2/5 split.' },
     ],
     example: {
       label: 'Worked example',
@@ -108,7 +108,7 @@ export const COPY_EN = {
     eyebrow: '07 / 10 · Adaptive burn',
     h2Pre: 'Sixteen burn regimes. ',
     h2Italic: 'The matrix decides where every premium goes.',
-    lede: "The AdaptiveFeeDistributor sits in front of the burner. Before any LUMINA is bought, the router consults a 4×4 matrix indexed on solvency × momentum, with 16 pre-tuned cells. HEALTHY × STABLE is the V5.3 default and applies an 85/8/2/5 split (BuybackBurn / Treasury / Operations / Founder); CRISIS × CRASH halts burn entirely and stages 96 % of incoming USDC for a defensive buyback.",
+    lede: "The AdaptiveFeeDistributor sits in front of the burner. Before any LUMINA is bought, the router consults a 4×4 matrix indexed on solvency × momentum, with 16 pre-tuned cells. HEALTHY × STABLE is the V5.3 default and applies an 85/8/2/5 split (Burn / Buyback / Operations / Maintenance); CRISIS × CRASH halts burn entirely and stages 96 % of incoming USDC for a defensive buyback.",
     rowLabels: ['ULTRA', 'HEALTHY', 'STRESSED', 'CRISIS'],
     colLabels: ['RALLY', 'STABLE', 'DECLINE', 'CRASH'],
     matrix: [

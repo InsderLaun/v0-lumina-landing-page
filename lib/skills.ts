@@ -1,4 +1,4 @@
-// 22 SKILLS — full lifecycle coverage (discover → quote → buy → monitor →
+// 24 SKILLS — full lifecycle coverage (discover → quote → buy → monitor →
 // claim → marketplace → integration). Each `githubUrl` points to a real
 // file:line in either LUMINA-PROTOCOL (V5.3 on Base Sepolia: 6 Flash shields
 // behind FlashShieldAdapter (UUPS) over BaseFlashShield slim, PolicyManagerV2

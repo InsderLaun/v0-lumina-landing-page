@@ -46,7 +46,7 @@ export const COPY_ES = {
       { title: 'ClaimBond acuñado (ERC-1155)',  body: 'Acuñado al holder, indexado por epoch. Valor nominal $1 por unidad. Vencimiento: 730 días.' },
       { title: 'Elegís: esperar O vender',      body: 'Mantener el bono hasta el vencimiento para recibir $LUMINA, o listarlo en el marketplace secundario hoy por USDC.' },
       { title: 'Esperar 730d → $LUMINA',        body: 'redeemBond() lee el oráculo y acuña luminaAmount = usdAmount / LUMINA_price al holder. Capturás el upside si $LUMINA aprecia.' },
-      { title: 'O vender ahora → USDC',         body: 'Listás en el marketplace secundario con descuento. El comprador paga USDC. Fee 2% — enrutado por el AdaptiveFeeDistributor con el mismo split 85/8/2/5.' },
+      { title: 'O vender ahora → USDC',         body: 'Listás en el marketplace secundario con descuento. El comprador paga USDC. Fee 3% del marketplace (1.5% vendedor + 1.5% comprador) — enrutado por el AdaptiveFeeDistributor con el mismo split 85/8/2/5.' },
     ],
     example: {
       label: 'Ejemplo trabajado',
@@ -97,7 +97,7 @@ export const COPY_ES = {
     eyebrow: '07 / 10 · Quema adaptativa',
     h2Pre: 'Dieciséis regímenes de quema. ',
     h2Italic: 'La matriz decide a dónde va cada prima.',
-    lede: 'El AdaptiveFeeDistributor está al frente del burner. Antes de comprar LUMINA, el router consulta una matriz 4×4 indexada por solvencia × momentum, con 16 celdas pre-ajustadas. HEALTHY × STABLE es el régimen por defecto de V5.3 y aplica un split 85/8/2/5 (BuybackBurn / Treasury / Operations / Founder); CRISIS × CRASH detiene la quema completamente y reserva 96% del USDC entrante para un buyback defensivo.',
+    lede: 'El AdaptiveFeeDistributor está al frente del burner. Antes de comprar LUMINA, el router consulta una matriz 4×4 indexada por solvencia × momentum, con 16 celdas pre-ajustadas. HEALTHY × STABLE es el régimen por defecto de V5.3 y aplica un split 85/8/2/5 (Burn / Buyback / Operations / Maintenance); CRISIS × CRASH detiene la quema completamente y reserva 96% del USDC entrante para un buyback defensivo.',
     rowLabels: ['ULTRA', 'HEALTHY', 'STRESSED', 'CRISIS'],
     colLabels: ['RALLY', 'STABLE', 'DECLINE', 'CRASH'],
     matrix: [
