@@ -52,7 +52,7 @@ export const COPY_EN = {
     h2Italic: 'six steps, two endings.',
     lede: 'Every Lumina position walks the same six-step path. The premium is paid in USDC and burns $LUMINA on the way in. If the trigger fires, a ClaimBond is minted. From there the holder picks one of two endings — wait 730 days for $LUMINA at maturity, or sell now on the secondary marketplace for USDC.',
     steps: [
-      { title: 'Buy policy (USDC)',          body: 'Pay a small premium in USDC. Routed through the AdaptiveFeeDistributor: 85% reaches the TWAPBurner — buy & burn $LUMINA on Uniswap V3 — and 8/2/5% fund treasury/ops/founder. Supply shrinks immediately.' },
+      { title: 'Buy policy (USDC)',          body: 'Pay a small premium in USDC. Routed through the AdaptiveFeeDistributor: 85% reaches the TWAPBurner — buy & burn $LUMINA on Uniswap V3 — and 8/2/5% fund buyback/ops/maintenance. Supply shrinks immediately.' },
       { title: 'Trigger fires',              body: 'Oracle observes the covered asset. If the trigger condition is met inside the policy window, the policy is triggered and a ClaimBond becomes mintable.' },
       { title: 'ClaimBond minted (ERC-1155)', body: 'Minted to the holder, indexed by epoch. $1 face value per unit. Maturity: 730 days.' },
       { title: 'Choose: wait OR sell',       body: 'Hold the bond to maturity for $LUMINA, or list it on the secondary marketplace today for USDC.' },

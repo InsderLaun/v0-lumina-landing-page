@@ -41,7 +41,7 @@ export const COPY_ES = {
     h2Italic: 'seis pasos, dos finales.',
     lede: 'Cada posición Lumina recorre el mismo camino de seis pasos. La prima se paga en USDC y quema $LUMINA al entrar. Si el trigger se dispara, se acuña un ClaimBond. Desde ahí el holder elige uno de dos finales — esperar 730 días para recibir $LUMINA al vencimiento, o vender ahora en el marketplace secundario por USDC.',
     steps: [
-      { title: 'Comprar póliza (USDC)',         body: 'Pagás una pequeña prima en USDC. Se enruta al AdaptiveFeeDistributor: 85% al TWAPBurner — compra y quema $LUMINA en Uniswap V3 — y 8/2/5% reparte treasury/ops/founder. El supply se reduce inmediatamente.' },
+      { title: 'Comprar póliza (USDC)',         body: 'Pagás una pequeña prima en USDC. Se enruta al AdaptiveFeeDistributor: 85% al TWAPBurner — compra y quema $LUMINA en Uniswap V3 — y 8/2/5% reparte buyback/ops/maintenance. El supply se reduce inmediatamente.' },
       { title: 'Trigger se dispara',            body: 'El oráculo observa el activo cubierto. Si la condición de trigger se cumple dentro de la ventana, la póliza queda activada y un ClaimBond es acuñable.' },
       { title: 'ClaimBond acuñado (ERC-1155)',  body: 'Acuñado al holder, indexado por epoch. Valor nominal $1 por unidad. Vencimiento: 730 días.' },
       { title: 'Elegís: esperar O vender',      body: 'Mantener el bono hasta el vencimiento para recibir $LUMINA, o listarlo en el marketplace secundario hoy por USDC.' },

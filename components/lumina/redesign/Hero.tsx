@@ -9,7 +9,7 @@ const BURN_EVENTS = [
   { t: '00:42 UTC', action: 'Flash BTC 1h', amount: '+ 2.92 USDC', lumina: '80.2 LUMINA' },
   { t: '00:38 UTC', action: 'Flash ETH 24h', amount: '+ 45.80 USDC', lumina: '1,258.2 LUMINA' },
   { t: '00:31 UTC', action: 'Flash BTC 48h', amount: '+ 148.67 USDC', lumina: '4,083.5 LUMINA' },
-  { t: '00:27 UTC', action: 'Bond resale 2%', amount: '+ 12.00 USDC', lumina: '329.7 LUMINA' },
+  { t: '00:27 UTC', action: 'Bond resale 3%', amount: '+ 12.00 USDC', lumina: '329.7 LUMINA' },
 ] as const
 
 export function Hero() {

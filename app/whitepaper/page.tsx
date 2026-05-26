@@ -20,7 +20,7 @@ export default function WhitepaperHubPage() {
 
       <header className="rd-wp-hero">
         <div className="wrap">
-          <span className="rd-eyebrow">Whitepapers · V3.0 · 2026</span>
+          <span className="rd-eyebrow">Whitepapers · V5.4 · 2026</span>
           <h1>
             Choose your <em>reading</em>.
           </h1>
@@ -34,18 +34,18 @@ export default function WhitepaperHubPage() {
       <main className="rd-wp-versions">
         <div className="wrap">
           <div className="rd-section-head">
-            <h2>Full Whitepaper · V3.0</h2>
-            <span className="rd-count">17 sections · ~50 pages</span>
+            <h2>Full Whitepaper · V5.4</h2>
+            <span className="rd-count">16 sections · ~30 pages</span>
           </div>
           <div className="rd-wp-grid">
             <WhitepaperCard
               variant="full"
               flag="EN"
-              ver="FULL · V3.0"
+              ver="FULL · V5.4"
               pages="English"
               title="Whitepaper · English"
-              desc="Complete protocol specification: architecture, kink pricing model, 9 ClaimBond products, oracle infrastructure, security audit findings, and full economic model."
-              toc="§1 Abstract · §2 Architecture · §3 Pricing · §4 Products · §5 ClaimBonds · §6 Oracle · §7 Security · §17 Roadmap"
+              desc="Complete protocol specification: architecture, flash-crash pricing model, 6 Flash Shield products, oracle infrastructure, security audit findings, and full economic model."
+              toc="§1 Abstract · §2 Architecture · §3 Pricing · §4 Products · §5 ClaimBonds · §6 Oracle · §7 Security · §16 Roadmap"
               href="/whitepaper/en"
               cta="Read full →"
               source="hosted"
@@ -53,11 +53,11 @@ export default function WhitepaperHubPage() {
             <WhitepaperCard
               variant="full"
               flag="ES"
-              ver="COMPLETO · V3.0"
+              ver="COMPLETO · V5.4"
               pages="Español"
               title="Whitepaper · Español"
-              desc="Especificación completa del protocolo: arquitectura, modelo kink de pricing, 9 productos ClaimBond, infraestructura oracle, hallazgos de auditoría y modelo económico íntegro."
-              toc="§1 Resumen · §2 Arquitectura · §3 Pricing · §4 Productos · §5 ClaimBonds · §6 Oracle · §7 Seguridad · §17 Roadmap"
+              desc="Especificación completa del protocolo: arquitectura, modelo de pricing flash-crash, 6 productos Flash Shield, infraestructura oracle, hallazgos de auditoría y modelo económico íntegro."
+              toc="§1 Resumen · §2 Arquitectura · §3 Pricing · §4 Productos · §5 ClaimBonds · §6 Oracle · §7 Seguridad · §16 Roadmap"
               href="/whitepaper/es"
               cta="Leer completo →"
               source="hosted"
@@ -89,7 +89,7 @@ export default function WhitepaperHubPage() {
               pages="2 páginas"
               title="Resumen · Español"
               desc="Brief de dos páginas: qué es Lumina, por qué la especulación paramétrica para agentes IA importa y cómo integrarlo. Ideal para inversores, partners u orientación técnica rápida."
-              toc="Problema · Solución · Arquitectura · 9 productos · Tokenomics · Roadmap · Contacto"
+              toc="Problema · Solución · Arquitectura · 6 productos · Tokenomics · Roadmap · Contacto"
               href={SUMMARY_ES_URL}
               external
               cta="Abrir PDF ↗"

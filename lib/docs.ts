@@ -352,7 +352,7 @@ export const DOCS: DocEntry[] = [
   },
   {
     title: 'SolvencyOracle.sol',
-    description: 'Monitors the BondVault solvency floor (125%). Used by burnFromReserves to block insolvent burns.',
+    description: 'Monitors the BondVault solvency ratio (200/100/70% bands). Used by burnFromReserves to block insolvent burns.',
     repo: 'LUMINA-PROTOCOL',
     path: 'src/oracles/SolvencyOracle.sol',
     category: 'source',

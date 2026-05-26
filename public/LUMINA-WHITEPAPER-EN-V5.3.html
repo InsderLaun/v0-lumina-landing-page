@@ -199,7 +199,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
           <tr><td>Core</td><td><code>CoverRouterV2</code> &middot; <code>PolicyManagerV2</code> &middot; <code>TWAPBurner</code> &middot; <code>AdaptiveFeeDistributor</code></td><td>Buy / redeem / cancel; premium math; routes 100% of premiums to burn</td></tr>
           <tr><td>Products</td><td><code>BaseFlashShield</code> + 6 Flash shield implementations behind <code>FlashShieldAdapter</code></td><td>One contract per BTC/ETH trigger window; UUPS proxies; adapter bridges to the legacy <code>IShieldV2</code> surface</td></tr>
           <tr><td>Marketplace</td><td><code>LuminaBondMarketplace</code> &middot; <code>BuybackEngine</code></td><td>Secondary trading of ClaimBonds; commit-reveal MEV protection</td></tr>
-          <tr><td>Oracles &amp; automation</td><td><code>LuminaOracleV2</code> &middot; <code>CapacityOracle</code> &middot; <code>SolvencyOracle</code> &middot; <code>ShieldKeeper</code></td><td>EIP-712 signed proofs; LUMINA TWAP price; 125% solvency floor; trigger automation</td></tr>
+          <tr><td>Oracles &amp; automation</td><td><code>LuminaOracleV2</code> &middot; <code>CapacityOracle</code> &middot; <code>SolvencyOracle</code> &middot; <code>ShieldKeeper</code></td><td>EIP-712 signed proofs; LUMINA TWAP price; solvency-ratio monitoring (200/100/70% bands); trigger automation</td></tr>
         </tbody>
       </table>
     </div>
@@ -321,7 +321,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>If the formula evaluates to zero (very small covers), the contract floors the premium at <strong>1 micro-USDC</strong> ($0.000001).</p>
 
     <h3>5.2 Capacity check</h3>
-    <p>Before recording a policy, <code>PolicyManagerV2</code> queries <code>BondVault.availableCapacityUSD()</code>. If the policy's potential payout would push the vault below its solvency floor (125% over outstanding obligations), the purchase reverts with <code>InsufficientCapacity</code>.</p>
+    <p>Before recording a policy, <code>PolicyManagerV2</code> queries <code>BondVault.availableCapacityUSD()</code>. If the policy's potential payout would push the vault below its backing floor (committed ≤ 50% of reserve value, i.e. ~200% backing), the purchase reverts with <code>InsufficientCapacity</code>.</p>
     <p><strong>Capacity is computed on a 1-hour TWAP of LUMINA price</strong>, not the spot price. This anti-MEV safeguard prevents an attacker from manipulating spot to either deny coverage or force the protocol into thin reserves.</p>
     <p>BondVault enforces an additional throttle on burns/redemptions: <strong>cap 1.08% per week, FIFO queue</strong>, so a single block cannot drain the reserve even if a large cohort triggers simultaneously.</p>
 
@@ -368,7 +368,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p><code>BOND_MATURITY_SECONDS = 730 days</code>. A bond minted today by a triggered policy matures exactly two years from now. Maturity is fixed at issuance and does not change if the bond is sold on the marketplace &mdash; the buyer redeems at the same date.</p>
 
     <h3>6.4 Solvency floor</h3>
-    <p>The protocol tracks <code>totalCommittedUSD</code> (sum of issued bonds) and <code>totalReservedUSD</code> (sum of capacity reservations from active policies). Their sum may never exceed <code>SAFETY_FACTOR_BPS &times; reserveValueUSD / 10000</code>. <code>burnFromReserves</code> &mdash; an admin path used to retire excess collateral &mdash; reverts if it would breach the 125% solvency floor.</p>
+    <p>The protocol tracks <code>totalCommittedUSD</code> (sum of issued bonds) and <code>totalReservedUSD</code> (sum of capacity reservations from active policies). Their sum may never exceed <code>SAFETY_FACTOR_BPS &times; reserveValueUSD / 10000</code>. <code>burnFromReserves</code> &mdash; an admin path used to retire excess collateral &mdash; is capped at 5% of vault reserves per transaction.</p>
   </div>
 </section>
 
@@ -416,7 +416,7 @@ td.mono,td code{font-family:'JetBrains Mono',monospace;color:var(--text-secondar
     <p>Two additional oracles serve internal protocol needs:</p>
     <ul>
       <li><code>CapacityOracle.getLuminaPrice()</code> &mdash; provides a 1-hour TWAP of LUMINA's spot price, used by capacity and solvency checks.</li>
-      <li><code>SolvencyOracle</code> &mdash; monitors the BondVault's 125% solvency floor; consumed by <code>burnFromReserves</code> to block burns that would compromise solvency.</li>
+      <li><code>SolvencyOracle</code> &mdash; monitors the BondVault's solvency ratio (200/100/70% bands); consumed by <code>burnFromReserves</code> to block burns that would compromise solvency.</li>
     </ul>
   </div>
 </section>
