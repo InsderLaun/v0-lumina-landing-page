@@ -7,10 +7,11 @@ import { WhitepaperCard } from '@/components/lumina/redesign/WhitepaperCard'
 
 export const dynamic = 'force-dynamic'
 
-const SUMMARY_EN_URL =
-  'https://github.com/org-lumina/v0-lumina-landing-page/blob/main/public/LUMINA-SUMMARY-EN.pdf'
-const SUMMARY_ES_URL =
-  'https://github.com/org-lumina/v0-lumina-landing-page/blob/main/public/LUMINA-SUMMARY-ES.pdf'
+// Short ("summary") whitepaper is the on-site, fully-designed interactive page
+// at /whitepaper-short/[lang] — NOT a GitHub PDF. Mirrors the full whitepaper,
+// which is also hosted in-site (/whitepaper/[lang]).
+const SUMMARY_EN_URL = '/whitepaper-short/en'
+const SUMMARY_ES_URL = '/whitepaper-short/es'
 
 export default function WhitepaperHubPage() {
   return (
@@ -65,35 +66,33 @@ export default function WhitepaperHubPage() {
           </div>
 
           <div className="rd-section-head" style={{ marginTop: 64 }}>
-            <h2>Executive Summary · 2-page brief</h2>
-            <span className="rd-count">Quick context · PDF</span>
+            <h2>Executive Summary · short version</h2>
+            <span className="rd-count">Quick context · hosted</span>
           </div>
           <div className="rd-wp-grid">
             <WhitepaperCard
               variant="summary"
               flag="EN"
-              ver="SUMMARY · PDF"
-              pages="2 pages"
+              ver="SUMMARY · LIVE"
+              pages="Interactive"
               title="Summary · English"
-              desc="Two-page brief covering what Lumina is, why parametric speculation for AI agents matters, and how to integrate. Ideal for investors, partners, or quick technical orientation."
+              desc="A short, interactive brief covering what Lumina is, why parametric speculation for AI agents matters, and how to integrate. Ideal for investors, partners, or quick technical orientation."
               toc="Problem · Solution · Architecture · 6 products at a glance · Tokenomics · Roadmap · Contact"
               href={SUMMARY_EN_URL}
-              external
-              cta="Open PDF ↗"
-              source="github"
+              cta="Read summary →"
+              source="hosted"
             />
             <WhitepaperCard
               variant="summary"
               flag="ES"
-              ver="RESUMEN · PDF"
-              pages="2 páginas"
+              ver="RESUMEN · LIVE"
+              pages="Interactivo"
               title="Resumen · Español"
-              desc="Brief de dos páginas: qué es Lumina, por qué la especulación paramétrica para agentes IA importa y cómo integrarlo. Ideal para inversores, partners u orientación técnica rápida."
+              desc="Brief corto e interactivo: qué es Lumina, por qué la especulación paramétrica para agentes IA importa y cómo integrarlo. Ideal para inversores, partners u orientación técnica rápida."
               toc="Problema · Solución · Arquitectura · 6 productos · Tokenomics · Roadmap · Contacto"
               href={SUMMARY_ES_URL}
-              external
-              cta="Abrir PDF ↗"
-              source="github"
+              cta="Leer resumen →"
+              source="hosted"
             />
           </div>
         </div>
