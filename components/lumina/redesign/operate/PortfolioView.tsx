@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAccount, usePublicClient, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { erc20Abi, formatUnits, parseUnits, type Hex } from 'viem'
-import { DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_SEPOLIA, LUMINA_API_URL } from '@/lib/lumina-config'
 import { claimBondAbi, bondVaultAbi, policyManagerV2Abi } from '@/lib/abis/operate'
 import { SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
@@ -62,6 +62,43 @@ export function PortfolioView() {
 
     ;(async () => {
       try {
+        // [API-first] Cached server endpoint reconstructs the wallet's policies
+        // server-side — avoids a wide client-side eth_getLogs scan (the cause of
+        // "FAILED TO LOAD"). Falls back to the on-chain scan if the API is down.
+        try {
+          const res = await fetch(`${LUMINA_API_URL}/api/v1/public/policies/${address}`, { cache: 'no-store' })
+          if (res.ok) {
+            const body = (await res.json()) as {
+              policies?: Array<{
+                productId: string; policyId: string; coverage: string
+                premium: string; payout: string; txHash: string; createdAt: string
+              }>
+            }
+            if (cancelled) return
+            const rows: PolicyRow[] = (body.policies ?? []).map((p) => {
+              const pid = p.productId as Hex
+              const shield = SHIELD_BY_PRODUCT_ID[pid]
+              const createdAt = BigInt(Math.floor(new Date(p.createdAt).getTime() / 1000) || 0)
+              return {
+                productId: pid,
+                policyId: BigInt(p.policyId),
+                shieldName: shield?.name ?? `Unknown (${pid.slice(0, 10)})`,
+                cover: BigInt(p.coverage),
+                premium: BigInt(p.premium),
+                payout: BigInt(p.payout),
+                txHash: p.txHash as Hex,
+                createdAt,
+                expiresAt: createdAt + BigInt(shield?.durationSeconds ?? 0),
+              }
+            })
+            setPolicies(rows)
+            return // success — skip the on-chain scan
+          }
+        } catch (apiErr) {
+          console.warn('[portfolio] policies API failed, falling back to on-chain scan:', apiErr)
+        }
+
+        // Fallback: scan PolicyCreated on-chain (legacy path).
         const head = await publicClient.getBlockNumber()
         const logs = await getLogsChunked({
           client: publicClient,
@@ -141,6 +178,23 @@ export function PortfolioView() {
 
     ;(async () => {
       try {
+        // [API-first] Cached server endpoint lists the wallet's bond epochs —
+        // avoids a wide client-side eth_getLogs scan. The per-epoch on-chain reads
+        // below (balanceOf/isMatured/getEpochInfo) still validate live state.
+        try {
+          const res = await fetch(`${LUMINA_API_URL}/api/v1/public/bonds/${address}?status=all`, { cache: 'no-store' })
+          if (res.ok) {
+            const body = (await res.json()) as { bonds?: Array<{ epochId: string }> }
+            if (cancelled) return
+            const epochs = Array.from(new Set((body.bonds ?? []).map((b) => b.epochId))).map(BigInt)
+            setUserEpochs(epochs)
+            return // success — skip the on-chain scan
+          }
+        } catch (apiErr) {
+          console.warn('[portfolio] bonds API failed, falling back to on-chain scan:', apiErr)
+        }
+
+        // Fallback: scan BondsMinted(to=wallet) on-chain (legacy path).
         const head = await publicClient.getBlockNumber()
         const logs = await getLogsChunked({
           client: publicClient,
