@@ -87,7 +87,11 @@ export function AgentDashboardView() {
     ;(async () => {
       try {
         const head = await publicClient.getBlockNumber()
-        const [pCreated, pTriggered, bMinted, bRedeemed] = await Promise.all([
+        // [resilience] allSettled (not all): the dashboard aggregates 4 event
+        // scans, two of which (PolicyTriggered/BondRedeemed) have no cached public
+        // endpoint yet. A single failing scan must NOT blank the whole dashboard
+        // ("FAILED TO LOAD") — it degrades that slice to empty instead.
+        const settled = await Promise.allSettled([
           // PolicyCreated — buyer NOT indexed → pull all + filter
           getLogsChunked({
             client: publicClient,
@@ -162,6 +166,12 @@ export function AgentDashboardView() {
           }),
         ])
         if (cancelled) return
+        const [pCreated, pTriggered, bMinted, bRedeemed] = settled.map((s) =>
+          s.status === 'fulfilled' ? (s.value as unknown[]) : [],
+        )
+        if (settled.some((s) => s.status === 'rejected')) {
+          console.warn('[agent-dashboard] some event scans failed — showing partial data')
+        }
 
         // Active policies (we treat PolicyCreated as "issued"; status filtering would
         // need PolicyTriggered/Expired matching — out of scope for KPI count)
