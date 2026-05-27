@@ -33,6 +33,24 @@ const nextConfig = {
         destination: "https://docs.lumina-org.com/:path*",
         permanent: true,
       },
+      // [fix C-1 landing-404] `/products` and `/tokenomics` were never real
+      // routes (only the homepage anchor sections + the operate app exist), so
+      // direct hits / typed URLs / external links 404'd (found in PR LP#174).
+      // Point them at the canonical public content: `/products` -> the homepage
+      // Products section (6 shields + live premiums, `id="products"`), and
+      // `/tokenomics` -> the full whitepaper (its Tokenomics section). Temporary
+      // (307) on purpose — these may graduate into dedicated pages later, so we
+      // avoid browsers permanently caching the redirect.
+      {
+        source: "/products",
+        destination: "/#products",
+        permanent: false,
+      },
+      {
+        source: "/tokenomics",
+        destination: "/whitepaper",
+        permanent: false,
+      },
     ];
   },
   // [Sprint Polish Final] Agent-discovery files mirrored from the canonical
