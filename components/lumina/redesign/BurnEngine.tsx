@@ -5,25 +5,15 @@ import { usePublicClient } from 'wagmi'
 import { parseAbiItem, formatUnits } from 'viem'
 // [NOT-MIGRATABLE-TO-useContracts]
 // CONTRACTS.TWAPBurner is NOT exposed by /health (only the 7 canonical
-// keys are: coverRouter, policyManager, bondVault, claimBond,
-// marketplace, usdc, luminaToken). The TWAPBurner address lives in the
-// static lumina-config.ts snapshot and is verified against the
-// LUMINA-PROTOCOL `script/upgrade/UpgradeTWAPBurnerAutoBurn.s.sol`
-// PROXY constant. To make this redeploy-proof, expose `twapBurner` in
-// /health.contracts (server change) and then migrate to useContracts().
-import { CONTRACTS } from '@/lib/lumina-config'
-
-// Mock baseline used until a real on-chain query lands. Once the public client
-// returns logs successfully, this is replaced by the on-chain total. Kept as a
-// fallback for SSR and for environments where the RPC call fails.
-const FALLBACK_BURNED = 1_284_402
+// keys are). Used only for the on-chain FALLBACK scan below; the primary
+// source is the Ponder-backed /api/v1/stats/burns endpoint.
+import { CONTRACTS, LUMINA_API_URL } from '@/lib/lumina-config'
 
 const BURN_EXECUTED_EVENT = parseAbiItem(
   'event BurnExecuted(uint256 usdcSpent, uint256 luminaBurned, uint256 effectivePrice, uint256 timestamp)',
 )
 
-// Public Base Sepolia RPCs cap eth_getLogs windows; ~9000 blocks is safe and
-// covers >5h at 2s block time, which is plenty for a marketing counter.
+// Public Base Sepolia RPCs cap eth_getLogs windows; ~9000 blocks is safe.
 const LOG_LOOKBACK_BLOCKS = 9_000n
 
 function formatLumina(weiTotal: bigint): number {
@@ -32,13 +22,38 @@ function formatLumina(weiTotal: bigint): number {
 
 export function BurnEngine() {
   const publicClient = usePublicClient()
-  const [counter, setCounter] = useState(FALLBACK_BURNED)
-  const [isReal, setIsReal] = useState(false)
+  // No fake baseline — start at 0 and only show real, indexed/on-chain data.
+  const [burned, setBurned] = useState(0)
+  const [usdcVolume, setUsdcVolume] = useState(0) // whole USDC
+  const [last30, setLast30] = useState(0) // whole LUMINA
+  const [source, setSource] = useState<'api' | 'chain' | null>(null)
 
+  // Primary source: the Ponder-backed aggregate endpoint (fast, resilient).
   useEffect(() => {
-    if (!publicClient) return
     let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(`${LUMINA_API_URL}/api/v1/stats/burns`, { cache: 'no-store' })
+        if (!res.ok) throw new Error(`stats/burns ${res.status}`)
+        const b = await res.json()
+        if (cancelled) return
+        setBurned(formatLumina(BigInt(b.total_lumina_burned ?? '0')))
+        setUsdcVolume(Number(formatUnits(BigInt(b.total_usdc_volume ?? '0'), 6)))
+        setLast30(formatLumina(BigInt(b.last_30_days_burned ?? '0')))
+        setSource('api')
+      } catch {
+        // API unavailable → fall through to the on-chain scan effect below.
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
+  // Fallback: read TWAPBurner.BurnExecuted directly if the API didn't answer.
+  useEffect(() => {
+    if (source === 'api' || !publicClient) return
+    let cancelled = false
     ;(async () => {
       try {
         const head = await publicClient.getBlockNumber()
@@ -50,51 +65,20 @@ export function BurnEngine() {
           toBlock: head,
         })
         if (cancelled) return
-
         const total = logs.reduce<bigint>((sum, log) => {
-          const burned = log.args?.luminaBurned
-          return burned ? sum + burned : sum
+          const v = log.args?.luminaBurned
+          return v ? sum + v : sum
         }, 0n)
-
-        if (total > 0n) {
-          setCounter(Math.round(formatLumina(total)))
-          setIsReal(true)
-        }
+        setBurned(formatLumina(total))
+        setSource('chain')
       } catch {
-        // Silent fallback: keep the mock counter rolling.
+        // Both sources failed — leave the honest 0.
       }
     })()
-
-    const unwatch = publicClient.watchContractEvent({
-      address: CONTRACTS.TWAPBurner,
-      abi: [BURN_EXECUTED_EVENT],
-      eventName: 'BurnExecuted',
-      onLogs: (incoming) => {
-        const delta = incoming.reduce<bigint>((sum, log) => {
-          const burned = log.args?.luminaBurned
-          return burned ? sum + burned : sum
-        }, 0n)
-        if (delta === 0n) return
-        setCounter((c) => c + Math.round(formatLumina(delta)))
-        setIsReal(true)
-      },
-    })
-
     return () => {
       cancelled = true
-      unwatch?.()
     }
-  }, [publicClient])
-
-  // Mock auto-increment only while we have not yet observed a real burn.
-  useEffect(() => {
-    if (isReal) return
-    const id = setInterval(
-      () => setCounter((c) => c + Math.floor(Math.random() * 60 + 5)),
-      1800,
-    )
-    return () => clearInterval(id)
-  }, [isReal])
+  }, [publicClient, source])
 
   return (
     <section className="rd-sec rd-sec-alt" id="burn">
@@ -156,13 +140,14 @@ export function BurnEngine() {
 
             <div className="rd-burn-counter">
               <div className="label">
-                TOTAL LUMINA BURNED {isReal && <span style={{ color: 'var(--rd-accent)' }}>· LIVE</span>}
+                TOTAL LUMINA BURNED{' '}
+                {source && <span style={{ color: 'var(--rd-accent)' }}>· LIVE</span>}
               </div>
-              <div className="rd-v">{counter.toLocaleString('en-US')}</div>
+              <div className="rd-v">{burned.toLocaleString('en-US')}</div>
               <div className="rd-sub">
-                {isReal
-                  ? 'Read from TWAPBurner.BurnExecuted on Base Sepolia · last 9k blocks'
-                  : '~ $46,752 destroyed forever · last 30d: 184k'}
+                {burned > 0
+                  ? `≈ $${usdcVolume.toLocaleString('en-US', { maximumFractionDigits: 2 })} premium volume · last 30d: ${last30.toLocaleString('en-US')} LUMINA`
+                  : 'Live data — production volumes accrue post-mainnet launch (testnet: 0).'}
               </div>
             </div>
           </div>
