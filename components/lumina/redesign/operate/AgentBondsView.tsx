@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useAccount, usePublicClient, useReadContracts } from 'wagmi'
 import { formatUnits, type Hex } from 'viem'
-import { DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_SEPOLIA, LUMINA_API_URL } from '@/lib/lumina-config'
 import { claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { useContracts } from '@/hooks/use-contracts'
@@ -59,6 +59,34 @@ export function AgentBondsView() {
     setErr(null)
     ;(async () => {
       try {
+        // [API-first] cached server endpoint for the wallet's bond epochs — avoids
+        // a wide client-side eth_getLogs scan ("FAILED TO LOAD"). The holdings API
+        // does not carry the mint blockNumber/txHash, so those are only populated
+        // by the on-chain fallback below; the per-epoch reads still validate state.
+        try {
+          const res = await fetch(`${LUMINA_API_URL}/api/v1/public/bonds/${address}?status=all`, { cache: 'no-store' })
+          if (res.ok) {
+            const body = (await res.json()) as { bonds?: Array<{ epochId: string; balance: string }> }
+            const blk = await publicClient.getBlockNumber()
+            if (cancelled) return
+            setLatestBlock(blk)
+            setMints(
+              (body.bonds ?? [])
+                .map((b) => ({
+                  epochId: BigInt(b.epochId),
+                  usdAmount: BigInt(b.balance),
+                  blockNumber: 0n, // not provided by the holdings API
+                  txHash: '' as `0x${string}`,
+                }))
+                .sort((a, b) => Number(b.epochId - a.epochId)),
+            )
+            return
+          }
+        } catch (apiErr) {
+          console.warn('[agent-bonds] API failed, falling back to on-chain scan:', apiErr)
+        }
+
+        // Fallback: on-chain BondsMinted scan (legacy path; full blockNumber/txHash).
         const block = await publicClient.getBlockNumber()
         if (cancelled) return
         setLatestBlock(block)

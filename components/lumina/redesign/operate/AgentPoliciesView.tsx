@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useAccount, usePublicClient } from 'wagmi'
 import { formatUnits, type Hex } from 'viem'
-import { DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_SEPOLIA, LUMINA_API_URL } from '@/lib/lumina-config'
 import { SHIELDS, SHIELD_BY_PRODUCT_ID } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { useContracts } from '@/hooks/use-contracts'
@@ -54,6 +54,43 @@ export function AgentPoliciesView() {
 
     ;(async () => {
       try {
+        // [API-first] cached server endpoint avoids a wide client-side eth_getLogs
+        // scan ("FAILED TO LOAD"); falls back to the on-chain scan if API is down.
+        try {
+          const res = await fetch(`${LUMINA_API_URL}/api/v1/public/policies/${address}`, { cache: 'no-store' })
+          if (res.ok) {
+            const body = (await res.json()) as {
+              policies?: Array<{
+                productId: string; policyId: string; coverage: string
+                premium: string; payout: string; txHash: string; blockNumber: number
+              }>
+            }
+            const blk = await publicClient.getBlockNumber()
+            if (cancelled) return
+            setLatestBlock(blk)
+            const ours: PolicyRow[] = (body.policies ?? [])
+              .map((p) => {
+                const pid = p.productId as Hex
+                return {
+                  productId: pid,
+                  policyId: BigInt(p.policyId),
+                  cover: BigInt(p.coverage),
+                  premium: BigInt(p.premium),
+                  payout: BigInt(p.payout),
+                  blockNumber: BigInt(p.blockNumber),
+                  txHash: p.txHash as Hex,
+                  shieldName: SHIELD_BY_PRODUCT_ID[pid]?.name ?? `Unknown (${pid.slice(0, 10)})`,
+                }
+              })
+              .sort((a, b) => Number(b.blockNumber - a.blockNumber))
+            setRows(ours)
+            return
+          }
+        } catch (apiErr) {
+          console.warn('[agent-policies] API failed, falling back to on-chain scan:', apiErr)
+        }
+
+        // Fallback: on-chain scan (legacy path).
         const block = await publicClient.getBlockNumber()
         if (cancelled) return
         setLatestBlock(block)
