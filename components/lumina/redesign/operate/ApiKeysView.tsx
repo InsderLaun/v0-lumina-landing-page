@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAccount, useSignMessage } from 'wagmi'
 import { AlertTriangle, Copy, Key, Loader2, Trash2 } from 'lucide-react'
 import { LUMINA_API_URL } from '@/lib/lumina-config'
-import { useApiKey } from '@/hooks/use-api-key'
 
 interface KeyRecord {
   id: number
@@ -56,9 +55,21 @@ export function ApiKeysView() {
   const [keysLoading, setKeysLoading] = useState(false)
   const [keysErr, setKeysErr] = useState<string | null>(null)
   // The plaintext key is needed to authenticate GET/DELETE — chicken-and-egg
-  // until the user generates one or pastes an existing one. Backed by the
-  // shared localStorage store so the earnings/activity pages reuse it.
-  const { apiKey: activeApiKey, setApiKey: setActiveApiKey } = useApiKey()
+  // until the user generates one or pastes an existing one.
+  //
+  // Note: kept as local useState (the previous, known-good pattern). The
+  // `lumina_api_key` localStorage entry is mirrored explicitly at each set-site
+  // below so the earnings/activity/webhooks pages (which read via useApiKey)
+  // pick the key up cross-page without ApiKeysView depending on the hook.
+  const [activeApiKey, setActiveApiKey] = useState<string | null>(null)
+  const writeSharedKey = (k: string | null): void => {
+    try {
+      if (k) window.localStorage.setItem('lumina_api_key', k)
+      else window.localStorage.removeItem('lumina_api_key')
+    } catch {
+      /* private mode / disabled storage — ignore */
+    }
+  }
 
   const refreshKeys = useCallback(async (apiKey: string) => {
     setKeysLoading(true)
@@ -119,6 +130,7 @@ export function ApiKeysView() {
       const createdAt = body.createdAt as number
       setGen({ kind: 'reveal', apiKey, label: lbl, createdAt })
       setActiveApiKey(apiKey)
+      writeSharedKey(apiKey)
       setLabel('')
     } catch (err) {
       setGen({ kind: 'error', message: err instanceof Error ? err.message : 'Onboard failed' })
@@ -298,7 +310,10 @@ export function ApiKeysView() {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         const v = (e.target as HTMLInputElement).value.trim()
-                        if (v) setActiveApiKey(v)
+                        if (v) {
+                          setActiveApiKey(v)
+                          writeSharedKey(v)
+                        }
                       }
                     }}
                     style={{ ...inputStyle, flex: 1 }}
