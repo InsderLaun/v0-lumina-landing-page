@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAccount, useSignMessage } from 'wagmi'
 import { AlertTriangle, Copy, Key, Loader2, Trash2 } from 'lucide-react'
 import { LUMINA_API_URL } from '@/lib/lumina-config'
+import { useApiKey } from '@/hooks/use-api-key'
 
 interface KeyRecord {
   id: number
@@ -55,8 +56,9 @@ export function ApiKeysView() {
   const [keysLoading, setKeysLoading] = useState(false)
   const [keysErr, setKeysErr] = useState<string | null>(null)
   // The plaintext key is needed to authenticate GET/DELETE — chicken-and-egg
-  // until the user generates one or pastes an existing one.
-  const [activeApiKey, setActiveApiKey] = useState<string | null>(null)
+  // until the user generates one or pastes an existing one. Backed by the
+  // shared localStorage store so the earnings/activity pages reuse it.
+  const { apiKey: activeApiKey, setApiKey: setActiveApiKey } = useApiKey()
 
   const refreshKeys = useCallback(async (apiKey: string) => {
     setKeysLoading(true)
