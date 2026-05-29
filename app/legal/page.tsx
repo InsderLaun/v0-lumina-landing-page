@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 export const metadata: Metadata = {
   title: "Legal · Terms, Risk Disclosure & Privacy | Lumina Protocol",
   description:
-    "Terms of Service, Risk Disclosure and Privacy scaffold for Lumina Protocol. Lumina is a TESTNET product — no real funds are at risk.",
+    "Terms of Service, Risk Disclosure and Privacy scaffold for Lumina Protocol. Lumina runs on Base mainnet (chain 8453) — real funds are at risk. DYOR.",
 };
 
 // NOTE FOR MAINTAINERS
@@ -44,23 +44,29 @@ export default function LegalPage() {
 
         <hr className="my-10 border-border" />
 
-        {/* Testnet banner */}
+        {/* Mainnet banner */}
         <section
           role="note"
-          className="mb-12 rounded-lg border border-yellow-500/40 bg-yellow-500/5 p-5"
+          className="mb-12 rounded-lg border border-red-500/40 bg-red-500/5 p-5"
         >
-          <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-yellow-500">
-            Testnet product — no real funds
+          <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-red-500">
+            Mainnet product — real funds are at risk
           </h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Lumina Protocol is currently deployed on the{" "}
-            <strong>Base Sepolia testnet</strong>. All tokens used by the
-            protocol on this network — including the mock USDC at{" "}
-            <code>0xD944d8e5D8329994D83950872Ec210891d3Ab6AE</code> — are{" "}
-            <strong>test tokens with no monetary value</strong>. No real money
-            is, or should be, at risk. Do not send mainnet assets to any address
-            referenced in this product. Premiums, payouts, bonds, and $LUMINA
-            balances on testnet have no real-world financial value.
+            Lumina Protocol is deployed on <strong>Base mainnet (chain 8453)</strong>{" "}
+            and uses Circle&rsquo;s canonical USDC at{" "}
+            <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code>. Premiums,
+            payouts, bonds, and $LUMINA balances on this network have{" "}
+            <strong>real monetary value</strong>. Smart-contract bugs, oracle
+            failures, governance attacks, liquidity gaps, regulatory action, or
+            $LUMINA price decline can result in <strong>total loss of funds</strong>.
+            Do your own research. This is not financial advice. The protocol is
+            offered &ldquo;as is&rdquo; with no warranty of any kind.
+          </p>
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+            A read-only Base Sepolia sandbox at <code>/sandbox/*</code> remains
+            available for testing — funds on Sepolia have no value and do not
+            affect mainnet positions.
           </p>
         </section>
 
@@ -74,8 +80,7 @@ export default function LegalPage() {
             API, SDK, or related interfaces (collectively, the
             &ldquo;Service&rdquo;), you agree to the following terms. The Service
             is provided on an &ldquo;as is&rdquo; and &ldquo;as available&rdquo;
-            basis, without warranties of any kind, for evaluation on a public
-            test network.
+            basis, without warranties of any kind.
           </p>
           <p className="mb-4 leading-relaxed text-muted-foreground">
             {PLACEHOLDER} Binding terms covering eligibility, acceptable use,
@@ -92,9 +97,9 @@ export default function LegalPage() {
           </h2>
           <p className="mb-4 leading-relaxed text-muted-foreground">
             Parametric coverage and on-chain financial primitives carry material
-            risks. Even on testnet, you should understand the following risk
-            factors, which would apply with real economic consequence on
-            mainnet:
+            risks. On Base mainnet these risks have real economic consequence —
+            understand the following before purchasing any policy or holding
+            $LUMINA:
           </p>
           <ul className="mb-4 list-disc space-y-3 pl-6 leading-relaxed text-muted-foreground">
             <li>

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAccount, useChainId, useDisconnect, useReadContract, useSwitchChain } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
-import { baseSepolia } from 'wagmi/chains'
+import { base } from 'wagmi/chains'
 import { erc20Abi, formatUnits } from 'viem'
 import { LogOut } from 'lucide-react'
 import { TOKENS } from '@/lib/lumina-config'
@@ -38,7 +38,7 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
   const { openConnectModal } = useConnectModal()
   const { switchChain } = useSwitchChain()
 
-  const wrongChain = isConnected && chainId !== baseSepolia.id
+  const wrongChain = isConnected && chainId !== base.id
   const links = role === 'agent' ? AGENT_LINKS : HUMAN_LINKS
   const { data: contracts } = useContracts()
 
@@ -73,20 +73,20 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
 
   return (
     <div className="rd-page" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Sepolia banner — always visible on /app/* */}
+      {/* Mainnet banner — always visible on /app/* */}
       <div
         style={{
-          background: '#3a2a0a',
-          borderBottom: '1px solid color-mix(in oklab, var(--rd-warn) 33%, transparent)',
+          background: '#0a2a14',
+          borderBottom: '1px solid color-mix(in oklab, var(--rd-accent) 33%, transparent)',
           padding: '6px 20px',
           fontSize: 11,
           fontFamily: 'var(--font-jetbrains), monospace',
-          color: 'var(--rd-warn)',
+          color: 'var(--rd-accent)',
           letterSpacing: '0.06em',
           textAlign: 'center',
         }}
       >
-        ⚠ BASE SEPOLIA TESTNET · CHAIN 84532 · NO REAL FUNDS · USE TEST USDC ONLY
+        🟢 BASE MAINNET · LIVE · CHAIN 8453
       </div>
 
       {/* Wrong-chain banner — only when connected to wrong chain */}
@@ -108,10 +108,10 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
           }}
         >
           <span>
-            ⚠ WRONG NETWORK (chain {chainId}) — Lumina runs on Base Sepolia (84532)
+            ⚠ WRONG NETWORK (chain {chainId}) — Please switch to Base mainnet (chain 8453)
           </span>
           <button
-            onClick={() => switchChain({ chainId: baseSepolia.id })}
+            onClick={() => switchChain({ chainId: base.id })}
             style={{
               padding: '4px 12px',
               background: 'var(--rd-neg)',
@@ -333,7 +333,7 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
               lineHeight: 1.5,
             }}
           >
-            v5.1 · BASE SEPOLIA
+            v5.4 · BASE MAINNET
             <br />
             <Link href="/" style={{ color: 'var(--rd-text-3)' }}>
               ← Back to lumina-org.com
@@ -401,7 +401,7 @@ function ChainPill({ chainId, wrongChain }: { chainId: number; wrongChain: boole
           color: wrongChain ? 'var(--rd-neg)' : 'var(--rd-text-2)',
         }}
       >
-        {wrongChain ? `WRONG (${chainId})` : 'BASE SEPOLIA'}
+        {wrongChain ? `WRONG (${chainId})` : 'BASE MAINNET'}
       </span>
     </div>
   )

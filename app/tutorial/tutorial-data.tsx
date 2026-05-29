@@ -2,7 +2,7 @@
 // against org-lumina/LUMINA-PROTOCOL@main and org-lumina/lumina-api@main.
 // If a number on this page disagrees with those repos, the source wins.
 //
-// V5.3 (Sprint T-30c, deployed 2026-05-21 on Base Sepolia).
+// V5.3 (Sprint T-30c, deployed 2026-05-21 on Base mainnet).
 // Five tutorials, in this order:
 //   HUMAN flow (wallet)
 //     1. Buy your first policy
@@ -38,20 +38,20 @@ function uiRef(path: string) {
 // `lib/lumina-config.ts` still holds zero-address sentinels from Sprint Z.2
 // pre-redeploy cleanup. Replace with `useContracts()` once the snapshot is
 // refreshed; until then these are the source of truth for the tutorial.
-const COVER_ROUTER = '0xcdB70B40e6a3DEac3189185d947A0e458518F566'
-const POLICY_MANAGER = '0x546C07e07DeBCdbf7a2A7Ef12C38c8c8fcAFcDd8'
-const BOND_VAULT = '0x193acBc1EdC5E565a4aBE96941C7E7AeF637B6EC'
-const CLAIM_BOND = '0xaa57Ab52Eb00f296Ad4CFA9E9c201f3737271FB4'
-const MARKETPLACE = '0x0938205f4cBe5F572656533FC930FFce6F5F4345'
+const COVER_ROUTER = '0x7A49B31DC3540E037cdCEb95765eD46f6a515aa2'
+const POLICY_MANAGER = '0x8c20dfE07a5679b8DE8376361Bc9f63eD081C268'
+const BOND_VAULT = '0x1C50d05eEF138aAa9df22a001db4a75343a604E4'
+const CLAIM_BOND = '0x8203435Bc108FaBE1beB1fe40F66a7C8B42529F1'
+const MARKETPLACE = '0xfB3ec1B507DE8a7dB50691a26f872360F0EF71AB'
 const API = LUMINA_API_URL
 
 // FlashShieldAdapter UUPS proxies — one per active flash shield (V5.3).
-const ADAPTER_FLASH_BTC_1H = '0x5d50310B9166184e822cD5368F51C1409713054f'
-const ADAPTER_FLASH_BTC_24H = '0x475b3F712707F61824122a94fE78b106260F8882'
-const ADAPTER_FLASH_BTC_48H = '0xdc6387E86F7D852D1f99F4009cFd8AdC2d500298'
-const ADAPTER_FLASH_ETH_1H = '0x57869AD3E7C56B0c96F357179DD231b407C88338'
-const ADAPTER_FLASH_ETH_24H = '0x4fD09cF98F6814Cc8b33C2E491429f59d0bCf089'
-const ADAPTER_FLASH_ETH_48H = '0x9696CFFD7dE8B1e16F83Dcc798c5CE69a61C884C'
+const ADAPTER_FLASH_BTC_1H = '0xA6A82271c1f19CfB53BbD12D4396f25051f8f563'
+const ADAPTER_FLASH_BTC_24H = '0xE62881cB4563b0508c698fA8a1efCc439c4c382D'
+const ADAPTER_FLASH_BTC_48H = '0x8Ee1662604440F70fc52c87354Fc5D145940EB52'
+const ADAPTER_FLASH_ETH_1H = '0xd51ae78C64C8fC93D80D58aA054c0B3AEfff3030'
+const ADAPTER_FLASH_ETH_24H = '0x4932996761e78899d70Aa672859E23090ccDBbB0'
+const ADAPTER_FLASH_ETH_48H = '0x9b4DFA1E1a5E79cF357470521c480710db229491'
 
 export type Audience = 'human' | 'agent'
 export type AnyStep = Omit<TutorialStepProps, 'audience'> & { audience: Audience }
@@ -91,7 +91,7 @@ export const HUMAN_STEPS: AnyStep[] = [
           local storage and re-used by every <code>/app/*</code> screen.
         </p>
         <p>
-          Make sure your wallet is on <strong>Base Sepolia</strong> (chain id{' '}
+          Make sure your wallet is on <strong>Base mainnet</strong> (chain id{' '}
           <code>{CHAIN.id}</code>, RPC <code>{CHAIN.rpc}</code>). If you are on
           the wrong network, the Operate App shows a one-click switch button
           (wagmi's <code>useSwitchChain</code>). Block explorer:{' '}
@@ -108,7 +108,7 @@ export const HUMAN_STEPS: AnyStep[] = [
         <p>
           <strong>Need test funds?</strong> Once connected, click below to
           claim <strong>10,000 mock USDC</strong> + <strong>0.05 ETH</strong>{' '}
-          on Base Sepolia. One claim per wallet per 24h. The dedicated{' '}
+          on Base mainnet. One claim per wallet per 24h. The dedicated{' '}
           <a href="/faucet" style={{ color: 'var(--rd-accent)' }}>
             /faucet
           </a>{' '}

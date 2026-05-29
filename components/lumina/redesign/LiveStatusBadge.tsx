@@ -12,7 +12,7 @@ const FETCH_TIMEOUT_MS = 5_000
 type Status = 'loading' | 'ok' | 'down'
 
 /**
- * Small live-status pill: green dot + "API live · chain 84532" when /health
+ * Small live-status pill: green dot + "API live · chain 8453" when /health
  * returns 200, red dot + "API offline" otherwise. Used in the hero to give
  * builders an at-a-glance signal that the protocol is up before they
  * integrate.

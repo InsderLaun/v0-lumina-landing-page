@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// [Audit #35 CHAIN-1] V5.1 lives on Base Sepolia. A dedicated paid RPC takes
-// precedence (so prod isn't rate-limited); public Sepolia endpoints follow as
-// fallbacks. NOTE: read NEXT_PUBLIC_RPC_URL_ALCHEMY first to match
+// [Mainnet migration 2026-05-29] V5.4 lives on Base mainnet (chainId 8453).
+// A dedicated paid RPC takes precedence (so prod isn't rate-limited); public
+// Base mainnet endpoints follow as fallbacks. NOTE: read
+// NEXT_PUBLIC_RPC_URL_ALCHEMY first to match
 // web3-provider.tsx (the wagmi transport). They previously read different var
 // names, so setting only _ALCHEMY left this proxy on the public endpoint.
 const PRIMARY_RPC = process.env.NEXT_PUBLIC_RPC_URL_ALCHEMY ?? process.env.NEXT_PUBLIC_RPC_URL
 const RPC_URLS = [
   ...(PRIMARY_RPC ? [PRIMARY_RPC] : []),
-  'https://sepolia.base.org',
-  'https://base-sepolia-rpc.publicnode.com',
+  'https://mainnet.base.org',
+  'https://base-mainnet-rpc.publicnode.com',
 ]
 
 // Only allow read-only RPC methods

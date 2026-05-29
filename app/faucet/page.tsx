@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 export const metadata = {
   title: 'Faucet · LUMINA Protocol',
   description:
-    'Get 10,000 mock USDC + 0.05 Base Sepolia ETH to test Lumina parametric shields. One claim per wallet per 24h.',
+    'Get 10,000 mock USDC + 0.05 Base mainnet ETH to test Lumina parametric shields. One claim per wallet per 24h.',
 }
 
 // Sprint USDC Mock — Phase 5.

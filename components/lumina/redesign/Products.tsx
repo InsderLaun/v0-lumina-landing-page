@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 
-// Sprint Landing Integral V5.3 — 6 productos live on Base Sepolia.
+// Sprint Landing Integral V5.3 — 6 productos live on Base mainnet.
 // FlashBTC × 3 (1h/24h/48h) + FlashETH × 3 (1h/24h/48h). RateShock está
 // pausado (CR.products.active = false + PM.productActive = false desde
 // 2026-05-22); MicroDepeg y FlashBTC 4h fueron retirados en T-30c. La

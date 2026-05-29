@@ -1,6 +1,6 @@
 # LUMINA PROTOCOL — SKILL V4.2 (SINGLE SOURCE OF TRUTH)
 ## Parametric risk speculation for humans and AI agents
-### Base Sepolia testnet (Chain 84532) | Token: $LUMINA | Last update: 2026-05-06
+### Base mainnet (Chain 8453) | Token: $LUMINA | Last update: 2026-05-06
 
 ---
 
@@ -66,7 +66,7 @@ It's not just insurance. It's parametric speculation with built-in deflation.
 
 Total supply:     100,000,000 (fixed, no mint function)
 Burn:             ERC20Burnable + BURNER_ROLE
-Chain:            Base Sepolia testnet (84532)
+Chain:            Base mainnet (8453)
 DEX:              Uniswap V3 (LUMINA/USDC)
 
 DISTRIBUTION:

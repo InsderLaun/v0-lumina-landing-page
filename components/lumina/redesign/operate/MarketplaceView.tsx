@@ -10,9 +10,9 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from 'wagmi'
-import { baseSepolia } from 'wagmi/chains'
+import { base } from 'wagmi/chains'
 import { erc20Abi, formatUnits, type Hex } from 'viem'
-import { TOKENS, DEPLOY_BLOCK_SEPOLIA, LUMINA_API_URL } from '@/lib/lumina-config'
+import { TOKENS, DEPLOY_BLOCK_MAINNET, LUMINA_API_URL } from '@/lib/lumina-config'
 import { marketplaceAbi, claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { useContracts } from '@/hooks/use-contracts'
@@ -94,7 +94,7 @@ export function MarketplaceView() {
                 { name: 'priceUSDC', type: 'uint256', indexed: false },
               ],
             },
-            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            fromBlock: DEPLOY_BLOCK_MAINNET,
             toBlock: head,
           }),
           getLogsChunked({
@@ -108,7 +108,7 @@ export function MarketplaceView() {
                 { name: 'seller', type: 'address', indexed: true },
               ],
             },
-            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            fromBlock: DEPLOY_BLOCK_MAINNET,
             toBlock: head,
           }),
           getLogsChunked({
@@ -124,7 +124,7 @@ export function MarketplaceView() {
                 { name: 'priceUSDC', type: 'uint256', indexed: false },
               ],
             },
-            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            fromBlock: DEPLOY_BLOCK_MAINNET,
             toBlock: head,
           }),
         ])
@@ -381,7 +381,7 @@ export function MarketplaceView() {
 function ListingCard({ listing, mine }: { listing: ListingRow; mine: boolean }) {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
-  const wrongChain = isConnected && chainId !== baseSepolia.id
+  const wrongChain = isConnected && chainId !== base.id
   const { data: contracts } = useContracts()
   const { writeContract, data: tx, isPending, error: writeErr, reset } = useWriteContract()
   const { isLoading: confirming, isSuccess } = useWaitForTransactionReceipt({ hash: tx })

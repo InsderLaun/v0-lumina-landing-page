@@ -3,7 +3,7 @@
 import { getDefaultConfig, RainbowKitProvider, darkTheme, connectorsForWallets } from "@rainbow-me/rainbowkit"
 import { metaMaskWallet, coinbaseWallet, rainbowWallet, walletConnectWallet } from "@rainbow-me/rainbowkit/wallets"
 import { WagmiProvider, createConfig, fallback, http } from "wagmi"
-import { baseSepolia } from "wagmi/chains"
+import { base } from "wagmi/chains"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import "@rainbow-me/rainbowkit/styles.css"
 import { type ReactNode } from "react"
@@ -54,26 +54,27 @@ const connectors = connectorsForWallets(
     { appName: "Lumina Protocol", projectId }
 )
 
-// [Audit #35 CHAIN-1] Pinned to Base Sepolia (chainId 84532) — the V5.1
-// deploy.
+// [Mainnet migration 2026-05-29] Pinned to Base mainnet (chainId 8453) —
+// V5.4 LIVE since 2026-05-28. The Sepolia sandbox at /sandbox/* is
+// fronted by lumina-api separately and does not need a wagmi config here.
 //
 // [Sprint F — multi-RPC redundancy] Wrap the transports in `fallback` so
 // browser reads survive a single provider outage. Wagmi tries Alchemy first
 // (paid, fastest); if it fails or rate-limits, falls back to QuickNode, then
-// to the public Base Sepolia RPC. Each provider unset → that slot collapses
+// to the public Base mainnet RPC. Each provider unset → that slot collapses
 // to the public endpoint, so the user always gets at least one working RPC.
-const PUBLIC_BASE_SEPOLIA = "https://sepolia.base.org"
-const ALCHEMY_RPC = process.env.NEXT_PUBLIC_RPC_URL_ALCHEMY ?? process.env.NEXT_PUBLIC_RPC_URL ?? PUBLIC_BASE_SEPOLIA
-const QUICKNODE_RPC = process.env.NEXT_PUBLIC_RPC_URL_QUICKNODE ?? PUBLIC_BASE_SEPOLIA
+const PUBLIC_BASE_MAINNET = "https://mainnet.base.org"
+const ALCHEMY_RPC = process.env.NEXT_PUBLIC_RPC_URL_ALCHEMY ?? process.env.NEXT_PUBLIC_RPC_URL ?? PUBLIC_BASE_MAINNET
+const QUICKNODE_RPC = process.env.NEXT_PUBLIC_RPC_URL_QUICKNODE ?? PUBLIC_BASE_MAINNET
 
 const config = createConfig({
     connectors,
-    chains: [baseSepolia],
+    chains: [base],
     transports: {
-        [baseSepolia.id]: fallback([
+        [base.id]: fallback([
             http(ALCHEMY_RPC),
             http(QUICKNODE_RPC),
-            http(PUBLIC_BASE_SEPOLIA),
+            http(PUBLIC_BASE_MAINNET),
         ]),
     },
     ssr: true,

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useAccount, usePublicClient, useReadContracts } from 'wagmi'
 import { formatUnits, type Hex } from 'viem'
-import { DEPLOY_BLOCK_SEPOLIA, LUMINA_API_URL } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_MAINNET, LUMINA_API_URL } from '@/lib/lumina-config'
 import { claimBondAbi } from '@/lib/abis/operate'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { useContracts } from '@/hooks/use-contracts'
@@ -104,7 +104,7 @@ export function AgentBondsView() {
             ],
           },
           args: { to: address },
-          fromBlock: DEPLOY_BLOCK_SEPOLIA,
+          fromBlock: DEPLOY_BLOCK_MAINNET,
           toBlock: block,
         })
         if (cancelled) return
@@ -393,7 +393,7 @@ function Table({ rows }: { rows: BondRow[] }) {
           </Mono>
           <Mono color="var(--rd-text-3)">{r.blockNumber.toString()}</Mono>
           <a
-            href={`https://sepolia.basescan.org/tx/${r.txHash}`}
+            href={`https://basescan.org/tx/${r.txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11 }}

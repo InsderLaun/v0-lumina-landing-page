@@ -1,18 +1,18 @@
-# E2E Test — Human policy purchase flow (Base Sepolia)
+# E2E Test — Human policy purchase flow (Base mainnet)
 
 > **Manual test checklist.** Founder runs this on a real wallet against the
-> live Base Sepolia deploy and reports back which steps pass / fail. If any
+> live Base mainnet deploy and reports back which steps pass / fail. If any
 > step fails, file an issue and stop — do not continue downstream.
 
-**Network**: Base Sepolia, chain id `84532`
+**Network**: Base mainnet, chain id `8453`
 **Frontend**: production deploy, or local `pnpm dev`
 **Wallet**: any RainbowKit-supported wallet (MetaMask, Coinbase, Rainbow, WalletConnect)
 
 ## Pre-conditions
 
-- [ ] Wallet connected with **≥ 0.001 test ETH** for gas (faucet: https://www.alchemy.com/faucets/base-sepolia)
-- [ ] Wallet has **≥ 10 test USDC** (mint via MockUSDC at `0xD944d8e5D8329994D83950872Ec210891d3Ab6AE` → `mint(yourAddress, 10000000)` for $10)
-- [ ] Wallet currently on Base Sepolia (`84532`)
+- [ ] Wallet connected with **≥ 0.001 test ETH** for gas (faucet: https://www.alchemy.com/faucets/base-mainnet)
+- [ ] Wallet has **≥ 10 test USDC** (mint via MockUSDC at `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` → `mint(yourAddress, 10000000)` for $10)
+- [ ] Wallet currently on Base mainnet (`8453`)
 - [ ] Browser console open to catch any JS errors
 
 ## Public navbar sanity (Phase 1 verification)
@@ -26,12 +26,12 @@
 
 ## Wrong-chain UX (Phase 2 verification)
 
-- [ ] Switch your wallet to **any non-Sepolia chain** (Ethereum mainnet, Polygon, etc.)
+- [ ] Switch your wallet to **any non-Base-mainnet chain** (Ethereum mainnet, Polygon, etc.)
 - [ ] Open `/app/human/products`
 - [ ] Verify the **red wrong-chain banner** is visible at the top
-- [ ] Verify the banner shows "Lumina runs on Base Sepolia (84532)" and a "Switch" button
-- [ ] Click "Switch" — wallet should prompt to switch to Sepolia; confirm
-- [ ] Banner disappears once on chain `84532`
+- [ ] Verify the banner shows "Please switch to Base mainnet (chain 8453)" and a "Switch" button
+- [ ] Click "Switch" — wallet should prompt to switch to Base mainnet; confirm
+- [ ] Banner disappears once on chain `8453`
 - [ ] Open a shield detail page; while still on the wrong chain, the **Approve** and **Buy** buttons must be **disabled** (gray, not clickable)
 
 ## Step 1 — Browse products

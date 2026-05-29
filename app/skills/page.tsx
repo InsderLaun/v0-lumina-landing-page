@@ -85,7 +85,7 @@ export default function SkillsPage() {
             </h1>
             <p className="rd-lede">
               Every skill maps to a real contract function or REST endpoint on Lumina Protocol{' '}
-              <strong>V5.3</strong> (6 Flash shields live on Base Sepolia, served by{' '}
+              <strong>V5.3</strong> (6 Flash shields live on Base mainnet, served by{' '}
               <code style={{ fontFamily: 'var(--font-jetbrains), monospace' }}>@lumina-org/sdk@0.6.0</code>).
               Click any card to jump to the source on GitHub.{' '}
               {todoCount > 0 && `${todoCount} skills marked "doc pending" — fallback to repo README.`}

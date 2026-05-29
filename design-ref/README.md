@@ -32,6 +32,6 @@ Fonts: Inter (sans), JetBrains Mono (mono), Fraunces (display serif, italic for 
 
 - Sepolia banner persistent across all /app/* routes
 - Sidebar context-switches between Human and Agent links
-- Top bar: Lumina logo + role pill + Base Sepolia status + USDC/LUMINA balances + wallet pill
+- Top bar: Lumina logo + role pill + Base mainnet status + USDC/LUMINA balances + wallet pill
 - All numeric/code text uses JetBrains Mono with letter-spacing 0.06em
 - Hero headlines use Fraunces 300 with italic emphasis on key words

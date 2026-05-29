@@ -99,7 +99,7 @@ function AppShell({ role, active, children, walletShort = '0x7a4F…3bC8', usdc 
         padding: '6px 20px', fontSize: 11, fontFamily: T.fontMono,
         color: T.warn, letterSpacing: '0.06em', textAlign: 'center',
       }}>
-        ⚠ SEPOLIA TESTNET · CHAIN 84532 · NO REAL FUNDS · USE TEST USDC ONLY
+        ⚠ SEPOLIA TESTNET · CHAIN 8453 · NO REAL FUNDS · USE TEST USDC ONLY
       </div>
 
       {/* Top bar */}

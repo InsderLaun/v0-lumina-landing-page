@@ -13,7 +13,7 @@ const BURN_EXECUTED_EVENT = parseAbiItem(
   'event BurnExecuted(uint256 usdcSpent, uint256 luminaBurned, uint256 effectivePrice, uint256 timestamp)',
 )
 
-// Public Base Sepolia RPCs cap eth_getLogs windows; ~9000 blocks is safe.
+// Public Base mainnet RPCs cap eth_getLogs windows; ~9000 blocks is safe.
 const LOG_LOOKBACK_BLOCKS = 9_000n
 
 function formatLumina(weiTotal: bigint): number {
@@ -147,7 +147,7 @@ export function BurnEngine() {
               <div className="rd-sub">
                 {burned > 0
                   ? `≈ $${usdcVolume.toLocaleString('en-US', { maximumFractionDigits: 2 })} premium volume · last 30d: ${last30.toLocaleString('en-US')} LUMINA`
-                  : 'Live data — production volumes accrue post-mainnet launch (testnet: 0).'}
+                  : 'Awaiting first burn — indexer reading Base mainnet live.'}
               </div>
             </div>
           </div>

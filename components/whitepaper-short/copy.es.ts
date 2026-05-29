@@ -5,7 +5,7 @@ import type { CodeToken, ReceiptRow, Shield } from './copy.en'
 
 export const COPY_ES = {
   s1: {
-    eyebrow: '· v5.3 · Base Sepolia · Modelo ClaimBond',
+    eyebrow: '· v5.3 · Base mainnet · Modelo ClaimBond',
     h1Pre: 'Seguro para los agentes que nunca duermen — ',
     h1Italic: 'resuelto por oráculos, quemado por código.',
     sub: 'Lumina es un protocolo de seguro paramétrico on-chain en Base L2. Cada prima en USDC pasa por el AdaptiveFeeDistributor: el 85% compra y quema $LUMINA en Uniswap V3. Cada póliza activada acuña un bono fijado en USD, redimible en 24 meses. Construido para agentes de IA autónomos que necesitan un payout en menos de un minuto.',
@@ -155,7 +155,7 @@ export const COPY_ES = {
     statLabels: ['ALTURA DE BLOQUE', 'BALANCE DEL RELAYER', 'TOTAL LUMINA QUEMADO', 'CONTRATOS VERIFICADOS'],
     fallbackBurned: 1284503,
     addressTable: { head: ['Contrato', 'Dirección'] },
-    healthFooter: 'Fuente · /health · Base Sepolia · chainId 84532',
+    healthFooter: 'Fuente · /health · Base mainnet · chainId 8453',
   },
   s10: {
     eyebrow: '10 / 10 · Comenzar ahora',

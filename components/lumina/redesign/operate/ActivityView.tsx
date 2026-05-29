@@ -157,7 +157,7 @@ export function ActivityView() {
                     <Mono color={amt ? 'var(--rd-text)' : 'var(--rd-text-3)'}>{amt ? `$${amt}` : '—'}</Mono>
                     <Mono color="var(--rd-text-3)">{timeAgo(it.blockTimestamp)}</Mono>
                     {it.txHash ? (
-                      <a href={`https://sepolia.basescan.org/tx/${it.txHash}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11 }}>
+                      <a href={`https://basescan.org/tx/${it.txHash}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11 }}>
                         {it.txHash.slice(0, 8)}… ↗
                       </a>
                     ) : (
