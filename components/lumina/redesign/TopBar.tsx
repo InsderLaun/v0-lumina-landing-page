@@ -36,7 +36,7 @@ export function TopBar() {
         </div>
         <span className="rd-topbar-divider">·</span>
         <div className="rd-topbar-item">
-          <span>BASE SEPOLIA</span> <b>TESTNET</b>
+          <span>BASE MAINNET</span> <b>LIVE</b>
         </div>
         <span className="rd-topbar-divider">·</span>
         <div className="rd-topbar-item">

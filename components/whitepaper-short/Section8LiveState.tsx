@@ -18,7 +18,7 @@ type Health = {
 // the live values are fetched from /health at runtime; this FALLBACK only
 // renders if /health is unreachable.
 const FALLBACK: Health = {
-  chain: { block: 41159517, chainId: 84532, rpcConnected: true },
+  chain: { block: 41159517, chainId: 8453, rpcConnected: true },
   relayer: { address: 'Awaiting redeploy post-Sprint Z.2', balanceWei: '19945485874244489' },
   contracts: {
     coverRouter:   'Awaiting redeploy post-Sprint Z.2',
@@ -112,7 +112,7 @@ export async function Section8LiveState({
             <div key={i} className="wp-addr">
               <div className="wp-addr__name">{r.name}</div>
               <a
-                href={`https://sepolia.basescan.org/address/${r.addr}`}
+                href={`https://basescan.org/address/${r.addr}`}
                 target="_blank" rel="noopener noreferrer"
                 className="wp-addr__hex"
               >

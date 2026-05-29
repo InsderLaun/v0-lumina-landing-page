@@ -10,7 +10,7 @@
 
 ## Resumen ejecutivo
 
-Sprint 2 entrega el "Operate App" en `/app/*` — la interfaz operativa del protocolo Lumina V5.1 sobre Base Sepolia. La app soporta dos roles: humano (compra de pólizas paramétricas vía llamadas directas a `CoverRouterV2`) y supervisor de AI agent (monitoreo read-only del wallet del agente). Se entregan 8 pantallas funcionales con datos on-chain reales, sin un solo dato hardcoded de premiums ni una sola función inventada — toda llamada a contrato fue cross-checked contra el código fuente en `org-lumina/LUMINA-PROTOCOL` @ `6a3ce42`.
+Sprint 2 entrega el "Operate App" en `/app/*` — la interfaz operativa del protocolo Lumina V5.1 sobre Base mainnet. La app soporta dos roles: humano (compra de pólizas paramétricas vía llamadas directas a `CoverRouterV2`) y supervisor de AI agent (monitoreo read-only del wallet del agente). Se entregan 8 pantallas funcionales con datos on-chain reales, sin un solo dato hardcoded de premiums ni una sola función inventada — toda llamada a contrato fue cross-checked contra el código fuente en `org-lumina/LUMINA-PROTOCOL` @ `6a3ce42`.
 
 El núcleo del sprint son las 12 componentes en `components/lumina/redesign/operate/` que orquestan reads on-chain (vía `useReadContracts` batched), log indexing client-side (eventos `PolicyCreated`, `BondsMinted`, `Listed/Cancelled/Bought`), y un state machine de approve→buy contra `CoverRouterV2.purchasePolicy`. La paleta CYAN del Sprint 1 se reutiliza intacta; la cuarentena wallet (12 archivos del audit fix PR #1) queda sin tocar.
 

@@ -1,4 +1,4 @@
-# Connectivity Audit — Base Sepolia (chain 84532)
+# Connectivity Audit — Base mainnet (chain 8453)
 
 | Field | Value |
 |---|---|
@@ -6,7 +6,7 @@
 | Frontend commit | `7648f354` (branch `chore/connectivity-audit`) |
 | LUMINA-PROTOCOL commit | `195bc8f6` (`main`) |
 | lumina-api commit | `19a1d906` (`main`) |
-| Network in scope | Base Sepolia, chain id `84532` (`0x14a34`) — testnet |
+| Network in scope | Base mainnet, chain id `8453` (`0x14a34`) — testnet |
 
 ## Summary
 
@@ -67,9 +67,9 @@ Source of truth: `/tmp/la-conn/src/routes/*.ts` at commit `19a1d906`.
 
 | Check | Result | Evidence |
 |---|---|---|
-| `wagmi.config` chain list | ✓ `[baseSepolia]` only | `components/lumina/web3-provider.tsx:63` |
+| `wagmi.config` chain list | ✓ `[base]` only | `components/lumina/web3-provider.tsx:63` |
 | RPC transport pinned to Sepolia | ✓ | `components/lumina/web3-provider.tsx:64` (`http(process.env.NEXT_PUBLIC_RPC_URL)`) |
-| Default chain | ✓ Base Sepolia | wagmi infers from single-chain list |
+| Default chain | ✓ Base mainnet | wagmi infers from single-chain list |
 | Persistent Sepolia banner in `/app/*` | ✓ | `components/lumina/redesign/operate/AppShell.tsx:74-86` |
 | Wrong-chain red banner | ✓ | `AppShell.tsx:99-128` |
 | `useSwitchChain` wired | ✓ | `AppShell.tsx:107` |
@@ -80,8 +80,8 @@ Source of truth: `/tmp/la-conn/src/routes/*.ts` at commit `19a1d906`.
 
 ### Leaks fixed in this sprint
 
-1. **`lib/wallet.ts:7`** — `BASE_CHAIN_ID = '0x2105'` (= 8453, Base mainnet). Now `'0x14a34'` (= 84532, Sepolia). The legacy `/connect` page consumes this constant.
-2. **`lib/wallet.ts:139-153`** — `wallet_addEthereumChain` prompted with `chainName: 'Base Mainnet'` and `rpcUrls: ['https://mainnet.base.org']`. Now `'Base Sepolia'` + `'https://sepolia.base.org'` + Sepolia explorer.
+1. **`lib/wallet.ts:7`** — `BASE_CHAIN_ID = '0x2105'` (= 8453, Base mainnet). Now `'0x14a34'` (= 8453, Sepolia). The legacy `/connect` page consumes this constant.
+2. **`lib/wallet.ts:139-153`** — `wallet_addEthereumChain` prompted with `chainName: 'Base Mainnet'` and `rpcUrls: ['https://mainnet.base.org']`. Now `'Base mainnet'` + `'https://mainnet.base.org'` + Sepolia explorer.
 3. **`components/lumina/redesign/Nav.tsx`** — public nav previously rendered a Connect button + WrongNetworkBanner. Both removed; wallet UX consolidated in `AppShell` (`/app/*` only).
 4. **`ShieldDetailView.tsx`**, **`MarketplaceView.tsx`** — Approve / Buy / Cancel buttons did not gate on chain id. Now they read `useChainId()` and disable while `wrongChain`.
 
@@ -104,8 +104,8 @@ None of these affect runtime behavior.
 When ready to ship Base mainnet (chain id `8453`):
 
 1. Deploy V5.1 contracts to Base mainnet; record addresses in a new mainnet block in `lib/lumina-config.ts`.
-2. Add `base` to `wagmi.config.chains` alongside `baseSepolia`, decide which is default.
+2. Add `base` to `wagmi.config.chains` alongside `base`, decide which is default.
 3. Update `lib/wallet.ts:BASE_CHAIN_ID` (or branch on env) to point at the chosen default.
-4. Update `AppShell.tsx` `wrongChain` check to allow either Base mainnet or Base Sepolia depending on env / a feature flag.
+4. Update `AppShell.tsx` `wrongChain` check to allow either Base mainnet or Base mainnet depending on env / a feature flag.
 5. Re-run this connectivity audit on mainnet — every contract address must match the new deploy.
 6. Pre-flight gates: cold-storage admin key, bug bounty active, multisig configured, audit re-run on mainnet bytecode.

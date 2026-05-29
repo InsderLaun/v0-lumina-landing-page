@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 export const metadata = {
   title: 'Lumina Protocol — Whitepaper · Español',
   description:
-    'Whitepaper completo de Lumina Protocol (Español). 6 shields paramétricos Flash BTC/ETH, BondVault único, mecánica ClaimBond, oráculo Chainlink en Base Sepolia, distribución adaptativa de quema, token deflacionario y API agent-first.',
+    'Whitepaper completo de Lumina Protocol (Español). 6 shields paramétricos Flash BTC/ETH, BondVault único, mecánica ClaimBond, oráculo Chainlink en Base mainnet, distribución adaptativa de quema, token deflacionario y API agent-first.',
 }
 
 export default function WhitepaperES() {

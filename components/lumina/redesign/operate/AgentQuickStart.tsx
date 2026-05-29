@@ -15,7 +15,7 @@ const lumina = new LuminaClient({ apiKey: process.env.LUMINA_API_KEY! })
 const provider = new JsonRpcProvider(
   process.env.NEXT_PUBLIC_RPC_URL_ALCHEMY ??
     process.env.NEXT_PUBLIC_RPC_URL ??
-    'https://base-sepolia-rpc.publicnode.com',
+    'https://base-mainnet-rpc.publicnode.com',
 )
 const buyer = new Wallet(process.env.BUYER_PRIVATE_KEY!, provider)
 

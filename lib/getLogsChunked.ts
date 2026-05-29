@@ -1,4 +1,4 @@
-// Public Base Sepolia RPCs (https://sepolia.base.org and the Alchemy free tier)
+// Public Base mainnet RPCs (https://mainnet.base.org and the Alchemy free tier)
 // reject eth_getLogs windows that span too many blocks with HTTP 413 ("payload
 // too large") or block-range errors. This helper splits the requested range
 // into bounded chunks, retries with a smaller window on size errors, and

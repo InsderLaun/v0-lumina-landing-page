@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useAccount, usePublicClient, useReadContract } from 'wagmi'
 import { erc20Abi, formatUnits, type Hex } from 'viem'
-import { TOKENS, DEPLOY_BLOCK_SEPOLIA } from '@/lib/lumina-config'
+import { TOKENS, DEPLOY_BLOCK_MAINNET } from '@/lib/lumina-config'
 import { ASSET_COLORS, SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { useContracts } from '@/hooks/use-contracts'
@@ -108,7 +108,7 @@ export function AgentDashboardView() {
                 { name: 'payout', type: 'uint256', indexed: false },
               ],
             },
-            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            fromBlock: DEPLOY_BLOCK_MAINNET,
             toBlock: head,
           }),
           getLogsChunked({
@@ -125,7 +125,7 @@ export function AgentDashboardView() {
                 { name: 'reason', type: 'bytes32', indexed: false },
               ],
             },
-            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            fromBlock: DEPLOY_BLOCK_MAINNET,
             toBlock: head,
           }),
           // BondsMinted — to IS indexed → use args filter
@@ -142,7 +142,7 @@ export function AgentDashboardView() {
               ],
             },
             args: { to: address },
-            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            fromBlock: DEPLOY_BLOCK_MAINNET,
             toBlock: head,
           }),
           // BondRedeemed — holder IS indexed
@@ -161,7 +161,7 @@ export function AgentDashboardView() {
               ],
             },
             args: { holder: address },
-            fromBlock: DEPLOY_BLOCK_SEPOLIA,
+            fromBlock: DEPLOY_BLOCK_MAINNET,
             toBlock: head,
           }),
         ])
@@ -358,7 +358,7 @@ export function AgentDashboardView() {
                 >
                   <KindPill kind={f.kind} />
                   <span style={{ color: 'var(--rd-text)' }}>{f.msg}</span>
-                  <a href={`https://sepolia.basescan.org/tx/${f.txHash}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 10, textAlign: 'right' }}>
+                  <a href={`https://basescan.org/tx/${f.txHash}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 10, textAlign: 'right' }}>
                     {f.txHash.slice(0, 10)}… ↗
                   </a>
                 </div>

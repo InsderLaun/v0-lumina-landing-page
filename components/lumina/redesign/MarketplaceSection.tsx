@@ -187,7 +187,7 @@ export function MarketplaceSection() {
             letterSpacing: '0.04em',
           }}
         >
-          Marketplace 0x0938…4345 (Base Sepolia · V5.3) · USDC settlement · 3% marketplace fee burned (1.5% seller + 1.5% buyer) · min $1/unit
+          Marketplace 0xfB3e…71AB (Base mainnet · V5.4) · USDC settlement · 3% marketplace fee burned (1.5% seller + 1.5% buyer) · min $1/unit
         </p>
       </div>
     </section>

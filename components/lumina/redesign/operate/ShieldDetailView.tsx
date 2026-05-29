@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { useAccount, useChainId, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { baseSepolia } from 'wagmi/chains'
+import { base } from 'wagmi/chains'
 import { erc20Abi, formatUnits, parseUnits } from 'viem'
 import { TOKENS } from '@/lib/lumina-config'
 import { coverRouterV2Abi } from '@/lib/abis/operate'
@@ -24,7 +24,7 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
   const [errMsg, setErrMsg] = useState<string | null>(null)
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
-  const wrongChain = isConnected && chainId !== baseSepolia.id
+  const wrongChain = isConnected && chainId !== base.id
   const { data: contracts } = useContracts()
 
   const coverWei = parseUnits(coverUsdc.toString(), 6)
@@ -362,7 +362,7 @@ export function ShieldDetailView({ shield }: { shield: ShieldDescriptor }) {
             {step === 'success' && buyTx && (
               <Banner color="var(--rd-pos)" style={{ marginTop: 10 }}>
                 ✓ Confirmed.{' '}
-                <a href={`https://sepolia.basescan.org/tx/${buyTx}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--rd-accent)' }}>
+                <a href={`https://basescan.org/tx/${buyTx}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--rd-accent)' }}>
                   View on Basescan ↗
                 </a>
                 <Link href="/app/human/portfolio" style={{ marginLeft: 8, color: 'var(--rd-accent)' }}>

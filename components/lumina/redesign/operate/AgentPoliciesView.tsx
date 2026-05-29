@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Download } from 'lucide-react'
 import { useAccount, usePublicClient } from 'wagmi'
 import { formatUnits, type Hex } from 'viem'
-import { DEPLOY_BLOCK_SEPOLIA, LUMINA_API_URL } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_MAINNET, LUMINA_API_URL } from '@/lib/lumina-config'
 import { SHIELDS, SHIELD_BY_PRODUCT_ID } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
 import { useContracts } from '@/hooks/use-contracts'
@@ -24,7 +24,7 @@ interface PolicyRow {
 }
 
 const RANGE_BLOCKS: Record<RangeFilter, bigint | null> = {
-  // Base Sepolia ~2s/block. Approximations: 24h=43200, 7d=302400, 30d=1296000.
+  // Base mainnet ~2s/block. Approximations: 24h=43200, 7d=302400, 30d=1296000.
   '24h': 43_200n,
   '7d': 302_400n,
   '30d': 1_296_000n,
@@ -110,7 +110,7 @@ export function AgentPoliciesView() {
               { name: 'payout', type: 'uint256', indexed: false },
             ],
           },
-          fromBlock: DEPLOY_BLOCK_SEPOLIA,
+          fromBlock: DEPLOY_BLOCK_MAINNET,
           toBlock: block,
         })
         if (cancelled) return
@@ -375,7 +375,7 @@ function Table({ rows }: { rows: PolicyRow[] }) {
           <Mono color="var(--rd-warn)">${fmt(r.premium, 6)}</Mono>
           <Mono color="var(--rd-pos)">${fmt(r.payout, 6)}</Mono>
           <a
-            href={`https://sepolia.basescan.org/tx/${r.txHash}`}
+            href={`https://basescan.org/tx/${r.txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11 }}

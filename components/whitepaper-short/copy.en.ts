@@ -16,7 +16,7 @@ export type Shield = {
 
 export const COPY_EN = {
   s1: {
-    eyebrow: '· v5.3 · Base Sepolia · ClaimBond Model',
+    eyebrow: '· v5.3 · Base mainnet · ClaimBond Model',
     h1Pre: 'Insurance for the agents who never sleep — ',
     h1Italic: 'settled by oracles, burned by code.',
     sub: "Lumina is a parametric on-chain insurance protocol on Base L2. Every USDC premium routes through the AdaptiveFeeDistributor: 85% buys and burns $LUMINA on Uniswap V3. Every triggered policy mints a fixed-USD bond, redeemable in 24 months. Built for autonomous AI agents that need a sub-minute payout.",
@@ -168,7 +168,7 @@ export const COPY_EN = {
     addressTable: {
       head: ['Contract', 'Address'],
     },
-    healthFooter: 'Source · /health · Base Sepolia · chainId 84532',
+    healthFooter: 'Source · /health · Base mainnet · chainId 8453',
   },
   s10: {
     eyebrow: '10 / 10 · Start now',

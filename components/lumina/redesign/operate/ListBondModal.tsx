@@ -332,7 +332,7 @@ export function ListBondModal({ epochId, faceValueBalance, maturityTs, onClose, 
 
         {listTx && (
           <a
-            href={`https://sepolia.basescan.org/tx/${listTx}`}
+            href={`https://basescan.org/tx/${listTx}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{

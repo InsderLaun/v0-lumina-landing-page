@@ -36,7 +36,7 @@ export function Hero({ stats }: { stats?: HeroStats | null }) {
         <div className="rd-hero-eyebrow" style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span className="rd-dot" />
-            <span>v5.3 · Base Sepolia · Flash Shield Adapters · ClaimBond Model</span>
+            <span>v5.4 · Base Mainnet · 19 Contracts Live</span>
           </span>
           <LiveStatusBadge />
         </div>
@@ -61,7 +61,7 @@ export function Hero({ stats }: { stats?: HeroStats | null }) {
               className="rd-hero-sub"
               style={{ marginTop: 8, fontSize: 14, color: 'var(--rd-text-3)' }}
             >
-              Six flash products live on Base Sepolia · BTC + ETH · 1h / 24h / 48h windows. Parametric
+              Six flash products live on Base mainnet · BTC + ETH · 1h / 24h / 48h windows. Parametric
               DeFi insurance — built for AI agents. Install:{' '}
               <code
                 style={{
@@ -78,6 +78,23 @@ export function Hero({ stats }: { stats?: HeroStats | null }) {
             <div className="rd-hero-cta">
               <a
                 className="rd-btn rd-btn-primary"
+                href="https://app.fjordfoundry.com/token-sales/0x8CFcaa48984F606243529808baE938c141ffA7bf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: 'linear-gradient(135deg, #ff6b00, #ffaa00)',
+                  color: '#0a0a0f',
+                  fontWeight: 700,
+                  boxShadow: '0 0 24px rgba(255, 107, 0, 0.4)',
+                }}
+              >
+                🔥 Join the LUMINA LBP on Fjord
+              </a>
+              <a
+                className="rd-btn rd-btn-ghost"
                 href="#sdk"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
               >
@@ -93,6 +110,17 @@ export function Hero({ stats }: { stats?: HeroStats | null }) {
                 I&apos;m a human
               </Link>
             </div>
+            <p
+              style={{
+                marginTop: 8,
+                fontSize: 11,
+                color: 'var(--rd-text-3)',
+                letterSpacing: '0.04em',
+                fontFamily: 'var(--font-jetbrains), monospace',
+              }}
+            >
+              🟢 LIVE ON BASE MAINNET · LBP SEEDS LUMINA/USDC POOL · 2026-05-30
+            </p>
           </div>
 
           <aside className="rd-hero-side">
@@ -142,7 +170,7 @@ export function Hero({ stats }: { stats?: HeroStats | null }) {
               </span>
             </div>
             <div style={{ marginTop: 10, fontSize: 10, color: 'var(--rd-text-3)', letterSpacing: '0.04em' }}>
-              {live ? 'Live data from Base Sepolia · refreshed ~60s' : 'Showing last known values · verify on-chain'}
+              {live ? 'Live data from Base mainnet · refreshed ~60s' : 'Showing last known values · verify on-chain'}
             </div>
           </aside>
         </div>

@@ -4,9 +4,10 @@ declare global {
   }
 }
 
-// Base Sepolia testnet (chain id 84532). V5.1 is testnet-only —
-// mainnet (0x2105 / 8453) is planned but not active.
-export const BASE_CHAIN_ID = '0x14a34';
+// Base mainnet (chain id 8453, hex 0x2105). LUMINA V5.4 LIVE since
+// 2026-05-28. The Sepolia deployment remains only at /sandbox/* for
+// wallet-less testing.
+export const BASE_CHAIN_ID = '0x2105';
 
 // Custom event fired by setStoredWallet so any component using
 // useLuminaWallet() in the same tab gets a re-render. The DOM
@@ -143,14 +144,14 @@ export const ensureBaseNetwork = async () => {
         method: 'wallet_addEthereumChain',
         params: [{
           chainId: BASE_CHAIN_ID,
-          chainName: 'Base Sepolia',
+          chainName: 'Base',
           nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
           rpcUrls: [
             process.env.NEXT_PUBLIC_RPC_URL_ALCHEMY,
             process.env.NEXT_PUBLIC_RPC_URL_QUICKNODE,
-            'https://sepolia.base.org', // last-resort fallback
+            'https://mainnet.base.org', // last-resort fallback
           ].filter(Boolean) as string[],
-          blockExplorerUrls: ['https://sepolia.basescan.org'],
+          blockExplorerUrls: ['https://basescan.org'],
         }],
       });
     }

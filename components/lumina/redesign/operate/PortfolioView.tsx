@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAccount, usePublicClient, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { erc20Abi, formatUnits, parseUnits, type Hex } from 'viem'
-import { DEPLOY_BLOCK_SEPOLIA, LUMINA_API_URL } from '@/lib/lumina-config'
+import { DEPLOY_BLOCK_MAINNET, LUMINA_API_URL } from '@/lib/lumina-config'
 import { claimBondAbi, bondVaultAbi, policyManagerV2Abi } from '@/lib/abis/operate'
 import { SHIELD_BY_PRODUCT_ID, SHIELDS } from '@/lib/operate/products'
 import { getLogsChunked } from '@/lib/getLogsChunked'
@@ -115,7 +115,7 @@ export function PortfolioView() {
               { name: 'payout', type: 'uint256', indexed: false },
             ],
           },
-          fromBlock: DEPLOY_BLOCK_SEPOLIA,
+          fromBlock: DEPLOY_BLOCK_MAINNET,
           toBlock: head,
         })
         if (cancelled) return
@@ -209,7 +209,7 @@ export function PortfolioView() {
             ],
           },
           args: { to: address },
-          fromBlock: DEPLOY_BLOCK_SEPOLIA,
+          fromBlock: DEPLOY_BLOCK_MAINNET,
           toBlock: head,
         })
         if (cancelled) return
@@ -416,7 +416,7 @@ function PoliciesTable({ rows, loading, err, onRetry }: { rows: PolicyRow[]; loa
           <Mono>${formatBaseUnits(r.cover, 6)}</Mono>
           <Mono color="var(--rd-warn)">${formatBaseUnits(r.premium, 6)}</Mono>
           <Mono color="var(--rd-pos)">${formatBaseUnits(r.payout, 6)}</Mono>
-          <a href={`https://sepolia.basescan.org/tx/${r.txHash}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11 }}>
+          <a href={`https://basescan.org/tx/${r.txHash}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--rd-text-3)', fontFamily: 'var(--font-jetbrains), monospace', fontSize: 11 }}>
             {r.txHash.slice(0, 10)}… ↗
           </a>
         </Row>

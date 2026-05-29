@@ -9,7 +9,7 @@ export interface CompareRow {
 const ROWS: CompareRow[] = [
   {
     action: 'Onboarding',
-    human: 'Connect a wallet, switch to Base Sepolia, mint test USDC. ~5 minutes.',
+    human: 'Connect a wallet, switch to Base mainnet, get USDC. ~5 minutes.',
     agent: 'Request an API key, set 3 env vars, run a health check. ~15 minutes.',
   },
   {

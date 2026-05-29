@@ -1,6 +1,6 @@
 // Curated documentation catalog for /docs page.
 // All paths verified against post-merge state of:
-//   - org-lumina/LUMINA-PROTOCOL  (V5.3 on Base Sepolia: 6 Flash shields
+//   - org-lumina/LUMINA-PROTOCOL  (V5.3 on Base mainnet: 6 Flash shields
 //                                   behind FlashShieldAdapter (UUPS) over
 //                                   BaseFlashShield slim, PolicyManagerV2
 //                                   routes through adapters)
@@ -86,7 +86,7 @@ export function docsByCategory(category: DocCategory): DocEntry[] {
 }
 
 // ────────────────────────────────────────────────────────────────
-// V5.3 deployment on Base Sepolia (chain 84532).
+// V5.3 deployment on Base mainnet (chain 8453).
 // Shield adapters were redeployed in V5.3 (PolicyManagerV2 →
 // FlashShieldAdapter (UUPS) → BaseFlashShield slim). Core V5.2
 // contracts continue to back the system — no redeploy.
@@ -101,34 +101,34 @@ export interface V53Address {
 }
 
 export const V53_NETWORK = {
-  name: 'Base Sepolia',
-  chainId: 84532,
-  explorer: 'https://sepolia.basescan.org',
+  name: 'Base mainnet',
+  chainId: 8453,
+  explorer: 'https://basescan.org',
 } as const
 
 // One FlashShieldAdapter (UUPS) per shield — 6 total on V5.3.
 export const V53_FLASH_ADAPTERS: V53Address[] = [
-  { label: 'FlashBTC1h_Adapter',  address: '0x5d50310B9166184e822cD5368F51C1409713054f', note: 'Trigger BTC -2.5% / 1h' },
-  { label: 'FlashBTC24h_Adapter', address: '0x475b3F712707F61824122a94fE78b106260F8882', note: 'Trigger BTC -6% / 24h' },
-  { label: 'FlashBTC48h_Adapter', address: '0xdc6387E86F7D852D1f99F4009cFd8AdC2d500298', note: 'Trigger BTC -10% / 48h' },
-  { label: 'FlashETH1h_Adapter',  address: '0x57869AD3E7C56B0c96F357179DD231b407C88338', note: 'Trigger ETH -4% / 1h' },
-  { label: 'FlashETH24h_Adapter', address: '0x4fD09cF98F6814Cc8b33C2E491429f59d0bCf089', note: 'Trigger ETH -8.5% / 24h' },
-  { label: 'FlashETH48h_Adapter', address: '0x9696CFFD7dE8B1e16F83Dcc798c5CE69a61C884C', note: 'Trigger ETH -14% / 48h' },
+  { label: 'FlashBTC1h_Adapter',  address: '0xA6A82271c1f19CfB53BbD12D4396f25051f8f563', note: 'Trigger BTC -2.5% / 1h' },
+  { label: 'FlashBTC24h_Adapter', address: '0xE62881cB4563b0508c698fA8a1efCc439c4c382D', note: 'Trigger BTC -6% / 24h' },
+  { label: 'FlashBTC48h_Adapter', address: '0x8Ee1662604440F70fc52c87354Fc5D145940EB52', note: 'Trigger BTC -10% / 48h' },
+  { label: 'FlashETH1h_Adapter',  address: '0xd51ae78C64C8fC93D80D58aA054c0B3AEfff3030', note: 'Trigger ETH -4% / 1h' },
+  { label: 'FlashETH24h_Adapter', address: '0x4932996761e78899d70Aa672859E23090ccDBbB0', note: 'Trigger ETH -8.5% / 24h' },
+  { label: 'FlashETH48h_Adapter', address: '0x9b4DFA1E1a5E79cF357470521c480710db229491', note: 'Trigger ETH -14% / 48h' },
 ]
 
 // Core V5.2 contracts — reused unchanged by V5.3.
 export const V53_CORE: V53Address[] = [
-  { label: 'LuminaTokenV2',          address: '0x62C0b58bB30CA857674ec593F1e23B3F15266680' },
-  { label: 'BondVault',              address: '0x193acBc1EdC5E565a4aBE96941C7E7AeF637B6EC', note: 'Throttle 1.08%/week, FIFO per epoch' },
-  { label: 'ClaimBond',              address: '0xaa57Ab52Eb00f296Ad4CFA9E9c201f3737271FB4' },
-  { label: 'CoverRouter',            address: '0xcdB70B40e6a3DEac3189185d947A0e458518F566' },
-  { label: 'PolicyManager (proxy)',  address: '0x546C07e07DeBCdbf7a2A7Ef12C38c8c8fcAFcDd8', note: 'Sprint Cleanup impl 0xdE41D414eD191A1090546078DF8e120c196Be22F' },
-  { label: 'FounderVesting',         address: '0xfF4Db529bBCd4E3CC091E07b7845241EB4762832', note: 'V2 — 3 unlock paths' },
-  { label: 'LuminaOracleV2',         address: '0x9bfa2f7A5098C89b8740D1694d1f716A0Bd871dD' },
-  { label: 'TWAPBurner',             address: '0x242d76082856901b4ba1E7c50C022D46a6941bC0' },
-  { label: 'AdaptiveFeeDistributor', address: '0xeC7841A4a9ecfb8cA58391E233A645B021c59D54', note: 'Split 85/8/2/5 (Burn/Buyback/Operations/Maintenance)' },
-  { label: 'BuybackEngine',          address: '0x56B5a1115B0d9781E7358521204d927d2F80d8B4' },
-  { label: 'Marketplace',            address: '0x0938205f4cBe5F572656533FC930FFce6F5F4345' },
+  { label: 'LuminaTokenV2',          address: '0xa35766202444d1d3D6d09Cf687B29D3C2632223C' },
+  { label: 'BondVault',              address: '0x1C50d05eEF138aAa9df22a001db4a75343a604E4', note: 'Throttle 1.08%/week, FIFO per epoch' },
+  { label: 'ClaimBond',              address: '0x8203435Bc108FaBE1beB1fe40F66a7C8B42529F1' },
+  { label: 'CoverRouter',            address: '0x7A49B31DC3540E037cdCEb95765eD46f6a515aa2' },
+  { label: 'PolicyManager (proxy)',  address: '0x8c20dfE07a5679b8DE8376361Bc9f63eD081C268', note: 'Sprint Cleanup impl 0x8c20dfE07a5679b8DE8376361Bc9f63eD081C268' },
+  { label: 'FounderVesting',         address: '0xBC5C561a13BdC886A08F4bB901E198C1Fbd2803A', note: 'V2 — 3 unlock paths' },
+  { label: 'LuminaOracleV2',         address: '0x191Be3f976CC7471aE2cc4001e92611BA0De1bef' },
+  { label: 'TWAPBurner',             address: '0x99AA64806b680AbEB073Eb2171bda138a5D52b58' },
+  { label: 'AdaptiveFeeDistributor', address: '0xafD0928BFf5488D978F16b907e4Be84B15B95AB2', note: 'Split 85/8/2/5 (Burn/Buyback/Operations/Maintenance)' },
+  { label: 'BuybackEngine',          address: '0x558F1675c10650A027e68BE33F8C5F290d8Ea307' },
+  { label: 'Marketplace',            address: '0xfB3ec1B507DE8a7dB50691a26f872360F0EF71AB' },
 ]
 
 // Off-chain surface — the SDK resolves addresses at runtime via /health,
@@ -158,7 +158,7 @@ export const V53_POLICY_TERMS = {
   marginBps: 20000,           // 2.00x
   paymentAsset: 'USDC',
   strikeSnapshot: 'spot at createPolicy',
-  sequencerL2Check: 'active (no-op on Base Sepolia)',
+  sequencerL2Check: 'active (no-op on Base mainnet)',
 } as const
 
 export const DOCS: DocEntry[] = [
@@ -185,8 +185,8 @@ export const DOCS: DocEntry[] = [
     category: 'getting-started',
   },
   {
-    title: 'V5.3 deployment addresses (Base Sepolia)',
-    description: 'Authoritative deployed addresses for the V5.3 release on Base Sepolia (chain 84532). Includes the 6 FlashShieldAdapter instances and the V5.2 core that V5.3 reuses.',
+    title: 'V5.3 deployment addresses (Base mainnet)',
+    description: 'Authoritative deployed addresses for the V5.3 release on Base mainnet (chain 8453). Includes the 6 FlashShieldAdapter instances and the V5.2 core that V5.3 reuses.',
     repo: 'LUMINA-PROTOCOL',
     path: 'docs/DEPLOYMENTS-V5.3.md',
     category: 'getting-started',

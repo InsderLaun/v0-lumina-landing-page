@@ -22,17 +22,17 @@ export default function RoleSelectPage() {
     >
       <div
         style={{
-          background: '#3a2a0a',
-          borderBottom: '1px solid color-mix(in oklab, var(--rd-warn) 33%, transparent)',
+          background: '#0a2a14',
+          borderBottom: '1px solid color-mix(in oklab, var(--rd-accent) 33%, transparent)',
           padding: '6px 20px',
           fontSize: 11,
           fontFamily: 'var(--font-jetbrains), monospace',
-          color: 'var(--rd-warn)',
+          color: 'var(--rd-accent)',
           letterSpacing: '0.06em',
           textAlign: 'center',
         }}
       >
-        ⚠ BASE SEPOLIA TESTNET · NO REAL FUNDS
+        🟢 LIVE ON BASE MAINNET · CHAIN 8453
       </div>
 
       <header

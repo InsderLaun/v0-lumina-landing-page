@@ -1,4 +1,4 @@
-// Sprint Landing Integral V5.3 — 6 flash shields on Base Sepolia.
+// Sprint Landing Integral V5.3 — 6 flash shields on Base mainnet.
 // FlashBTC × 3 (1h/24h/48h) + FlashETH × 3 (1h/24h/48h). MicroDepeg y
 // FlashBTC 4h fueron retirados en Sprint T-30c. RateShock está pausado
 // (CR.products.active = false + PM.productActive = false desde Sprint

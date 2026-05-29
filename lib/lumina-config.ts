@@ -6,68 +6,66 @@
 // Every other file in the project MUST import from this file.
 // NEVER hardcode protocol data anywhere else.
 //
-// [Audit #35 CHAIN-1] Migrated from Base Mainnet (V1/V2) to
-// Base Sepolia. Currently on V5.3 (Sprint T-30c deploy 2026-05-21):
-// 6 active flash products (FlashBTC × 3 + FlashETH × 3) wired
-// through FlashShieldAdapter UUPS proxies. V5.1 legacy products
-// (FlashBTC4h, MicroDepeg USDT, RateShock) are retired or paused
-// and their address fields here retain zero placeholders so
-// existing UI imports keep compiling; the user-facing surfaces
-// no longer reference them. A future PR can drop the legacy keys
-// entirely once all downstream imports migrate to `useShields()`
-// or `lib/operate/products.ts`.
+// [Mainnet migration 2026-05-29] V5.4 went LIVE on Base mainnet
+// (chainId 8453) on 2026-05-28. 19 core contracts + 6 Phase C
+// adapter proxies are deployed. 6 active flash products
+// (FlashBTC × 3 + FlashETH × 3) wired through FlashShieldAdapter
+// UUPS proxies and registered on PolicyManagerV2. V5.1 legacy
+// products (FlashBTC4h, MicroDepeg USDT, RateShock) were retired
+// and are NOT registered on mainnet. The Sepolia deploy lives on
+// at /sandbox/* for wallet-less integration testing only.
 // ════════════════════════════════════════════════════════════
 
 export const CHAIN = {
-  id: 84532,
-  name: "Base Sepolia",
-  hexId: "0x14a34",
-  rpc: "https://sepolia.base.org",
-  explorer: "https://sepolia.basescan.org",
-  explorerApi: "https://api-sepolia.basescan.org/api",
+  id: 8453,
+  name: "Base",
+  hexId: "0x2105",
+  rpc: "https://mainnet.base.org",
+  explorer: "https://basescan.org",
+  explorerApi: "https://api.basescan.org/api",
 } as const
 
-// Earliest block we need to scan for V5.1 events. Tightened to the actual
-// deploy on 2026-04-27 — ClaimBond was the first of the five core contracts,
-// minted at block 40_775_247 (creation tx
-// 0x6b4eac4d3d083432699c511897b21c2e49a6d3b8c6dc16f934db6add375c0616).
-// Floored to 40_775_000 to leave a small margin for any contract redeployed
-// in the same window. Bound by getLogsChunked so size is not a concern.
-export const DEPLOY_BLOCK_SEPOLIA = 41_680_000n // [perf] V5.4 contracts (ClaimBond 41680286 / BondVault 41680290 / Marketplace 41680314) all deployed ~41,680,28x; was 40,775,000 (V5.0) → ~905k empty blocks scanned per load
+// Earliest block we need to scan for V5.4 mainnet events. The Complete
+// deploy wrapper landed at block 46_608_317 on 2026-05-28; floor to
+// 46_608_000 for a small margin. Bound by getLogsChunked so size is not a
+// concern. Renamed from DEPLOY_BLOCK_MAINNET — old name kept as alias for
+// backward compat during the cutover, remove after this PR is in main.
+export const DEPLOY_BLOCK_MAINNET = 46_608_000n
 
 export const TOKENS = {
   USDC: {
-    // V5.4 testnet — MockUSDC (mintable, permissionless faucet)
-    address: "0xD944d8e5D8329994D83950872Ec210891d3Ab6AE" as `0x${string}`, // LIVE mUSDC (Base Sepolia)
+    // V5.4 mainnet — Circle USDC, canonical Base mainnet address.
+    address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as `0x${string}`,
     symbol: "USDC",
-    name: "USD Coin (mock)",
+    name: "USD Coin",
     decimals: 6,
-    issuer: "Lumina (mock for V5.1 testnet)",
+    issuer: "Circle",
   },
   aBasUSDC: {
-    // V5.1 testnet has no Aave integration; placeholder pointing at MockUSDC
-    // so any UI reading TOKENS.aBasUSDC still type-checks.
-    address: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    // Aave V3 base aUSDC. CapacityOracle reads this via FounderVesting Path 1
+    // condition C (Aave V3 USDC borrow rate). Address pinned to live Base
+    // mainnet aBasUSDC.
+    address: "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB" as `0x${string}`,
     symbol: "aBasUSDC",
-    name: "Aave Base USDC (mock)",
+    name: "Aave Base USDC",
     decimals: 6,
   },
 } as const
 
 export const AAVE = {
-  // V5.1 has no Aave integration. The pool field is set to the zero address
-  // sentinel; any UI relying on AAVE.pool should fall back to "not available".
-  pool: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+  // Aave V3 Pool on Base mainnet. Consumed by FounderVesting (PATH 1 C).
+  pool: "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5" as `0x${string}`,
   aToken: TOKENS.aBasUSDC.address,
 } as const
 
 export const ORACLES = {
-  // V5.4 testnet — Chainlink feeds on Base Sepolia (wired in DeployShieldsAndAdapters).
-  ETH_USD: "0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1" as `0x${string}`, // Chainlink ETH/USD (Base Sepolia)
-  BTC_USD: "0x0FB99723Aee6f420beAD13e6bBB79b7E6F034298" as `0x${string}`, // Chainlink BTC/USD (Base Sepolia)
+  // V5.4 mainnet — Chainlink BTC/USD + ETH/USD on Base mainnet, wired into
+  // each shield at deploy (DeployPhaseC).
+  ETH_USD: "0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70" as `0x${string}`, // Chainlink ETH/USD (Base mainnet)
+  BTC_USD: "0x64c911996D3c6aC71f9b455B1E8E7266BcbD848F" as `0x${string}`, // Chainlink BTC/USD (Base mainnet)
 } as const
 
-// CONTRACTS — V5.1 on Base Sepolia (chainId 84532).
+// CONTRACTS — V5.4 on Base mainnet (chainId 8453).
 //
 // ⚠️ DEPRECATED for client components. Prefer `useContracts()` from
 // `hooks/use-contracts.ts` (and `useShields()` from `hooks/use-shields.ts`)
@@ -86,24 +84,24 @@ export const ORACLES = {
 // LIVE V5.1 from `/api/v1/products`; for runtime resolution use
 // `useShields()` instead.
 export const CONTRACTS = {
-  // ─── Canonical LIVE V5.4 (Base Sepolia), derived on-chain — see
-  //     audit-pack/manifests/V5.4-canonical-deployed.json. Runtime source of
-  //     truth for the user-facing 6 remains /health.contracts via useContracts();
-  //     these are the static fallback (no longer zeroed). ───
-  CoverRouter: "0xcdB70B40e6a3DEac3189185d947A0e458518F566" as `0x${string}`,
-  PolicyManager: "0x546C07e07DeBCdbf7a2A7Ef12C38c8c8fcAFcDd8" as `0x${string}`,
-  LuminaToken: "0x62C0b58bB30CA857674ec593F1e23B3F15266680" as `0x${string}`,
-  ClaimBond: "0xaa57Ab52Eb00f296Ad4CFA9E9c201f3737271FB4" as `0x${string}`,
-  BondVault: "0x193acBc1EdC5E565a4aBE96941C7E7AeF637B6EC" as `0x${string}`,
-  Marketplace: "0x0938205f4cBe5F572656533FC930FFce6F5F4345" as `0x${string}`,
-  // ─── NOT in /health, static snapshot (canonical V5.4) ───
-  Oracle: "0xd52aef11ff411E9e54F7a1bB680065F158cF6545" as `0x${string}`, // CapacityOracle proxy (LIVE)
-  LuminaOracleV2: "0x9bfa2f7A5098C89b8740D1694d1f716A0Bd871dD" as `0x${string}`, // EIP-712 shield oracle (non-upgradeable)
-  Phala: "0x0000000000000000000000000000000000000000" as `0x${string}`, // not deployed
-  BuybackEngine: "0x56B5a1115B0d9781E7358521204d927d2F80d8B4" as `0x${string}`,
-  ShieldKeeper: "0x0000000000000000000000000000000000000000" as `0x${string}`, // GAP: not wired (adapter.keeper()==0x0); settlement via relayer
-  TWAPBurner: "0x242d76082856901b4ba1E7c50C022D46a6941bC0" as `0x${string}`,
-  TreasuryVesting: "0x0000000000000000000000000000000000000000" as `0x${string}`, // address not in canonical manifest — confirm on-chain before use
+  // ─── Canonical LIVE V5.4 mainnet (Base 8453), derived from the
+  //     DeployLuminaV5Mainnet broadcast manifest at 2026-05-28. Runtime
+  //     source of truth for the 6 user-facing remains /health.contracts via
+  //     useContracts(); these are the static fallback. ───
+  CoverRouter:   "0x7A49B31DC3540E037cdCEb95765eD46f6a515aa2" as `0x${string}`,
+  PolicyManager: "0x8c20dfE07a5679b8DE8376361Bc9f63eD081C268" as `0x${string}`,
+  LuminaToken:   "0xa35766202444d1d3D6d09Cf687B29D3C2632223C" as `0x${string}`,
+  ClaimBond:     "0x8203435Bc108FaBE1beB1fe40F66a7C8B42529F1" as `0x${string}`,
+  BondVault:     "0x1C50d05eEF138aAa9df22a001db4a75343a604E4" as `0x${string}`,
+  Marketplace:   "0xfB3ec1B507DE8a7dB50691a26f872360F0EF71AB" as `0x${string}`,
+  // ─── NOT in /health, static snapshot (V5.4 mainnet) ───
+  Oracle:         "0x4dFbb04b60d41A6B5693c7181d0a7Cc43d82e8E3" as `0x${string}`, // CapacityOracle proxy (LIVE mainnet)
+  LuminaOracleV2: "0x191Be3f976CC7471aE2cc4001e92611BA0De1bef" as `0x${string}`, // EIP-712 shield oracle
+  Phala:          "0x0000000000000000000000000000000000000000" as `0x${string}`, // not deployed
+  BuybackEngine:  "0x558F1675c10650A027e68BE33F8C5F290d8Ea307" as `0x${string}`,
+  ShieldKeeper:   "0x8F43fB0C7F7F3A26D9631c1f430b08CF9C6879c3" as `0x${string}`, // mainnet has it wired
+  TWAPBurner:     "0x99AA64806b680AbEB073Eb2171bda138a5D52b58" as `0x${string}`,
+  TreasuryVesting: "0x745f4a9b77b5cCaF4B418ee1e5e1865Bfe088B75" as `0x${string}`,
   // V5.1 has a SINGLE BondVault. The legacy 5-vault keys below all alias
   // BondVault so existing UI components compile; the "My Vaults" tab
   // needs a redesign to expose V5.1's actual primitives.
@@ -125,39 +123,40 @@ export const CONTRACTS = {
     Depeg:   "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → MICRODEPEG-001
     ILIndex: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → RATESHOCK-001 (closest)
     Exploit: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — → RATESHOCK-001
-    // V5.3 canonical 6 flash shields + legacy zero placeholders
-    FlashBTC1h:  "0x7d1615C90d01712a3b86Df26312aC6D8EFa0d0b3" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashBTC4h:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — not in V5.3 T-30c bundle
-    FlashBTC24h: "0x18e2D3b8Ff4D194CDB9862f8e6239E5e1145961d" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashBTC48h: "0xe206dd8fb02b1C2A0507566c3d03a27554E8CBeB" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH1h:  "0xfF1a1B20153019C22f97278204Ccfc1b1409a518" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH24h: "0x2832b5543f6F2a055312654739F0ae03F5b0b582" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH48h: "0x60dFC6610c64aC84e12afA943737Cf7733215B75" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    MicroDepeg:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
-    RateShock:   "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2)
+    // V5.4 mainnet — productShield() returns the ADAPTER proxy, which is
+    // what the SDK and PolicyManager target. The underlying drop-math
+    // shield contracts are reachable via adapter.shield() but the UI does
+    // not need them directly. Keys mirror the adapter addresses below.
+    FlashBTC1h:  "0xA6A82271c1f19CfB53BbD12D4396f25051f8f563" as `0x${string}`, // mainnet 2026-05-28
+    FlashBTC4h:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // RETIRED — not registered on mainnet
+    FlashBTC24h: "0xE62881cB4563b0508c698fA8a1efCc439c4c382D" as `0x${string}`, // mainnet 2026-05-28
+    FlashBTC48h: "0x8Ee1662604440F70fc52c87354Fc5D145940EB52" as `0x${string}`, // mainnet 2026-05-28
+    FlashETH1h:  "0xd51ae78C64C8fC93D80D58aA054c0B3AEfff3030" as `0x${string}`, // mainnet 2026-05-28
+    FlashETH24h: "0x4932996761e78899d70Aa672859E23090ccDBbB0" as `0x${string}`, // mainnet 2026-05-28
+    FlashETH48h: "0x9b4DFA1E1a5E79cF357470521c480710db229491" as `0x${string}`, // mainnet 2026-05-28
+    MicroDepeg:  "0x0000000000000000000000000000000000000000" as `0x${string}`, // RETIRED (no reliable USDT Chainlink feed on Sepolia at T-30c)
+    RateShock:   "0x0000000000000000000000000000000000000000" as `0x${string}`, // RETIRED — not registered on mainnet
   },
-  // FlashShieldAdapter UUPS proxies — one per flash shield. Sprint T-30c
-  // (V5.3, deployed 2026-05-21 on Base Sepolia, deployer
-  // 0xe585e76A0b8CbbC2d10b1110a9ac3F4c11dBfDa8). The adapter normalizes
-  // each shield's policy lifecycle behind a stable proxy interface so the
-  // landing/operate UI can wire write paths without re-fetching ABIs on
-  // every shield redeploy. Static snapshot — runtime resolution can be
-  // added later via /api/v1/products if the adapters get registered there.
+  // FlashShieldAdapter UUPS proxies — one per flash shield. Mainnet (V5.4)
+  // deployed 2026-05-28 by 0x130377f9dE9f0134Fa82e24273C0225fB23B9040 via
+  // DeployLuminaV5Mainnet wrapper (PR #187 / ADR-027). The adapter
+  // normalizes each shield's policy lifecycle behind a stable proxy
+  // interface so the landing/operate UI can wire write paths without
+  // re-fetching ABIs on every shield redeploy. These addresses ARE what
+  // PolicyManagerV2.productShield(productId) returns.
   adapters: {
-    FlashBTC1h:  "0x5d50310B9166184e822cD5368F51C1409713054f" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashBTC24h: "0x475b3F712707F61824122a94fE78b106260F8882" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashBTC48h: "0xdc6387E86F7D852D1f99F4009cFd8AdC2d500298" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH1h:  "0x57869AD3E7C56B0c96F357179DD231b407C88338" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH24h: "0x4fD09cF98F6814Cc8b33C2E491429f59d0bCf089" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
-    FlashETH48h: "0x9696CFFD7dE8B1e16F83Dcc798c5CE69a61C884C" as `0x${string}`, // Sprint T-30c V5.3 (2026-05-21)
+    FlashBTC1h:  "0xA6A82271c1f19CfB53BbD12D4396f25051f8f563" as `0x${string}`, // mainnet 2026-05-28
+    FlashBTC24h: "0xE62881cB4563b0508c698fA8a1efCc439c4c382D" as `0x${string}`, // mainnet 2026-05-28
+    FlashBTC48h: "0x8Ee1662604440F70fc52c87354Fc5D145940EB52" as `0x${string}`, // mainnet 2026-05-28
+    FlashETH1h:  "0xd51ae78C64C8fC93D80D58aA054c0B3AEfff3030" as `0x${string}`, // mainnet 2026-05-28
+    FlashETH24h: "0x4932996761e78899d70Aa672859E23090ccDBbB0" as `0x${string}`, // mainnet 2026-05-28
+    FlashETH48h: "0x9b4DFA1E1a5E79cF357470521c480710db229491" as `0x${string}`, // mainnet 2026-05-28
   },
-  // EmergencyPause / TimelockController / GnosisSafe are not deployed in V5.1
-  // testnet per protocol policy ("NO TimelockController in any deploy" — see
-  // org-lumina/LUMINA-PROTOCOL fix/v5.1-relayer-payment-flow PR description).
-  // Set to zero address sentinels so UI references resolve without throwing.
+  // V5.4 mainnet: admin roles + Ownable owners are held by a Gnosis Safe.
+  // EmergencyPause / TimelockController not deployed (per protocol policy).
   EmergencyPause: "0x0000000000000000000000000000000000000000" as `0x${string}`,
   TimelockController: "0x0000000000000000000000000000000000000000" as `0x${string}`,
-  GnosisSafe: "0x0000000000000000000000000000000000000000" as `0x${string}`, // OBSOLETE - awaiting redeploy (Sprint Z.2) — V5.1 testnet "multisig" was the deployer EOA
+  GnosisSafe: "0xa9aE612fD97f5e33B5829d16B6408ebD8422C783" as `0x${string}`, // Safe 1.4.1 on Base mainnet — admin of all UUPS proxies + AccessControl roles
 } as const
 
 // V5.1 lumina-api endpoint (public read + agent-key write surface).

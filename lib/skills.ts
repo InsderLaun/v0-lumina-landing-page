@@ -1,6 +1,6 @@
 // 24 SKILLS — full lifecycle coverage (discover → quote → buy → monitor →
 // claim → marketplace → integration). Each `githubUrl` points to a real
-// file:line in either LUMINA-PROTOCOL (V5.3 on Base Sepolia: 6 Flash shields
+// file:line in either LUMINA-PROTOCOL (V5.3 on Base mainnet: 6 Flash shields
 // behind FlashShieldAdapter (UUPS) over BaseFlashShield slim, PolicyManagerV2
 // routes through adapters) or lumina-api (V5.3: runtime address resolution
 // via GET /health; @lumina-org/sdk @ 0.6.0). `todoNote` is set when no
@@ -42,7 +42,7 @@ export const SKILLS: Skill[] = [
     number: '01',
     title: 'Browse the 6 Shields catalog',
     description:
-      'List all active parametric products on Base Sepolia (V5.3): 3 Flash BTC (1h/24h/48h) and 3 Flash ETH (1h/24h/48h). Each shield has its own contract address, trigger condition, premium formula, and capacity. RateShock is paused; FlashBTC4h and MicroDepeg are not in the V5.3 bundle.',
+      'List all active parametric products on Base mainnet (V5.3): 3 Flash BTC (1h/24h/48h) and 3 Flash ETH (1h/24h/48h). Each shield has its own contract address, trigger condition, premium formula, and capacity. RateShock is paused; FlashBTC4h and MicroDepeg are not in the V5.3 bundle.',
     audience: 'both',
     difficulty: 1,
     tags: ['read', 'catalog', 'public'],
@@ -275,7 +275,7 @@ export const SKILLS: Skill[] = [
     number: '18',
     title: 'Connect wallet via RainbowKit',
     description:
-      'The frontend bundles RainbowKit + wagmi for MetaMask, Coinbase, WalletConnect, and Rainbow. Auto-prompts to switch network if not on Base Sepolia (chain 84532).',
+      'The frontend bundles RainbowKit + wagmi for MetaMask, Coinbase, WalletConnect, and Rainbow. Auto-prompts to switch network if not on Base mainnet (chain 8453).',
     audience: 'human',
     difficulty: 1,
     tags: ['ui', 'wallet'],
@@ -301,7 +301,7 @@ export const SKILLS: Skill[] = [
     number: '20',
     title: 'Generate an agent API key',
     description:
-      'Self-service key issuance is admin-only on V5.3 testnet — request via labs@lumina-org.com with your wallet address. Max 3 active keys per wallet, plaintext shown once.',
+      'Self-service key issuance opens via POST /api/v1/agent/onboard (wallet-signed). On V5.4 mainnet, sign once and receive an `lk_…` key. Max 3 active keys per wallet, plaintext shown once.',
     audience: 'agent',
     difficulty: 2,
     tags: ['api', 'auth', 'admin'],

@@ -95,7 +95,7 @@ export function HumanProductsView() {
               marginBottom: 8,
             }}
           >
-            SHIELDS · 6 ACTIVE PRODUCTS · BASE SEPOLIA · CAPACITY ${capacityUsd}
+            SHIELDS · 6 ACTIVE PRODUCTS · BASE MAINNET · CAPACITY ${capacityUsd}
           </div>
           <h1
             style={{
@@ -191,7 +191,7 @@ export function HumanProductsView() {
             : 'ⓘ Premiums shown for $1,000 cover. Real premiums update on-chain on the detail page.'}
         </span>
         <a
-          href={coverRouterForLink ? `https://sepolia.basescan.org/address/${coverRouterForLink}` : '#'}
+          href={coverRouterForLink ? `https://basescan.org/address/${coverRouterForLink}` : '#'}
           target="_blank"
           rel="noopener noreferrer"
           aria-disabled={!coverRouterForLink}

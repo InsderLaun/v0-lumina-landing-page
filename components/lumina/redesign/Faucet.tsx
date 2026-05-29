@@ -192,24 +192,52 @@ export function FaucetButton() {
 }
 
 /**
- * Full /faucet page section. Uses the same `rd-sec` chrome as the rest of
- * the redesign landing so the page sits inside TopBar + Nav + SiteFooter
- * naturally.
+ * Full /faucet page section. Now mainnet-gated: the faucet mints mock USDC
+ * on Base Sepolia and is not applicable on Base mainnet (chain 8453, live
+ * since 2026-05-28). Hidden by default; enable with
+ * `NEXT_PUBLIC_ENABLE_TESTNET_FAUCET=true` only for preview/sandbox builds.
+ * Production users acquire USDC via Coinbase, a bridge, or Uniswap.
  */
 export function FaucetSection() {
+  if (process.env.NEXT_PUBLIC_ENABLE_TESTNET_FAUCET !== 'true') {
+    return (
+      <section className="rd-sec" id="faucet">
+        <div className="wrap">
+          <div className="rd-sec-num">
+            UTIL · <span>USDC on mainnet</span>
+          </div>
+          <h2>
+            Get USDC for <em>real</em>.
+          </h2>
+          <p className="rd-sec-lede">
+            Lumina runs on Base mainnet (chain 8453). The protocol settles in
+            Circle&rsquo;s canonical USDC at{' '}
+            <code className="mono">0x833589f…0x02913</code>. Acquire USDC via
+            Coinbase, a CEX withdrawal to Base, an L2-bridge from Ethereum
+            mainnet, or by swapping on Uniswap on Base. The testnet faucet that
+            used to live here is retired for mainnet and only available in
+            preview builds under <code>/sandbox/*</code>.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="rd-sec" id="faucet">
       <div className="wrap">
         <div className="rd-sec-num">
-          UTIL · <span>Testnet faucet</span>
+          UTIL · <span>Testnet faucet (sandbox)</span>
         </div>
         <h2>
           Get test <em>mUSDC</em> in one click.
         </h2>
         <p className="rd-sec-lede">
-          Connect your wallet, click the button, get 10,000 mock USDC and 0.05
-          Base Sepolia ETH. Enough to buy a Flash BTC 24h policy and pay gas.
-          Mock USDC is purpose-built for Lumina testnet — it has no value.
+          <strong>Sandbox-only.</strong> Connect your wallet, click the button,
+          get 10,000 mock USDC and 0.05 Base Sepolia ETH. Enough to exercise
+          the full purchase → trigger → redeem flow on Sepolia. mUSDC has no
+          monetary value — for real policies on mainnet, see{' '}
+          <a href="/contracts/deployed">contracts</a>.
         </p>
 
         <div style={{ marginTop: 24, marginBottom: 32 }}>

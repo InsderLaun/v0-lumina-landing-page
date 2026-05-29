@@ -47,7 +47,7 @@ export function SiteFooter() {
             <Link href="/skills">SKILL file</Link>
             <Link href="/docs">Smart contracts</Link>
             <Link href="/tutorial">Tutorial</Link>
-            <Link href="/faucet">Testnet faucet</Link>
+            <Link href="/faucet">USDC on Base</Link>
             <Link href="/legal">Legal · Terms &amp; Risk</Link>
           </div>
 
@@ -117,7 +117,7 @@ export function SiteFooter() {
 
         <div className="rd-foot-bottom">
           <span>© 2026 LUMINA PROTOCOL · ALL RIGHTS RESERVED</span>
-          <span>6 PRODUCTS · BASE SEPOLIA · TESTNET</span>
+          <span>6 PRODUCTS · BASE MAINNET · LIVE</span>
         </div>
       </div>
     </footer>

@@ -218,7 +218,7 @@ export function BondCard({ epochId, faceValue, maturityTs, matured, onRedeemed }
 
       {redeemTx && (
         <a
-          href={`https://sepolia.basescan.org/tx/${redeemTx}`}
+          href={`https://basescan.org/tx/${redeemTx}`}
           target="_blank"
           rel="noopener noreferrer"
           style={{
