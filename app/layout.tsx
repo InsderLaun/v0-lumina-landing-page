@@ -1,13 +1,13 @@
 import React from "react";
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Fraunces } from "next/font/google";
+import { DM_Sans, JetBrains_Mono, Bricolage_Grotesque } from "next/font/google";
 import { Providers } from "./providers";
 
 import "./globals.css";
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-body",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -15,56 +15,41 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
 });
 
-const fraunces = Fraunces({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
   variable: "--font-display",
 });
 
+const siteUrl = "https://www.insiderlaun.com";
+
 export const metadata: Metadata = {
-  title: "Lumina Protocol — The Safety Net for Autonomous AI Agents",
+  metadataBase: new URL(siteUrl),
+  title: "InsiderLaun — Memecoin Radar & Community",
   description:
-    "Parametric insurance on Base L2. Protect your AI agent against liquidations, depeg events, and bridge failures — or provide liquidity and earn real yield from premiums. Powered by Chainlink oracles. 100% automated resolution.",
-  keywords: [
-    "AI agent insurance",
-    "parametric insurance",
-    "Base L2",
-    "Chainlink",
-    "DeFi insurance",
-    "autonomous agents",
-    "machine-to-machine",
-    "M2M insurance",
-    "USDC",
-    "liquid staking",
-    "on-chain insurance",
-  ],
-  authors: [{ name: "Lumina Protocol" }],
+    "Discover memecoin culture with InsiderLaun. Follow the Telegram Live Radar, join the Discord community, and explore FOMO with our invitation.",
+  applicationName: "InsiderLaun",
+  alternates: {
+    canonical: "/",
+  },
+  keywords: ["InsiderLaun", "memecoins", "radar", "community", "internet culture"],
   icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "Lumina Protocol — The Safety Net for Autonomous AI Agents",
+    title: "InsiderLaun — Memecoin Radar & Community",
     description:
-      "Parametric insurance on Base L2 for AI agents. 5 products. 100% automated resolution via Chainlink oracles.",
-    url: "https://lumina-org.com",
-    siteName: "Lumina Protocol",
+      "Memecoin discoveries, internet culture and your people. Find the InsiderLaun radar and community.",
+    url: siteUrl,
+    siteName: "InsiderLaun",
     type: "website",
     locale: "en_US",
-    images: ["/og-image.png"],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Lumina Protocol — AI Agent Insurance on Base L2",
+    card: "summary",
+    title: "InsiderLaun — Memecoin Radar & Community",
     description:
-      "Parametric insurance for autonomous AI agents. Powered by Chainlink. 100% automated.",
-    images: ["/og-image.png"],
+      "Your home for memecoin discoveries and community. Find your people with InsiderLaun.",
   },
   robots: {
     index: true,
@@ -73,7 +58,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0f",
+  themeColor: "#141714",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -99,7 +84,7 @@ export default function RootLayout({
         `}} />
       </head>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} font-sans antialiased`}
+        className={`${dmSans.variable} ${jetbrainsMono.variable} ${bricolage.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>
