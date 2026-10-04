@@ -35,7 +35,7 @@ gcloud run deploy lumina-app --source . --region=us-central1 --port=8080 --allow
 4. Verificar resolución y sitio:
 ```bash
 nslookup www.insiderlaun.com
-``
+```
 
 ## Notas
 
