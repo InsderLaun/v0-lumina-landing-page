@@ -22,49 +22,36 @@ const fraunces = Fraunces({
   variable: "--font-display",
 });
 
+const siteUrl = "https://www.insiderlaun.com";
+
 export const metadata: Metadata = {
-  title: "Lumina Protocol — The Safety Net for Autonomous AI Agents",
+  metadataBase: new URL(siteUrl),
+  title: "InsiderLaun — Memecoin Radar & Community",
   description:
-    "Parametric insurance on Base L2. Protect your AI agent against liquidations, depeg events, and bridge failures — or provide liquidity and earn real yield from premiums. Powered by Chainlink oracles. 100% automated resolution.",
-  keywords: [
-    "AI agent insurance",
-    "parametric insurance",
-    "Base L2",
-    "Chainlink",
-    "DeFi insurance",
-    "autonomous agents",
-    "machine-to-machine",
-    "M2M insurance",
-    "USDC",
-    "liquid staking",
-    "on-chain insurance",
-  ],
-  authors: [{ name: "Lumina Protocol" }],
+    "InsiderLaun es un radar y comunidad para seguir la cultura de las memecoins. Encontrá los espacios oficiales en Telegram, Discord y FOMO Family.",
+  applicationName: "InsiderLaun",
+  alternates: {
+    canonical: "/",
+  },
+  keywords: ["InsiderLaun", "memecoins", "radar", "comunidad", "cultura onchain"],
   icons: {
-    icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "Lumina Protocol — The Safety Net for Autonomous AI Agents",
+    title: "InsiderLaun — Memecoin Radar & Community",
     description:
-      "Parametric insurance on Base L2 for AI agents. 5 products. 100% automated resolution via Chainlink oracles.",
-    url: "https://lumina-org.com",
-    siteName: "Lumina Protocol",
+      "Un radar y punto de encuentro para seguir las conversaciones y comunidades de la cultura memecoin.",
+    url: siteUrl,
+    siteName: "InsiderLaun",
     type: "website",
-    locale: "en_US",
-    images: ["/og-image.png"],
+    locale: "es_AR",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Lumina Protocol — AI Agent Insurance on Base L2",
+    card: "summary",
+    title: "InsiderLaun — Memecoin Radar & Community",
     description:
-      "Parametric insurance for autonomous AI agents. Powered by Chainlink. 100% automated.",
-    images: ["/og-image.png"],
+      "Un radar y punto de encuentro para la cultura memecoin y su comunidad.",
   },
   robots: {
     index: true,
@@ -73,7 +60,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0f",
+  themeColor: "#090b0a",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -85,7 +72,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="es" className="dark">
       <head>
         <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta httpEquiv="Pragma" content="no-cache" />
