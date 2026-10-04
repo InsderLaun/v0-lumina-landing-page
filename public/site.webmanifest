@@ -1,7 +1,7 @@
 {
-  "name": "Lumina Protocol",
-  "short_name": "Lumina",
-  "description": "Parametric DeFi insurance for humans and AI agents.",
+  "name": "InsiderLaun",
+  "short_name": "InsiderLaun",
+  "description": "Radar y comunidad para la cultura memecoin.",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -14,8 +14,8 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#00d4ff",
-  "background_color": "#0a0a0c",
+  "theme_color": "#c7fb69",
+  "background_color": "#090b0a",
   "display": "standalone",
   "start_url": "/"
 }
