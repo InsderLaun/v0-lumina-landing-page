@@ -1,13 +1,13 @@
 import React from "react";
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Fraunces } from "next/font/google";
+import { DM_Sans, JetBrains_Mono, Bricolage_Grotesque } from "next/font/google";
 import { Providers } from "./providers";
 
 import "./globals.css";
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-body",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -15,10 +15,8 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
 });
 
-const fraunces = Fraunces({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
   variable: "--font-display",
 });
 
@@ -28,12 +26,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "InsiderLaun — Memecoin Radar & Community",
   description:
-    "InsiderLaun es un radar y comunidad para seguir la cultura de las memecoins. Encontrá los espacios oficiales en Telegram, Discord y FOMO Family.",
+    "Discover memecoin culture with InsiderLaun. Follow the Telegram Live Radar, join the Discord community, and explore FOMO with our invitation.",
   applicationName: "InsiderLaun",
   alternates: {
     canonical: "/",
   },
-  keywords: ["InsiderLaun", "memecoins", "radar", "comunidad", "cultura onchain"],
+  keywords: ["InsiderLaun", "memecoins", "radar", "community", "internet culture"],
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },
@@ -41,17 +39,17 @@ export const metadata: Metadata = {
   openGraph: {
     title: "InsiderLaun — Memecoin Radar & Community",
     description:
-      "Un radar y punto de encuentro para seguir las conversaciones y comunidades de la cultura memecoin.",
+      "Memecoin discoveries, internet culture and your people. Find the InsiderLaun radar and community.",
     url: siteUrl,
     siteName: "InsiderLaun",
     type: "website",
-    locale: "es_AR",
+    locale: "en_US",
   },
   twitter: {
     card: "summary",
     title: "InsiderLaun — Memecoin Radar & Community",
     description:
-      "Un radar y punto de encuentro para la cultura memecoin y su comunidad.",
+      "Your home for memecoin discoveries and community. Find your people with InsiderLaun.",
   },
   robots: {
     index: true,
@@ -60,7 +58,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#090b0a",
+  themeColor: "#141714",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -72,7 +70,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="dark">
+    <html lang="en" className="dark">
       <head>
         <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta httpEquiv="Pragma" content="no-cache" />
@@ -86,7 +84,7 @@ export default function RootLayout({
         `}} />
       </head>
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} font-sans antialiased`}
+        className={`${dmSans.variable} ${jetbrainsMono.variable} ${bricolage.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>
