@@ -1,113 +1,120 @@
-import '@/components/lumina/redesign/redesign.css'
+import './insiderlaun.css'
 
-import { TopBar } from '@/components/lumina/redesign/TopBar'
-import { Nav } from '@/components/lumina/redesign/Nav'
-import { Hero, type HeroStats } from '@/components/lumina/redesign/Hero'
-import { HowItWorks } from '@/components/lumina/redesign/HowItWorks'
-import { Bonds } from '@/components/lumina/redesign/Bonds'
-import { Products } from '@/components/lumina/redesign/Products'
-import { SdkCta } from '@/components/lumina/redesign/SdkCta'
-import { MarketplaceSection } from '@/components/lumina/redesign/MarketplaceSection'
-import { LifecycleSection } from '@/components/lumina/redesign/LifecycleSection'
-import { BurnEngine } from '@/components/lumina/redesign/BurnEngine'
-import { Audience } from '@/components/lumina/redesign/Audience'
-import { Roadmap } from '@/components/lumina/redesign/Roadmap'
-import { CTAFooter } from '@/components/lumina/redesign/CTAFooter'
-import { SiteFooter } from '@/components/lumina/redesign/SiteFooter'
+const telegramUrl = process.env.NEXT_PUBLIC_TELEGRAM_URL
+const discordUrl = process.env.NEXT_PUBLIC_DISCORD_URL
 
-export const dynamic = 'force-dynamic'
-
-const API_BASE = 'https://lumina-api-production-ac85.up.railway.app'
-const QUOTE_COVERAGE_BASE_UNITS = '1000000000' // $1,000 in 6-dec USDC
-
-interface ApiProduct {
-  productId: string
-  name: string
-  active: boolean
-}
-
-interface QuoteResponse {
-  productId: string
-  coverageAmount: string
-  premium: string
-  payout: string
-}
-
-/**
- * Fetch live premiums for the 6 active flash shields. Runs at request time
- * (`force-dynamic`) and caches the result for 1h via Next's fetch cache.
- * On any failure the function returns `null` and the `<Products />` component
- * falls back to its hardcoded source-of-truth, so the page never breaks if
- * the API is down or build runs offline.
- */
-async function fetchLivePremiums(): Promise<Record<string, number> | null> {
-  try {
-    const productsRes = await fetch(`${API_BASE}/products`, {
-      next: { revalidate: 3600 },
-    })
-    if (!productsRes.ok) throw new Error(`/products ${productsRes.status}`)
-    const productsBody = (await productsRes.json()) as { products: ApiProduct[] }
-    const active = productsBody.products.filter((p) => p.active)
-
-    const quotes = await Promise.all(
-      active.map(async (p) => {
-        const r = await fetch(
-          `${API_BASE}/products/${p.productId}/quote?coverageAmount=${QUOTE_COVERAGE_BASE_UNITS}`,
-          { next: { revalidate: 3600 } },
-        )
-        if (!r.ok) throw new Error(`quote ${p.name} ${r.status}`)
-        const q = (await r.json()) as QuoteResponse
-        // premium is in 6-dec USDC base units; convert to dollars for $1k cover
-        return [p.name, Number(q.premium) / 1_000_000] as const
-      }),
-    )
-
-    return Object.fromEntries(quotes)
-  } catch (err) {
-    // Fail-silent: log on the server, return null so the client falls back to
-    // the hardcoded source-of-truth in `<Products />`.
-    console.error('[page.tsx] live premium fetch failed, falling back to static:', err)
-    return null
-  }
-}
-
-/**
- * Fetch the aggregated live on-chain stats (price/reserve/capacity/supply) from
- * the cached /api/v1/live-stats endpoint. ISR 60s; returns null on failure so the
- * Hero renders "—" instead of a fake number (never a fabricated value).
- */
-async function fetchLiveStats(): Promise<HeroStats | null> {
-  try {
-    const r = await fetch(`${API_BASE}/api/v1/live-stats`, { next: { revalidate: 60 } })
-    if (!r.ok) throw new Error(`/live-stats ${r.status}`)
-    return (await r.json()) as HeroStats
-  } catch (err) {
-    console.error('[page.tsx] live-stats fetch failed:', err)
-    return null
-  }
-}
-
-export default async function HomePage() {
-  const [livePremiums, liveStats] = await Promise.all([fetchLivePremiums(), fetchLiveStats()])
-
+function ArrowIcon() {
   return (
-    <div className="rd-page">
-      <TopBar />
-      <Nav />
-      <main>
-        <Hero stats={liveStats} />
-        <HowItWorks />
-        <Bonds />
-        <Products livePremiums={livePremiums ?? undefined} />
-        <SdkCta />
-        <MarketplaceSection />
-        <LifecycleSection />
-        <BurnEngine />
-        <Audience />
-        <Roadmap />
-        <CTAFooter />
-      </main>
-      <SiteFooter />
-    </div>
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <path d="M4.5 10h10.75M10 4.75 15.25 10 10 15.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function TelegramIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+      <path d="m20.47 4.17-3.1 15.02c-.23 1.06-.85 1.32-1.72.82l-4.76-3.51-2.3 2.22c-.25.25-.46.46-.94.46l.34-4.84 8.82-7.97c.38-.34-.08-.53-.59-.19L5.31 12.2.63 10.74c-1.02-.32-1.04-1.02.21-1.49L19.15 2.2c.84-.31 1.57.2 1.32 1.97Z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function DiscordIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+      <path d="M19.7 5.05a18.3 18.3 0 0 0-4.52-1.4l-.57 1.16a16.9 16.9 0 0 0-5.2 0l-.58-1.16a18.1 18.1 0 0 0-4.53 1.4C1.44 9.28.67 13.4 1.05 17.46a18.2 18.2 0 0 0 5.56 2.8l1.2-1.95c-.66-.24-1.29-.54-1.89-.9l.46-.35c3.65 1.7 7.61 1.7 11.22 0l.47.35c-.6.36-1.24.66-1.9.9l1.2 1.95a18.1 18.1 0 0 0 5.56-2.8c.45-4.7-.77-8.78-3.23-12.41ZM8.62 14.9c-1.1 0-2-.98-2-2.18s.88-2.18 2-2.18 2.02.98 2 2.18c0 1.2-.88 2.18-2 2.18Zm6.76 0c-1.1 0-2-.98-2-2.18s.88-2.18 2-2.18 2.02.98 2 2.18-.88 2.18-2 2.18Z" fill="currentColor" />
+    </svg>
+  )
+}
+
+function CommunityLink({
+  href,
+  name,
+  detail,
+  icon,
+}: {
+  href: string | undefined
+  name: string
+  detail: string
+  icon: React.ReactNode
+}) {
+  return (
+    <a
+      className="il-link-card"
+      href={href}
+      target={href ? '_blank' : undefined}
+      rel={href ? 'noreferrer' : undefined}
+      aria-disabled={!href}
+    >
+      <span className="il-link-icon">{icon}</span>
+      <span className="il-link-copy">
+        <strong>{name}</strong>
+        <span>{detail}</span>
+        {!href && <small>Enlace oficial por configurar</small>}
+      </span>
+      <span className="il-link-arrow"><ArrowIcon /></span>
+    </a>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <main className="il-page">
+      <div className="il-grain" aria-hidden="true" />
+      <header className="il-header">
+        <a className="il-brand" href="/" aria-label="InsiderLaun, inicio">
+          <span className="il-mark" aria-hidden="true"><i /><i /><i /><i /></span>
+          <span className="il-brand-name">Insider<span>Laun</span></span>
+        </a>
+        <span className="il-header-note"><span className="il-status-dot" /> MEMECOIN RADAR</span>
+      </header>
+
+      <section className="il-hero" aria-labelledby="il-title">
+        <div className="il-copy">
+          <p className="il-eyebrow"><span>01</span> CULTURA ONCHAIN · EN COMUNIDAD</p>
+          <h1 id="il-title">El pulso de las <em>memecoins.</em></h1>
+          <p className="il-description">
+            InsiderLaun es un radar y punto de encuentro para seguir las conversaciones,
+            descubrir comunidades y estar cerca de la cultura que nace onchain.
+          </p>
+
+          <div className="il-links" aria-label="Comunidades oficiales">
+            <CommunityLink
+              href={telegramUrl}
+              name="Telegram Live Radar"
+              detail="Señales y conversación en tiempo real"
+              icon={<TelegramIcon />}
+            />
+            <CommunityLink
+              href={discordUrl}
+              name="Discord Community"
+              detail="Un espacio para compartir la cultura"
+              icon={<DiscordIcon />}
+            />
+          </div>
+          <p className="il-footnote">Dos espacios. Una comunidad. Elegí por dónde empezar.</p>
+        </div>
+
+        <div className="il-art" aria-hidden="true">
+          <div className="il-orbit il-orbit-outer" />
+          <div className="il-orbit il-orbit-inner" />
+          <div className="il-orbit il-orbit-core" />
+          <div className="il-art-center">
+            <span className="il-art-monogram">IL</span>
+            <span className="il-art-caption">ONCHAIN CULTURE</span>
+          </div>
+          <span className="il-node il-node-one">MEME</span>
+          <span className="il-node il-node-two">COMMUNITY</span>
+          <span className="il-node il-node-three">RADAR</span>
+          <span className="il-spark il-spark-one" />
+          <span className="il-spark il-spark-two" />
+        </div>
+      </section>
+
+      <footer className="il-footer">
+        <span>InsiderLaun <span className="il-footer-dot">·</span> Radar de cultura memecoin</span>
+        <span className="il-footer-right">BUILT AROUND COMMUNITY <span className="il-footer-star">✳</span></span>
+      </footer>
+    </main>
   )
 }
