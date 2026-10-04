@@ -1,7 +1,8 @@
 import './insiderlaun.css'
 
-const telegramUrl = process.env.NEXT_PUBLIC_TELEGRAM_URL
-const discordUrl = process.env.NEXT_PUBLIC_DISCORD_URL
+const telegramUrl = 'https://t.me/InsiderLaun'
+const discordUrl = 'https://discord.gg/a4eJuYAbJ'
+const fomoUrl = 'https://fomo.family/r/Insider3v'
 
 function ArrowIcon() {
   return (
@@ -27,30 +28,38 @@ function DiscordIcon() {
   )
 }
 
+function FomoIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+      <path d="m12 2 2.2 6.6L21 6l-3.4 6 6.4 2.5-7 .8.5 7.1-4.5-5.5L8.5 22l1.2-7-7 .2 6.1-3.6L4 6l6.7 2.4L12 2Z" fill="currentColor" />
+    </svg>
+  )
+}
+
 function CommunityLink({
   href,
   name,
   detail,
   icon,
+  sponsored = false,
 }: {
-  href: string | undefined
+  href: string
   name: string
   detail: string
   icon: React.ReactNode
+  sponsored?: boolean
 }) {
   return (
     <a
       className="il-link-card"
       href={href}
-      target={href ? '_blank' : undefined}
-      rel={href ? 'noreferrer' : undefined}
-      aria-disabled={!href}
+      target="_blank"
+      rel={sponsored ? 'sponsored noreferrer' : 'noreferrer'}
     >
       <span className="il-link-icon">{icon}</span>
       <span className="il-link-copy">
         <strong>{name}</strong>
         <span>{detail}</span>
-        {!href && <small>Enlace oficial por configurar</small>}
       </span>
       <span className="il-link-arrow"><ArrowIcon /></span>
     </a>
@@ -78,7 +87,7 @@ export default function HomePage() {
             descubrir comunidades y estar cerca de la cultura que nace onchain.
           </p>
 
-          <div className="il-links" aria-label="Comunidades oficiales">
+          <div className="il-links" aria-label="Canales y comunidad">
             <CommunityLink
               href={telegramUrl}
               name="Telegram Live Radar"
@@ -91,8 +100,15 @@ export default function HomePage() {
               detail="Un espacio para compartir la cultura"
               icon={<DiscordIcon />}
             />
+            <CommunityLink
+              href={fomoUrl}
+              name="FOMO Family"
+              detail="Entrá a FOMO con mi invitación"
+              icon={<FomoIcon />}
+              sponsored
+            />
           </div>
-          <p className="il-footnote">Dos espacios. Una comunidad. Elegí por dónde empezar.</p>
+          <p className="il-footnote">Dos espacios para la comunidad. Un acceso extra a FOMO Family.</p>
         </div>
 
         <div className="il-art" aria-hidden="true">
