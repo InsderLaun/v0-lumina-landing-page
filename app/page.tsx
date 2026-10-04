@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import Image from 'next/image'
 import './insiderlaun.css'
 
 const telegramUrl = 'https://t.me/InsiderLaun'
@@ -156,7 +157,7 @@ export default function HomePage() {
             />
           </div>
           <a className="il-fomo" href={fomoUrl} target="_blank" rel="sponsored noopener noreferrer">
-            <span className="il-fomo-sticker" aria-hidden="true"><StarIcon /><span>F!</span></span>
+            <span className="il-fomo-logo"><Image src="/fomo-logo.svg" alt="FOMO" width={75} height={24} /></span>
             <span className="il-fomo-copy">
               <span className="il-fomo-label">YOUR INVITATION / FOMO FAMILY</span>
               <span className="il-fomo-title">There’s a place for you on FOMO, too.</span>
